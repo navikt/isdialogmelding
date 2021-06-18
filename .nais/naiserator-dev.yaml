@@ -46,9 +46,6 @@ spec:
       claims:
         extra:
           - "NAVident"
-  envFrom:
-    - configmap: loginservice-idporten
-    - secret: isdialogmelding-serviceuser
   env:
     - name: KTOR_ENV
       value: production
