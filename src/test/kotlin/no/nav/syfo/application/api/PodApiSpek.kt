@@ -66,31 +66,4 @@ object PodApiSpek : Spek({
             }
         }
     }
-    describe("Successful liveness and unsuccessful readiness checks when database not working") {
-        with(TestApplicationEngine()) {
-            start()
-            application.routing {
-                registerPodApi(
-                    ApplicationState(
-                        alive = true,
-                        ready = true
-                    ),
-                )
-            }
-
-            it("Returns ok on is_alive") {
-                with(handleRequest(HttpMethod.Get, "/is_alive")) {
-                    response.status()?.isSuccess() shouldBeEqualTo true
-                    response.content shouldNotBeEqualTo null
-                }
-            }
-
-            it("Returns internal server error when readiness check fails") {
-                with(handleRequest(HttpMethod.Get, "/is_ready")) {
-                    response.status() shouldBeEqualTo HttpStatusCode.InternalServerError
-                    response.content shouldNotBeEqualTo null
-                }
-            }
-        }
-    }
 })
