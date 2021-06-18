@@ -36,19 +36,10 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
 }
 
-val githubUser: String by project
-val githubPassword: String by project
 repositories {
     jcenter()
     maven(url = "https://packages.confluent.io/maven/")
     maven(url = "https://jitpack.io")
-    maven {
-        url = uri("https://maven.pkg.github.com/navikt/tjenestespesifikasjoner")
-        credentials {
-            username = githubUser
-            password = githubPassword
-        }
-    }
 }
 
 dependencies {
@@ -74,7 +65,6 @@ dependencies {
 
     // MQ
     implementation("com.ibm.mq:com.ibm.mq.allclient:${Versions.mqVersion}")
-    implementation("no.nav.tjenestespesifikasjoner:servicemeldingMedKontaktinformasjon-v1-tjenestespesifikasjon:${Versions.tjenesteSpesifikasjonerGithubVersion}")
 
     testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusjosejwtVersion}")
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktorVersion}")
