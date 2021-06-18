@@ -1,0 +1,67 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: isdialogmelding
+  namespace: teamsykefravr
+  labels:
+    team: teamsykefravr
+spec:
+  image: {{ image }}
+  port: 8080
+  replicas:
+    min: 1
+    max: 2
+    cpuThresholdPercentage: 70
+  liveness:
+    path: /is_alive
+    initialDelay: 60
+    periodSeconds: 5
+    timeout: 5
+    failureThreshold: 3
+  readiness:
+    path: /is_ready
+    initialDelay: 60
+    periodSeconds: 5
+    timeout: 5
+    failureThreshold: 3
+  leaderElection: true
+  prometheus:
+    enabled: true
+    path: /prometheus
+  resources:
+    limits:
+      cpu: 200m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 384Mi
+  ingresses:
+    - "https://isdialogmelding.dev.intern.nav.no"
+  azure:
+    application:
+      enabled: true
+      tenant: trygdeetaten.no
+      replyURLs:
+        - "https://isdialogmelding.dev.intern.nav.no/oauth2/callback"
+      claims:
+        extra:
+          - "NAVident"
+  envFrom:
+    - configmap: loginservice-idporten
+    - secret: isdialogmelding-serviceuser
+  env:
+    - name: KTOR_ENV
+      value: production
+    - name: TOGGLE_MQ_SENDING_ENABLED
+      value: 'true'
+    - name: MQGATEWAY_HOSTNAME
+      value: b27apvl220.preprod.local
+    - name: MQGATEWAY_PORT
+      value: '1413'
+    - name: MQGATEWAY_NAME
+      value: MQLS02
+    - name: MQGATEWAY_CHANNEL_NAME
+      value: Q1_isdialogmelding
+    - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
+      value: QA.Q414.IU03_UTSENDING
+
