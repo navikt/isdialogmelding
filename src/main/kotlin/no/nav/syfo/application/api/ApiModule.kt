@@ -2,44 +2,29 @@ package no.nav.syfo.application.api
 
 import io.ktor.application.*
 import io.ktor.routing.*
+import no.nav.syfo.api.registerDialogmeldingApi
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.authentication.installContentNegotiation
 import no.nav.syfo.application.api.authentication.installStatusPages
-import no.nav.syfo.oppfolgingsplan.registerOppfolgingsplanApi
+import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 
 fun Application.apiModule(
     applicationState: ApplicationState,
-//    mqSender: MQSenderInterface,
-    environment: Environment,
 ) {
     installContentNegotiation()
-//    installJwtAuthentication(
-//        jwtIssuerList = listOf(
-//            JwtIssuer(
-//                accectedAudienceList = environment.loginserviceIdportenAudience,
-//                jwtIssuerType = JwtIssuerType.selvbetjening,
-//                wellKnown = wellKnownSelvbetjening,
-//            ),
-//            JwtIssuer(
-//                accectedAudienceList = listOf(environment.loginserviceClientId),
-//                jwtIssuerType = JwtIssuerType.veileder,
-//                wellKnown = wellKnownVeileder,
-//            )
-//        ),
-//    )
     installStatusPages()
 
-//    val oppfolgingsplanService = OppfolgingsplanService(
-//        env = environment,
+//    val mqSender = MQSender(environment)
+
+    val oppfolgingsplanService = OppfolgingsplanService(
 //        mqSender = mqSender
-//    )
+    )
 
     routing {
         registerPodApi(applicationState)
         registerPrometheusApi()
-        registerOppfolgingsplanApi(
-//            oppfolgingsplanservice = oppfolgingsplanService
+        registerDialogmeldingApi(
+            oppfolgingsplanService = oppfolgingsplanService
         )
 
 //        authenticate(JwtIssuerType.selvbetjening.name) {

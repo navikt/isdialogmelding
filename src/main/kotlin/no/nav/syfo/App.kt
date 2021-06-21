@@ -31,13 +31,9 @@ fun main() {
                 port = applicationPort
             }
 
-//            val mqSender = MQSender(environment)
-
             module {
                 apiModule(
                     applicationState = applicationState,
-//                    mqSender = mqSender,
-                    environment = environment,
                 )
             }
         }
