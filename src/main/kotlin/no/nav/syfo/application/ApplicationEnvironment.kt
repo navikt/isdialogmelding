@@ -3,8 +3,8 @@ package no.nav.syfo.application
 import io.ktor.application.*
 
 data class Environment(
-//    val serviceuserUsername: String = getEnvVarAllowNull("SERVICEUSER_USERNAME"),
-//    val serviceuserPassword: String = getEnvVarAllowNull("SERVICEUSER_PASSWORD"),
+    val serviceuserUsername: String = getEnvVarAllowNull("SERVICEUSER_USERNAME"),
+    val serviceuserPassword: String = getEnvVarAllowNull("SERVICEUSER_PASSWORD"),
     val mqChannelName: String = getEnvVarAllowNull("MQGATEWAY_CHANNEL_NAME", "DEV.APP.SVRCONN"),
     val mqHostname: String = getEnvVarAllowNull("MQGATEWAY_HOSTNAME", "localhost"),
     val mqQueueManager: String = getEnvVarAllowNull("MQGATEWAY_NAME", "QM1"),

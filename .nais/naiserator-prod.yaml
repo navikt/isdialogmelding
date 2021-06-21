@@ -46,6 +46,8 @@ spec:
       claims:
         extra:
           - "NAVident"
+  envFrom:
+    - secret: isdialogmelding-serviceuser
   env:
     - name: KTOR_ENV
       value: "production"
