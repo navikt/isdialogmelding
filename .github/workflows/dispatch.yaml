@@ -57,7 +57,7 @@ jobs:
           docker push ${IMAGE}
           echo ${IMAGE}
   deploy-dev:
-    name: Deploy to NAIS Dev-gcp
+    name: Deploy to NAIS Dev-fss
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -65,5 +65,5 @@ jobs:
       - uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-gcp
+          CLUSTER: dev-fss
           RESOURCE: .nais/naiserator-dev.yaml

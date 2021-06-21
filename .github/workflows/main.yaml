@@ -57,7 +57,7 @@ jobs:
 
   deploy-dev:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/dev-')
-    name: Deploy to NAIS Dev-gcp
+    name: Deploy to NAIS Dev-fss
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -65,12 +65,12 @@ jobs:
       - uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-gcp
+          CLUSTER: dev-fss
           RESOURCE: .nais/naiserator-dev.yaml
 
   deploy-prod:
     if: github.ref == 'refs/heads/master'
-    name: Deploy to NAIS Prod-gcp
+    name: Deploy to NAIS Prod-fss
     needs: deploy-dev
     runs-on: ubuntu-latest
     steps:
@@ -78,6 +78,6 @@ jobs:
       - uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-gcp
+          CLUSTER: prod-fss
           RESOURCE: .nais/naiserator-prod.yaml
 
