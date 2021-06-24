@@ -37,6 +37,12 @@ spec:
       memory: 384Mi
   ingresses:
     - "https://isdialogmelding.dev.intern.nav.no"
+  accessPolicy:
+    inbound:
+      rules:
+        - application: fastlegerest
+          namespace: teamsykefravr
+          cluster: dev-fss
   azure:
     application:
       enabled: true
@@ -63,4 +69,3 @@ spec:
       value: Q1_isdialogmelding
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
       value: QA.Q414.IU03_UTSENDING
-

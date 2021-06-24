@@ -23,7 +23,7 @@ fun Route.registerDialogmeldingApi(
             try {
                 call.respond(HttpStatusCode.OK, "Vellykket!")
             } catch (e: IllegalArgumentException) {
-                val illegalArgumentMessage = "Could not get from oppfolgingsplanApi"
+                val illegalArgumentMessage = "Could not get from dialogmeldingApi"
                 log.warn("$illegalArgumentMessage: {}", e.message)
                 call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
             }

@@ -3,6 +3,8 @@ package no.nav.syfo.application
 import io.ktor.application.*
 
 data class Environment(
+    val aadAppClient: String = getEnvVar("AZURE_APP_CLIENT_ID"),
+    val azureAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),
     val serviceuserUsername: String = getEnvVarAllowNull("SERVICEUSER_USERNAME"),
     val serviceuserPassword: String = getEnvVarAllowNull("SERVICEUSER_PASSWORD"),
     val mqChannelName: String = getEnvVarAllowNull("MQGATEWAY_CHANNEL_NAME", "DEV.APP.SVRCONN"),
