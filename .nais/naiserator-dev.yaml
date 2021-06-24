@@ -35,14 +35,19 @@ spec:
     requests:
       cpu: 100m
       memory: 384Mi
-  vault:
-    enabled: true
-    paths:
-      - kvPath: serviceuser/data/dev/srvpadm2
-        mountPath: /secrets/serviceuser
-  webproxy: true
   ingresses:
     - "https://isdialogmelding.dev.intern.nav.no"
+  azure:
+    application:
+      enabled: true
+      tenant: trygdeetaten.no
+      replyURLs:
+        - "https://isdialogmelding.dev.intern.nav.no/oauth2/callback"
+      claims:
+        extra:
+          - "NAVident"
+  envFrom:
+    - secret: isdialogmelding-serviceuser
   env:
     - name: KTOR_ENV
       value: production
