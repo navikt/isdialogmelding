@@ -38,7 +38,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: serviceuser/data/prod/srvisdialogmelding
+      - kvPath: serviceuser/data/prod/isdialogmelding
         mountPath: /secrets/serviceuser
   webproxy: true
   ingresses:

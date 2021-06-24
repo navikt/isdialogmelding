@@ -38,7 +38,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: serviceuser/data/dev/srvisdialogmelding
+      - kvPath: serviceuser/data/dev/srvpadm2
         mountPath: /secrets/serviceuser
   webproxy: true
   ingresses:
