@@ -5,9 +5,9 @@ import io.ktor.application.*
 import io.ktor.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import no.nav.syfo.application.*
+import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.apiModule
-import no.nav.syfo.util.getFileAsString
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
@@ -26,10 +26,6 @@ fun main() {
             config = HoconApplicationConfig(ConfigFactory.load())
 
             val environment = Environment()
-            val vaultSecrets = VaultSecrets(
-                serviceuserPassword = getFileAsString("/secrets/serviceuser/password"),
-                serviceuserUsername = getFileAsString("/secrets/serviceuser/username"),
-            )
 
             connector {
                 port = applicationPort
