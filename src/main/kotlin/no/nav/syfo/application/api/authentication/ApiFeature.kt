@@ -13,7 +13,6 @@ import no.nav.syfo.util.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URL
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.application.api.authentication")
@@ -40,7 +39,7 @@ fun Authentication.Configuration.configureJwt(
     jwt(name = jwtIssuer.jwtIssuerType.name) {
         verifier(jwkProviderSelvbetjening, jwtIssuer.wellKnown.issuer)
         validate { credential ->
-            if (hasExpectedAudience(credential, jwtIssuer.accectedAudienceList)) {
+            if (hasExpectedAudience(credential, jwtIssuer.acceptedAudienceList)) {
                 JWTPrincipal(credential.payload)
             } else {
                 log.warn(

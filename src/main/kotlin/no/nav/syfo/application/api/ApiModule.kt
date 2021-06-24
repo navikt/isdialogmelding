@@ -1,18 +1,29 @@
 package no.nav.syfo.application.api
 
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.routing.*
 import no.nav.syfo.api.registerDialogmeldingApi
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.api.authentication.installContentNegotiation
-import no.nav.syfo.application.api.authentication.installStatusPages
+import no.nav.syfo.application.Environment
+import no.nav.syfo.application.api.authentication.*
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 
 fun Application.apiModule(
     applicationState: ApplicationState,
+    environment: Environment,
 ) {
     installContentNegotiation()
     installStatusPages()
+    installJwtAuthentication(
+        jwtIssuerList = listOf(
+            JwtIssuer(
+                acceptedAudienceList = listOf(environment.aadAppClient),
+                jwtIssuerType = JwtIssuerType.AZUREAD_V2,
+                wellKnown = getWellKnown(environment.azureAppWellKnownUrl),
+            ),
+        ),
+    )
 
 //    val mqSender = MQSender(environment)
 
@@ -23,14 +34,11 @@ fun Application.apiModule(
     routing {
         registerPodApi(applicationState)
         registerPrometheusApi()
-        registerDialogmeldingApi(
-            oppfolgingsplanService = oppfolgingsplanService
-        )
 
-//        authenticate(JwtIssuerType.selvbetjening.name) {
-//            registerOppfolgingsplanApi(
-//                oppfolgingsplanService = oppfolgingsplanService,
-//            )
-//        }
+        authenticate(JwtIssuerType.AZUREAD_V2.name) {
+            registerDialogmeldingApi(
+                oppfolgingsplanService = oppfolgingsplanService,
+            )
+        }
     }
 }

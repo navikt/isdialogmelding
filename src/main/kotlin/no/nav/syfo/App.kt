@@ -34,6 +34,7 @@ fun main() {
             module {
                 apiModule(
                     applicationState = applicationState,
+                    environment = environment,
                 )
             }
         }
