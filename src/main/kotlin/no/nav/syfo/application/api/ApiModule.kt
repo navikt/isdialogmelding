@@ -12,6 +12,7 @@ import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 fun Application.apiModule(
     applicationState: ApplicationState,
     environment: Environment,
+    oppfolgingsplanService: OppfolgingsplanService,
 ) {
     installContentNegotiation()
     installStatusPages()
@@ -23,12 +24,6 @@ fun Application.apiModule(
                 wellKnown = getWellKnown(environment.azureAppWellKnownUrl),
             ),
         ),
-    )
-
-//    val mqSender = MQSender(environment)
-
-    val oppfolgingsplanService = OppfolgingsplanService(
-//        mqSender = mqSender
     )
 
     routing {

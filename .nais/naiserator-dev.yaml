@@ -57,15 +57,13 @@ spec:
   env:
     - name: KTOR_ENV
       value: production
-    - name: TOGGLE_MQ_SENDING_ENABLED
-      value: 'true'
+    - name: MQGATEWAY_NAME
+      value: "MQLS02"
     - name: MQGATEWAY_HOSTNAME
-      value: b27apvl220.preprod.local
+      value: "b27apvl220.preprod.local"
     - name: MQGATEWAY_PORT
       value: '1413'
-    - name: MQGATEWAY_NAME
-      value: MQLS02
     - name: MQGATEWAY_CHANNEL_NAME
-      value: Q1_isdialogmelding
+      value: Q1_ISDIALOGMELDING
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
       value: QA.Q414.IU03_UTSENDING
