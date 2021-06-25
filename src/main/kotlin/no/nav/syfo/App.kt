@@ -8,6 +8,8 @@ import io.ktor.server.netty.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.apiModule
+import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
@@ -31,10 +33,16 @@ fun main() {
                 port = applicationPort
             }
 
+            val mqSender = MQSender(environment)
+            val oppfolgingsplanService = OppfolgingsplanService(
+                mqSender = mqSender
+            )
+
             module {
                 apiModule(
                     applicationState = applicationState,
                     environment = environment,
+                    oppfolgingsplanService = oppfolgingsplanService,
                 )
             }
         }

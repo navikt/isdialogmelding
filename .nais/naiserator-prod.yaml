@@ -57,13 +57,13 @@ spec:
   env:
     - name: KTOR_ENV
       value: "production"
+    - name: MQGATEWAY_NAME
+      value: "MPLS02"
     - name: MQGATEWAY_HOSTNAME
       value: "a01apvl269.adeo.no"
     - name: MQGATEWAY_PORT
       value: '1414'
-    - name: MQGATEWAY_NAME
-      value: "MPLS02"
     - name: MQGATEWAY_CHANNEL_NAME
-      value: "P_isdialogmelding"
+      value: "P_ISDIALOGMELDING"
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
       value: QA.P414.IU03_UTSENDING
