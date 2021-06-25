@@ -5,8 +5,8 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import no.nav.syfo.domain.RSHodemelding
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
+import no.nav.syfo.oppfolgingsplan.domain.RSHodemelding
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -33,8 +33,11 @@ fun Route.registerDialogmeldingApi(
                 val dialogmelding = call.receive<RSHodemelding>()
 
                 oppfolgingsplanService.sendMelding(dialogmelding)
+                call.respond(HttpStatusCode.OK, "Vellykket deling av oppfolgingsplan med lege!")
             } catch (e: Exception) {
-                log.error("FEIL! :(")
+                val errorMessage = "Feil ved sending av OP til lege!"
+                log.error(errorMessage, e)
+                call.respond(HttpStatusCode.BadRequest, e.message ?: errorMessage)
             }
         }
     }

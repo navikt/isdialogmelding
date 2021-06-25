@@ -26,6 +26,7 @@ object Versions {
     const val prometheusVersion = "0.9.0"
     const val redisEmbeddedVersion = "0.7.3"
     const val spekVersion = "2.0.15"
+    const val syfotjenesterVersion = "1.2021.06.09-13.09-b3d30de9996e"
     const val mqVersion = "9.2.2.0"
     const val tjenesteSpesifikasjonerGithubVersion = "1.2020.06.11-19.53-1cad83414166"
 }
@@ -36,10 +37,19 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
 }
 
+val githubUser: String by project
+val githubPassword: String by project
 repositories {
     jcenter()
     maven(url = "https://packages.confluent.io/maven/")
     maven(url = "https://jitpack.io")
+    maven {
+        url = uri("https://maven.pkg.github.com/navikt/syfotjenester")
+        credentials {
+            username = githubUser
+            password = githubPassword
+        }
+    }
 }
 
 dependencies {
@@ -65,6 +75,11 @@ dependencies {
 
     // MQ
     implementation("com.ibm.mq:com.ibm.mq.allclient:${Versions.mqVersion}")
+
+    implementation("no.nav.syfotjenester:fellesformat:${Versions.syfotjenesterVersion}")
+    implementation("no.nav.syfotjenester:kith-base64:${Versions.syfotjenesterVersion}")
+    implementation("no.nav.syfotjenester:kith-dialogmelding:${Versions.syfotjenesterVersion}")
+    implementation("no.nav.syfotjenester:kith-hodemelding:${Versions.syfotjenesterVersion}")
 
     testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusjosejwtVersion}")
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktorVersion}")
