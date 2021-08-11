@@ -1,4 +1,4 @@
-package no.nav.syfo.domain
+package no.nav.syfo.oppfolgingsplan.domain
 
 data class RSMottaker(
     val partnerId: String?,
