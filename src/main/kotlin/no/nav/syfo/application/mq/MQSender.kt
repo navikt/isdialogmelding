@@ -26,7 +26,7 @@ class MQSender(private val env: Environment) {
         }
     }
 
-    fun sendMessage(payload: String) {
+    fun sendMessageToEmottak(payload: String) {
         val queueName = env.emottakQueuename
 
         log.info("Sending oppfolgingsplan to behandler on queue $queueName")

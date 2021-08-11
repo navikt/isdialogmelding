@@ -10,14 +10,14 @@ import org.slf4j.LoggerFactory
 private val log = LoggerFactory.getLogger("no.nav.syfo.oppfolgingsplan")
 
 class OppfolgingsplanService(
-    mqSender: MQSender,
+    val mqSender: MQSender,
 ) {
     fun sendMelding(melding: RSHodemelding) {
         log.info("Trying to send oppfolgingsplan to lege")
 
         val fellesformat: Fellesformat = opprettDialogmelding(melding)
 
-        // TODO Send to emottak with mq!
+        mqSender.sendMessageToEmottak(fellesformat.message!!)
     }
 
     private fun opprettDialogmelding(hodemelding: RSHodemelding): Fellesformat {
