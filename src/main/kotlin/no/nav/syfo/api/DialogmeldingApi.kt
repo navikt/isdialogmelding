@@ -5,6 +5,8 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import no.nav.syfo.metric.COUNT_SEND_OPPFOLGINGSPLAN_FAILED
+import no.nav.syfo.metric.COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 import no.nav.syfo.oppfolgingsplan.domain.RSHodemelding
 import org.slf4j.Logger
@@ -34,10 +36,14 @@ fun Route.registerDialogmeldingApi(
 
                 oppfolgingsplanService.sendMelding(dialogmelding)
                 call.respond(HttpStatusCode.OK, "Vellykket deling av oppfolgingsplan med lege!")
+
+                COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS.inc()
             } catch (e: Exception) {
                 val errorMessage = "Feil ved sending av OP til lege!"
                 log.error(errorMessage, e)
                 call.respond(HttpStatusCode.BadRequest, e.message ?: errorMessage)
+
+                COUNT_SEND_OPPFOLGINGSPLAN_FAILED.inc()
             }
         }
     }
