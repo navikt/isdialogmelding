@@ -6,6 +6,7 @@ import com.ibm.msg.client.jms.JmsConstants.JMS_IBM_ENCODING
 import com.ibm.msg.client.jms.JmsFactoryFactory
 import com.ibm.msg.client.wmq.common.CommonConstants.*
 import no.nav.syfo.application.Environment
+import no.nav.syfo.metric.COUNT_SEND_MESSAGE_EMOTTAK_MQ
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.jms.ConnectionFactory
@@ -35,6 +36,7 @@ class MQSender(private val env: Environment) {
             val message = context.createTextMessage(payload)
             context.createProducer().send(destination, message)
         }
+        COUNT_SEND_MESSAGE_EMOTTAK_MQ.inc()
     }
 
     private fun connectionFactory(env: Environment): ConnectionFactory {
