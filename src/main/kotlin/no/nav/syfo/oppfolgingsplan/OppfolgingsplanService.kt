@@ -13,7 +13,7 @@ class OppfolgingsplanService(
     val mqSender: MQSender,
 ) {
     fun sendMelding(melding: RSHodemelding) {
-        log.info("Trying to send oppfolgingsplan to lege")
+        log.info("Trying to send oppfolgingsplan to lege with partnerId: ${melding.meldingInfo?.mottaker?.partnerId}")
 
         val fellesformat: Fellesformat = opprettDialogmelding(melding)
 
