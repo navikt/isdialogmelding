@@ -36,7 +36,7 @@ class MQSender(private val env: Environment) {
             val message = context.createTextMessage(payload)
             context.createProducer().send(destination, message)
         }
-        COUNT_SEND_MESSAGE_EMOTTAK_MQ.inc()
+        COUNT_SEND_MESSAGE_EMOTTAK_MQ.increment()
     }
 
     private fun connectionFactory(env: Environment): ConnectionFactory {

@@ -14,6 +14,7 @@ fun Application.apiModule(
     environment: Environment,
     oppfolgingsplanService: OppfolgingsplanService,
 ) {
+    installMetrics()
     installContentNegotiation()
     installStatusPages()
     installJwtAuthentication(
