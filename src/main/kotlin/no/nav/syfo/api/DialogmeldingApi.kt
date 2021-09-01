@@ -37,13 +37,13 @@ fun Route.registerDialogmeldingApi(
                 oppfolgingsplanService.sendMelding(dialogmelding)
                 call.respond(HttpStatusCode.OK, "Vellykket deling av oppfolgingsplan med lege!")
 
-                COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS.inc()
+                COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS.increment()
             } catch (e: Exception) {
                 val errorMessage = "Feil ved sending av OP til lege!"
                 log.error(errorMessage, e)
                 call.respond(HttpStatusCode.BadRequest, e.message ?: errorMessage)
 
-                COUNT_SEND_OPPFOLGINGSPLAN_FAILED.inc()
+                COUNT_SEND_OPPFOLGINGSPLAN_FAILED.increment()
             }
         }
     }
