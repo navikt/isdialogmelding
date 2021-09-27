@@ -43,6 +43,9 @@ spec:
         - application: fastlegerest
           namespace: teamsykefravr
           cluster: prod-fss
+    outbound:
+      external:
+        - host: "fastlegerest.prod-fss-pub.nais.io"
   azure:
     application:
       enabled: true
@@ -67,3 +70,7 @@ spec:
       value: "P_ISDIALOGMELDING"
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
       value: QA.P414.IU03_UTSENDING
+    - name: FASTLEGEREST_CLIENT_ID
+      value: "prod-fss.teamsykefravr.fastlegerest"
+    - name: FASTLEGEREST_URL
+      value: "https://fastlegerest.prod-fss-pub.nais.io"
