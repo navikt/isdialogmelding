@@ -7,6 +7,8 @@ import no.nav.syfo.api.registerDialogmeldingApi
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.authentication.*
+import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.fastlege.FastlegeClient
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 
 fun Application.apiModule(
@@ -25,6 +27,19 @@ fun Application.apiModule(
                 wellKnown = getWellKnown(environment.azureAppWellKnownUrl),
             ),
         ),
+    )
+
+    val azureAdClient = AzureAdClient(
+        azureAppClientId = environment.aadAppClient,
+        azureAppClientSecret = environment.azureAppClientSecret,
+        azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint
+    )
+
+    // TODO: Ta i bruk fra nytt api for å hente behandlere som man kan motta dialogmelding
+    val fastlegeClient = FastlegeClient(
+        azureAdClient = azureAdClient,
+        fastlegeRestClientId = environment.fastlegeRestClientId,
+        fastlegeRestUrl = environment.fastlegeRestUrl
     )
 
     routing {
