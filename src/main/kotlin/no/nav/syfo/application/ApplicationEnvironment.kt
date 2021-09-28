@@ -17,6 +17,8 @@ data class Environment(
     val mqApplicationName: String = "isdialogmelding",
     val fastlegeRestClientId: String = getEnvVar("FASTLEGEREST_CLIENT_ID"),
     val fastlegeRestUrl: String = getEnvVar("FASTLEGEREST_URL"),
+    val syfoPartnerinfoClientId: String = getEnvVar("SYFOPARTNERINFO_CLIENT_ID"),
+    val syfoPartnerinfoUrl: String = getEnvVar("SYFOPARTNERINFO_URL"),
 )
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =

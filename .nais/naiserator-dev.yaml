@@ -46,6 +46,7 @@ spec:
     outbound:
       external:
         - host: "fastlegerest.dev-fss-pub.nais.io"
+        - host: "syfopartnerinfo.dev-fss-pub.nais.io"
   azure:
     application:
       enabled: true
@@ -74,3 +75,7 @@ spec:
       value: "dev-fss.teamsykefravr.fastlegerest"
     - name: FASTLEGEREST_URL
       value: "https://fastlegerest.dev-fss-pub.nais.io"
+    - name: SYFOPARTNERINFO_CLIENT_ID
+      value: "dev-fss.teamsykefravr.syfopartnerinfo"
+    - name: SYFOPARTNERINFO_URL
+      value: "https://syfopartnerinfo.dev-fss-pub.nais.io"
