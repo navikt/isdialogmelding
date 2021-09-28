@@ -10,6 +10,7 @@ import no.nav.syfo.application.api.authentication.*
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.fastlege.FastlegeClient
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
+import no.nav.syfo.partnerinfo.PartnerinfoClient
 
 fun Application.apiModule(
     applicationState: ApplicationState,
@@ -32,14 +33,19 @@ fun Application.apiModule(
     val azureAdClient = AzureAdClient(
         azureAppClientId = environment.aadAppClient,
         azureAppClientSecret = environment.azureAppClientSecret,
-        azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint
+        azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
     )
 
-    // TODO: Ta i bruk fra nytt api for å hente behandlere som man kan motta dialogmelding
+    // TODO: Ta i bruk fra nytt api for å hente behandlere som kan motta dialogmelding
     val fastlegeClient = FastlegeClient(
         azureAdClient = azureAdClient,
         fastlegeRestClientId = environment.fastlegeRestClientId,
-        fastlegeRestUrl = environment.fastlegeRestUrl
+        fastlegeRestUrl = environment.fastlegeRestUrl,
+    )
+    val partnerinfoClient = PartnerinfoClient(
+        azureAdClient = azureAdClient,
+        syfoPartnerinfoClientId = environment.syfoPartnerinfoClientId,
+        syfoPartnerinfoUrl = environment.syfoPartnerinfoUrl,
     )
 
     routing {
