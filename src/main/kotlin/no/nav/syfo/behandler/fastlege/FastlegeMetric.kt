@@ -1,4 +1,4 @@
-package no.nav.syfo.fastlege
+package no.nav.syfo.behandler.fastlege
 
 import io.micrometer.core.instrument.Counter
 import no.nav.syfo.metric.METRICS_NS

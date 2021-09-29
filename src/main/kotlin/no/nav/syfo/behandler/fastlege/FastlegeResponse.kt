@@ -1,5 +1,6 @@
-package no.nav.syfo.fastlege
+package no.nav.syfo.behandler.fastlege
 
+import no.nav.syfo.behandler.domain.Fastlege
 import java.time.LocalDate
 
 data class FastlegeResponse(
@@ -16,7 +17,7 @@ data class FastlegeResponse(
 ) {
     data class Pasient(
         val fornavn: String?,
-        val mellom: String?,
+        val mellomnavn: String?,
         val etternavn: String?,
         val fnr: String?,
     )
@@ -38,6 +39,29 @@ data class FastlegeResponse(
 
     data class Pasientforhold(
         val fom: LocalDate,
-        val tom: LocalDate
+        val tom: LocalDate,
+    )
+}
+
+fun FastlegeResponse.Fastlegekontor.toKontor(): Fastlege.Kontor {
+    return Fastlege.Kontor(
+        orgnummer = this.orgnummer,
+        adresse = this.postadresse?.adresse,
+        postnummer = this.postadresse?.postnummer,
+        poststed = this.postadresse?.poststed,
+        telefon = this.telefon,
+    )
+}
+
+fun FastlegeResponse.toFastlege(partnerId: Int): Fastlege {
+    return Fastlege(
+        fornavn = this.fornavn,
+        mellomnavn = this.mellomnavn,
+        etternavn = this.etternavn,
+        partnerId = partnerId,
+        herId = this.herId,
+        helsepersonellregisterId = this.helsepersonellregisterId,
+        fnr = this.fnr,
+        kontor = this.fastlegekontor.toKontor(),
     )
 }
