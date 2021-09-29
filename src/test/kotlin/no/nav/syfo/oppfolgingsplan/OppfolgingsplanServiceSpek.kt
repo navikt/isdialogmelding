@@ -4,9 +4,9 @@ import io.mockk.*
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.testhelper.generator.defaultFellesformatMessageXmlRegex
 import no.nav.syfo.testhelper.generator.generateRSHodemelding
+import org.junit.Assert.assertTrue
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import kotlin.test.assertTrue
 
 object OppfolgingsplanServiceSpek : Spek({
 
