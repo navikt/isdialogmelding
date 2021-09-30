@@ -13,6 +13,7 @@ import no.nav.syfo.behandler.api.registerBehandlerApi
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 
 fun Application.apiModule(
@@ -38,6 +39,11 @@ fun Application.apiModule(
         azureAppClientId = environment.aadAppClient,
         azureAppClientSecret = environment.azureAppClientSecret,
         azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+    )
+    val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
+        azureAdClient = azureAdClient,
+        syfotilgangskontrollClientId = environment.syfotilgangskontrollClientId,
+        tilgangskontrollBaseUrl = environment.syfotilgangskontrollUrl,
     )
 
     val fastlegeClient = FastlegeClient(
@@ -67,7 +73,8 @@ fun Application.apiModule(
                 oppfolgingsplanService = oppfolgingsplanService,
             )
             registerBehandlerApi(
-                behandlerService = behandlerService
+                behandlerService = behandlerService,
+                veilederTilgangskontrollClient = veilederTilgangskontrollClient,
             )
         }
     }

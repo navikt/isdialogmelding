@@ -19,6 +19,8 @@ data class Environment(
     val fastlegeRestUrl: String = getEnvVar("FASTLEGEREST_URL"),
     val syfoPartnerinfoClientId: String = getEnvVar("SYFOPARTNERINFO_CLIENT_ID"),
     val syfoPartnerinfoUrl: String = getEnvVar("SYFOPARTNERINFO_URL"),
+    val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),
+    val syfotilgangskontrollUrl: String = getEnvVar("SYFOTILGANGSKONTROLL_URL"),
 )
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =

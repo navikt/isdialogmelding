@@ -47,6 +47,7 @@ spec:
       external:
         - host: "fastlegerest.dev-fss-pub.nais.io"
         - host: "syfopartnerinfo.dev-fss-pub.nais.io"
+        - host: "syfo-tilgangskontroll.dev-fss-pub.nais.io"
   azure:
     application:
       enabled: true
@@ -79,3 +80,7 @@ spec:
       value: "dev-fss.teamsykefravr.syfopartnerinfo"
     - name: SYFOPARTNERINFO_URL
       value: "https://syfopartnerinfo.dev-fss-pub.nais.io"
+    - name: SYFOTILGANGSKONTROLL_CLIENT_ID
+      value: "dev-fss.teamsykefravr.syfo-tilgangskontroll"
+    - name: SYFOTILGANGSKONTROLL_URL
+      value: "https://syfo-tilgangskontroll.dev-fss-pub.nais.io"
