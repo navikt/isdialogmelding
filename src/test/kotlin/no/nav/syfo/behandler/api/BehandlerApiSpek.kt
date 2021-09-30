@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.syfo.testhelper.*
+import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
 import no.nav.syfo.testhelper.generator.generatePartnerinfoResponse
 import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
@@ -152,6 +153,16 @@ class BehandlerApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.BadRequest
+                        }
+                    }
+                    it("should return status Forbidden if denied access to personident supplied in $NAV_PERSONIDENT_HEADER") {
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_VEILEDER_NO_ACCESS.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.Forbidden
                         }
                     }
                 }

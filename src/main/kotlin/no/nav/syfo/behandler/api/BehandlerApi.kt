@@ -6,6 +6,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.domain.toBehandlerDialogmeldingDTO
+import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
@@ -20,6 +21,7 @@ const val behandlerPersonident = "/personident"
 
 fun Route.registerBehandlerApi(
     behandlerService: BehandlerService,
+    veilederTilgangskontrollClient: VeilederTilgangskontrollClient,
 ) {
     route(behandlerPath) {
         get(behandlerPersonident) {
@@ -31,15 +33,25 @@ fun Route.registerBehandlerApi(
                     PersonIdentNumber(personIdent)
                 } ?: throw IllegalArgumentException("No PersonIdent supplied")
 
-                val fastlege = behandlerService.getFastlegeMedPartnerinfo(
+                val hasAccess = veilederTilgangskontrollClient.hasAccess(
+                    callId = callId,
                     personIdentNumber = personIdentNumber,
                     token = token,
-                    callId = callId,
                 )
-                val behandlerDialogmeldingDTOList =
-                    fastlege?.let { listOf(fastlege.toBehandlerDialogmeldingDTO()) } ?: emptyList()
-
-                call.respond(behandlerDialogmeldingDTOList)
+                if (hasAccess) {
+                    val fastlege = behandlerService.getFastlegeMedPartnerinfo(
+                        personIdentNumber = personIdentNumber,
+                        token = token,
+                        callId = callId,
+                    )
+                    val behandlerDialogmeldingDTOList =
+                        fastlege?.let { listOf(fastlege.toBehandlerDialogmeldingDTO()) } ?: emptyList()
+                    call.respond(behandlerDialogmeldingDTOList)
+                } else {
+                    val accessDeniedMessage = "Denied Veileder access to PersonIdent"
+                    log.warn("$accessDeniedMessage, {}", callId)
+                    call.respond(HttpStatusCode.Forbidden, accessDeniedMessage)
+                }
             } catch (e: IllegalArgumentException) {
                 val illegalArgumentMessage = "Could not retrieve list of BehandlerDialogmelding for PersonIdent"
                 log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)

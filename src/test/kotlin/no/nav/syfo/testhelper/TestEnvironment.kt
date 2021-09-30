@@ -8,6 +8,7 @@ fun testEnvironment(
     azureOpenidConfigTokenEndpoint: String,
     fastlegeRestUrl: String,
     syfoPartnerinfoUrl: String,
+    syfoTilgangskontrollUrl: String,
 ) = Environment(
     aadAppClient = "isdialogmelding-client-id",
     azureAppClientSecret = "isdialogmelding-secret",
@@ -24,6 +25,8 @@ fun testEnvironment(
     fastlegeRestUrl = fastlegeRestUrl,
     syfoPartnerinfoClientId = "syfopartnerinfo-client-id",
     syfoPartnerinfoUrl = syfoPartnerinfoUrl,
+    syfotilgangskontrollClientId = "syfo-tilgangskontroll-client-id",
+    syfotilgangskontrollUrl = syfoTilgangskontrollUrl,
 )
 
 fun testAppState() = ApplicationState(
