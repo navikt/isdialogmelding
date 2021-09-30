@@ -8,8 +8,8 @@ import io.ktor.server.netty.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.apiModule
+import no.nav.syfo.application.api.authentication.getWellKnown
 import no.nav.syfo.application.mq.MQSender
-import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
@@ -34,15 +34,14 @@ fun main() {
             }
 
             val mqSender = MQSender(environment)
-            val oppfolgingsplanService = OppfolgingsplanService(
-                mqSender = mqSender
-            )
+            val wellKnownInternalAzureAD = getWellKnown(environment.azureAppWellKnownUrl)
 
             module {
                 apiModule(
                     applicationState = applicationState,
                     environment = environment,
-                    oppfolgingsplanService = oppfolgingsplanService,
+                    mqSender = mqSender,
+                    wellKnownInternalAzureAD = wellKnownInternalAzureAD,
                 )
             }
         }

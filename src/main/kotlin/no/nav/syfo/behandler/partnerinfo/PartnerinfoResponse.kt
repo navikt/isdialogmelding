@@ -1,4 +1,4 @@
-package no.nav.syfo.partnerinfo
+package no.nav.syfo.behandler.partnerinfo
 
 data class PartnerinfoResponse(
     val partnerId: Int,

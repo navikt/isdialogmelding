@@ -1,4 +1,4 @@
-package no.nav.syfo.partnerinfo
+package no.nav.syfo.behandler.partnerinfo
 
 import io.micrometer.core.instrument.Counter
 import no.nav.syfo.metric.METRICS_NS
