@@ -59,7 +59,7 @@ class FastlegeClient(
     }
 
     companion object {
-        const val FASTLEGE_PATH = "/api/v2/fastlege"
+        const val FASTLEGE_PATH = "/fastlegerest/api/v2/fastlege"
         private val log = LoggerFactory.getLogger(FastlegeClient::class.java)
     }
 }
