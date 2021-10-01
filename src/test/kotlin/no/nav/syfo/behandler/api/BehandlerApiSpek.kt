@@ -70,6 +70,8 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingDTO.poststed shouldBeEqualTo fastlegeResponse.fastlegekontor.postadresse?.poststed
                             behandlerDialogmeldingDTO.telefon shouldBeEqualTo fastlegeResponse.fastlegekontor.telefon
                             behandlerDialogmeldingDTO.orgnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.orgnummer
+                            behandlerDialogmeldingDTO.kontor shouldBeEqualTo fastlegeResponse.fastlegekontor.navn
+                            behandlerDialogmeldingDTO.type shouldBeEqualTo "FASTLEGE"
                         }
                     }
                     it("should return empty list of BehandlerDialogmelding for arbeidstaker uten fastlege") {

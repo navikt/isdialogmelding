@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 data class FastlegeResponse(
     val fornavn: String,
-    val mellomnavn: String,
+    val mellomnavn: String?,
     val etternavn: String,
     val fnr: String,
     val herId: Int,
@@ -26,8 +26,8 @@ data class FastlegeResponse(
         val navn: String?,
         val besoeksadresse: Adresse?,
         val postadresse: Adresse?,
-        val telefon: String,
-        val epost: String,
+        val telefon: String?,
+        val epost: String?,
         val orgnummer: String?,
     ) {
         data class Adresse(
@@ -45,10 +45,18 @@ data class FastlegeResponse(
 
 fun FastlegeResponse.Fastlegekontor.toKontor(): Fastlege.Kontor {
     return Fastlege.Kontor(
+        navn = this.navn,
         orgnummer = this.orgnummer,
-        adresse = this.postadresse?.adresse,
-        postnummer = this.postadresse?.postnummer,
-        poststed = this.postadresse?.poststed,
+        postadresse = Fastlege.Adresse(
+            adresse = this.postadresse?.adresse,
+            postnummer = this.postadresse?.postnummer,
+            poststed = this.postadresse?.poststed,
+        ),
+        besoeksadresse = Fastlege.Adresse(
+            adresse = this.besoeksadresse?.adresse,
+            postnummer = this.besoeksadresse?.postnummer,
+            poststed = this.besoeksadresse?.poststed,
+        ),
         telefon = this.telefon,
     )
 }
