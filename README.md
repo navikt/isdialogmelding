@@ -1,35 +1,44 @@
 ![Build status](https://github.com/navikt/isdialogmelding/workflows/main/badge.svg?branch=master)
 
 # isdialogmelding
-isdialogmelding is a backend service for handling of DialogmoteInnkallinger. Dialogmoteinnkallinger are handled by SYFO-veiledere in Syfomodiaperson(https://github.com/navikt/syfomodiaperson) in Modia.
+
+Applikasjon for håndtering av dialogmeldinger i SYFO-domenet. Funksjonalitet:
+
+* Deling av oppfølgingsplan
+* API med informasjon om behandlere (fastlege) som kan motta dialogmelding
 
 ## Technologies used
+
 * Docker
 * Gradle
 * Kotlin
-* Kafka
 * Ktor
-* Postgres
-* Redis
 * IBM MQ
 
 ##### Test Libraries:
+
 * Kluent
 * Mockk
 * Spek
 
 #### Requirements
+
 * JDK 11
 
 ## Download packages from Github Package Registry
-Certain packages (tjenestespesifikasjoner) must be downloaded from Github Package Registry, which requires authentication.
-The packages can be downloaded via build.gradle:
+
+Certain packages (syfotjenester) must be downloaded from Github Package Registry, which requires authentication. The
+packages can be downloaded via build.gradle:
+
 ```
 val githubUser: String by project
 val githubPassword: String by project
 repositories {
+    jcenter()
+    maven(url = "https://packages.confluent.io/maven/")
+    maven(url = "https://jitpack.io")
     maven {
-        url = uri("https://maven.pkg.github.com/navikt/tjenestespesifikasjoner")
+        url = uri("https://maven.pkg.github.com/navikt/syfotjenester")
         credentials {
             username = githubUser
             password = githubPassword
@@ -57,26 +66,23 @@ The variables can alternatively be configured as environment variables or used i
 ```
 
 ### Build
+
 Run `./gradlew clean shadowJar`
 
-
 ### Lint
+
 Run `./gradlew --continue ktlintCheck`
 
 ### Test
+
 Run `./gradlew test -i`
 
 ### Run Application
 
 #### Create Docker Image
+
 Creating a docker image should be as simple as `docker build -t isdialogmelding .`
 
 #### Run Docker Image
+
 `docker run --rm -it -p 8080:8080 isdialogmelding`
-
-### Cache
-This application uses Redis for caching. Redis is deployed automatically on changes to workflow or config on master branch. For manual deploy, run: `kubectl apply -f .nais/redis-config.yaml` or `kubectl apply -f .nais/redisexporter.yaml`.
-
-### Kafka
-This application produces the following topic(s):
-* isdialogmelding-dialogmote-statusendring
