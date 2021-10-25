@@ -43,6 +43,9 @@ spec:
         - application: fastlegerest
           namespace: teamsykefravr
           cluster: prod-fss
+        - application: fastlegerest
+          namespace: teamsykefravr
+          cluster: prod-gcp
         - application: syfomodiaperson
           namespace: teamsykefravr
           cluster: prod-fss
