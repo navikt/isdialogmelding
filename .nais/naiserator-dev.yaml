@@ -51,9 +51,10 @@ spec:
           cluster: dev-fss
     outbound:
       external:
-        - host: "fastlegerest.dev-fss-pub.nais.io"
         - host: "syfopartnerinfo.dev-fss-pub.nais.io"
         - host: "syfo-tilgangskontroll.dev-fss-pub.nais.io"
+      rules:
+        - application: fastlegerest
   azure:
     application:
       enabled: true
@@ -79,9 +80,9 @@ spec:
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
       value: QA.Q414.IU03_UTSENDING
     - name: FASTLEGEREST_CLIENT_ID
-      value: "dev-fss.teamsykefravr.fastlegerest"
+      value: "dev-gcp.teamsykefravr.fastlegerest"
     - name: FASTLEGEREST_URL
-      value: "https://fastlegerest.dev-fss-pub.nais.io"
+      value: "https://fastlegerest.dev.intern.nav.no"
     - name: SYFOPARTNERINFO_CLIENT_ID
       value: "dev-fss.teamsykefravr.syfopartnerinfo"
     - name: SYFOPARTNERINFO_URL
