@@ -51,9 +51,10 @@ spec:
           cluster: prod-fss
     outbound:
       external:
-        - host: "fastlegerest.prod-fss-pub.nais.io"
         - host: "syfopartnerinfo.prod-fss-pub.nais.io"
         - host: "syfo-tilgangskontroll.prod-fss-pub.nais.io"
+      rules:
+        - application: fastlegerest
   azure:
     application:
       enabled: true
@@ -79,9 +80,9 @@ spec:
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
       value: QA.P414.IU03_UTSENDING
     - name: FASTLEGEREST_CLIENT_ID
-      value: "prod-fss.teamsykefravr.fastlegerest"
+      value: "prod-gcp.teamsykefravr.fastlegerest"
     - name: FASTLEGEREST_URL
-      value: "https://fastlegerest.prod-fss-pub.nais.io"
+      value: "https://fastlegerest.intern.nav.no"
     - name: SYFOPARTNERINFO_CLIENT_ID
       value: "prod-fss.teamsykefravr.syfopartnerinfo"
     - name: SYFOPARTNERINFO_URL
