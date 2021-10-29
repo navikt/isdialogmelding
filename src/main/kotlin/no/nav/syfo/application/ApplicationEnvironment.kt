@@ -9,6 +9,11 @@ data class Environment(
     val azureAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),
     val serviceuserUsername: String = getEnvVar("SERVICEUSER_USERNAME"),
     val serviceuserPassword: String = getEnvVar("SERVICEUSER_PASSWORD"),
+    val isdialogmeldingDbHost: String = getEnvVar("NAIS_DATABASE_ISDIALOGMELDING_ISDIALOGMELDING_DB_HOST"),
+    val isdialogmeldingDbPort: String = getEnvVar("NAIS_DATABASE_ISDIALOGMELDING_ISDIALOGMELDING_DB_PORT"),
+    val isdialogmeldingDbName: String = getEnvVar("NAIS_DATABASE_ISDIALOGMELDING_ISDIALOGMELDING_DB_DATABASE"),
+    val isdialogmeldingDbUsername: String = getEnvVar("NAIS_DATABASE_ISDIALOGMELDING_ISDIALOGMELDING_DB_USERNAME"),
+    val isdialogmeldingDbPassword: String = getEnvVar("NAIS_DATABASE_ISDIALOGMELDING_ISDIALOGMELDING_DB_PASSWORD"),
     val mqQueueManager: String = getEnvVar("MQGATEWAY_NAME"),
     val mqHostname: String = getEnvVar("MQGATEWAY_HOSTNAME"),
     val mqPort: Int = getEnvVar("MQGATEWAY_PORT", "1413").toInt(),
@@ -21,7 +26,11 @@ data class Environment(
     val syfoPartnerinfoUrl: String = getEnvVar("SYFOPARTNERINFO_URL"),
     val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),
     val syfotilgangskontrollUrl: String = getEnvVar("SYFOTILGANGSKONTROLL_URL"),
-)
+) {
+    fun jdbcUrl(): String {
+        return "jdbc:postgresql://$isdialogmeldingDbHost:$isdialogmeldingDbPort/$isdialogmeldingDbName"
+    }
+}
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =
     System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable \"$varName\"")

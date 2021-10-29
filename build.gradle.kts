@@ -5,6 +5,8 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 object Versions {
+    const val flywayVersion = "8.0.2"
+    const val hikariVersion = "5.0.0"
     const val jacksonVersion = "2.11.3"
     const val ktorVersion = "1.6.3"
     const val jaxbVersion = "2.3.1"
@@ -17,6 +19,8 @@ object Versions {
     const val syfotjenesterVersion = "1.2021.06.09-13.09-b3d30de9996e"
     const val mqVersion = "9.2.2.0"
     const val micrometerRegistryVersion = "1.7.1"
+    const val postgresVersion = "42.3.0"
+    const val postgresEmbeddedVersion = "0.13.4"
 }
 
 plugins {
@@ -69,6 +73,12 @@ dependencies {
     implementation("no.nav.syfotjenester:kith-base64:${Versions.syfotjenesterVersion}")
     implementation("no.nav.syfotjenester:kith-dialogmelding:${Versions.syfotjenesterVersion}")
     implementation("no.nav.syfotjenester:kith-hodemelding:${Versions.syfotjenesterVersion}")
+
+    // Database
+    implementation("org.flywaydb:flyway-core:${Versions.flywayVersion}")
+    implementation("com.zaxxer:HikariCP:${Versions.hikariVersion}")
+    implementation("org.postgresql:postgresql:${Versions.postgresVersion}")
+    testImplementation("com.opentable.components:otj-pg-embedded:${Versions.postgresEmbeddedVersion}")
 
     testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusjosejwtVersion}")
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktorVersion}")

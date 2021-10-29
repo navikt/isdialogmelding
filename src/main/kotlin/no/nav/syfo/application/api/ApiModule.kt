@@ -7,6 +7,7 @@ import no.nav.syfo.api.registerDialogmeldingApi
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.authentication.*
+import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.registerBehandlerApi
@@ -18,6 +19,7 @@ import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 
 fun Application.apiModule(
     applicationState: ApplicationState,
+    database: DatabaseInterface,
     environment: Environment,
     mqSender: MQSender,
     wellKnownInternalAzureAD: WellKnown,
@@ -65,7 +67,10 @@ fun Application.apiModule(
     )
 
     routing {
-        registerPodApi(applicationState)
+        registerPodApi(
+            applicationState = applicationState,
+            database = database,
+        )
         registerPrometheusApi()
 
         authenticate(JwtIssuerType.AZUREAD_V2.name) {

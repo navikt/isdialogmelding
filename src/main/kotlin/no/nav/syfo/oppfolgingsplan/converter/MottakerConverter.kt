@@ -57,11 +57,11 @@ class MottakerConverter(private val rsMottaker: RSMottaker?) {
                                         .withDN("Fastlege")
                                 )
                                 .withFamilyName(rsMottaker.behandler!!.etternavn)
-                                .withMiddleName(rsMottaker.behandler!!.mellomnavn)
-                                .withGivenName(rsMottaker.behandler!!.fornavn)
+                                .withMiddleName(rsMottaker.behandler.mellomnavn)
+                                .withGivenName(rsMottaker.behandler.fornavn)
                                 .withIdent(
                                     FACTORY.createXMLIdent()
-                                        .withId(rsMottaker.behandler!!.fnr)
+                                        .withId(rsMottaker.behandler.fnr)
                                         .withTypeId(
                                             FACTORY.createXMLCV()
                                                 .withDN("Fødselsnummer Norsk fødselsnummer")
@@ -71,7 +71,7 @@ class MottakerConverter(private val rsMottaker: RSMottaker?) {
                                 )
                                 .withIdent(
                                     FACTORY.createXMLIdent()
-                                        .withId(rsMottaker.behandler!!.hprId)
+                                        .withId(rsMottaker.behandler.hprId)
                                         .withTypeId(
                                             FACTORY.createXMLCV()
                                                 .withDN("HPR-nummer")
