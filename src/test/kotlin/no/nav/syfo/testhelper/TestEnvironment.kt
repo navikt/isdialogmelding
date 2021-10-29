@@ -27,6 +27,11 @@ fun testEnvironment(
     syfoPartnerinfoUrl = syfoPartnerinfoUrl,
     syfotilgangskontrollClientId = "syfo-tilgangskontroll-client-id",
     syfotilgangskontrollUrl = syfoTilgangskontrollUrl,
+    isdialogmeldingDbHost = "localhost",
+    isdialogmeldingDbPort = "5432",
+    isdialogmeldingDbName = "isdialogmelding_dev",
+    isdialogmeldingDbUsername = "username",
+    isdialogmeldingDbPassword = "password",
 )
 
 fun testAppState() = ApplicationState(

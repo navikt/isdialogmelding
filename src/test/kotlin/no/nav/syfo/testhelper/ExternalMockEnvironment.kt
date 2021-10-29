@@ -6,6 +6,7 @@ import no.nav.syfo.testhelper.mocks.*
 
 class ExternalMockEnvironment {
     val applicationState: ApplicationState = testAppState()
+    val database = TestDatabase()
     private val azureAdMock = AzureAdMock()
 
     private val fastlegeRestMock = FastlegeRestMock()
@@ -34,6 +35,7 @@ fun ExternalMockEnvironment.startExternalMocks() {
 
 fun ExternalMockEnvironment.stopExternalMocks() {
     this.externalApplicationMockMap.stop()
+    this.database.stop()
 }
 
 fun HashMap<String, NettyApplicationEngine>.start() {
