@@ -64,6 +64,12 @@ spec:
       claims:
         extra:
           - "NAVident"
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_12
+        databases:
+          - name: isdialogmelding-db
+        diskAutoresize: true
   envFrom:
     - secret: isdialogmelding-serviceuser
   env:
