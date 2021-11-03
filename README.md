@@ -13,6 +13,7 @@ Applikasjon for håndtering av dialogmeldinger i SYFO-domenet. Funksjonalitet:
 * Gradle
 * Kotlin
 * Ktor
+* Postgres
 * IBM MQ
 
 ##### Test Libraries:
