@@ -24,9 +24,9 @@ object Versions {
 }
 
 plugins {
-    kotlin("jvm") version "1.4.30"
     id("com.github.johnrengelman.shadow") version "7.1.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
+    kotlin("jvm") version "1.5.31"
 }
 
 val githubUser: String by project
@@ -109,6 +109,9 @@ tasks {
     }
 
     withType<ShadowJar> {
+        archiveBaseName.set("app")
+        archiveClassifier.set("")
+        archiveVersion.set("")
     }
 
     withType<Test> {
