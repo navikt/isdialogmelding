@@ -32,7 +32,6 @@ plugins {
 val githubUser: String by project
 val githubPassword: String by project
 repositories {
-    jcenter()
     maven(url = "https://packages.confluent.io/maven/")
     maven(url = "https://jitpack.io")
     maven {
