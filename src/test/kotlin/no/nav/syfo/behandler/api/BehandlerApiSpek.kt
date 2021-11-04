@@ -8,7 +8,6 @@ import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
-import no.nav.syfo.testhelper.generator.generatePartnerinfoResponse
 import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.configuredJacksonMapper
@@ -46,10 +45,9 @@ class BehandlerApiSpek : Spek({
                     externalMockEnvironment.wellKnownInternalAzureAD.issuer,
                     UserConstants.VEILEDER_IDENT,
                 )
-                val fastlegeResponse = generateFastlegeResponse(UserConstants.HERID.toInt())
-                val partnerinfoResponse = generatePartnerinfoResponse()
                 describe("Happy path") {
                     it("should return list of BehandlerDialogmelding if request is successful") {
+                        val fastlegeResponse = generateFastlegeResponse(UserConstants.HERID.toInt())
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -60,17 +58,17 @@ class BehandlerApiSpek : Spek({
 
                             val behandlerDialogmeldingList =
                                 objectMapper.readValue<List<BehandlerDialogmeldingDTO>>(response.content!!)
-
                             behandlerDialogmeldingList.size shouldBeEqualTo 1
 
+                            val behandlerDialogmeldingForPersonList = database.getBehandlerDialogmeldingForArbeidstaker(
+                                UserConstants.ARBEIDSTAKER_FNR,
+                            )
+                            behandlerDialogmeldingForPersonList.size shouldBeEqualTo 1
+
                             val behandlerDialogmeldingDTO = behandlerDialogmeldingList.first()
-                            behandlerDialogmeldingDTO.partnerId shouldBeEqualTo partnerinfoResponse.partnerId.toString()
-                            behandlerDialogmeldingDTO.herId shouldBeEqualTo fastlegeResponse.herId.toString()
-                            behandlerDialogmeldingDTO.hprId shouldBeEqualTo fastlegeResponse.helsepersonellregisterId
                             behandlerDialogmeldingDTO.fornavn shouldBeEqualTo fastlegeResponse.fornavn
                             behandlerDialogmeldingDTO.mellomnavn shouldBeEqualTo fastlegeResponse.mellomnavn
                             behandlerDialogmeldingDTO.etternavn shouldBeEqualTo fastlegeResponse.etternavn
-                            behandlerDialogmeldingDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
                             behandlerDialogmeldingDTO.adresse shouldBeEqualTo fastlegeResponse.fastlegekontor.postadresse?.adresse
                             behandlerDialogmeldingDTO.postnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.postadresse?.postnummer
                             behandlerDialogmeldingDTO.poststed shouldBeEqualTo fastlegeResponse.fastlegekontor.postadresse?.poststed
@@ -78,10 +76,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingDTO.orgnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.orgnummer
                             behandlerDialogmeldingDTO.kontor shouldBeEqualTo fastlegeResponse.fastlegekontor.navn
                             behandlerDialogmeldingDTO.type shouldBeEqualTo "FASTLEGE"
-
-                            database.getBehandlerDialogmeldingForArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_FNR,
-                            ).size shouldBeEqualTo 1
+                            behandlerDialogmeldingDTO.behandlerRef shouldBeEqualTo behandlerDialogmeldingForPersonList.first().behandlerRef.toString()
                         }
                     }
                     it("should return empty list of BehandlerDialogmelding for arbeidstaker uten fastlege") {
