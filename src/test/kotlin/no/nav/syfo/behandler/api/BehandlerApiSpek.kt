@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
+import no.nav.syfo.behandler.domain.BehandlerType
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
@@ -75,8 +76,12 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingDTO.telefon shouldBeEqualTo fastlegeResponse.fastlegekontor.telefon
                             behandlerDialogmeldingDTO.orgnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.orgnummer
                             behandlerDialogmeldingDTO.kontor shouldBeEqualTo fastlegeResponse.fastlegekontor.navn
-                            behandlerDialogmeldingDTO.type shouldBeEqualTo "FASTLEGE"
+                            behandlerDialogmeldingDTO.type shouldBeEqualTo BehandlerType.FASTLEGE.name
                             behandlerDialogmeldingDTO.behandlerRef shouldBeEqualTo behandlerDialogmeldingForPersonList.first().behandlerRef.toString()
+
+                            database.getBehandlerDialogmeldingForArbeidstaker(
+                                UserConstants.ARBEIDSTAKER_FNR,
+                            ).size shouldBeEqualTo 1
                         }
                     }
                     it("should return empty list of BehandlerDialogmelding for arbeidstaker uten fastlege") {

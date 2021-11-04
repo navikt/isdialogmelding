@@ -1,9 +1,11 @@
 package no.nav.syfo.behandler.fastlege
 
-import no.nav.syfo.behandler.domain.Fastlege
+import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.domain.BehandlerType
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.domain.Virksomhetsnummer
 import java.time.LocalDate
+import java.util.*
 
 data class FastlegeResponse(
     val fornavn: String,
@@ -45,30 +47,21 @@ data class FastlegeResponse(
     )
 }
 
-fun FastlegeResponse.Fastlegekontor.toKontor() = Fastlege.Kontor(
-    navn = this.navn,
-    orgnummer = this.orgnummer?.let { Virksomhetsnummer(it) },
-    postadresse = Fastlege.Adresse(
-        adresse = this.postadresse?.adresse,
-        postnummer = this.postadresse?.postnummer,
-        poststed = this.postadresse?.poststed,
-    ),
-    besoeksadresse = Fastlege.Adresse(
-        adresse = this.besoeksadresse?.adresse,
-        postnummer = this.besoeksadresse?.postnummer,
-        poststed = this.besoeksadresse?.poststed,
-    ),
-    telefon = this.telefon,
-)
-
-fun FastlegeResponse.toFastlege(partnerId: Int) = Fastlege(
+fun FastlegeResponse.toBehandler(partnerId: Int) = Behandler(
+    type = BehandlerType.FASTLEGE,
+    behandlerRef = UUID.randomUUID(),
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
     etternavn = this.etternavn,
     partnerId = partnerId,
     herId = this.herId,
     parentHerId = this.foreldreEnhetHerId,
-    helsepersonellregisterId = this.helsepersonellregisterId,
-    fnr = this.fnr?.let { PersonIdentNumber(it) },
-    kontor = this.fastlegekontor.toKontor(),
+    hprId = this.helsepersonellregisterId?.toInt(),
+    personident = this.fnr?.let { PersonIdentNumber(it) },
+    kontor = this.fastlegekontor.navn,
+    adresse = this.fastlegekontor.postadresse?.adresse,
+    postnummer = this.fastlegekontor.postadresse?.postnummer,
+    poststed = this.fastlegekontor.postadresse?.poststed,
+    telefon = this.fastlegekontor.telefon,
+    orgnummer = this.fastlegekontor.orgnummer?.let { Virksomhetsnummer(it) },
 )

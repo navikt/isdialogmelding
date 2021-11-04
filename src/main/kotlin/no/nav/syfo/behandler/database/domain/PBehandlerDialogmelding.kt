@@ -30,17 +30,16 @@ data class PBehandlerDialogmelding(
 )
 
 fun PBehandlerDialogmelding.toBehandler() = Behandler(
-    id = this.id,
     behandlerRef = this.behandlerRef,
     type = BehandlerType.valueOf(this.type),
     personident = this.personident?.let { PersonIdentNumber(it) },
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
     etternavn = this.etternavn,
-    partnerId = this.partnerId,
-    herId = this.herId,
-    parentHerId = this.parentHerId,
-    hprId = this.hprId,
+    partnerId = this.partnerId.toInt(),
+    herId = this.herId?.toInt(),
+    parentHerId = this.parentHerId?.toInt(),
+    hprId = this.hprId?.toInt(),
     kontor = this.kontor,
     adresse = this.adresse,
     postnummer = this.postnummer,
