@@ -27,13 +27,10 @@ data class Behandler(
 
 fun Behandler.toBehandlerDialogmeldingDTO() = BehandlerDialogmeldingDTO(
     type = this.type.name,
+    behandlerRef = this.behandlerRef.toString(),
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
     etternavn = this.etternavn,
-    fnr = this.personident?.value,
-    partnerId = this.partnerId,
-    herId = this.herId.toString(),
-    hprId = this.hprId,
     orgnummer = this.orgnummer?.value,
     kontor = this.kontor,
     adresse = this.adresse,
