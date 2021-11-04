@@ -8,7 +8,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.FastlegeResponse
-import no.nav.syfo.behandler.fastlege.toFastlege
+import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoResponse
 import no.nav.syfo.domain.PersonIdentNumber
@@ -91,7 +91,7 @@ class BehandlerServiceSpek : Spek({
                         val behandlere =
                             behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, anyToken, anyCallId)
                         behandlere.size shouldBeEqualTo 1
-                        behandlere.first().partnerId shouldBeEqualTo partnerId.toString()
+                        behandlere.first().partnerId shouldBeEqualTo partnerId
                     }
 
                     database.getBehandlerDialogmeldingForArbeidstaker(
@@ -109,7 +109,7 @@ class BehandlerServiceSpek : Spek({
                         val behandlere =
                             behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, anyToken, anyCallId)
                         behandlere.size shouldBeEqualTo 1
-                        behandlere.first().partnerId shouldBeEqualTo partnerId.toString()
+                        behandlere.first().partnerId shouldBeEqualTo partnerId
                     }
 
                     database.getBehandlerDialogmeldingForArbeidstaker(
@@ -120,7 +120,7 @@ class BehandlerServiceSpek : Spek({
                         val behandlere =
                             behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, anyToken, anyCallId)
                         behandlere.size shouldBeEqualTo 1
-                        behandlere.first().partnerId shouldBeEqualTo partnerId.toString()
+                        behandlere.first().partnerId shouldBeEqualTo partnerId
                     }
 
                     database.getBehandlerDialogmeldingForArbeidstaker(
@@ -143,7 +143,7 @@ class BehandlerServiceSpek : Spek({
                         val behandlere =
                             behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, anyToken, anyCallId)
                         behandlere.size shouldBeEqualTo 1
-                        behandlere.first().partnerId shouldBeEqualTo partnerId.toString()
+                        behandlere.first().partnerId shouldBeEqualTo partnerId
                     }
 
                     val behandlerDialogmeldingForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
@@ -155,7 +155,7 @@ class BehandlerServiceSpek : Spek({
                         val behandlere =
                             behandlerService.getBehandlere(UserConstants.ANNEN_ARBEIDSTAKER_FNR, anyToken, anyCallId)
                         behandlere.size shouldBeEqualTo 1
-                        behandlere.first().partnerId shouldBeEqualTo partnerId.toString()
+                        behandlere.first().partnerId shouldBeEqualTo partnerId
                     }
 
                     val behandlerDialogmeldingForAnnenArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
@@ -170,7 +170,7 @@ class BehandlerServiceSpek : Spek({
                     val fastlegeResponse = generateFastlegeResponse(parentHerId)
                     behandlerService.createBehandlerDialogmelding(
                         UserConstants.ARBEIDSTAKER_FNR,
-                        fastlegeResponse.toFastlege(partnerId),
+                        fastlegeResponse.toBehandler(partnerId),
                     )
                     fastlegeClientMock.mockResponse(UserConstants.ARBEIDSTAKER_FNR, fastlegeResponse)
                     partnerinfoClientMock.mockResponse(parentHerId, generatePartnerinfoResponse(partnerId))
@@ -179,7 +179,7 @@ class BehandlerServiceSpek : Spek({
                         val behandlere =
                             behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, anyToken, anyCallId)
                         behandlere.size shouldBeEqualTo 1
-                        behandlere.first().partnerId shouldBeEqualTo partnerId.toString()
+                        behandlere.first().partnerId shouldBeEqualTo partnerId
                     }
 
                     database.getBehandlerDialogmeldingForArbeidstaker(
@@ -190,7 +190,7 @@ class BehandlerServiceSpek : Spek({
                     val fastlegeResponse = generateFastlegeResponse(parentHerId)
                     behandlerService.createBehandlerDialogmelding(
                         UserConstants.ANNEN_ARBEIDSTAKER_FNR,
-                        fastlegeResponse.toFastlege(partnerId),
+                        fastlegeResponse.toBehandler(partnerId),
                     )
                     fastlegeClientMock.mockResponse(UserConstants.ARBEIDSTAKER_FNR, fastlegeResponse)
                     partnerinfoClientMock.mockResponse(parentHerId, generatePartnerinfoResponse(partnerId))
@@ -199,7 +199,7 @@ class BehandlerServiceSpek : Spek({
                         val behandlere =
                             behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, anyToken, anyCallId)
                         behandlere.size shouldBeEqualTo 1
-                        behandlere.first().partnerId shouldBeEqualTo partnerId.toString()
+                        behandlere.first().partnerId shouldBeEqualTo partnerId
                     }
 
                     database.getBehandlerDialogmeldingForArbeidstaker(
@@ -209,7 +209,7 @@ class BehandlerServiceSpek : Spek({
                 it("getBehandlere lagrer ny behandler for arbeidstaker når fastlege er annen enn siste lagret behandler") {
                     val behandlerRef = behandlerService.createBehandlerDialogmelding(
                         UserConstants.ARBEIDSTAKER_FNR,
-                        generateFastlegeResponse(otherParentHerId).toFastlege(otherPartnerId),
+                        generateFastlegeResponse(otherParentHerId).toBehandler(otherPartnerId),
                     ).behandlerRef
                     fastlegeClientMock.mockResponse(
                         UserConstants.ARBEIDSTAKER_FNR,
@@ -221,7 +221,7 @@ class BehandlerServiceSpek : Spek({
                         val behandlere =
                             behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, anyToken, anyCallId)
                         behandlere.size shouldBeEqualTo 1
-                        behandlere.first().partnerId shouldBeEqualTo partnerId.toString()
+                        behandlere.first().partnerId shouldBeEqualTo partnerId
                     }
 
                     val behandlerDialogmeldingForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
@@ -236,11 +236,11 @@ class BehandlerServiceSpek : Spek({
                     val otherFastlegeResponse = generateFastlegeResponse(otherParentHerId)
                     val behandlerRef = behandlerService.createBehandlerDialogmelding(
                         UserConstants.ARBEIDSTAKER_FNR,
-                        fastlegeResponse.toFastlege(partnerId),
+                        fastlegeResponse.toBehandler(partnerId),
                     ).behandlerRef
                     val otherBehandlerRef = behandlerService.createBehandlerDialogmelding(
                         UserConstants.ARBEIDSTAKER_FNR,
-                        otherFastlegeResponse.toFastlege(otherPartnerId),
+                        otherFastlegeResponse.toBehandler(otherPartnerId),
                     ).behandlerRef
                     fastlegeClientMock.mockResponse(
                         UserConstants.ARBEIDSTAKER_FNR,
@@ -252,7 +252,7 @@ class BehandlerServiceSpek : Spek({
                         val behandlere =
                             behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, anyToken, anyCallId)
                         behandlere.size shouldBeEqualTo 1
-                        behandlere.first().partnerId shouldBeEqualTo partnerId.toString()
+                        behandlere.first().partnerId shouldBeEqualTo partnerId
                     }
 
                     val behandlerDialogmeldingForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(

@@ -3,13 +3,9 @@ package no.nav.syfo.behandler.database
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.PBehandlerDialogmelding
-import no.nav.syfo.behandler.domain.BehandlerType
-import no.nav.syfo.behandler.domain.Fastlege
+import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.domain.PersonIdentNumber
-import java.sql.Connection
-import java.sql.ResultSet
-import java.sql.SQLException
-import java.sql.Timestamp
+import java.sql.*
 import java.time.Instant
 import java.util.*
 
@@ -43,27 +39,26 @@ fun Connection.createBehandlerDialogmeldingArbeidstaker(
 }
 
 fun Connection.createBehandlerDialogmelding(
-    fastlege: Fastlege,
+    behandler: Behandler,
 ): PBehandlerDialogmelding {
-    val behandlerRef = UUID.randomUUID()
     val now = Timestamp.from(Instant.now())
     val behandlerDialogmeldingList = this.prepareStatement(queryCreateBehandlerDialogmelding).use {
-        it.setString(1, behandlerRef.toString())
-        it.setString(2, BehandlerType.FASTLEGE.name)
-        it.setString(3, fastlege.fnr?.value)
-        it.setString(4, fastlege.fornavn)
-        it.setString(5, fastlege.mellomnavn)
-        it.setString(6, fastlege.etternavn)
-        it.setString(7, fastlege.partnerId.toString())
-        it.setString(8, fastlege.herId.toString())
-        it.setString(9, fastlege.parentHerId.toString())
-        it.setString(10, fastlege.helsepersonellregisterId)
-        it.setString(11, fastlege.kontor.navn)
-        it.setString(12, fastlege.kontor.postadresse.adresse)
-        it.setString(13, fastlege.kontor.postadresse.postnummer)
-        it.setString(14, fastlege.kontor.postadresse.poststed)
-        it.setString(15, fastlege.kontor.orgnummer?.value)
-        it.setString(16, fastlege.kontor.telefon)
+        it.setString(1, behandler.behandlerRef.toString())
+        it.setString(2, behandler.type.name)
+        it.setString(3, behandler.personident?.value)
+        it.setString(4, behandler.fornavn)
+        it.setString(5, behandler.mellomnavn)
+        it.setString(6, behandler.etternavn)
+        it.setString(7, behandler.partnerId.toString())
+        it.setString(8, behandler.herId.toString())
+        it.setString(9, behandler.parentHerId.toString())
+        it.setString(10, behandler.hprId.toString())
+        it.setString(11, behandler.kontor)
+        it.setString(12, behandler.adresse)
+        it.setString(13, behandler.postnummer)
+        it.setString(14, behandler.poststed)
+        it.setString(15, behandler.orgnummer?.value)
+        it.setString(16, behandler.telefon)
         it.setTimestamp(17, now)
         it.setTimestamp(18, now)
         it.executeQuery().toList { toPBehandlerDialogmelding() }

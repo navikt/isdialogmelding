@@ -1,15 +1,11 @@
 package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.database.createBehandlerDialogmelding
-import no.nav.syfo.behandler.database.createBehandlerDialogmeldingArbeidstaker
+import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.toBehandler
-import no.nav.syfo.behandler.database.getBehandlerDialogmelding
-import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
 import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.domain.Fastlege
 import no.nav.syfo.behandler.fastlege.FastlegeClient
-import no.nav.syfo.behandler.fastlege.toFastlege
+import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.domain.PersonIdentNumber
 
@@ -23,27 +19,25 @@ class BehandlerService(
         token: String,
         callId: String,
     ): List<Behandler> {
-        val aktivFastlege = getFastlegeMedPartnerinfo(
+        val aktivFastlegeBehandler = getAktivFastlegeBehandler(
             personIdentNumber = personIdentNumber,
             token = token,
             callId = callId,
         )
-
-        return if (aktivFastlege != null) {
+        return if (aktivFastlegeBehandler != null) {
             val behandler = createOrGetBehandler(
-                fastlege = aktivFastlege,
+                behandler = aktivFastlegeBehandler,
                 personIdentNumber = personIdentNumber,
             )
-
             listOf(behandler)
         } else emptyList()
     }
 
-    private suspend fun getFastlegeMedPartnerinfo(
+    private suspend fun getAktivFastlegeBehandler(
         personIdentNumber: PersonIdentNumber,
         token: String,
         callId: String,
-    ): Fastlege? {
+    ): Behandler? {
         val fastlegeResponse = fastlegeClient.fastlege(
             personIdentNumber = personIdentNumber,
             token = token,
@@ -61,16 +55,23 @@ class BehandlerService(
         )
 
         return if (partnerinfoResponse != null) {
-            fastlegeResponse.toFastlege(partnerinfoResponse.partnerId)
+            fastlegeResponse.toBehandler(
+                partnerId = partnerinfoResponse.partnerId,
+            )
         } else null
     }
 
-    private fun createOrGetBehandler(fastlege: Fastlege, personIdentNumber: PersonIdentNumber): Behandler {
-        val pBehandlerForFastlege = database.getBehandlerDialogmelding(partnerId = fastlege.partnerId)
+    private fun createOrGetBehandler(
+        behandler: Behandler,
+        personIdentNumber: PersonIdentNumber,
+    ): Behandler {
+        val pBehandlerForFastlege = database.getBehandlerDialogmelding(
+            partnerId = behandler.partnerId,
+        )
         if (pBehandlerForFastlege == null) {
             return createBehandlerDialogmelding(
-                personIdentNumber = personIdentNumber,
-                fastlege = fastlege,
+                behandler = behandler,
+                personIdentNumber = personIdentNumber
             )
         }
 
@@ -91,19 +92,19 @@ class BehandlerService(
 
     fun createBehandlerDialogmelding(
         personIdentNumber: PersonIdentNumber,
-        fastlege: Fastlege,
+        behandler: Behandler,
     ): Behandler {
         database.connection.use { connection ->
-            val pBehandlerForFastlege = connection.createBehandlerDialogmelding(
-                fastlege = fastlege,
+            val pBehandlerDialogmelding = connection.createBehandlerDialogmelding(
+                behandler = behandler,
             )
             connection.createBehandlerDialogmeldingArbeidstaker(
                 personIdentNumber = personIdentNumber,
-                behandlerDialogmeldingId = pBehandlerForFastlege.id,
+                behandlerDialogmeldingId = pBehandlerDialogmelding.id,
             )
             connection.commit()
 
-            return pBehandlerForFastlege.toBehandler()
+            return pBehandlerDialogmelding.toBehandler()
         }
     }
 

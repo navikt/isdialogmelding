@@ -10,15 +10,20 @@ fun generateFastlegeResponse(foreldreEnhetHerId: Int? = null) = FastlegeResponse
     fnr = "12125678911",
     herId = 1337,
     foreldreEnhetHerId = foreldreEnhetHerId,
-    helsepersonellregisterId = "hprId",
-    pasient = FastlegeResponse.Pasient(fornavn = null, mellomnavn = null, etternavn = null, fnr = null),
+    helsepersonellregisterId = "1234",
+    pasient = FastlegeResponse.Pasient(
+        fornavn = null,
+        mellomnavn = null,
+        etternavn = null,
+        fnr = null
+    ),
     fastlegekontor = FastlegeResponse.Fastlegekontor(
         navn = "Fastlegens kontor",
         besoeksadresse = null,
         postadresse = null,
         telefon = "",
         epost = "",
-        orgnummer = null
+        orgnummer = null,
     ),
     pasientforhold = FastlegeResponse.Pasientforhold(
         fom = LocalDate.now().minusDays(10),

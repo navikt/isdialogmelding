@@ -6,17 +6,16 @@ import no.nav.syfo.domain.Virksomhetsnummer
 import java.util.*
 
 data class Behandler(
-    val id: Int,
     val type: BehandlerType,
     val behandlerRef: UUID,
     val personident: PersonIdentNumber?,
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,
-    val partnerId: String,
-    val herId: String?,
-    val parentHerId: String?,
-    val hprId: String?,
+    val partnerId: Int,
+    val herId: Int?,
+    val parentHerId: Int?,
+    val hprId: Int?,
     val kontor: String?,
     val adresse: String?,
     val postnummer: String?,
