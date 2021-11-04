@@ -39,13 +39,13 @@ fun Route.registerBehandlerApi(
                     token = token,
                 )
                 if (hasAccess) {
-                    val fastlege = behandlerService.getFastlegeMedPartnerinfo(
+                    val behandlere = behandlerService.getBehandlere(
                         personIdentNumber = personIdentNumber,
                         token = token,
                         callId = callId,
                     )
                     val behandlerDialogmeldingDTOList =
-                        fastlege?.let { listOf(fastlege.toBehandlerDialogmeldingDTO()) } ?: emptyList()
+                        behandlere.map { behandler -> behandler.toBehandlerDialogmeldingDTO() }
                     call.respond(behandlerDialogmeldingDTOList)
                 } else {
                     val accessDeniedMessage = "Denied Veileder access to PersonIdent"

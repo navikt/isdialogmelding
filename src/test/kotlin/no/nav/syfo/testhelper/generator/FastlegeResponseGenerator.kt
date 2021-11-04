@@ -7,7 +7,7 @@ fun generateFastlegeResponse(foreldreEnhetHerId: Int? = null) = FastlegeResponse
     fornavn = "Dana",
     mellomnavn = "Katherine",
     etternavn = "Scully",
-    fnr = "fnr",
+    fnr = "12125678911",
     herId = 1337,
     foreldreEnhetHerId = foreldreEnhetHerId,
     helsepersonellregisterId = "hprId",

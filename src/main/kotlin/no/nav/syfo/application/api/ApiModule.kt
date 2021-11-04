@@ -60,7 +60,8 @@ fun Application.apiModule(
     )
     val behandlerService = BehandlerService(
         fastlegeClient = fastlegeClient,
-        partnerinfoClient = partnerinfoClient
+        partnerinfoClient = partnerinfoClient,
+        database = database,
     )
     val oppfolgingsplanService = OppfolgingsplanService(
         mqSender = mqSender
