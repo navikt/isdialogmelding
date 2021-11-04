@@ -29,11 +29,16 @@ class SyfopartnerInfoMock {
             routing {
                 get(BEHANDLER_PATH) {
                     when (call.parameters["herid"]) {
-                        UserConstants.HERID_UTEN_PARTNERINFO -> call.respond(
+                        UserConstants.HERID_UTEN_PARTNERINFO.toString() -> call.respond(
                             HttpStatusCode.OK,
                             emptyList<PartnerinfoResponse>()
                         )
-                        else -> call.respond(HttpStatusCode.OK, listOf(generatePartnerinfoResponse()))
+                        UserConstants.OTHER_HERID.toString() -> call.respond(
+                            HttpStatusCode.OK, listOf(generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID))
+                        )
+                        else -> call.respond(
+                            HttpStatusCode.OK, listOf(generatePartnerinfoResponse(UserConstants.PARTNERID))
+                        )
                     }
                 }
             }
