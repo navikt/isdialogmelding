@@ -38,3 +38,20 @@ class TestDatabaseNotResponding : DatabaseInterface {
     fun stop() {
     }
 }
+
+fun DatabaseInterface.dropData() {
+    val queryList = listOf(
+        """
+        DELETE FROM BEHANDLER_DIALOGMELDING
+        """.trimIndent(),
+        """
+        DELETE FROM BEHANDLER_DIALOGMELDING_ARBEIDSTAKER
+        """.trimIndent(),
+    )
+    this.connection.use { connection ->
+        queryList.forEach { query ->
+            connection.prepareStatement(query).execute()
+        }
+        connection.commit()
+    }
+}

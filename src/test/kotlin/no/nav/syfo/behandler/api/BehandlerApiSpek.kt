@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
@@ -22,10 +23,15 @@ class BehandlerApiSpek : Spek({
         start()
 
         val externalMockEnvironment = ExternalMockEnvironment()
+        val database = externalMockEnvironment.database
         application.testApiModule(externalMockEnvironment = externalMockEnvironment)
 
         beforeGroup {
             externalMockEnvironment.startExternalMocks()
+        }
+
+        afterEachTest {
+            database.dropData()
         }
 
         afterGroup {
@@ -72,6 +78,10 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingDTO.orgnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.orgnummer
                             behandlerDialogmeldingDTO.kontor shouldBeEqualTo fastlegeResponse.fastlegekontor.navn
                             behandlerDialogmeldingDTO.type shouldBeEqualTo "FASTLEGE"
+
+                            database.getBehandlerDialogmeldingForArbeidstaker(
+                                UserConstants.ARBEIDSTAKER_FNR,
+                            ).size shouldBeEqualTo 1
                         }
                     }
                     it("should return empty list of BehandlerDialogmelding for arbeidstaker uten fastlege") {
@@ -87,6 +97,10 @@ class BehandlerApiSpek : Spek({
                                 objectMapper.readValue<List<BehandlerDialogmeldingDTO>>(response.content!!)
 
                             behandlerDialogmeldingList.size shouldBeEqualTo 0
+
+                            database.getBehandlerDialogmeldingForArbeidstaker(
+                                UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR,
+                            ).size shouldBeEqualTo 0
                         }
                     }
 
@@ -106,6 +120,10 @@ class BehandlerApiSpek : Spek({
                                 objectMapper.readValue<List<BehandlerDialogmeldingDTO>>(response.content!!)
 
                             behandlerDialogmeldingList.size shouldBeEqualTo 0
+
+                            database.getBehandlerDialogmeldingForArbeidstaker(
+                                UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FORELDREENHET_FNR,
+                            ).size shouldBeEqualTo 0
                         }
                     }
 
@@ -125,6 +143,10 @@ class BehandlerApiSpek : Spek({
                                 objectMapper.readValue<List<BehandlerDialogmeldingDTO>>(response.content!!)
 
                             behandlerDialogmeldingList.size shouldBeEqualTo 0
+
+                            database.getBehandlerDialogmeldingForArbeidstaker(
+                                UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR,
+                            ).size shouldBeEqualTo 0
                         }
                     }
                 }

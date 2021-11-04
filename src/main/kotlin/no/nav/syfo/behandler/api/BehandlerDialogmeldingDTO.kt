@@ -5,7 +5,7 @@ data class BehandlerDialogmeldingDTO(
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,
-    val fnr: String,
+    val fnr: String?,
     val partnerId: String,
     val herId: String,
     val hprId: String?,
