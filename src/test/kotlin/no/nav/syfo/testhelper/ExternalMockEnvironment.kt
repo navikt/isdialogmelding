@@ -4,7 +4,7 @@ import io.ktor.server.netty.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.testhelper.mocks.*
 
-class ExternalMockEnvironment {
+class ExternalMockEnvironment private constructor() {
     val applicationState: ApplicationState = testAppState()
     val database = TestDatabase()
     private val azureAdMock = AzureAdMock()
@@ -29,7 +29,7 @@ class ExternalMockEnvironment {
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
 
     companion object {
-        val instance = ExternalMockEnvironment().also { it.externalApplicationMockMap.start() }
+        val instance: ExternalMockEnvironment by lazy { ExternalMockEnvironment().also { it.externalApplicationMockMap.start() } }
     }
 }
 
