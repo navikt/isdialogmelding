@@ -29,11 +29,7 @@ class ExternalMockEnvironment {
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
 
     companion object {
-        private val instance = ExternalMockEnvironment().also { it.externalApplicationMockMap.start() }
-
-        fun getInstance(): ExternalMockEnvironment {
-            return instance
-        }
+        val instance = ExternalMockEnvironment().also { it.externalApplicationMockMap.start() }
     }
 }
 

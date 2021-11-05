@@ -22,7 +22,7 @@ class BehandlerApiSpek : Spek({
     with(TestApplicationEngine()) {
         start()
 
-        val externalMockEnvironment = ExternalMockEnvironment.getInstance()
+        val externalMockEnvironment = ExternalMockEnvironment.instance
         val database = externalMockEnvironment.database
         application.testApiModule(externalMockEnvironment = externalMockEnvironment)
 
