@@ -72,6 +72,8 @@ spec:
         diskAutoresize: true
   envFrom:
     - secret: isdialogmelding-serviceuser
+  kafka:
+    pool: nav-prod
   env:
     - name: KTOR_ENV
       value: "production"
