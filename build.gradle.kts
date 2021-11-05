@@ -8,7 +8,7 @@ object Versions {
     const val flywayVersion = "8.0.2"
     const val hikariVersion = "5.0.0"
     const val jacksonVersion = "2.11.3"
-    const val ktorVersion = "1.6.3"
+    const val ktorVersion = "1.6.5"
     const val jaxbVersion = "2.3.1"
     const val kluentVersion = "1.68"
     const val logbackVersion = "1.2.3"
