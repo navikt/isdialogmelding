@@ -90,7 +90,7 @@ class BehandlerService(
         return pBehandlerForFastlege.toBehandler()
     }
 
-    fun createBehandlerDialogmelding(
+    private fun createBehandlerDialogmelding(
         personIdentNumber: PersonIdentNumber,
         behandler: Behandler,
     ): Behandler {

@@ -4,7 +4,7 @@ import io.ktor.server.netty.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.testhelper.mocks.*
 
-class ExternalMockEnvironment {
+class ExternalMockEnvironment private constructor() {
     val applicationState: ApplicationState = testAppState()
     val database = TestDatabase()
     private val azureAdMock = AzureAdMock()
@@ -27,28 +27,14 @@ class ExternalMockEnvironment {
         syfoTilgangskontrollUrl = syfoTilgangskontrollMock.url
     )
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
-}
 
-fun ExternalMockEnvironment.startExternalMocks() {
-    this.externalApplicationMockMap.start()
-}
-
-fun ExternalMockEnvironment.stopExternalMocks() {
-    this.externalApplicationMockMap.stop()
-    this.database.stop()
+    companion object {
+        val instance: ExternalMockEnvironment by lazy { ExternalMockEnvironment().also { it.externalApplicationMockMap.start() } }
+    }
 }
 
 fun HashMap<String, NettyApplicationEngine>.start() {
     this.forEach {
         it.value.start()
-    }
-}
-
-fun HashMap<String, NettyApplicationEngine>.stop(
-    gracePeriodMillis: Long = 1L,
-    timeoutMillis: Long = 10L,
-) {
-    this.forEach {
-        it.value.stop(gracePeriodMillis, timeoutMillis)
     }
 }
