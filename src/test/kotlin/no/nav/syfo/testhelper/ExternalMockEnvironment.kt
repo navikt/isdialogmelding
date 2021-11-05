@@ -27,28 +27,18 @@ class ExternalMockEnvironment {
         syfoTilgangskontrollUrl = syfoTilgangskontrollMock.url
     )
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
-}
 
-fun ExternalMockEnvironment.startExternalMocks() {
-    this.externalApplicationMockMap.start()
-}
+    companion object {
+        private val instance = ExternalMockEnvironment().also { it.externalApplicationMockMap.start() }
 
-fun ExternalMockEnvironment.stopExternalMocks() {
-    this.externalApplicationMockMap.stop()
-    this.database.stop()
+        fun getInstance(): ExternalMockEnvironment {
+            return instance
+        }
+    }
 }
 
 fun HashMap<String, NettyApplicationEngine>.start() {
     this.forEach {
         it.value.start()
-    }
-}
-
-fun HashMap<String, NettyApplicationEngine>.stop(
-    gracePeriodMillis: Long = 1L,
-    timeoutMillis: Long = 10L,
-) {
-    this.forEach {
-        it.value.stop(gracePeriodMillis, timeoutMillis)
     }
 }
