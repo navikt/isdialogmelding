@@ -2,8 +2,13 @@ package no.nav.syfo.testhelper
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.behandler.database.createBehandlerDialogmelding
+import no.nav.syfo.behandler.database.createBehandlerDialogmeldingArbeidstaker
+import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.domain.PersonIdentNumber
 import org.flywaydb.core.Flyway
 import java.sql.Connection
+import java.util.*
 
 class TestDatabase : DatabaseInterface {
     private val pg: EmbeddedPostgres
@@ -36,6 +41,23 @@ class TestDatabaseNotResponding : DatabaseInterface {
         get() = throw Exception("Not working")
 
     fun stop() {
+    }
+}
+
+fun DatabaseInterface.createBehandlerDialogmeldingForArbeidstaker(
+    behandler: Behandler,
+    arbeidstakerPersonIdent: PersonIdentNumber,
+): UUID {
+    this.connection.use { connection ->
+        val behandlerDialogmelding =
+            connection.createBehandlerDialogmelding(behandler)
+        connection.createBehandlerDialogmeldingArbeidstaker(
+            arbeidstakerPersonIdent,
+            behandlerDialogmelding.id
+        )
+        connection.commit()
+
+        return behandlerDialogmelding.behandlerRef
     }
 }
 
