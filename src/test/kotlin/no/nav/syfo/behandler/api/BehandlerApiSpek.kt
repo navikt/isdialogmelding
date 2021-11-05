@@ -48,7 +48,7 @@ class BehandlerApiSpek : Spek({
                 )
                 describe("Happy path") {
                     it("should return list of BehandlerDialogmelding if request is successful") {
-                        val fastlegeResponse = generateFastlegeResponse(UserConstants.HERID.toInt())
+                        val fastlegeResponse = generateFastlegeResponse(UserConstants.HERID)
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))

@@ -38,12 +38,16 @@ class FastlegeRestMock {
                         )
                         UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR.value -> call.respond(
                             HttpStatusCode.OK,
-                            generateFastlegeResponse(UserConstants.HERID_UTEN_PARTNERINFO.toInt())
+                            generateFastlegeResponse(UserConstants.HERID_UTEN_PARTNERINFO)
+                        )
+                        UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_HERID_FNR.value -> call.respond(
+                            HttpStatusCode.OK,
+                            generateFastlegeResponse(UserConstants.OTHER_HERID)
                         )
 
                         else -> call.respond(
                             HttpStatusCode.OK,
-                            generateFastlegeResponse(UserConstants.HERID.toInt())
+                            generateFastlegeResponse(UserConstants.HERID)
                         )
                     }
                 }
