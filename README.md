@@ -15,6 +15,7 @@ Applikasjon for håndtering av dialogmeldinger i SYFO-domenet. Funksjonalitet:
 * Ktor
 * Postgres
 * IBM MQ
+* Kafka
 
 ##### Test Libraries:
 
@@ -87,3 +88,9 @@ Creating a docker image should be as simple as `docker build -t isdialogmelding 
 #### Run Docker Image
 
 `docker run --rm -it -p 8080:8080 isdialogmelding`
+
+### Kafka
+
+This application owns and consumes from the following topic:
+
+* isdialogmelding-behandler-dialogmelding-bestilling
