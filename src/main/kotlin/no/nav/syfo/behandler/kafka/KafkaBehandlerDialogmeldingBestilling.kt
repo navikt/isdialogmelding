@@ -19,7 +19,7 @@ fun blockingApplicationLogicDialogmeldingBestilling(
     database: DatabaseInterface,
 ) {
     val consumerProperties = kafkaBehandlerDialogmeldingBestillingConsumerConfig(applicationEnvironmentKafka)
-    val kafkaConsumerDialogmeldingBestilling = KafkaConsumer<String, String>(consumerProperties)
+    val kafkaConsumerDialogmeldingBestilling = KafkaConsumer<String, KafkaBehandlerDialogmeldingDTO>(consumerProperties)
 
     kafkaConsumerDialogmeldingBestilling.subscribe(
         listOf(DIALOGMELDING_BESTILLING_TOPIC)
@@ -34,7 +34,7 @@ fun blockingApplicationLogicDialogmeldingBestilling(
 
 fun pollAndProcessDialogmeldingBestilling(
     database: DatabaseInterface,
-    kafkaConsumerDialogmeldingBestilling: KafkaConsumer<String, String>,
+    kafkaConsumerDialogmeldingBestilling: KafkaConsumer<String, KafkaBehandlerDialogmeldingDTO>,
 ) {
     val records = kafkaConsumerDialogmeldingBestilling.poll(Duration.ofMillis(1000))
     if (records.count() > 0) {
@@ -47,11 +47,11 @@ fun pollAndProcessDialogmeldingBestilling(
 }
 
 fun createAndStoreDialogmeldingBestillingFromRecords(
-    consumerRecords: ConsumerRecords<String, String>,
+    consumerRecords: ConsumerRecords<String, KafkaBehandlerDialogmeldingDTO>,
     database: DatabaseInterface,
 ) {
     // TODO: Store and send dialogmeldinger
     consumerRecords.forEach {
-        log.info("Received consumer record with key: ${it.key()} value: ${it.value()}")
+        log.info("Received consumer record with key: ${it.key()} behandlerRef: ${it.value().behandlerRef} kode: ${it.value().dialogmeldingKode} parent: ${it.value().dialogmeldingRefParent} conversation: ${it.value().dialogmeldingRefConversation}")
     }
 }
