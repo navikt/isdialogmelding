@@ -12,6 +12,7 @@ import no.nav.syfo.application.api.authentication.getWellKnown
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.behandler.kafka.launchKafkaTask
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
@@ -22,43 +23,53 @@ fun main() {
         alive = true,
         ready = false
     )
+    val logger = LoggerFactory.getLogger("ktor.application")
+    val environment = Environment()
+    val mqSender = MQSender(environment)
+    val wellKnownInternalAzureAD = getWellKnown(environment.azureAppWellKnownUrl)
+
+    val applicationEngineEnvironment = applicationEngineEnvironment {
+        log = logger
+        config = HoconApplicationConfig(ConfigFactory.load())
+
+        connector {
+            port = applicationPort
+        }
+
+        module {
+            databaseModule(environment = environment)
+            apiModule(
+                applicationState = applicationState,
+                database = applicationDatabase,
+                environment = environment,
+                mqSender = mqSender,
+                wellKnownInternalAzureAD = wellKnownInternalAzureAD,
+            )
+        }
+    }
+
+    applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) {
+        applicationState.ready = true
+        logger.info("Application is ready")
+        if (environment.toggleKafkaProcessingEnabled) {
+            launchKafkaTask(
+                applicationState = applicationState,
+                applicationEnvironmentKafka = environment.kafka,
+                database = applicationDatabase,
+            )
+        }
+    }
 
     val server = embeddedServer(
-        Netty,
-        applicationEngineEnvironment {
-            log = LoggerFactory.getLogger("ktor.application")
-            config = HoconApplicationConfig(ConfigFactory.load())
-
-            val environment = Environment()
-
-            connector {
-                port = applicationPort
-            }
-
-            val mqSender = MQSender(environment)
-            val wellKnownInternalAzureAD = getWellKnown(environment.azureAppWellKnownUrl)
-
-            module {
-                databaseModule(environment = environment)
-                apiModule(
-                    applicationState = applicationState,
-                    database = applicationDatabase,
-                    environment = environment,
-                    mqSender = mqSender,
-                    wellKnownInternalAzureAD = wellKnownInternalAzureAD,
-                )
-            }
-        }
+        factory = Netty,
+        environment = applicationEngineEnvironment,
     )
+
     Runtime.getRuntime().addShutdownHook(
         Thread {
             server.stop(10, 10, TimeUnit.SECONDS)
         }
     )
 
-    server.environment.monitor.subscribe(ApplicationStarted) { application ->
-        applicationState.ready = true
-        application.environment.log.info("Application is ready")
-    }
     server.start(wait = false)
 }
