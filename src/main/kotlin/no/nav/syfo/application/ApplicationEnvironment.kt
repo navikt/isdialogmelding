@@ -14,6 +14,13 @@ data class Environment(
     val isdialogmeldingDbName: String = getEnvVar("NAIS_DATABASE_ISDIALOGMELDING_ISDIALOGMELDING_DB_DATABASE"),
     val isdialogmeldingDbUsername: String = getEnvVar("NAIS_DATABASE_ISDIALOGMELDING_ISDIALOGMELDING_DB_USERNAME"),
     val isdialogmeldingDbPassword: String = getEnvVar("NAIS_DATABASE_ISDIALOGMELDING_ISDIALOGMELDING_DB_PASSWORD"),
+    val kafka: ApplicationEnvironmentKafka = ApplicationEnvironmentKafka(
+        aivenBootstrapServers = getEnvVar("KAFKA_BROKERS"),
+        aivenCredstorePassword = getEnvVar("KAFKA_CREDSTORE_PASSWORD"),
+        aivenKeystoreLocation = getEnvVar("KAFKA_KEYSTORE_PATH"),
+        aivenSecurityProtocol = "SSL",
+        aivenTruststoreLocation = getEnvVar("KAFKA_TRUSTSTORE_PATH"),
+    ),
     val mqQueueManager: String = getEnvVar("MQGATEWAY_NAME"),
     val mqHostname: String = getEnvVar("MQGATEWAY_HOSTNAME"),
     val mqPort: Int = getEnvVar("MQGATEWAY_PORT", "1413").toInt(),
@@ -26,11 +33,20 @@ data class Environment(
     val syfoPartnerinfoUrl: String = getEnvVar("SYFOPARTNERINFO_URL"),
     val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),
     val syfotilgangskontrollUrl: String = getEnvVar("SYFOTILGANGSKONTROLL_URL"),
+    val toggleKafkaProcessingEnabled: Boolean = getEnvVar("TOGGLE_KAFKA_PROCESSING_ENABLED").toBoolean(),
 ) {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$isdialogmeldingDbHost:$isdialogmeldingDbPort/$isdialogmeldingDbName"
     }
 }
+
+data class ApplicationEnvironmentKafka(
+    val aivenBootstrapServers: String,
+    val aivenCredstorePassword: String,
+    val aivenKeystoreLocation: String,
+    val aivenSecurityProtocol: String,
+    val aivenTruststoreLocation: String,
+)
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =
     System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable \"$varName\"")

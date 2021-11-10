@@ -1,11 +1,11 @@
 package no.nav.syfo.testhelper
 
-import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.Environment
+import no.nav.syfo.application.*
 import java.net.ServerSocket
 
 fun testEnvironment(
     azureOpenidConfigTokenEndpoint: String,
+    kafkaBootstrapServers: String,
     fastlegeRestUrl: String,
     syfoPartnerinfoUrl: String,
     syfoTilgangskontrollUrl: String,
@@ -14,6 +14,13 @@ fun testEnvironment(
     azureAppClientSecret = "isdialogmelding-secret",
     azureAppWellKnownUrl = "wellknown",
     azureOpenidConfigTokenEndpoint = azureOpenidConfigTokenEndpoint,
+    kafka = ApplicationEnvironmentKafka(
+        aivenBootstrapServers = kafkaBootstrapServers,
+        aivenCredstorePassword = "credstorepassord",
+        aivenKeystoreLocation = "keystore",
+        aivenSecurityProtocol = "SSL",
+        aivenTruststoreLocation = "truststore",
+    ),
     serviceuserUsername = "user",
     serviceuserPassword = "password",
     mqQueueManager = "mq-queue",
@@ -32,6 +39,7 @@ fun testEnvironment(
     isdialogmeldingDbName = "isdialogmelding_dev",
     isdialogmeldingDbUsername = "username",
     isdialogmeldingDbPassword = "password",
+    toggleKafkaProcessingEnabled = true,
 )
 
 fun testAppState() = ApplicationState(
