@@ -51,7 +51,7 @@ fun defaultFellesformatMessageXmlRegex(): Regex {
             "                            <ns2:TypeId V=\"FNR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"Fødselsnummer Norsk fødselsnummer\"/>\n" +
             "                        </ns2:Ident>\n" +
             "                        <ns2:Ident>\n" +
-            "                            <ns2:Id>hprId</ns2:Id>\n" +
+            "                            <ns2:Id>1</ns2:Id>\n" +
             "                            <ns2:TypeId V=\"HPR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"HPR-nummer\"/>\n" +
             "                        </ns2:Ident>\n" +
             "                    </ns2:HealthcareProfessional>\n" +

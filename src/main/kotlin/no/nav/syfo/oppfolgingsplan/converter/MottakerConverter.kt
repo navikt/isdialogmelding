@@ -71,7 +71,7 @@ class MottakerConverter(private val rsMottaker: RSMottaker?) {
                                 )
                                 .withIdent(
                                     FACTORY.createXMLIdent()
-                                        .withId(rsMottaker.behandler.hprId)
+                                        .withId(rsMottaker.behandler.hprId.toString())
                                         .withTypeId(
                                             FACTORY.createXMLCV()
                                                 .withDN("HPR-nummer")
