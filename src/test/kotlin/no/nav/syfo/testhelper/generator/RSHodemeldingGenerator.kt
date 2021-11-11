@@ -15,7 +15,7 @@ fun generateRSHodemelding(): RSHodemelding {
                 poststed = "poststed",
                 behandler = RSBehandler(
                     fnr = "fnr",
-                    hprId = "hprId",
+                    hprId = 1,
                     fornavn = "Dana",
                     mellomnavn = "Katherine",
                     etternavn = "Scully",
