@@ -10,7 +10,7 @@ fun generateFastlegeResponse(foreldreEnhetHerId: Int? = null) = FastlegeResponse
     fnr = "12125678911",
     herId = 1337,
     foreldreEnhetHerId = foreldreEnhetHerId,
-    helsepersonellregisterId = "1234",
+    helsepersonellregisterId = 1234,
     pasient = FastlegeResponse.Pasient(
         fornavn = null,
         mellomnavn = null,
