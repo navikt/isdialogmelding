@@ -3,6 +3,7 @@ package no.nav.syfo.behandler.kafka
 import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.behandler.database.*
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
@@ -19,7 +20,7 @@ fun blockingApplicationLogicDialogmeldingBestilling(
     database: DatabaseInterface,
 ) {
     val consumerProperties = kafkaBehandlerDialogmeldingBestillingConsumerConfig(applicationEnvironmentKafka)
-    val kafkaConsumerDialogmeldingBestilling = KafkaConsumer<String, KafkaBehandlerDialogmeldingDTO>(consumerProperties)
+    val kafkaConsumerDialogmeldingBestilling = KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>(consumerProperties)
 
     kafkaConsumerDialogmeldingBestilling.subscribe(
         listOf(DIALOGMELDING_BESTILLING_TOPIC)
@@ -34,7 +35,7 @@ fun blockingApplicationLogicDialogmeldingBestilling(
 
 fun pollAndProcessDialogmeldingBestilling(
     database: DatabaseInterface,
-    kafkaConsumerDialogmeldingBestilling: KafkaConsumer<String, KafkaBehandlerDialogmeldingDTO>,
+    kafkaConsumerDialogmeldingBestilling: KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>,
 ) {
     val records = kafkaConsumerDialogmeldingBestilling.poll(Duration.ofMillis(1000))
     if (records.count() > 0) {
@@ -47,11 +48,31 @@ fun pollAndProcessDialogmeldingBestilling(
 }
 
 fun createAndStoreDialogmeldingBestillingFromRecords(
-    consumerRecords: ConsumerRecords<String, KafkaBehandlerDialogmeldingDTO>,
+    consumerRecords: ConsumerRecords<String, BehandlerDialogmeldingBestillingDTO>,
     database: DatabaseInterface,
 ) {
-    // TODO: Store and send dialogmeldinger
     consumerRecords.forEach {
-        log.info("Received consumer record with key: ${it.key()} behandlerRef: ${it.value().behandlerRef} kode: ${it.value().dialogmeldingKode} parent: ${it.value().dialogmeldingRefParent} conversation: ${it.value().dialogmeldingRefConversation}")
+        log.info("Received consumer record with key: ${it.key()}")
+        val behandlerDialogmeldingBestilling = it.value().toBehandlerDialogmeldingBestilling()
+        val behandlerId = database.getBehandlerDialogmeldingForUuid(behandlerDialogmeldingBestilling.behandlerRef)?.id
+        if (behandlerId == null) {
+            log.error("Unknown behandlerRef in behandlerDialogmeldingBestilling: ${behandlerDialogmeldingBestilling.behandlerRef}")
+        } else {
+            database.connection.use { connection ->
+                val pBehandlerDialogmeldingBestilling = connection.getBehandlerDialogmeldingBestilling(
+                    uuid = behandlerDialogmeldingBestilling.uuid
+                )
+
+                if (pBehandlerDialogmeldingBestilling == null) {
+                    connection.createBehandlerDialogmeldingBestilling(
+                        behandlerDialogmeldingBestilling = behandlerDialogmeldingBestilling,
+                        behandlerId = behandlerId,
+                    )
+                } else {
+                    log.warn("Received duplicate behandler dialogmelding bestilling with uuid: ${behandlerDialogmeldingBestilling.uuid}")
+                }
+                connection.commit()
+            }
+        }
     }
 }
