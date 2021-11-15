@@ -64,6 +64,9 @@ fun DatabaseInterface.createBehandlerDialogmeldingForArbeidstaker(
 fun DatabaseInterface.dropData() {
     val queryList = listOf(
         """
+        DELETE FROM BEHANDLER_DIALOGMELDING_BESTILLING
+        """.trimIndent(),
+        """
         DELETE FROM BEHANDLER_DIALOGMELDING
         """.trimIndent(),
         """
