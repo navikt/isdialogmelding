@@ -65,7 +65,7 @@ class BehandlerService(
         behandler: Behandler,
         personIdentNumber: PersonIdentNumber,
     ): Behandler {
-        val pBehandlerForFastlege = database.getBehandlerDialogmelding(
+        val pBehandlerForFastlege = database.getBehandlerDialogmeldingForPartnerId(
             partnerId = behandler.partnerId,
         )
         if (pBehandlerForFastlege == null) {

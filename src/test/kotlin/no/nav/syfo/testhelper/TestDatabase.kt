@@ -2,8 +2,7 @@ package no.nav.syfo.testhelper
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.database.createBehandlerDialogmelding
-import no.nav.syfo.behandler.database.createBehandlerDialogmeldingArbeidstaker
+import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.domain.PersonIdentNumber
 import org.flywaydb.core.Flyway
@@ -63,6 +62,9 @@ fun DatabaseInterface.createBehandlerDialogmeldingForArbeidstaker(
 
 fun DatabaseInterface.dropData() {
     val queryList = listOf(
+        """
+        DELETE FROM BEHANDLER_DIALOGMELDING_BESTILLING
+        """.trimIndent(),
         """
         DELETE FROM BEHANDLER_DIALOGMELDING
         """.trimIndent(),

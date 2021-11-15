@@ -5,7 +5,7 @@ import org.apache.kafka.common.serialization.Deserializer
 
 val mapper = configuredJacksonMapper()
 
-class JacksonKafkaDeserializer : Deserializer<KafkaBehandlerDialogmeldingDTO> {
-    override fun deserialize(topic: String, data: ByteArray): KafkaBehandlerDialogmeldingDTO = mapper.readValue(data, KafkaBehandlerDialogmeldingDTO::class.java)
+class JacksonKafkaDeserializer : Deserializer<BehandlerDialogmeldingBestillingDTO> {
+    override fun deserialize(topic: String, data: ByteArray): BehandlerDialogmeldingBestillingDTO = mapper.readValue(data, BehandlerDialogmeldingBestillingDTO::class.java)
     override fun close() {}
 }
