@@ -136,7 +136,7 @@ const val queryGetBehandlerDialogmeldingForId =
         SELECT * FROM BEHANDLER_DIALOGMELDING WHERE id = ?
     """
 
-fun DatabaseInterface.getBehandlerDialogmeldingId(id: Int): PBehandlerDialogmelding? {
+fun DatabaseInterface.getBehandlerDialogmeldingForId(id: Int): PBehandlerDialogmelding? {
     return this.connection.use { connection ->
         connection.prepareStatement(queryGetBehandlerDialogmeldingForId)
             .use {

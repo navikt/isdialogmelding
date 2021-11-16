@@ -13,6 +13,7 @@ import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.kafka.launchKafkaTask
+import no.nav.syfo.cronjob.cronjobModule
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
@@ -56,6 +57,12 @@ fun main() {
                 applicationState = applicationState,
                 applicationEnvironmentKafka = environment.kafka,
                 database = applicationDatabase,
+            )
+            cronjobModule(
+                applicationState = applicationState,
+                database = applicationDatabase,
+                environment = environment,
+                mqSender = mqSender,
             )
         }
     }

@@ -60,19 +60,18 @@ const val querySetBehandlerDialogmeldingBestillingSendt =
         UPDATE BEHANDLER_DIALOGMELDING_BESTILLING SET sendt=?, sendt_tries=sendt_tries+1, updated_at=? WHERE uuid = ?
     """
 
-fun Connection.setBehandlerDialogmeldingBestillingSendt(
+fun DatabaseInterface.setBehandlerDialogmeldingBestillingSendt(
     uuid: UUID,
 ) {
-    val now = Timestamp.from(Instant.now())
-    val idList = this.prepareStatement(querySetBehandlerDialogmeldingBestillingSendt).use {
-        it.setTimestamp(1, now)
-        it.setTimestamp(2, now)
-        it.setString(3, uuid.toString())
-        it.executeQuery().toList { getInt("id") }
-    }
-
-    if (idList.size != 1) {
-        throw SQLException("Updating BehandlerDialogmeldingBestilling failed, no rows affected.")
+    this.connection.use { connection ->
+        val now = Timestamp.from(Instant.now())
+        connection.prepareStatement(querySetBehandlerDialogmeldingBestillingSendt).use { ps ->
+            ps.setTimestamp(1, now)
+            ps.setTimestamp(2, now)
+            ps.setString(3, uuid.toString())
+            ps.execute()
+        }
+        connection.commit()
     }
 }
 
@@ -81,17 +80,16 @@ const val queryIncrementBehandlerDialogmeldingBestillingSendtTries =
         UPDATE BEHANDLER_DIALOGMELDING_BESTILLING SET sendt_tries=sendt_tries+1,updated_at=? WHERE uuid = ?
     """
 
-fun Connection.setIncrementDialogmeldingBestillingSendtTries(
+fun DatabaseInterface.incrementDialogmeldingBestillingSendtTries(
     uuid: UUID,
 ) {
-    val idList = this.prepareStatement(querySetBehandlerDialogmeldingBestillingSendt).use {
-        it.setTimestamp(1, Timestamp.from(Instant.now()))
-        it.setString(2, uuid.toString())
-        it.executeQuery().toList { getInt("id") }
-    }
-
-    if (idList.size != 1) {
-        throw SQLException("Updating BehandlerDialogmeldingBestilling failed, no rows affected.")
+    this.connection.use { connection ->
+        connection.prepareStatement(queryIncrementBehandlerDialogmeldingBestillingSendtTries).use { ps ->
+            ps.setTimestamp(1, Timestamp.from(Instant.now()))
+            ps.setString(2, uuid.toString())
+            ps.execute()
+        }
+        connection.commit()
     }
 }
 
