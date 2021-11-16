@@ -14,6 +14,7 @@ fun testEnvironment(
     azureAppClientSecret = "isdialogmelding-secret",
     azureAppWellKnownUrl = "wellknown",
     azureOpenidConfigTokenEndpoint = azureOpenidConfigTokenEndpoint,
+    electorPath = "/tmp",
     kafka = ApplicationEnvironmentKafka(
         aivenBootstrapServers = kafkaBootstrapServers,
         aivenCredstorePassword = "credstorepassord",
