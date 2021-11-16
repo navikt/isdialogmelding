@@ -1,7 +1,7 @@
-package no.nav.syfo.oppfolgingsplan.hodemeldingwrapper
+package no.nav.syfo.fellesformat.hodemeldingwrapper
 
 import no.kith.xmlstds.dialog._2006_10_11.XMLDialogmelding
-import no.nav.syfo.oppfolgingsplan.hodemeldingwrapper.Dialogmelding.Versjon
+import no.nav.syfo.fellesformat.hodemeldingwrapper.Dialogmelding.Versjon
 import java.util.function.Function
 
 class Dialogmelding1_0(dialogmelding1_0: XMLDialogmelding) : DialogmeldingAbstract() {

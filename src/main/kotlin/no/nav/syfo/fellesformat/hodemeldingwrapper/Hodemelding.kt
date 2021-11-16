@@ -1,4 +1,4 @@
-package no.nav.syfo.oppfolgingsplan.hodemeldingwrapper
+package no.nav.syfo.fellesformat.hodemeldingwrapper
 
 import no.kith.xmlstds.msghead._2006_05_24.XMLDocument
 import no.kith.xmlstds.msghead._2006_05_24.XMLMsgHead

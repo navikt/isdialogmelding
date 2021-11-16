@@ -1,7 +1,7 @@
-package no.nav.syfo.oppfolgingsplan
+package no.nav.syfo.fellesformat
 
 import no.kith.xmlstds.msghead._2006_05_24.XMLMsgHead
-import no.nav.syfo.oppfolgingsplan.hodemeldingwrapper.Hodemelding
+import no.nav.syfo.fellesformat.hodemeldingwrapper.Hodemelding
 import no.nav.xml.eiff._2.XMLEIFellesformat
 import no.nav.xml.eiff._2.XMLMottakenhetBlokk
 import java.util.function.Consumer

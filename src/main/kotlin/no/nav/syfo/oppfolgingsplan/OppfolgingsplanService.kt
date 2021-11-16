@@ -1,6 +1,7 @@
 package no.nav.syfo.oppfolgingsplan
 
 import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.fellesformat.Fellesformat
 import no.nav.syfo.oppfolgingsplan.converter.FellesformatConverter
 import no.nav.syfo.oppfolgingsplan.domain.RSHodemelding
 import no.nav.syfo.util.JAXB
@@ -13,7 +14,7 @@ class OppfolgingsplanService(
     val mqSender: MQSender,
 ) {
     fun sendMelding(melding: RSHodemelding) {
-        log.info("Trying to send oppfolgingsplan to lege with partnerId: ${melding.meldingInfo?.mottaker?.partnerId}")
+        log.info("Sending oppfølgingsplan to lege with partnerId: ${melding.meldingInfo?.mottaker?.partnerId}")
 
         val fellesformat: Fellesformat = opprettDialogmelding(melding)
 
