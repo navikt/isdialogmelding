@@ -30,7 +30,6 @@ class MQSender(private val env: Environment) {
     fun sendMessageToEmottak(payload: String) {
         val queueName = env.emottakQueuename
 
-        log.info("Sending oppfolgingsplan to behandler on queue $queueName")
         jmsContext.createContext(AUTO_ACKNOWLEDGE).use { context ->
             val destination = context.createQueue("queue:///$queueName")
             val message = context.createTextMessage(payload)

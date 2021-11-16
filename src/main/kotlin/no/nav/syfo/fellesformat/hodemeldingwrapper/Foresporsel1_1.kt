@@ -1,4 +1,4 @@
-package no.nav.syfo.oppfolgingsplan.hodemeldingwrapper
+package no.nav.syfo.fellesformat.hodemeldingwrapper
 
 import no.kith.xmlstds.dialog._2013_01_23.XMLForesporsel
 
