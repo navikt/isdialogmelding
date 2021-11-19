@@ -18,7 +18,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: .nais/kafka/behandler-dialogmelding-bestilling.yaml
+          RESOURCE: .nais/kafka/behandler-dialogmelding-bestilling.yaml,.nais/kafka/dialogmelding.yaml
           VARS: .nais/kafka/dev.json
 
   deploy-kafka-prod:
@@ -31,6 +31,6 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
-          RESOURCE: .nais/kafka/behandler-dialogmelding-bestilling.yaml
+          RESOURCE: .nais/kafka/behandler-dialogmelding-bestilling.yaml,.nais/kafka/dialogmelding.yaml
           VARS: .nais/kafka/prod.json
 

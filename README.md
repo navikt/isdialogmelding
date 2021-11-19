@@ -91,6 +91,7 @@ Creating a docker image should be as simple as `docker build -t isdialogmelding 
 
 ### Kafka
 
-This application owns and consumes from the following topic:
+This application owns and consumes from the following topics:
 
-* isdialogmelding-behandler-dialogmelding-bestilling
+* isdialogmelding-behandler-dialogmelding-bestilling: outgoing dialogmelding (are sent to emottak via MQ)
+* isdialogmelding-dialogmelding: incoming (processed to receive replies to previously sent messages)
