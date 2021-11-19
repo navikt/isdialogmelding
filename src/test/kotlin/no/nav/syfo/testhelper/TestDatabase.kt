@@ -4,6 +4,7 @@ import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.fastlege.Pasient
 import no.nav.syfo.domain.PersonIdentNumber
 import org.flywaydb.core.Flyway
 import java.sql.Connection
@@ -45,14 +46,18 @@ class TestDatabaseNotResponding : DatabaseInterface {
 
 fun DatabaseInterface.createBehandlerDialogmeldingForArbeidstaker(
     behandler: Behandler,
+    pasient: Pasient,
     arbeidstakerPersonIdent: PersonIdentNumber,
 ): UUID {
     this.connection.use { connection ->
         val behandlerDialogmelding =
             connection.createBehandlerDialogmelding(behandler)
         connection.createBehandlerDialogmeldingArbeidstaker(
-            arbeidstakerPersonIdent,
-            behandlerDialogmelding.id
+            personIdentNumber = arbeidstakerPersonIdent,
+            fornavn = pasient.fornavn,
+            mellomnavn = pasient.mellomnavn,
+            etternavn = pasient.etternavn,
+            behandlerDialogmeldingId = behandlerDialogmelding.id,
         )
         connection.commit()
 

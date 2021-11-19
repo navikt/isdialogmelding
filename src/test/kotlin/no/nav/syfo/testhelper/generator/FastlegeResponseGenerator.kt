@@ -1,9 +1,17 @@
 package no.nav.syfo.testhelper.generator
 
 import no.nav.syfo.behandler.fastlege.FastlegeResponse
+import no.nav.syfo.behandler.fastlege.Pasient
+import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.testhelper.UserConstants
 import java.time.LocalDate
 
-fun generateFastlegeResponse(foreldreEnhetHerId: Int? = null) = FastlegeResponse(
+fun generateFastlegeResponse(
+    foreldreEnhetHerId: Int? = null,
+    pasientFnr: PersonIdentNumber = UserConstants.ARBEIDSTAKER_FNR,
+    pasientFornavn: String = UserConstants.ARBEIDSTAKER_FORNAVN,
+    pasientEtternavn: String = UserConstants.ARBEIDSTAKER_ETTERNAVN,
+) = FastlegeResponse(
     fornavn = "Dana",
     mellomnavn = "Katherine",
     etternavn = "Scully",
@@ -11,11 +19,11 @@ fun generateFastlegeResponse(foreldreEnhetHerId: Int? = null) = FastlegeResponse
     herId = 1337,
     foreldreEnhetHerId = foreldreEnhetHerId,
     helsepersonellregisterId = 1234,
-    pasient = FastlegeResponse.Pasient(
-        fornavn = null,
+    pasient = Pasient(
+        fornavn = pasientFornavn,
         mellomnavn = null,
-        etternavn = null,
-        fnr = null
+        etternavn = pasientEtternavn,
+        fnr = pasientFnr.value,
     ),
     fastlegekontor = FastlegeResponse.Fastlegekontor(
         navn = "Fastlegens kontor",

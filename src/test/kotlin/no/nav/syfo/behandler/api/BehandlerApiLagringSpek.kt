@@ -2,10 +2,12 @@ package no.nav.syfo.behandler.api
 
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import no.nav.syfo.behandler.database.getArbeidstakerNavn
 import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
-import no.nav.syfo.behandler.fastlege.toBehandler
+import no.nav.syfo.behandler.fastlege.toBehandlerPasientPair
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
+import no.nav.syfo.testhelper.mocks.FastlegeRestMock
 import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
 import org.amshove.kluent.shouldBeEqualTo
@@ -49,8 +51,12 @@ class BehandlerApiLagringSpek : Spek({
                     )
                     behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
                     behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                    val behandlerDialogmeldingArbeidstaker = database.getArbeidstakerNavn(UserConstants.ARBEIDSTAKER_FNR)
+                    behandlerDialogmeldingArbeidstaker!!.fornavn shouldBeEqualTo UserConstants.ARBEIDSTAKER_FORNAVN
+                    behandlerDialogmeldingArbeidstaker.etternavn shouldBeEqualTo UserConstants.ARBEIDSTAKER_ETTERNAVN
                 }
-                it("multiple gets should store behandler once for arbeidstaker with fastlege") {
+                it("multiple gets should store behandler once for arbeidstaker with fastlege, but update arbeidstaker name") {
+                    FastlegeRestMock.invocationCount = 0
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -65,6 +71,9 @@ class BehandlerApiLagringSpek : Spek({
                     )
                     behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
                     behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                    val behandlerDialogmeldingArbeidstaker = database.getArbeidstakerNavn(UserConstants.ARBEIDSTAKER_FNR)
+                    behandlerDialogmeldingArbeidstaker!!.fornavn shouldBeEqualTo UserConstants.ARBEIDSTAKER_FORNAVN
+                    behandlerDialogmeldingArbeidstaker.etternavn shouldBeEqualTo UserConstants.ARBEIDSTAKER_ETTERNAVN
 
                     with(
                         handleRequest(HttpMethod.Get, url) {
@@ -79,6 +88,9 @@ class BehandlerApiLagringSpek : Spek({
                     )
                     behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
                     behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                    val behandlerDialogmeldingArbeidstakerUpdated = database.getArbeidstakerNavn(UserConstants.ARBEIDSTAKER_FNR)
+                    behandlerDialogmeldingArbeidstakerUpdated!!.fornavn shouldBeEqualTo UserConstants.ARBEIDSTAKER_FORNAVN_UPDATED
+                    behandlerDialogmeldingArbeidstakerUpdated.etternavn shouldBeEqualTo UserConstants.ARBEIDSTAKER_ETTERNAVN_UPDATED
                 }
                 it("gets for arbeidstakere with equal fastlege should store behandler once") {
                     with(
@@ -112,9 +124,11 @@ class BehandlerApiLagringSpek : Spek({
             }
             describe("Get list of BehandlerDialogmelding with behandlere in database") {
                 it("should not store behandler when fastlege is latest behandler stored for arbeidstaker") {
+                    val pair = generateFastlegeResponse(UserConstants.HERID).toBehandlerPasientPair(UserConstants.PARTNERID)
                     database.createBehandlerDialogmeldingForArbeidstaker(
-                        behandler = generateFastlegeResponse(UserConstants.HERID).toBehandler(UserConstants.PARTNERID),
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        behandler = pair.first,
+                        pasient = pair.second,
+                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
                     )
 
                     with(
@@ -131,9 +145,11 @@ class BehandlerApiLagringSpek : Spek({
                     ).size shouldBeEqualTo 1
                 }
                 it("should store behandler for arbeidstaker when fastlege is stored for other arbeidstaker") {
+                    val pair = generateFastlegeResponse(UserConstants.HERID, UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_HERID_FNR).toBehandlerPasientPair(UserConstants.PARTNERID)
                     database.createBehandlerDialogmeldingForArbeidstaker(
-                        behandler = generateFastlegeResponse(UserConstants.HERID).toBehandler(UserConstants.PARTNERID),
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_HERID_FNR
+                        behandler = pair.first,
+                        pasient = pair.second,
+                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_HERID_FNR,
                     )
 
                     with(
@@ -150,9 +166,11 @@ class BehandlerApiLagringSpek : Spek({
                     ).size shouldBeEqualTo 1
                 }
                 it("should store behandler when fastlege is not latest behandler for arbeidstaker") {
+                    val pair = generateFastlegeResponse(UserConstants.OTHER_HERID).toBehandlerPasientPair(UserConstants.OTHER_PARTNERID)
                     val behandlerRef = database.createBehandlerDialogmeldingForArbeidstaker(
-                        behandler = generateFastlegeResponse(UserConstants.OTHER_HERID).toBehandler(UserConstants.OTHER_PARTNERID),
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        behandler = pair.first,
+                        pasient = pair.second,
+                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
                     )
 
                     with(
@@ -172,12 +190,16 @@ class BehandlerApiLagringSpek : Spek({
                     behandlerDialogmeldingForArbeidstakerList[1].behandlerRef shouldBeEqualTo behandlerRef
                 }
                 it("should store behandler for arbeidstaker when fastlege is stored for arbeidstaker but other fastlege is latest behandler") {
+                    val pair = generateFastlegeResponse(UserConstants.HERID).toBehandlerPasientPair(UserConstants.PARTNERID)
                     val behandlerRef = database.createBehandlerDialogmeldingForArbeidstaker(
-                        behandler = generateFastlegeResponse(UserConstants.HERID).toBehandler(UserConstants.PARTNERID),
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        behandler = pair.first,
+                        pasient = pair.second,
+                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
                     )
+                    val otherPair = generateFastlegeResponse(UserConstants.OTHER_HERID).toBehandlerPasientPair(UserConstants.OTHER_PARTNERID)
                     val otherBehandlerRef = database.createBehandlerDialogmeldingForArbeidstaker(
-                        behandler = generateFastlegeResponse(UserConstants.OTHER_HERID).toBehandler(UserConstants.OTHER_PARTNERID),
+                        behandler = otherPair.first,
+                        pasient = otherPair.second,
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
                     )
 

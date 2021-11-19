@@ -10,6 +10,10 @@ object UserConstants {
     val ARBEIDSTAKER_UTEN_FASTLEGE_FNR = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "4"))
     val ARBEIDSTAKER_FASTLEGE_UTEN_FORELDREENHET_FNR = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "3"))
     val ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "6"))
+    val ARBEIDSTAKER_FORNAVN = "A"
+    val ARBEIDSTAKER_ETTERNAVN = "B"
+    val ARBEIDSTAKER_FORNAVN_UPDATED = "Aa"
+    val ARBEIDSTAKER_ETTERNAVN_UPDATED = "Bb"
 
     const val HERID = 404
     const val OTHER_HERID = 604

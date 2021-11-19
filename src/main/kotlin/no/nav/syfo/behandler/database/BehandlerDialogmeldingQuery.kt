@@ -3,6 +3,7 @@ package no.nav.syfo.behandler.database
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.PBehandlerDialogmelding
+import no.nav.syfo.behandler.database.domain.PBehandlerDialogmeldingArbeidstaker
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.domain.PersonIdentNumber
 import java.sql.*
@@ -15,26 +16,59 @@ const val queryCreateBehandlerDialogmeldingArbeidstaker =
             id,
             uuid,
             arbeidstaker_personident,
+            fornavn,
+            mellomnavn,
+            etternavn,
             created_at,
             behandler_dialogmelding_id
-            ) VALUES (DEFAULT, ?, ?, ?, ?) RETURNING id
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?) RETURNING id
     """
 
 fun Connection.createBehandlerDialogmeldingArbeidstaker(
     personIdentNumber: PersonIdentNumber,
+    fornavn: String,
+    mellomnavn: String?,
+    etternavn: String,
     behandlerDialogmeldingId: Int,
 ) {
     val uuid = UUID.randomUUID()
     val idList = this.prepareStatement(queryCreateBehandlerDialogmeldingArbeidstaker).use {
         it.setString(1, uuid.toString())
         it.setString(2, personIdentNumber.value)
-        it.setTimestamp(3, Timestamp.from(Instant.now()))
-        it.setInt(4, behandlerDialogmeldingId)
+        it.setString(3, fornavn)
+        it.setString(4, mellomnavn)
+        it.setString(5, etternavn)
+        it.setTimestamp(6, Timestamp.from(Instant.now()))
+        it.setInt(7, behandlerDialogmeldingId)
         it.executeQuery().toList { getInt("id") }
     }
 
     if (idList.size != 1) {
         throw SQLException("Creating BehandlerDialogmeldingArbeidstaker failed, no rows affected.")
+    }
+}
+
+const val queryUpdateBehandlerDialogmeldingArbeidstaker =
+    """
+        UPDATE BEHANDLER_DIALOGMELDING_ARBEIDSTAKER 
+        SET fornavn=?, mellomnavn=?, etternavn=?
+        WHERE (arbeidstaker_personident=? AND behandler_dialogmelding_id=?)
+    """
+
+fun Connection.updateBehandlerDialogmeldingArbeidstaker(
+    personIdentNumber: PersonIdentNumber,
+    fornavn: String,
+    mellomnavn: String?,
+    etternavn: String,
+    behandlerDialogmeldingId: Int,
+) {
+    this.prepareStatement(queryUpdateBehandlerDialogmeldingArbeidstaker).use {
+        it.setString(1, fornavn)
+        it.setString(2, mellomnavn)
+        it.setString(3, etternavn)
+        it.setString(4, personIdentNumber.value)
+        it.setInt(5, behandlerDialogmeldingId)
+        it.execute()
     }
 }
 
@@ -201,4 +235,32 @@ fun ResultSet.toPBehandlerDialogmelding(): PBehandlerDialogmelding =
         telefon = getString("telefon"),
         createdAt = getTimestamp("created_at").toLocalDateTime(),
         updatedAt = getTimestamp("updated_at").toLocalDateTime(),
+    )
+
+const val queryGetArbeidstakerNavn =
+    """
+        SELECT * 
+        FROM BEHANDLER_DIALOGMELDING_ARBEIDSTAKER 
+        WHERE arbeidstaker_personident = ?
+        ORDER BY created_at DESC
+    """
+
+fun DatabaseInterface.getArbeidstakerNavn(personIdentNumber: PersonIdentNumber): PBehandlerDialogmeldingArbeidstaker? {
+    return this.connection.use { connection ->
+        connection.prepareStatement(queryGetArbeidstakerNavn)
+            .use {
+                it.setString(1, personIdentNumber.value)
+                it.executeQuery().toList { toPBehandlerDialogmeldingArbeidstaker() }.firstOrNull()
+            }
+    }
+}
+
+fun ResultSet.toPBehandlerDialogmeldingArbeidstaker(): PBehandlerDialogmeldingArbeidstaker =
+    PBehandlerDialogmeldingArbeidstaker(
+        id = getInt("id"),
+        arbeidstakerPersonident = getString("arbeidstaker_personident"),
+        fornavn = getString("fornavn"),
+        mellomnavn = getString("mellomnavn"),
+        etternavn = getString("etternavn"),
+        createdAt = getTimestamp("created_at").toLocalDateTime(),
     )

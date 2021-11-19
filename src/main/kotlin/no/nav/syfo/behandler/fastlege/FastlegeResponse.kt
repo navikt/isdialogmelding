@@ -19,13 +19,6 @@ data class FastlegeResponse(
     val fastlegekontor: Fastlegekontor,
     val pasientforhold: Pasientforhold,
 ) {
-    data class Pasient(
-        val fornavn: String?,
-        val mellomnavn: String?,
-        val etternavn: String?,
-        val fnr: String?,
-    )
-
     data class Fastlegekontor(
         val navn: String?,
         val besoeksadresse: Adresse?,
@@ -47,21 +40,31 @@ data class FastlegeResponse(
     )
 }
 
-fun FastlegeResponse.toBehandler(partnerId: Int) = Behandler(
-    type = BehandlerType.FASTLEGE,
-    behandlerRef = UUID.randomUUID(),
-    fornavn = this.fornavn,
-    mellomnavn = this.mellomnavn,
-    etternavn = this.etternavn,
-    partnerId = partnerId,
-    herId = this.herId,
-    parentHerId = this.foreldreEnhetHerId,
-    hprId = this.helsepersonellregisterId,
-    personident = this.fnr?.let { PersonIdentNumber(it) },
-    kontor = this.fastlegekontor.navn,
-    adresse = this.fastlegekontor.postadresse?.adresse,
-    postnummer = this.fastlegekontor.postadresse?.postnummer,
-    poststed = this.fastlegekontor.postadresse?.poststed,
-    telefon = this.fastlegekontor.telefon,
-    orgnummer = this.fastlegekontor.orgnummer?.let { Virksomhetsnummer(it) },
+data class Pasient(
+    val fornavn: String,
+    val mellomnavn: String?,
+    val etternavn: String,
+    val fnr: String,
+)
+
+fun FastlegeResponse.toBehandlerPasientPair(partnerId: Int) = Pair(
+    first = Behandler(
+        type = BehandlerType.FASTLEGE,
+        behandlerRef = UUID.randomUUID(),
+        fornavn = this.fornavn,
+        mellomnavn = this.mellomnavn,
+        etternavn = this.etternavn,
+        partnerId = partnerId,
+        herId = this.herId,
+        parentHerId = this.foreldreEnhetHerId,
+        hprId = this.helsepersonellregisterId,
+        personident = this.fnr?.let { PersonIdentNumber(it) },
+        kontor = this.fastlegekontor.navn,
+        adresse = this.fastlegekontor.postadresse?.adresse,
+        postnummer = this.fastlegekontor.postadresse?.postnummer,
+        poststed = this.fastlegekontor.postadresse?.poststed,
+        telefon = this.fastlegekontor.telefon,
+        orgnummer = this.fastlegekontor.orgnummer?.let { Virksomhetsnummer(it) },
+    ),
+    second = this.pasient,
 )

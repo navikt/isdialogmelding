@@ -4,8 +4,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.toBehandler
 import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.fastlege.FastlegeClient
-import no.nav.syfo.behandler.fastlege.toBehandler
+import no.nav.syfo.behandler.fastlege.*
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.domain.PersonIdentNumber
 
@@ -19,15 +18,15 @@ class BehandlerService(
         token: String,
         callId: String,
     ): List<Behandler> {
-        val aktivFastlegeBehandler = getAktivFastlegeBehandler(
+        val aktivFastlegeBehandlerPair = getAktivFastlegeBehandler(
             personIdentNumber = personIdentNumber,
             token = token,
             callId = callId,
         )
-        return if (aktivFastlegeBehandler != null) {
+        return if (aktivFastlegeBehandlerPair != null) {
             val behandler = createOrGetBehandler(
-                behandler = aktivFastlegeBehandler,
-                personIdentNumber = personIdentNumber,
+                behandler = aktivFastlegeBehandlerPair.first,
+                pasient = aktivFastlegeBehandlerPair.second,
             )
             listOf(behandler)
         } else emptyList()
@@ -37,7 +36,7 @@ class BehandlerService(
         personIdentNumber: PersonIdentNumber,
         token: String,
         callId: String,
-    ): Behandler? {
+    ): Pair<Behandler, Pasient>? {
         val fastlegeResponse = fastlegeClient.fastlege(
             personIdentNumber = personIdentNumber,
             token = token,
@@ -55,7 +54,7 @@ class BehandlerService(
         )
 
         return if (partnerinfoResponse != null) {
-            fastlegeResponse.toBehandler(
+            fastlegeResponse.toBehandlerPasientPair(
                 partnerId = partnerinfoResponse.partnerId,
             )
         } else null
@@ -63,15 +62,19 @@ class BehandlerService(
 
     private fun createOrGetBehandler(
         behandler: Behandler,
-        personIdentNumber: PersonIdentNumber,
+        pasient: Pasient,
     ): Behandler {
+        val personIdentNumber = PersonIdentNumber(pasient.fnr)
         val pBehandlerForFastlege = database.getBehandlerDialogmeldingForPartnerId(
             partnerId = behandler.partnerId,
         )
         if (pBehandlerForFastlege == null) {
             return createBehandlerDialogmelding(
                 behandler = behandler,
-                personIdentNumber = personIdentNumber
+                personIdentNumber = personIdentNumber,
+                fornavn = pasient.fornavn,
+                mellomnavn = pasient.mellomnavn,
+                etternavn = pasient.etternavn,
             )
         }
 
@@ -84,6 +87,17 @@ class BehandlerService(
             addBehandlerDialogmeldingToArbeidstaker(
                 personIdentNumber = personIdentNumber,
                 behandlerDialogmeldingId = pBehandlerForFastlege.id,
+                fornavn = pasient.fornavn,
+                mellomnavn = pasient.mellomnavn,
+                etternavn = pasient.etternavn,
+            )
+        } else {
+            updateBehandlerDialogmeldingToArbeidstaker(
+                personIdentNumber = personIdentNumber,
+                behandlerDialogmeldingId = pBehandlerForFastlege.id,
+                fornavn = pasient.fornavn,
+                mellomnavn = pasient.mellomnavn,
+                etternavn = pasient.etternavn,
             )
         }
 
@@ -92,6 +106,9 @@ class BehandlerService(
 
     private fun createBehandlerDialogmelding(
         personIdentNumber: PersonIdentNumber,
+        fornavn: String,
+        mellomnavn: String?,
+        etternavn: String,
         behandler: Behandler,
     ): Behandler {
         database.connection.use { connection ->
@@ -100,6 +117,9 @@ class BehandlerService(
             )
             connection.createBehandlerDialogmeldingArbeidstaker(
                 personIdentNumber = personIdentNumber,
+                fornavn = fornavn,
+                mellomnavn = mellomnavn,
+                etternavn = etternavn,
                 behandlerDialogmeldingId = pBehandlerDialogmelding.id,
             )
             connection.commit()
@@ -110,11 +130,36 @@ class BehandlerService(
 
     private fun addBehandlerDialogmeldingToArbeidstaker(
         personIdentNumber: PersonIdentNumber,
+        fornavn: String,
+        mellomnavn: String?,
+        etternavn: String,
         behandlerDialogmeldingId: Int,
     ) {
         database.connection.use { connection ->
             connection.createBehandlerDialogmeldingArbeidstaker(
                 personIdentNumber = personIdentNumber,
+                fornavn = fornavn,
+                mellomnavn = mellomnavn,
+                etternavn = etternavn,
+                behandlerDialogmeldingId = behandlerDialogmeldingId,
+            )
+            connection.commit()
+        }
+    }
+
+    private fun updateBehandlerDialogmeldingToArbeidstaker(
+        personIdentNumber: PersonIdentNumber,
+        fornavn: String,
+        mellomnavn: String?,
+        etternavn: String,
+        behandlerDialogmeldingId: Int,
+    ) {
+        database.connection.use { connection ->
+            connection.updateBehandlerDialogmeldingArbeidstaker(
+                personIdentNumber = personIdentNumber,
+                fornavn = fornavn,
+                mellomnavn = mellomnavn,
+                etternavn = etternavn,
                 behandlerDialogmeldingId = behandlerDialogmeldingId,
             )
             connection.commit()
