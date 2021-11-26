@@ -2,7 +2,7 @@ package no.nav.syfo.oppfolgingsplan
 
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.fellesformat.Fellesformat
-import no.nav.syfo.oppfolgingsplan.converter.FellesformatConverter
+import no.nav.syfo.oppfolgingsplan.converter.createFellesformat
 import no.nav.syfo.oppfolgingsplan.domain.RSHodemelding
 import no.nav.syfo.util.JAXB
 import no.nav.xml.eiff._2.XMLEIFellesformat
@@ -22,7 +22,7 @@ class OppfolgingsplanService(
     }
 
     private fun opprettDialogmelding(hodemelding: RSHodemelding): Fellesformat {
-        val xmleiFellesformat: XMLEIFellesformat = FellesformatConverter(hodemelding).getEiFellesformat()
+        val xmleiFellesformat: XMLEIFellesformat = createFellesformat(hodemelding)
         return Fellesformat(xmleiFellesformat, JAXB::marshallDialogmelding1_0)
     }
 }
