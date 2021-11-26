@@ -2,8 +2,7 @@ package no.nav.syfo.behandler.kafka
 
 import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.database.*
+import no.nav.syfo.behandler.BehandlerDialogmeldingService
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
@@ -17,7 +16,7 @@ private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.behandler.kafka")
 fun blockingApplicationLogicDialogmeldingBestilling(
     applicationState: ApplicationState,
     applicationEnvironmentKafka: ApplicationEnvironmentKafka,
-    database: DatabaseInterface,
+    behandlerDialogmeldingService: BehandlerDialogmeldingService,
 ) {
     val consumerProperties = kafkaBehandlerDialogmeldingBestillingConsumerConfig(applicationEnvironmentKafka)
     val kafkaConsumerDialogmeldingBestilling = KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>(consumerProperties)
@@ -27,21 +26,21 @@ fun blockingApplicationLogicDialogmeldingBestilling(
     )
     while (applicationState.ready) {
         pollAndProcessDialogmeldingBestilling(
-            database = database,
+            behandlerDialogmeldingService = behandlerDialogmeldingService,
             kafkaConsumerDialogmeldingBestilling = kafkaConsumerDialogmeldingBestilling,
         )
     }
 }
 
 fun pollAndProcessDialogmeldingBestilling(
-    database: DatabaseInterface,
+    behandlerDialogmeldingService: BehandlerDialogmeldingService,
     kafkaConsumerDialogmeldingBestilling: KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>,
 ) {
     val records = kafkaConsumerDialogmeldingBestilling.poll(Duration.ofMillis(1000))
     if (records.count() > 0) {
         createAndStoreDialogmeldingBestillingFromRecords(
             consumerRecords = records,
-            database = database,
+            behandlerDialogmeldingService = behandlerDialogmeldingService,
         )
         kafkaConsumerDialogmeldingBestilling.commitSync()
     }
@@ -49,30 +48,10 @@ fun pollAndProcessDialogmeldingBestilling(
 
 fun createAndStoreDialogmeldingBestillingFromRecords(
     consumerRecords: ConsumerRecords<String, BehandlerDialogmeldingBestillingDTO>,
-    database: DatabaseInterface,
+    behandlerDialogmeldingService: BehandlerDialogmeldingService,
 ) {
     consumerRecords.forEach {
         log.info("Received consumer record with key: ${it.key()}")
-        val behandlerDialogmeldingBestilling = it.value().toBehandlerDialogmeldingBestilling()
-        val behandlerId = database.getBehandlerDialogmeldingForUuid(behandlerDialogmeldingBestilling.behandlerRef)?.id
-        if (behandlerId == null) {
-            log.error("Unknown behandlerRef in behandlerDialogmeldingBestilling: ${behandlerDialogmeldingBestilling.behandlerRef}")
-        } else {
-            database.connection.use { connection ->
-                val pBehandlerDialogmeldingBestilling = connection.getBehandlerDialogmeldingBestilling(
-                    uuid = behandlerDialogmeldingBestilling.uuid
-                )
-
-                if (pBehandlerDialogmeldingBestilling == null) {
-                    connection.createBehandlerDialogmeldingBestilling(
-                        behandlerDialogmeldingBestilling = behandlerDialogmeldingBestilling,
-                        behandlerId = behandlerId,
-                    )
-                } else {
-                    log.warn("Received duplicate behandler dialogmelding bestilling with uuid: ${behandlerDialogmeldingBestilling.uuid}")
-                }
-                connection.commit()
-            }
-        }
+        behandlerDialogmeldingService.handleIncomingDialogmeldingBestilling(it.value())
     }
 }

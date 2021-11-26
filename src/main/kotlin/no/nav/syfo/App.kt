@@ -12,6 +12,7 @@ import no.nav.syfo.application.api.authentication.getWellKnown
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.behandler.BehandlerDialogmeldingService
 import no.nav.syfo.behandler.kafka.launchKafkaTask
 import no.nav.syfo.cronjob.cronjobModule
 import org.slf4j.LoggerFactory
@@ -53,17 +54,24 @@ fun main() {
         applicationState.ready = true
         logger.info("Application is ready")
         if (environment.toggleKafkaProcessingEnabled) {
+
+            val behandlerDialogmeldingService = BehandlerDialogmeldingService(
+                database = applicationDatabase,
+            )
+
             launchKafkaTask(
                 applicationState = applicationState,
                 applicationEnvironmentKafka = environment.kafka,
-                database = applicationDatabase,
+                behandlerDialogmeldingService = behandlerDialogmeldingService,
             )
             cronjobModule(
                 applicationState = applicationState,
-                database = applicationDatabase,
                 environment = environment,
                 mqSender = mqSender,
+                behandlerDialogmeldingService = behandlerDialogmeldingService,
             )
+        } else {
+            logger.info("Kafka-processing and cronjob disabled")
         }
     }
 

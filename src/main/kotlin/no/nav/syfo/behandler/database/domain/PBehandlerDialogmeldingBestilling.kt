@@ -18,10 +18,10 @@ data class PBehandlerDialogMeldingBestilling(
 )
 
 fun PBehandlerDialogMeldingBestilling.toBehandlerDialogmeldingBestilling(
-    behandlerRef: UUID
+    behandler: Behandler,
 ) = BehandlerDialogmeldingBestilling(
     uuid = this.uuid,
-    behandlerRef = behandlerRef,
+    behandler = behandler,
     arbeidstakerPersonIdent = PersonIdentNumber(this.arbeidstakerPersonIdent),
     parentUuid = this.parentUuid,
     conversationUuid = this.conversationUuid,

@@ -3,6 +3,7 @@ package no.nav.syfo.behandler.kafka
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
+import no.nav.syfo.behandler.BehandlerDialogmeldingService
 import no.nav.syfo.behandler.database.createBehandlerDialogmelding
 import no.nav.syfo.behandler.database.getBehandlerDialogmeldingBestilling
 import no.nav.syfo.testhelper.*
@@ -24,6 +25,7 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
         start()
 
         val database = TestDatabase()
+        val behandlerDialogmeldingService = BehandlerDialogmeldingService(database)
         val random = Random()
 
         describe(KafkaBehandlerDialogmeldingBestillingSpek::class.java.simpleName) {
@@ -68,7 +70,7 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                     it("should persist incoming bestillinger") {
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
-                                database = database,
+                                behandlerDialogmeldingService = behandlerDialogmeldingService,
                                 kafkaConsumerDialogmeldingBestilling = mockConsumer,
                             )
                         }
@@ -127,7 +129,7 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                     it("Should only persist once when duplicates") {
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
-                                database = database,
+                                behandlerDialogmeldingService = behandlerDialogmeldingService,
                                 kafkaConsumerDialogmeldingBestilling = mockConsumer,
                             )
                         }
@@ -172,13 +174,12 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                     it("should not persist incoming bestillinger when behandlerRef is invalid") {
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
-                                database = database,
+                                behandlerDialogmeldingService = behandlerDialogmeldingService,
                                 kafkaConsumerDialogmeldingBestilling = mockConsumer,
                             )
                         }
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
-
                         val pBehandlerDialogmeldingBestilling =
                             database.connection.use {
                                 it.getBehandlerDialogmeldingBestilling(

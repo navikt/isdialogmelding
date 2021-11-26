@@ -17,9 +17,11 @@ data class BehandlerDialogmeldingBestillingDTO(
     val dialogmeldingVedlegg: ByteArray? = null,
 )
 
-fun BehandlerDialogmeldingBestillingDTO.toBehandlerDialogmeldingBestilling() = BehandlerDialogmeldingBestilling(
+fun BehandlerDialogmeldingBestillingDTO.toBehandlerDialogmeldingBestilling(
+    behandler: Behandler,
+) = BehandlerDialogmeldingBestilling(
     uuid = UUID.fromString(this.dialogmeldingUuid),
-    behandlerRef = UUID.fromString(behandlerRef),
+    behandler = behandler,
     arbeidstakerPersonIdent = PersonIdentNumber(this.personIdent),
     parentUuid = this.dialogmeldingRefParent?.let { UUID.fromString(it) },
     conversationUuid = UUID.fromString(this.dialogmeldingRefConversation),
