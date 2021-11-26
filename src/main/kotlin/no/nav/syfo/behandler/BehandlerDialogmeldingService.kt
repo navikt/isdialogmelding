@@ -2,9 +2,16 @@ package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
-import no.nav.syfo.behandler.database.domain.toBehandlerDialogmeldingBestilling
+import no.nav.syfo.behandler.database.domain.*
+import no.nav.syfo.behandler.domain.BehandlerDialogmeldingArbeidstaker
 import no.nav.syfo.behandler.domain.BehandlerDialogmeldingBestilling
+import no.nav.syfo.behandler.kafka.*
+import no.nav.syfo.domain.PersonIdentNumber
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.util.UUID
+
+private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.behandler")
 
 class BehandlerDialogmeldingService(
     private val database: DatabaseInterface,
@@ -13,7 +20,7 @@ class BehandlerDialogmeldingService(
         return database.getBehandlerDialogmeldingBestillingNotSendt()
             .map { pBehandlerDialogMeldingBestilling ->
                 pBehandlerDialogMeldingBestilling.toBehandlerDialogmeldingBestilling(
-                    database.getBehandlerDialogmeldingForId(pBehandlerDialogMeldingBestilling.behandlerId)!!.behandlerRef
+                    database.getBehandlerDialogmeldingForId(pBehandlerDialogMeldingBestilling.behandlerId)!!.toBehandler()
                 )
             }
     }
@@ -24,5 +31,44 @@ class BehandlerDialogmeldingService(
 
     fun incrementDialogmeldingBestillingSendtTries(uuid: UUID) {
         database.incrementDialogmeldingBestillingSendtTries(uuid)
+    }
+
+    fun getArbeidstakerNavn(personIdent: PersonIdentNumber): BehandlerDialogmeldingArbeidstaker {
+        // TODO: Hente arbeidstaker navn fra PDL
+        return BehandlerDialogmeldingArbeidstaker(
+            arbeidstakerPersonident = personIdent,
+            fornavn = "",
+            mellomnavn = null,
+            etternavn = "",
+        )
+    }
+
+    fun handleIncomingDialogmeldingBestilling(
+        dialogmeldingBestillingDTO: BehandlerDialogmeldingBestillingDTO,
+    ) {
+        val behandlerRef = UUID.fromString(dialogmeldingBestillingDTO.behandlerRef)
+        val pBehandler = database.getBehandlerDialogmeldingForUuid(behandlerRef)
+        if (pBehandler == null) {
+            log.error("Unknown behandlerRef $behandlerRef in behandlerDialogmeldingBestilling ${dialogmeldingBestillingDTO.dialogmeldingUuid}")
+        } else {
+            val behandlerDialogmeldingBestilling = dialogmeldingBestillingDTO.toBehandlerDialogmeldingBestilling(
+                behandler = pBehandler.toBehandler()
+            )
+            database.connection.use { connection ->
+                val pBehandlerDialogmeldingBestilling = connection.getBehandlerDialogmeldingBestilling(
+                    uuid = behandlerDialogmeldingBestilling.uuid
+                )
+
+                if (pBehandlerDialogmeldingBestilling == null) {
+                    connection.createBehandlerDialogmeldingBestilling(
+                        behandlerDialogmeldingBestilling = behandlerDialogmeldingBestilling,
+                        behandlerId = pBehandler.id,
+                    )
+                } else {
+                    log.warn("Ignoring duplicate behandler dialogmelding bestilling with uuid: ${behandlerDialogmeldingBestilling.uuid}.")
+                }
+                connection.commit()
+            }
+        }
     }
 }

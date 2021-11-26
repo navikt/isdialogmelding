@@ -5,7 +5,7 @@ import java.util.UUID
 
 data class BehandlerDialogmeldingBestilling(
     val uuid: UUID,
-    val behandlerRef: UUID,
+    val behandler: Behandler,
     val arbeidstakerPersonIdent: PersonIdentNumber,
     val parentUuid: UUID?,
     val conversationUuid: UUID,

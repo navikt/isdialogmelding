@@ -2,23 +2,25 @@ package no.nav.syfo.testhelper.generator
 
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerType
+import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Virksomhetsnummer
 import java.util.UUID
 
 fun generateBehandler(behandlerRef: UUID, partnerId: Int) = Behandler(
     type = BehandlerType.FASTLEGE,
     behandlerRef = behandlerRef,
-    personident = null,
-    fornavn = "Leif",
-    mellomnavn = null,
-    etternavn = "Lege",
-    herId = null,
-    parentHerId = null,
+    personident = PersonIdentNumber("12125678911"),
+    fornavn = "Dana",
+    mellomnavn = "Katherine",
+    etternavn = "Scully",
+    herId = 77,
+    parentHerId = 99,
     partnerId = partnerId,
-    hprId = null,
+    hprId = 9,
     kontor = null,
-    adresse = null,
-    postnummer = null,
-    poststed = null,
-    orgnummer = null,
+    adresse = "adresse",
+    postnummer = "1234",
+    poststed = "poststed",
+    orgnummer = Virksomhetsnummer("123456789"),
     telefon = null,
 )
