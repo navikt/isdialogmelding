@@ -15,6 +15,7 @@ import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
 import no.nav.syfo.behandler.kafka.launchKafkaTask
 import no.nav.syfo.cronjob.cronjobModule
+import no.nav.syfo.dialogmelding.DialogmeldingService
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
@@ -64,11 +65,16 @@ fun main() {
                 applicationEnvironmentKafka = environment.kafka,
                 behandlerDialogmeldingService = behandlerDialogmeldingService,
             )
+            val dialogmeldingService = DialogmeldingService(
+                behandlerDialogmeldingService = behandlerDialogmeldingService,
+                mqSender = mqSender,
+            )
             cronjobModule(
                 applicationState = applicationState,
                 environment = environment,
                 mqSender = mqSender,
                 behandlerDialogmeldingService = behandlerDialogmeldingService,
+                dialogmeldingService = dialogmeldingService,
             )
         } else {
             logger.info("Kafka-processing and cronjob disabled")

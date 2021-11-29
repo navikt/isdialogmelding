@@ -1,0 +1,112 @@
+package no.nav.syfo.cronjob
+
+import io.ktor.server.testing.*
+import io.mockk.*
+import kotlinx.coroutines.runBlocking
+import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.behandler.BehandlerDialogmeldingService
+import no.nav.syfo.behandler.database.createBehandlerDialogmelding
+import no.nav.syfo.behandler.database.getBehandlerDialogmeldingBestilling
+import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.testhelper.*
+import no.nav.syfo.testhelper.generator.generateBehandler
+import no.nav.syfo.testhelper.generator.generateBehandlerDialogmeldingBestillingDTO
+import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldNotBeEqualTo
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
+import java.util.Random
+import java.util.UUID
+
+class DialogmeldingCronjobSpek : Spek({
+
+    describe(DialogmeldingSendCronjob::class.java.simpleName) {
+        with(TestApplicationEngine()) {
+            start()
+            val random = Random()
+            val externalMockEnvironment = ExternalMockEnvironment.instance
+            val database = externalMockEnvironment.database
+
+            val mqSenderMock = mockk<MQSender>()
+            justRun { mqSenderMock.sendMessageToEmottak(any()) }
+
+            application.testApiModule(
+                externalMockEnvironment = externalMockEnvironment,
+            )
+
+            val behandlerDialogmeldingService = BehandlerDialogmeldingService(
+                database = database,
+            )
+
+            val dialogmeldingService = DialogmeldingService(
+                behandlerDialogmeldingService = behandlerDialogmeldingService,
+                mqSender = mqSenderMock,
+            )
+
+            val dialogmeldingSendCronjob = DialogmeldingSendCronjob(
+                behandlerDialogmeldingService = behandlerDialogmeldingService,
+                dialogmeldingService = dialogmeldingService,
+                mqSender = mqSenderMock,
+            )
+
+            beforeEachTest {
+                database.dropData()
+            }
+            afterEachTest {
+                database.dropData()
+            }
+
+            describe("Cronjob sender bestilte dialogmeldinger") {
+                it("Sender bestilt dialogmelding") {
+                    val behandlerRef = UUID.randomUUID()
+                    val partnerId = random.nextInt()
+                    val behandler = generateBehandler(behandlerRef, partnerId)
+                    database.connection.use {
+                        it.createBehandlerDialogmelding(behandler)
+                        it.commit()
+                    }
+
+                    val dialogmeldingBestillingUuid = UUID.randomUUID()
+
+                    val dialogmeldingBestillingDTO = generateBehandlerDialogmeldingBestillingDTO(
+                        uuid = dialogmeldingBestillingUuid,
+                        behandlerRef = behandlerRef,
+                    )
+                    behandlerDialogmeldingService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
+
+                    val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
+                        connection.getBehandlerDialogmeldingBestilling(
+                            uuid = dialogmeldingBestillingUuid,
+                        )
+                    }
+                    pBehandlerDialogmeldingBestillingBefore shouldNotBeEqualTo null
+                    pBehandlerDialogmeldingBestillingBefore!!.sendt shouldBeEqualTo null
+                    pBehandlerDialogmeldingBestillingBefore.sendtTries shouldBeEqualTo 0
+
+                    runBlocking {
+                        val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
+                        result.failed shouldBeEqualTo 0
+                        result.updated shouldBeEqualTo 1
+                    }
+                    verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
+
+                    val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
+                        connection.getBehandlerDialogmeldingBestilling(
+                            uuid = dialogmeldingBestillingUuid,
+                        )
+                    }
+                    pBehandlerDialogmeldingBestillingAfter!!.sendt shouldNotBeEqualTo null
+                    pBehandlerDialogmeldingBestillingAfter.sendtTries shouldBeEqualTo 1
+
+                    clearMocks(mqSenderMock)
+                    runBlocking {
+                        val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
+                        result.failed shouldBeEqualTo 0
+                        result.updated shouldBeEqualTo 0
+                    }
+                    verify(exactly = 0) { mqSenderMock.sendMessageToEmottak(any()) }
+                }
+            }
+        }
+    }
+})
