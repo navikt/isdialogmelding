@@ -3,10 +3,12 @@ package no.nav.syfo.cronjob
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
+import no.nav.syfo.dialogmelding.DialogmeldingService
 import org.slf4j.LoggerFactory
 
 class DialogmeldingSendCronjob(
     val behandlerDialogmeldingService: BehandlerDialogmeldingService,
+    val dialogmeldingService: DialogmeldingService,
     val mqSender: MQSender,
 ) : DialogmeldingCronjob {
 
@@ -23,7 +25,7 @@ class DialogmeldingSendCronjob(
         val dialogmeldingBestillingListe = behandlerDialogmeldingService.getDialogmeldingBestillingListe()
         dialogmeldingBestillingListe.forEach { dialogmeldingBestillling ->
             try {
-                // TODO: Send dialogmelding
+                dialogmeldingService.sendMelding(dialogmeldingBestillling)
                 behandlerDialogmeldingService.setDialogmeldingBestillingSendt(dialogmeldingBestillling.uuid)
                 sendingResult.updated++
                 COUNT_CRONJOB_DIALOGMELDING_SEND_COUNT.increment()

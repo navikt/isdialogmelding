@@ -132,4 +132,6 @@ fun ResultSet.toPBehandlerDialogmeldingBestilling(): PBehandlerDialogMeldingBest
         kode = getInt("kode"),
         tekst = getString("type"),
         vedlegg = getBytes("vedlegg"),
+        sendt = getTimestamp("sendt"),
+        sendtTries = getInt("sendt_tries"),
     )

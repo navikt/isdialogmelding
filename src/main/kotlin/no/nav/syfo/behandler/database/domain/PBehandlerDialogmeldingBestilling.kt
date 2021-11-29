@@ -2,6 +2,7 @@ package no.nav.syfo.behandler.database.domain
 
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.PersonIdentNumber
+import java.sql.Timestamp
 import java.util.UUID
 
 data class PBehandlerDialogMeldingBestilling(
@@ -15,6 +16,8 @@ data class PBehandlerDialogMeldingBestilling(
     val kode: Int,
     val tekst: String?,
     val vedlegg: ByteArray? = null,
+    val sendt: Timestamp?,
+    val sendtTries: Int,
 )
 
 fun PBehandlerDialogMeldingBestilling.toBehandlerDialogmeldingBestilling(
