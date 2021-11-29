@@ -6,47 +6,29 @@ import no.nav.syfo.behandler.domain.BehandlerDialogmeldingBestilling
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class DokumentDialogmeldingConverter(melding: BehandlerDialogmeldingBestilling) {
-    private val dialogmeldingConverter: DialogmeldingConverter
-    private var document: XMLDocument? = null
-    fun getDocument(): XMLDocument {
-        ensureDocument()
-        return document!!
-    }
-
-    private fun ensureDocument() {
-        if (document == null) {
-            document = FACTORY.createXMLDocument()
-                .withDocumentConnection(
-                    FACTORY.createXMLCS()
-                        .withDN("Hoveddokument")
-                        .withV("H")
+fun createDialogmeldingDocument(melding: BehandlerDialogmeldingBestilling): XMLDocument {
+    val factory = ObjectFactory()
+    return factory.createXMLDocument()
+        .withDocumentConnection(
+            factory.createXMLCS()
+                .withDN("Hoveddokument")
+                .withV("H")
+        )
+        .withRefDoc(
+            factory.createXMLRefDoc()
+                .withIssueDate(
+                    factory.createXMLTS()
+                        .withV(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
                 )
-                .withRefDoc(
-                    FACTORY.createXMLRefDoc()
-                        .withIssueDate(
-                            FACTORY.createXMLTS()
-                                .withV(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
-                        )
-                        .withMsgType(
-                            FACTORY.createXMLCS()
-                                .withDN("XML-instans")
-                                .withV("XML")
-                        )
-                        .withMimeType("text/xml")
-                        .withContent(
-                            FACTORY.createXMLRefDocContent()
-                                .withAny(dialogmeldingConverter.getDialogmelding())
-                        )
+                .withMsgType(
+                    factory.createXMLCS()
+                        .withDN("XML-instans")
+                        .withV("XML")
                 )
-        }
-    }
-
-    companion object {
-        private val FACTORY = ObjectFactory()
-    }
-
-    init {
-        dialogmeldingConverter = DialogmeldingConverter(melding)
-    }
+                .withMimeType("text/xml")
+                .withContent(
+                    factory.createXMLRefDocContent()
+                        .withAny(createDialogmelding(melding))
+                )
+        )
 }

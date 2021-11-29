@@ -5,9 +5,8 @@ import no.nav.syfo.behandler.BehandlerDialogmeldingService
 import no.nav.syfo.behandler.domain.BehandlerDialogmeldingArbeidstaker
 import no.nav.syfo.behandler.domain.BehandlerDialogmeldingBestilling
 import no.nav.syfo.fellesformat.Fellesformat
-import no.nav.syfo.dialogmelding.converter.FellesformatConverter
+import no.nav.syfo.dialogmelding.converter.createFellesformat
 import no.nav.syfo.util.JAXB
-import no.nav.xml.eiff._2.XMLEIFellesformat
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("no.nav.syfo.dialogmelding")
@@ -29,10 +28,10 @@ class DialogmeldingService(
         melding: BehandlerDialogmeldingBestilling,
         arbeidstakerNavn: BehandlerDialogmeldingArbeidstaker,
     ): Fellesformat {
-        val xmleiFellesformat: XMLEIFellesformat = FellesformatConverter(
+        val xmleiFellesformat = createFellesformat(
             melding = melding,
             arbeidstakerNavn = arbeidstakerNavn,
-        ).getEiFellesformat()
+        )
         return Fellesformat(xmleiFellesformat, JAXB::marshallDialogmelding1_0)
     }
 }
