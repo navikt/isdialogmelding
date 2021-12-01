@@ -19,7 +19,7 @@ class DialogmeldingSendCronjob(
         dialogmeldingSendJob()
     }
 
-    fun dialogmeldingSendJob(): DialogmeldingCronjobResult {
+    suspend fun dialogmeldingSendJob(): DialogmeldingCronjobResult {
         val sendingResult = DialogmeldingCronjobResult()
 
         val dialogmeldingBestillingListe = behandlerDialogmeldingService.getDialogmeldingBestillingListe()

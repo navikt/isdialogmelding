@@ -4,11 +4,10 @@ import no.kith.xmlstds.msghead._2006_05_24.ObjectFactory
 import no.kith.xmlstds.msghead._2006_05_24.XMLMsgInfo
 import no.nav.syfo.behandler.domain.*
 import java.time.LocalDateTime
-import java.util.*
 
 fun createMsgInfo(
     melding: BehandlerDialogmeldingBestilling,
-    arbeidstakerNavn: BehandlerDialogmeldingArbeidstaker,
+    arbeidstaker: BehandlerDialogmeldingArbeidstaker,
 ): XMLMsgInfo {
     val factory = ObjectFactory()
     return factory.createXMLMsgInfo()
@@ -32,5 +31,5 @@ fun createMsgInfo(
         )
         .withSender(createSender())
         .withReceiver(createReceiver(melding))
-        .withPatient(createPasient(arbeidstakerNavn))
+        .withPatient(createPasient(arbeidstaker))
 }

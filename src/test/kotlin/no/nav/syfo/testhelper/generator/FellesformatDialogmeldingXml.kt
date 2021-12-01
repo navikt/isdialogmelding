@@ -60,8 +60,9 @@ fun defaultFellesformatDialogmeldingXmlRegex(): Regex {
             "                </ns2:Organisation>\n" +
             "            </ns2:Receiver>\n" +
             "            <ns2:Patient>\n" +
-            "                <ns2:FamilyName></ns2:FamilyName>\n" +
-            "                <ns2:GivenName></ns2:GivenName>\n" +
+            "                <ns2:FamilyName>Etternavn</ns2:FamilyName>\n" +
+            "                <ns2:MiddleName>Mellomnavn</ns2:MiddleName>\n" +
+            "                <ns2:GivenName>Fornavn</ns2:GivenName>\n" +
             "                <ns2:Ident>\n" +
             "                    <ns2:Id>01010112345</ns2:Id>\n" +
             "                    <ns2:TypeId V=\"FNR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"Fødselsnummer\"/>\n" +

@@ -15,22 +15,22 @@ class DialogmeldingService(
     val behandlerDialogmeldingService: BehandlerDialogmeldingService,
     val mqSender: MQSender,
 ) {
-    fun sendMelding(melding: BehandlerDialogmeldingBestilling) {
+    suspend fun sendMelding(melding: BehandlerDialogmeldingBestilling) {
         log.info("Sending dialogmelding to lege with partnerId: ${melding.behandler.partnerId}")
-        val arbeidstakerNavn = behandlerDialogmeldingService.getArbeidstakerNavn(melding.arbeidstakerPersonIdent)
+        val arbeidstaker = behandlerDialogmeldingService.getBehandlerDialogmeldingArbeidstaker(melding.arbeidstakerPersonIdent)
 
-        val fellesformat: Fellesformat = opprettDialogmelding(melding, arbeidstakerNavn)
+        val fellesformat: Fellesformat = opprettDialogmelding(melding, arbeidstaker)
 
         mqSender.sendMessageToEmottak(fellesformat.message!!)
     }
 
     private fun opprettDialogmelding(
         melding: BehandlerDialogmeldingBestilling,
-        arbeidstakerNavn: BehandlerDialogmeldingArbeidstaker,
+        arbeidstaker: BehandlerDialogmeldingArbeidstaker,
     ): Fellesformat {
         val xmleiFellesformat = createFellesformat(
             melding = melding,
-            arbeidstakerNavn = arbeidstakerNavn,
+            arbeidstaker = arbeidstaker,
         )
         return Fellesformat(xmleiFellesformat, JAXB::marshallDialogmelding1_0)
     }

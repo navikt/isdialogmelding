@@ -6,11 +6,11 @@ import no.nav.syfo.behandler.domain.BehandlerDialogmeldingBestilling
 
 fun createMsgHead(
     melding: BehandlerDialogmeldingBestilling,
-    arbeidstakerNavn: BehandlerDialogmeldingArbeidstaker,
+    arbeidstaker: BehandlerDialogmeldingArbeidstaker,
 ): XMLMsgHead {
     val factory = ObjectFactory()
     return factory.createXMLMsgHead()
-        .withMsgInfo(createMsgInfo(melding, arbeidstakerNavn))
+        .withMsgInfo(createMsgInfo(melding, arbeidstaker))
         .withDocument(createDialogmeldingDocument(melding))
         .withDocument(createVedleggDocument(melding))
 }

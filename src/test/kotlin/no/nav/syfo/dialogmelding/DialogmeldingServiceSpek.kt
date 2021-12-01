@@ -1,9 +1,12 @@
 package no.nav.syfo.dialogmelding
 
 import io.mockk.*
+import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
 import no.nav.syfo.behandler.kafka.toBehandlerDialogmeldingBestilling
+import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.testhelper.ExternalMockEnvironment
 import no.nav.syfo.testhelper.generator.*
 import org.junit.Assert.assertTrue
@@ -17,7 +20,20 @@ object DialogmeldingServiceSpek : Spek({
         it("Sends correct message on MQ") {
             val externalMockEnvironment = ExternalMockEnvironment.instance
             val database = externalMockEnvironment.database
-            val behandlerDialogmeldingService = BehandlerDialogmeldingService(database)
+            val environment = ExternalMockEnvironment.instance.environment
+            val pdlClient = PdlClient(
+                azureAdClient = AzureAdClient(
+                    azureAppClientId = environment.aadAppClient,
+                    azureAppClientSecret = environment.azureAppClientSecret,
+                    azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+                ),
+                pdlClientId = environment.pdlClientId,
+                pdlUrl = environment.pdlUrl,
+            )
+            val behandlerDialogmeldingService = BehandlerDialogmeldingService(
+                database = database,
+                pdlClient = pdlClient,
+            )
             val mqSender = mockk<MQSender>()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -38,8 +54,9 @@ object DialogmeldingServiceSpek : Spek({
                 ),
             )
 
-            dialogmeldingService.sendMelding(melding)
-
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
             verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlRegex()

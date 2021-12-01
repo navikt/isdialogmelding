@@ -23,6 +23,7 @@ fun Application.apiModule(
     environment: Environment,
     mqSender: MQSender,
     wellKnownInternalAzureAD: WellKnown,
+    azureAdClient: AzureAdClient,
 ) {
     installMetrics()
     installContentNegotiation()
@@ -37,11 +38,6 @@ fun Application.apiModule(
         ),
     )
 
-    val azureAdClient = AzureAdClient(
-        azureAppClientId = environment.aadAppClient,
-        azureAppClientSecret = environment.azureAppClientSecret,
-        azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
-    )
     val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
         azureAdClient = azureAdClient,
         syfotilgangskontrollClientId = environment.syfotilgangskontrollClientId,

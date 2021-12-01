@@ -9,6 +9,7 @@ fun testEnvironment(
     fastlegeRestUrl: String,
     syfoPartnerinfoUrl: String,
     syfoTilgangskontrollUrl: String,
+    pdlUrl: String,
 ) = Environment(
     aadAppClient = "isdialogmelding-client-id",
     azureAppClientSecret = "isdialogmelding-secret",
@@ -31,6 +32,8 @@ fun testEnvironment(
     emottakQueuename = "emottak-queue",
     fastlegeRestClientId = "fastlegerest-client-id",
     fastlegeRestUrl = fastlegeRestUrl,
+    pdlClientId = "pdlclientid",
+    pdlUrl = pdlUrl,
     syfoPartnerinfoClientId = "syfopartnerinfo-client-id",
     syfoPartnerinfoUrl = syfoPartnerinfoUrl,
     syfotilgangskontrollClientId = "syfo-tilgangskontroll-client-id",

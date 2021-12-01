@@ -8,6 +8,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.syfo.client.httpClientProxy
 import org.slf4j.LoggerFactory
+import java.util.concurrent.ConcurrentHashMap
 
 class AzureAdClient(
     private val azureAppClientId: String,
@@ -31,6 +32,30 @@ class AzureAdClient(
                 append("requested_token_use", "on_behalf_of")
             }
         )?.toAzureAdToken()
+    }
+
+    suspend fun getSystemToken(scopeClientId: String): AzureAdToken? {
+        val cacheKey = scopeClientId
+        val cachedToken = tokenCache[cacheKey]
+        return if (cachedToken?.isExpired() == false) {
+            COUNT_CALL_AZUREAD_TOKEN_SYSTEM_CACHE_HIT.increment()
+            cachedToken
+        } else {
+            val azureAdTokenResponse = getAccessToken(
+                Parameters.build {
+                    append("client_id", azureAppClientId)
+                    append("client_secret", azureAppClientSecret)
+                    append("grant_type", "client_credentials")
+                    append("scope", "api://$scopeClientId/.default")
+                }
+            )
+            azureAdTokenResponse?.let { token ->
+                val azureAdToken = token.toAzureAdToken()
+                COUNT_CALL_AZUREAD_TOKEN_SYSTEM_CACHE_MISS.increment()
+                tokenCache[cacheKey] = azureAdToken
+                azureAdToken
+            }
+        }
     }
 
     private suspend fun getAccessToken(
@@ -61,6 +86,7 @@ class AzureAdClient(
     }
 
     companion object {
+        private val tokenCache = ConcurrentHashMap<String, AzureAdToken>()
         private val log = LoggerFactory.getLogger(AzureAdClient::class.java)
     }
 }

@@ -6,6 +6,8 @@ import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
 import no.nav.syfo.behandler.database.createBehandlerDialogmelding
 import no.nav.syfo.behandler.database.getBehandlerDialogmeldingBestilling
+import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateBehandler
 import no.nav.syfo.testhelper.generator.generateBehandlerDialogmeldingBestillingDTO
@@ -23,10 +25,26 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
 
     with(TestApplicationEngine()) {
         start()
-
-        val database = TestDatabase()
-        val behandlerDialogmeldingService = BehandlerDialogmeldingService(database)
+        val database = ExternalMockEnvironment.instance.database
+        val environment = ExternalMockEnvironment.instance.environment
+        val pdlClient = PdlClient(
+            azureAdClient = AzureAdClient(
+                azureAppClientId = environment.aadAppClient,
+                azureAppClientSecret = environment.azureAppClientSecret,
+                azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+            ),
+            pdlClientId = environment.pdlClientId,
+            pdlUrl = environment.pdlUrl,
+        )
+        val behandlerDialogmeldingService = BehandlerDialogmeldingService(
+            database = database,
+            pdlClient = pdlClient,
+        )
         val random = Random()
+
+        afterEachTest {
+            database.dropData()
+        }
 
         describe(KafkaBehandlerDialogmeldingBestillingSpek::class.java.simpleName) {
 
@@ -37,37 +55,37 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                     partition,
                 )
                 describe("Happy path") {
-                    val behandlerRef = UUID.randomUUID()
-                    val partnerId = random.nextInt()
-                    val behandler = generateBehandler(behandlerRef, partnerId)
-                    database.connection.use {
-                        it.createBehandlerDialogmelding(behandler)
-                        it.commit()
-                    }
+                    it("should persist incoming bestillinger") {
+                        val behandlerRef = UUID.randomUUID()
+                        val partnerId = random.nextInt()
+                        val behandler = generateBehandler(behandlerRef, partnerId)
+                        database.connection.use {
+                            it.createBehandlerDialogmelding(behandler)
+                            it.commit()
+                        }
 
-                    val dialogmeldingBestillingUuid = UUID.randomUUID()
-                    val dialogmeldingBestilling = generateBehandlerDialogmeldingBestillingDTO(
-                        uuid = dialogmeldingBestillingUuid,
-                        behandlerRef = behandlerRef,
-                    )
-                    val dialogmeldingBestillingRecord = ConsumerRecord(
-                        DIALOGMELDING_BESTILLING_TOPIC,
-                        partition,
-                        1,
-                        dialogmeldingBestilling.dialogmeldingUuid,
-                        dialogmeldingBestilling,
-                    )
-                    val mockConsumer = mockk<KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>>()
-                    every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                        mapOf(
-                            behandlerDialogmeldingBestillingTopicPartition to listOf(
-                                dialogmeldingBestillingRecord,
+                        val dialogmeldingBestillingUuid = UUID.randomUUID()
+                        val dialogmeldingBestilling = generateBehandlerDialogmeldingBestillingDTO(
+                            uuid = dialogmeldingBestillingUuid,
+                            behandlerRef = behandlerRef,
+                        )
+                        val dialogmeldingBestillingRecord = ConsumerRecord(
+                            DIALOGMELDING_BESTILLING_TOPIC,
+                            partition,
+                            1,
+                            dialogmeldingBestilling.dialogmeldingUuid,
+                            dialogmeldingBestilling,
+                        )
+                        val mockConsumer = mockk<KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>>()
+                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                            mapOf(
+                                behandlerDialogmeldingBestillingTopicPartition to listOf(
+                                    dialogmeldingBestillingRecord,
+                                )
                             )
                         )
-                    )
-                    every { mockConsumer.commitSync() } returns Unit
+                        every { mockConsumer.commitSync() } returns Unit
 
-                    it("should persist incoming bestillinger") {
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
                                 behandlerDialogmeldingService = behandlerDialogmeldingService,
@@ -88,45 +106,45 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                     }
                 }
                 describe("Should only persist once when duplicates") {
-                    val behandlerRef = UUID.randomUUID()
-                    val partnerId = random.nextInt()
-                    val behandler = generateBehandler(behandlerRef, partnerId)
-                    database.connection.use {
-                        it.createBehandlerDialogmelding(behandler)
-                        it.commit()
-                    }
+                    it("Should only persist once when duplicates") {
+                        val behandlerRef = UUID.randomUUID()
+                        val partnerId = random.nextInt()
+                        val behandler = generateBehandler(behandlerRef, partnerId)
+                        database.connection.use {
+                            it.createBehandlerDialogmelding(behandler)
+                            it.commit()
+                        }
 
-                    val dialogmeldingBestillingUuid = UUID.randomUUID()
-                    val dialogmeldingBestilling = generateBehandlerDialogmeldingBestillingDTO(
-                        uuid = dialogmeldingBestillingUuid,
-                        behandlerRef = behandlerRef,
-                    )
-                    val dialogmeldingBestillingRecord = ConsumerRecord(
-                        DIALOGMELDING_BESTILLING_TOPIC,
-                        partition,
-                        2,
-                        dialogmeldingBestilling.dialogmeldingUuid,
-                        dialogmeldingBestilling,
-                    )
-                    val dialogmeldingBestillingRecordDuplicate = ConsumerRecord(
-                        DIALOGMELDING_BESTILLING_TOPIC,
-                        partition,
-                        3,
-                        dialogmeldingBestilling.dialogmeldingUuid,
-                        dialogmeldingBestilling,
-                    )
-                    val mockConsumer = mockk<KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>>()
-                    every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                        mapOf(
-                            behandlerDialogmeldingBestillingTopicPartition to listOf(
-                                dialogmeldingBestillingRecord,
-                                dialogmeldingBestillingRecordDuplicate,
+                        val dialogmeldingBestillingUuid = UUID.randomUUID()
+                        val dialogmeldingBestilling = generateBehandlerDialogmeldingBestillingDTO(
+                            uuid = dialogmeldingBestillingUuid,
+                            behandlerRef = behandlerRef,
+                        )
+                        val dialogmeldingBestillingRecord = ConsumerRecord(
+                            DIALOGMELDING_BESTILLING_TOPIC,
+                            partition,
+                            2,
+                            dialogmeldingBestilling.dialogmeldingUuid,
+                            dialogmeldingBestilling,
+                        )
+                        val dialogmeldingBestillingRecordDuplicate = ConsumerRecord(
+                            DIALOGMELDING_BESTILLING_TOPIC,
+                            partition,
+                            3,
+                            dialogmeldingBestilling.dialogmeldingUuid,
+                            dialogmeldingBestilling,
+                        )
+                        val mockConsumer = mockk<KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>>()
+                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                            mapOf(
+                                behandlerDialogmeldingBestillingTopicPartition to listOf(
+                                    dialogmeldingBestillingRecord,
+                                    dialogmeldingBestillingRecordDuplicate,
+                                )
                             )
                         )
-                    )
-                    every { mockConsumer.commitSync() } returns Unit
+                        every { mockConsumer.commitSync() } returns Unit
 
-                    it("Should only persist once when duplicates") {
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
                                 behandlerDialogmeldingService = behandlerDialogmeldingService,
@@ -147,31 +165,31 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                     }
                 }
                 describe("Does not persist when behandlerRef not valid") {
-                    val behandlerRef = UUID.randomUUID()
+                    it("should not persist incoming bestillinger when behandlerRef is invalid") {
+                        val behandlerRef = UUID.randomUUID()
 
-                    val dialogmeldingBestillingUuid = UUID.randomUUID()
-                    val dialogmeldingBestilling = generateBehandlerDialogmeldingBestillingDTO(
-                        uuid = dialogmeldingBestillingUuid,
-                        behandlerRef = behandlerRef,
-                    )
-                    val dialogmeldingBestillingRecord = ConsumerRecord(
-                        DIALOGMELDING_BESTILLING_TOPIC,
-                        partition,
-                        1,
-                        dialogmeldingBestilling.dialogmeldingUuid,
-                        dialogmeldingBestilling,
-                    )
-                    val mockConsumer = mockk<KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>>()
-                    every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                        mapOf(
-                            behandlerDialogmeldingBestillingTopicPartition to listOf(
-                                dialogmeldingBestillingRecord,
+                        val dialogmeldingBestillingUuid = UUID.randomUUID()
+                        val dialogmeldingBestilling = generateBehandlerDialogmeldingBestillingDTO(
+                            uuid = dialogmeldingBestillingUuid,
+                            behandlerRef = behandlerRef,
+                        )
+                        val dialogmeldingBestillingRecord = ConsumerRecord(
+                            DIALOGMELDING_BESTILLING_TOPIC,
+                            partition,
+                            1,
+                            dialogmeldingBestilling.dialogmeldingUuid,
+                            dialogmeldingBestilling,
+                        )
+                        val mockConsumer = mockk<KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>>()
+                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                            mapOf(
+                                behandlerDialogmeldingBestillingTopicPartition to listOf(
+                                    dialogmeldingBestillingRecord,
+                                )
                             )
                         )
-                    )
-                    every { mockConsumer.commitSync() } returns Unit
+                        every { mockConsumer.commitSync() } returns Unit
 
-                    it("should not persist incoming bestillinger when behandlerRef is invalid") {
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
                                 behandlerDialogmeldingService = behandlerDialogmeldingService,
