@@ -30,6 +30,8 @@ data class Environment(
     val mqApplicationName: String = "isdialogmelding",
     val fastlegeRestClientId: String = getEnvVar("FASTLEGEREST_CLIENT_ID"),
     val fastlegeRestUrl: String = getEnvVar("FASTLEGEREST_URL"),
+    val pdlClientId: String = getEnvVar("PDL_CLIENT_ID"),
+    val pdlUrl: String = getEnvVar("PDL_URL"),
     val syfoPartnerinfoClientId: String = getEnvVar("SYFOPARTNERINFO_CLIENT_ID"),
     val syfoPartnerinfoUrl: String = getEnvVar("SYFOPARTNERINFO_URL"),
     val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),

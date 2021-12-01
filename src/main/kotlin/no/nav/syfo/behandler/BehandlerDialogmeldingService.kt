@@ -6,6 +6,7 @@ import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.BehandlerDialogmeldingArbeidstaker
 import no.nav.syfo.behandler.domain.BehandlerDialogmeldingBestilling
 import no.nav.syfo.behandler.kafka.*
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.domain.PersonIdentNumber
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,6 +16,7 @@ private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.behandler")
 
 class BehandlerDialogmeldingService(
     private val database: DatabaseInterface,
+    private val pdlClient: PdlClient,
 ) {
     fun getDialogmeldingBestillingListe(): List<BehandlerDialogmeldingBestilling> {
         return database.getBehandlerDialogmeldingBestillingNotSendt()
@@ -33,13 +35,14 @@ class BehandlerDialogmeldingService(
         database.incrementDialogmeldingBestillingSendtTries(uuid)
     }
 
-    fun getArbeidstakerNavn(personIdent: PersonIdentNumber): BehandlerDialogmeldingArbeidstaker {
-        // TODO: Hente arbeidstaker navn fra PDL
+    suspend fun getBehandlerDialogmeldingArbeidstaker(personIdent: PersonIdentNumber): BehandlerDialogmeldingArbeidstaker {
+        val pdlNavn = pdlClient.person(personIdent)?.hentPerson?.navn?.first()
+            ?: throw RuntimeException("PDL returned empty response")
         return BehandlerDialogmeldingArbeidstaker(
             arbeidstakerPersonident = personIdent,
-            fornavn = "",
-            mellomnavn = null,
-            etternavn = "",
+            fornavn = pdlNavn.fornavn,
+            mellomnavn = pdlNavn.mellomnavn,
+            etternavn = pdlNavn.etternavn,
         )
     }
 

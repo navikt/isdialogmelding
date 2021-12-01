@@ -14,6 +14,8 @@ import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
 import no.nav.syfo.behandler.kafka.launchKafkaTask
+import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import org.slf4j.LoggerFactory
@@ -30,7 +32,11 @@ fun main() {
     val environment = Environment()
     val mqSender = MQSender(environment)
     val wellKnownInternalAzureAD = getWellKnown(environment.azureAppWellKnownUrl)
-
+    val azureAdClient = AzureAdClient(
+        azureAppClientId = environment.aadAppClient,
+        azureAppClientSecret = environment.azureAppClientSecret,
+        azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+    )
     val applicationEngineEnvironment = applicationEngineEnvironment {
         log = logger
         config = HoconApplicationConfig(ConfigFactory.load())
@@ -47,6 +53,7 @@ fun main() {
                 environment = environment,
                 mqSender = mqSender,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
+                azureAdClient = azureAdClient,
             )
         }
     }
@@ -55,9 +62,14 @@ fun main() {
         applicationState.ready = true
         logger.info("Application is ready")
         if (environment.toggleKafkaProcessingEnabled) {
-
+            val pdlClient = PdlClient(
+                azureAdClient = azureAdClient,
+                pdlClientId = environment.pdlClientId,
+                pdlUrl = environment.pdlUrl,
+            )
             val behandlerDialogmeldingService = BehandlerDialogmeldingService(
                 database = applicationDatabase,
+                pdlClient = pdlClient,
             )
 
             launchKafkaTask(

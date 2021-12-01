@@ -7,6 +7,8 @@ import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
 import no.nav.syfo.behandler.database.createBehandlerDialogmelding
 import no.nav.syfo.behandler.database.getBehandlerDialogmeldingBestilling
+import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateBehandler
@@ -26,7 +28,16 @@ class DialogmeldingCronjobSpek : Spek({
             val random = Random()
             val externalMockEnvironment = ExternalMockEnvironment.instance
             val database = externalMockEnvironment.database
-
+            val environment = externalMockEnvironment.environment
+            val pdlClient = PdlClient(
+                azureAdClient = AzureAdClient(
+                    azureAppClientId = environment.aadAppClient,
+                    azureAppClientSecret = environment.azureAppClientSecret,
+                    azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+                ),
+                pdlClientId = environment.pdlClientId,
+                pdlUrl = environment.pdlUrl,
+            )
             val mqSenderMock = mockk<MQSender>()
             justRun { mqSenderMock.sendMessageToEmottak(any()) }
 
@@ -36,6 +47,7 @@ class DialogmeldingCronjobSpek : Spek({
 
             val behandlerDialogmeldingService = BehandlerDialogmeldingService(
                 database = database,
+                pdlClient = pdlClient,
             )
 
             val dialogmeldingService = DialogmeldingService(

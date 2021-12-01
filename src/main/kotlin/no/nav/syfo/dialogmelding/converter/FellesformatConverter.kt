@@ -7,10 +7,10 @@ import no.nav.xml.eiff._2.XMLEIFellesformat
 
 fun createFellesformat(
     melding: BehandlerDialogmeldingBestilling,
-    arbeidstakerNavn: BehandlerDialogmeldingArbeidstaker,
+    arbeidstaker: BehandlerDialogmeldingArbeidstaker,
 ): XMLEIFellesformat {
     val factory = ObjectFactory()
     return factory.createXMLEIFellesformat()
-        .withAny(createMsgHead(melding, arbeidstakerNavn))
+        .withAny(createMsgHead(melding, arbeidstaker))
         .withAny(createMottakenhetBlokk(melding))
 }

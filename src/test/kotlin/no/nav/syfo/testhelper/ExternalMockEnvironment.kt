@@ -14,12 +14,14 @@ class ExternalMockEnvironment private constructor() {
     private val fastlegeRestMock = FastlegeRestMock()
     private val syfopartnerInfoMock = SyfopartnerInfoMock()
     private val syfoTilgangskontrollMock = SyfoTilgangskontrollMock()
+    private val pdlMock = PdlMock()
 
     val externalApplicationMockMap = hashMapOf(
         azureAdMock.name to azureAdMock.server,
         fastlegeRestMock.name to fastlegeRestMock.server,
         syfopartnerInfoMock.name to syfopartnerInfoMock.server,
-        syfoTilgangskontrollMock.name to syfoTilgangskontrollMock.server
+        syfoTilgangskontrollMock.name to syfoTilgangskontrollMock.server,
+        pdlMock.name to pdlMock.server,
     )
 
     val environment = testEnvironment(
@@ -27,7 +29,8 @@ class ExternalMockEnvironment private constructor() {
         kafkaBootstrapServers = embeddedEnvironment.brokersURL,
         fastlegeRestUrl = fastlegeRestMock.url,
         syfoPartnerinfoUrl = syfopartnerInfoMock.url,
-        syfoTilgangskontrollUrl = syfoTilgangskontrollMock.url
+        syfoTilgangskontrollUrl = syfoTilgangskontrollMock.url,
+        pdlUrl = pdlMock.url,
     )
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
 

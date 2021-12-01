@@ -93,6 +93,10 @@ spec:
       value: "prod-gcp.teamsykefravr.fastlegerest"
     - name: FASTLEGEREST_URL
       value: "https://fastlegerest.intern.nav.no"
+    - name: PDL_CLIENT_ID
+      value: "prod-fss.pdl.pdl-api"
+    - name: PDL_URL
+      value: "https://pdl-api.prod-fss-pub.nais.io/graphql"
     - name: SYFOPARTNERINFO_CLIENT_ID
       value: "prod-fss.teamsykefravr.syfopartnerinfo"
     - name: SYFOPARTNERINFO_URL

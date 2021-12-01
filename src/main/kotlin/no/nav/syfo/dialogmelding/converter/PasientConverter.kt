@@ -5,16 +5,16 @@ import no.kith.xmlstds.msghead._2006_05_24.XMLPatient
 import no.nav.syfo.behandler.domain.BehandlerDialogmeldingArbeidstaker
 
 fun createPasient(
-    arbeidstakerNavn: BehandlerDialogmeldingArbeidstaker,
+    arbeidstaker: BehandlerDialogmeldingArbeidstaker,
 ): XMLPatient {
     val factory = ObjectFactory()
     return factory.createXMLPatient()
-        .withFamilyName(arbeidstakerNavn.etternavn)
-        .withMiddleName(arbeidstakerNavn.mellomnavn)
-        .withGivenName(arbeidstakerNavn.fornavn)
+        .withFamilyName(arbeidstaker.etternavn)
+        .withMiddleName(arbeidstaker.mellomnavn)
+        .withGivenName(arbeidstaker.fornavn)
         .withIdent(
             factory.createXMLIdent()
-                .withId(arbeidstakerNavn.arbeidstakerPersonident.value)
+                .withId(arbeidstaker.arbeidstakerPersonident.value)
                 .withTypeId(
                     factory.createXMLCV()
                         .withDN("Fødselsnummer")
