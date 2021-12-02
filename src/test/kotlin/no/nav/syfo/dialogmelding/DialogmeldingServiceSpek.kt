@@ -16,32 +16,34 @@ import java.util.UUID
 
 object DialogmeldingServiceSpek : Spek({
 
+    val externalMockEnvironment = ExternalMockEnvironment.instance
+    val database = externalMockEnvironment.database
+    val environment = ExternalMockEnvironment.instance.environment
+    val pdlClient = PdlClient(
+        azureAdClient = AzureAdClient(
+            azureAppClientId = environment.aadAppClient,
+            azureAppClientSecret = environment.azureAppClientSecret,
+            azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+        ),
+        pdlClientId = environment.pdlClientId,
+        pdlUrl = environment.pdlUrl,
+    )
+    val behandlerDialogmeldingService = BehandlerDialogmeldingService(
+        database = database,
+        pdlClient = pdlClient,
+    )
+    val mqSender = mockk<MQSender>()
+
+    val dialogmeldingService = DialogmeldingService(
+        mqSender = mqSender,
+        behandlerDialogmeldingService = behandlerDialogmeldingService,
+    )
+
     describe("DialogmeldingService") {
-        it("Sends correct message on MQ") {
-            val externalMockEnvironment = ExternalMockEnvironment.instance
-            val database = externalMockEnvironment.database
-            val environment = ExternalMockEnvironment.instance.environment
-            val pdlClient = PdlClient(
-                azureAdClient = AzureAdClient(
-                    azureAppClientId = environment.aadAppClient,
-                    azureAppClientSecret = environment.azureAppClientSecret,
-                    azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
-                ),
-                pdlClientId = environment.pdlClientId,
-                pdlUrl = environment.pdlUrl,
-            )
-            val behandlerDialogmeldingService = BehandlerDialogmeldingService(
-                database = database,
-                pdlClient = pdlClient,
-            )
-            val mqSender = mockk<MQSender>()
+        it("Sends correct message on MQ when foresporsel dialogmote-innkalling") {
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val dialogmeldingService = DialogmeldingService(
-                mqSender = mqSender,
-                behandlerDialogmeldingService = behandlerDialogmeldingService,
-            )
             val uuid = UUID.randomUUID()
             val behandlerRef = UUID.randomUUID()
             val melding = generateBehandlerDialogmeldingBestillingDTO(
@@ -60,6 +62,93 @@ object DialogmeldingServiceSpek : Spek({
             verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+        }
+        it("Sends correct message on MQ when foresporsel endre tid-sted") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val uuid = UUID.randomUUID()
+            val behandlerRef = UUID.randomUUID()
+            val melding = generateBehandlerDialogmeldingEndreTidStedDTO(
+                behandlerRef = behandlerRef,
+                uuid = uuid,
+            ).toBehandlerDialogmeldingBestilling(
+                behandler = generateBehandler(
+                    behandlerRef = behandlerRef,
+                    partnerId = 1,
+                ),
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingEndreTidStedXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+        }
+        it("Sends correct message on MQ when referat") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val uuid = UUID.randomUUID()
+            val behandlerRef = UUID.randomUUID()
+            val melding = generateBehandlerDialogmeldingBestillingReferatDTO(
+                behandlerRef = behandlerRef,
+                uuid = uuid,
+            ).toBehandlerDialogmeldingBestilling(
+                behandler = generateBehandler(
+                    behandlerRef = behandlerRef,
+                    partnerId = 1,
+                ),
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingReferatXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+        }
+        it("Sends correct message on MQ when avlysning") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val uuid = UUID.randomUUID()
+            val behandlerRef = UUID.randomUUID()
+            val melding = generateBehandlerDialogmeldingBestillingAvlysningDTO(
+                behandlerRef = behandlerRef,
+                uuid = uuid,
+            ).toBehandlerDialogmeldingBestilling(
+                behandler = generateBehandler(
+                    behandlerRef = behandlerRef,
+                    partnerId = 1,
+                ),
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingAvlysningXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
 
             assertTrue(
