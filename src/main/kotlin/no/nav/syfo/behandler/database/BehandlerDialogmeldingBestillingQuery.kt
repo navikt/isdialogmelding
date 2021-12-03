@@ -130,7 +130,7 @@ fun ResultSet.toPBehandlerDialogmeldingBestilling(): PBehandlerDialogMeldingBest
         conversationUuid = UUID.fromString(getString("conversation")),
         type = getString("type"),
         kode = getInt("kode"),
-        tekst = getString("type"),
+        tekst = getString("tekst"),
         vedlegg = getBytes("vedlegg"),
         sendt = getTimestamp("sendt"),
         sendtTries = getInt("sendt_tries"),

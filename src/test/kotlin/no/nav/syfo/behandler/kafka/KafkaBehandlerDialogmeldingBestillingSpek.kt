@@ -103,6 +103,7 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                             }
                         pBehandlerDialogmeldingBestilling shouldNotBeEqualTo null
                         pBehandlerDialogmeldingBestilling!!.uuid shouldBeEqualTo dialogmeldingBestillingUuid
+                        pBehandlerDialogmeldingBestilling.tekst shouldBeEqualTo dialogmeldingBestilling.dialogmeldingTekst
                     }
                 }
                 describe("Should only persist once when duplicates") {
