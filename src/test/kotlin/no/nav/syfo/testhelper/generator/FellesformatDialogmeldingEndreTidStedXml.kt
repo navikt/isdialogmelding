@@ -1,6 +1,6 @@
 package no.nav.syfo.testhelper.generator
 
-fun defaultFellesformatDialogmeldingXmlRegex(): Regex {
+fun defaultFellesformatDialogmeldingEndreTidStedXmlRegex(): Regex {
     return Regex(
         "<\\?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"\\?>\n" +
             "<EI_fellesformat xmlns=\"http://www.nav.no/xml/eiff/2/\" xmlns:ns6=\"http://www.kith.no/xmlstds/base64container\" xmlns:ns5=\"http://www.kith.no/xmlstds/felleskomponent1\" xmlns:ns2=\"http://www.kith.no/xmlstds/msghead/2006-05-24\" xmlns:ns4=\"http://www.kith.no/xmlstds/dialog/2006-10-11\" xmlns:ns3=\"http://www.w3.org/2000/09/xmldsig#\">\n" +
@@ -12,6 +12,7 @@ fun defaultFellesformatDialogmeldingXmlRegex(): Regex {
             "            <ns2:MsgId>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns2:MsgId>\n" +
             "            <ns2:Ack V=\"J\" DN=\"Ja\"/>\n" +
             "            <ns2:ConversationRef>\n" +
+            "                <ns2:RefToParent>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns2:RefToParent>\n" +
             "                <ns2:RefToConversation>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns2:RefToConversation>\n" +
             "            </ns2:ConversationRef>\n" +
             "            <ns2:Sender>\n" +
@@ -78,8 +79,8 @@ fun defaultFellesformatDialogmeldingXmlRegex(): Regex {
             "                <ns2:Content>\n" +
             "                    <ns4:Dialogmelding>\n" +
             "                        <ns4:Foresporsel>\n" +
-            "                            <ns4:TypeForesp V=\"1\" S=\"2.16.578.1.12.4.1.1.8125\" DN=\"Innkalling dialogmøte 2\"/>\n" +
-            "                            <ns4:Sporsmal>En tekst</ns4:Sporsmal>\n" +
+            "                            <ns4:TypeForesp V=\"2\" S=\"2.16.578.1.12.4.1.1.8125\" DN=\"Endring dialogmøte 2\"/>\n" +
+            "                            <ns4:Sporsmal>Nytt tid og sted</ns4:Sporsmal>\n" +
             "                            <ns4:RollerRelatertNotat>\n" +
             "                                <ns4:RolleNotat V=\"1\" S=\"2.16.578.1.12.4.1.1.9057\"/>\n" +
             "                                <ns4:Person/>\n" +
