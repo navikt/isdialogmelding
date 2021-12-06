@@ -23,7 +23,7 @@ fun BehandlerDialogmeldingBestillingDTO.toBehandlerDialogmeldingBestilling(
     uuid = UUID.fromString(this.dialogmeldingUuid),
     behandler = behandler,
     arbeidstakerPersonIdent = PersonIdentNumber(this.personIdent),
-    parentUuid = this.dialogmeldingRefParent?.let { UUID.fromString(it) },
+    parentRef = this.dialogmeldingRefParent,
     conversationUuid = UUID.fromString(this.dialogmeldingRefConversation),
     type = DialogmeldingType.valueOf(dialogmeldingType),
     kode = DialogmeldingKode.fromInt(this.dialogmeldingKode),
