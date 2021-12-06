@@ -23,15 +23,6 @@ fun createDialogmelding(melding: BehandlerDialogmeldingBestilling): XMLDialogmel
                     )
                     .withTekstNotatInnhold(melding.tekst)
                     .withDokIdNotat(UUID.randomUUID().toString())
-                    .withRollerRelatertNotat(
-                        factory.createXMLRollerRelatertNotat()
-                            .withRolleNotat(
-                                fellesFactory.createXMLCV()
-                                    .withS("2.16.578.1.12.4.1.1.9057")
-                                    .withV("1")
-                            )
-                            .withPerson(factory.createXMLPerson())
-                    )
             )
     } else { // melding.type == DialogmeldingType.DIALOG_FORESPORSEL
         factory.createXMLDialogmelding()
@@ -44,15 +35,7 @@ fun createDialogmelding(melding: BehandlerDialogmeldingBestilling): XMLDialogmel
                             .withV(kode.toString())
                     )
                     .withSporsmal(melding.tekst)
-                    .withRollerRelatertNotat(
-                        factory.createXMLRollerRelatertNotat()
-                            .withRolleNotat(
-                                fellesFactory.createXMLCV()
-                                    .withS("2.16.578.1.12.4.1.1.9057")
-                                    .withV("1")
-                            )
-                            .withPerson(factory.createXMLPerson())
-                    )
+                    .withDokIdForesp(UUID.randomUUID().toString())
             )
     }
 }
