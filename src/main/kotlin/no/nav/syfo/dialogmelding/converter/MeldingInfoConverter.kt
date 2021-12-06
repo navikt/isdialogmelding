@@ -27,7 +27,7 @@ fun createMsgInfo(
         .withConversationRef(
             factory.createXMLConversationRef()
                 .withRefToConversation(melding.conversationUuid.toString())
-                .withRefToParent(melding.parentUuid?.toString())
+                .withRefToParent(melding.parentRef)
         )
         .withSender(createSender())
         .withReceiver(createReceiver(melding))

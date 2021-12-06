@@ -7,7 +7,7 @@ data class BehandlerDialogmeldingBestilling(
     val uuid: UUID,
     val behandler: Behandler,
     val arbeidstakerPersonIdent: PersonIdentNumber,
-    val parentUuid: UUID?,
+    val parentRef: String?,
     val conversationUuid: UUID,
     val type: DialogmeldingType,
     val kode: DialogmeldingKode,

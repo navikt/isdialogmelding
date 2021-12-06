@@ -37,7 +37,7 @@ fun Connection.createBehandlerDialogmeldingBestilling(
         it.setString(1, behandlerDialogmeldingBestilling.uuid.toString())
         it.setInt(2, behandlerId)
         it.setString(3, behandlerDialogmeldingBestilling.arbeidstakerPersonIdent.value)
-        it.setString(4, behandlerDialogmeldingBestilling.parentUuid?.toString())
+        it.setString(4, behandlerDialogmeldingBestilling.parentRef)
         it.setString(5, behandlerDialogmeldingBestilling.conversationUuid.toString())
         it.setString(6, behandlerDialogmeldingBestilling.type.name)
         it.setInt(7, behandlerDialogmeldingBestilling.kode.value)
@@ -126,7 +126,7 @@ fun ResultSet.toPBehandlerDialogmeldingBestilling(): PBehandlerDialogMeldingBest
         uuid = UUID.fromString(getString("uuid")),
         behandlerId = getInt("behandler_id"),
         arbeidstakerPersonIdent = getString("arbeidstaker_personident"),
-        parentUuid = getString("parent")?.let { UUID.fromString(it) },
+        parentRef = getString("parent"),
         conversationUuid = UUID.fromString(getString("conversation")),
         type = getString("type"),
         kode = getInt("kode"),
