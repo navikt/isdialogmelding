@@ -81,10 +81,7 @@ fun defaultFellesformatDialogmeldingEndreTidStedXmlRegex(): Regex {
             "                        <ns4:Foresporsel>\n" +
             "                            <ns4:TypeForesp V=\"2\" S=\"2.16.578.1.12.4.1.1.8125\" DN=\"Endring dialogmøte 2\"/>\n" +
             "                            <ns4:Sporsmal>Nytt tid og sted</ns4:Sporsmal>\n" +
-            "                            <ns4:RollerRelatertNotat>\n" +
-            "                                <ns4:RolleNotat V=\"1\" S=\"2.16.578.1.12.4.1.1.9057\"/>\n" +
-            "                                <ns4:Person/>\n" +
-            "                            </ns4:RollerRelatertNotat>\n" +
+            "                            <ns4:DokIdForesp>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns4:DokIdForesp>\n" +
             "                        </ns4:Foresporsel>\n" +
             "                    </ns4:Dialogmelding>\n" +
             "                </ns2:Content>\n" +

@@ -82,10 +82,6 @@ fun defaultFellesformatDialogmeldingAvlysningXmlRegex(): Regex {
             "                            <ns4:TemaKodet V=\"4\" S=\"2.16.578.1.12.4.1.1.8127\" DN=\"Avlysning dialogmøte\"/>\n" +
             "                            <ns4:TekstNotatInnhold xsi:type=\"xs:string\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">Møtet er avlyst</ns4:TekstNotatInnhold>\n" +
             "                            <ns4:DokIdNotat>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns4:DokIdNotat>\n" +
-            "                            <ns4:RollerRelatertNotat>\n" +
-            "                                <ns4:RolleNotat V=\"1\" S=\"2.16.578.1.12.4.1.1.9057\"/>\n" +
-            "                                <ns4:Person/>\n" +
-            "                            </ns4:RollerRelatertNotat>\n" +
             "                        </ns4:Notat>\n" +
             "                    </ns4:Dialogmelding>\n" +
             "                </ns2:Content>\n" +
