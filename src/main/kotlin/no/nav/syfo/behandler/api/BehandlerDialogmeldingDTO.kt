@@ -3,6 +3,7 @@ package no.nav.syfo.behandler.api
 data class BehandlerDialogmeldingDTO(
     val type: String,
     val behandlerRef: String,
+    val fnr: String?,
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,

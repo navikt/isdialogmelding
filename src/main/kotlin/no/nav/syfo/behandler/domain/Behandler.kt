@@ -27,6 +27,7 @@ data class Behandler(
 fun Behandler.toBehandlerDialogmeldingDTO() = BehandlerDialogmeldingDTO(
     type = this.type.name,
     behandlerRef = this.behandlerRef.toString(),
+    fnr = this.personident?.value,
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
     etternavn = this.etternavn,
