@@ -70,6 +70,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingDTO.kontor shouldBeEqualTo fastlegeResponse.fastlegekontor.navn
                             behandlerDialogmeldingDTO.type shouldBeEqualTo BehandlerType.FASTLEGE.name
                             behandlerDialogmeldingDTO.behandlerRef shouldBeEqualTo behandlerDialogmeldingForPersonList.first().behandlerRef.toString()
+                            behandlerDialogmeldingDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
 
                             database.getBehandlerDialogmeldingForArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_FNR,
