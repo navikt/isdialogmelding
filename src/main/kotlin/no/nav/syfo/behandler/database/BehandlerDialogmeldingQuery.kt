@@ -118,14 +118,15 @@ const val queryCreateBehandlerDialogmelding =
 
 const val queryGetBehandlerDialogmeldingForPartnerId =
     """
-        SELECT * FROM BEHANDLER_DIALOGMELDING WHERE partner_id = ?
+        SELECT * FROM BEHANDLER_DIALOGMELDING WHERE personident = ? and partner_id = ?
     """
 
-fun DatabaseInterface.getBehandlerDialogmeldingForPartnerId(partnerId: Int): PBehandlerDialogmelding? {
+fun DatabaseInterface.getBehandlerDialogmeldingMedPersonIdentForPartnerId(behandlerPersonIdent: PersonIdentNumber, partnerId: Int): PBehandlerDialogmelding? {
     return this.connection.use { connection ->
         connection.prepareStatement(queryGetBehandlerDialogmeldingForPartnerId)
             .use {
-                it.setString(1, partnerId.toString())
+                it.setString(1, behandlerPersonIdent.value)
+                it.setString(2, partnerId.toString())
                 it.executeQuery().toList { toPBehandlerDialogmelding() }
             }
     }.firstOrNull()

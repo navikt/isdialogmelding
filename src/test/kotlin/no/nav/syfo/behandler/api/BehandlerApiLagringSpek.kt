@@ -113,8 +113,11 @@ class BehandlerApiLagringSpek : Spek({
             describe("Get list of BehandlerDialogmelding with behandlere in database") {
                 it("should not store behandler when fastlege is latest behandler stored for arbeidstaker") {
                     database.createBehandlerDialogmeldingForArbeidstaker(
-                        behandler = generateFastlegeResponse(UserConstants.HERID).toBehandler(UserConstants.PARTNERID),
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        behandler = generateFastlegeResponse(
+                            UserConstants.FASTLEGE_FNR,
+                            UserConstants.HERID
+                        ).toBehandler(UserConstants.PARTNERID),
+                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
                     )
 
                     with(
@@ -132,7 +135,10 @@ class BehandlerApiLagringSpek : Spek({
                 }
                 it("should store behandler for arbeidstaker when fastlege is stored for other arbeidstaker") {
                     database.createBehandlerDialogmeldingForArbeidstaker(
-                        behandler = generateFastlegeResponse(UserConstants.HERID).toBehandler(UserConstants.PARTNERID),
+                        behandler = generateFastlegeResponse(
+                            UserConstants.FASTLEGE_FNR,
+                            UserConstants.HERID
+                        ).toBehandler(UserConstants.PARTNERID),
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_HERID_FNR
                     )
 
@@ -151,7 +157,10 @@ class BehandlerApiLagringSpek : Spek({
                 }
                 it("should store behandler when fastlege is not latest behandler for arbeidstaker") {
                     val behandlerRef = database.createBehandlerDialogmeldingForArbeidstaker(
-                        behandler = generateFastlegeResponse(UserConstants.OTHER_HERID).toBehandler(UserConstants.OTHER_PARTNERID),
+                        behandler = generateFastlegeResponse(
+                            UserConstants.FASTLEGE_FNR,
+                            UserConstants.OTHER_HERID
+                        ).toBehandler(UserConstants.OTHER_PARTNERID),
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
                     )
 
@@ -171,13 +180,20 @@ class BehandlerApiLagringSpek : Spek({
                     behandlerDialogmeldingForArbeidstakerList[0].behandlerRef shouldNotBeEqualTo behandlerRef
                     behandlerDialogmeldingForArbeidstakerList[1].behandlerRef shouldBeEqualTo behandlerRef
                 }
+
                 it("should store behandler for arbeidstaker when fastlege is stored for arbeidstaker but other fastlege is latest behandler") {
                     val behandlerRef = database.createBehandlerDialogmeldingForArbeidstaker(
-                        behandler = generateFastlegeResponse(UserConstants.HERID).toBehandler(UserConstants.PARTNERID),
+                        behandler = generateFastlegeResponse(
+                            UserConstants.FASTLEGE_FNR,
+                            UserConstants.HERID
+                        ).toBehandler(UserConstants.PARTNERID),
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
                     )
                     val otherBehandlerRef = database.createBehandlerDialogmeldingForArbeidstaker(
-                        behandler = generateFastlegeResponse(UserConstants.OTHER_HERID).toBehandler(UserConstants.OTHER_PARTNERID),
+                        behandler = generateFastlegeResponse(
+                            UserConstants.FASTLEGE_ANNEN_FNR,
+                            UserConstants.OTHER_HERID
+                        ).toBehandler(UserConstants.OTHER_PARTNERID),
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
                     )
 
@@ -197,6 +213,34 @@ class BehandlerApiLagringSpek : Spek({
                     behandlerDialogmeldingForArbeidstakerList[0].behandlerRef shouldBeEqualTo behandlerRef
                     behandlerDialogmeldingForArbeidstakerList[1].behandlerRef shouldBeEqualTo otherBehandlerRef
                     behandlerDialogmeldingForArbeidstakerList[2].behandlerRef shouldBeEqualTo behandlerRef
+                }
+
+                it("should store behandler for arbeidstaker when other fastlege with equal partnerId exists for other arbeidstaker") {
+                    val behandlerRef = database.createBehandlerDialogmeldingForArbeidstaker(
+                        behandler = generateFastlegeResponse(
+                            UserConstants.FASTLEGE_FNR,
+                            UserConstants.HERID
+                        ).toBehandler(UserConstants.PARTNERID),
+                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                    )
+
+                    with(
+                        handleRequest(HttpMethod.Get, url) {
+                            addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                            addHeader(
+                                NAV_PERSONIDENT_HEADER,
+                                UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_SAMME_PARTNERINFO_FNR.value
+                            )
+                        }
+                    ) {
+                        response.status() shouldBeEqualTo HttpStatusCode.OK
+                    }
+
+                    val behandlerDialogmeldingForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_SAMME_PARTNERINFO_FNR,
+                    )
+                    behandlerDialogmeldingForArbeidstakerList.size shouldBeEqualTo 1
+                    behandlerDialogmeldingForArbeidstakerList[0].behandlerRef shouldNotBeEqualTo behandlerRef
                 }
             }
         }

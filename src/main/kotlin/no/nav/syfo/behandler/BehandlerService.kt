@@ -1,8 +1,12 @@
 package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.database.*
+import no.nav.syfo.behandler.database.createBehandlerDialogmelding
+import no.nav.syfo.behandler.database.createBehandlerDialogmeldingArbeidstaker
+import no.nav.syfo.behandler.database.domain.PBehandlerDialogmelding
 import no.nav.syfo.behandler.database.domain.toBehandler
+import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
+import no.nav.syfo.behandler.database.getBehandlerDialogmeldingMedPersonIdentForPartnerId
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
@@ -65,9 +69,7 @@ class BehandlerService(
         behandler: Behandler,
         personIdentNumber: PersonIdentNumber,
     ): Behandler {
-        val pBehandlerForFastlege = database.getBehandlerDialogmeldingForPartnerId(
-            partnerId = behandler.partnerId,
-        )
+        val pBehandlerForFastlege = getBehandlerDialogmelding(behandler = behandler)
         if (pBehandlerForFastlege == null) {
             return createBehandlerDialogmelding(
                 behandler = behandler,
@@ -88,6 +90,17 @@ class BehandlerService(
         }
 
         return pBehandlerForFastlege.toBehandler()
+    }
+
+    private fun getBehandlerDialogmelding(behandler: Behandler): PBehandlerDialogmelding? {
+        if (behandler.personident != null) {
+            return database.getBehandlerDialogmeldingMedPersonIdentForPartnerId(
+                behandlerPersonIdent = behandler.personident,
+                partnerId = behandler.partnerId,
+            )
+        }
+
+        return null
     }
 
     private fun createBehandlerDialogmelding(
