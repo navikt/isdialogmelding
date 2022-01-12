@@ -48,6 +48,10 @@ class FastlegeRestMock {
                             HttpStatusCode.OK,
                             generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR, UserConstants.HERID)
                         )
+                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_FNR.value -> call.respond(
+                            HttpStatusCode.OK,
+                            generateFastlegeResponse(null, UserConstants.HERID)
+                        )
 
                         else -> call.respond(
                             HttpStatusCode.OK,

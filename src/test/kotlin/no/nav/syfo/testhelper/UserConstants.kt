@@ -11,6 +11,7 @@ object UserConstants {
     val ARBEIDSTAKER_UTEN_FASTLEGE_FNR = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "4"))
     val ARBEIDSTAKER_FASTLEGE_UTEN_FORELDREENHET_FNR = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "3"))
     val ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "6"))
+    val ARBEIDSTAKER_FASTLEGE_UTEN_FNR_FNR = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("5", "1"))
 
     val PERSON_FORNAVN = "Fornavn"
     val PERSON_MELLOMNAVN = "Mellomnavn"

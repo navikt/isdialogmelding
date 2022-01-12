@@ -4,11 +4,11 @@ import no.nav.syfo.behandler.fastlege.FastlegeResponse
 import no.nav.syfo.domain.PersonIdentNumber
 import java.time.LocalDate
 
-fun generateFastlegeResponse(personident: PersonIdentNumber, foreldreEnhetHerId: Int? = null) = FastlegeResponse(
+fun generateFastlegeResponse(personident: PersonIdentNumber?, foreldreEnhetHerId: Int? = null) = FastlegeResponse(
     fornavn = "Dana",
     mellomnavn = "Katherine",
     etternavn = "Scully",
-    fnr = personident.value,
+    fnr = personident?.value,
     herId = 1337,
     foreldreEnhetHerId = foreldreEnhetHerId,
     helsepersonellregisterId = 1234,

@@ -12,6 +12,9 @@ import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.domain.PersonIdentNumber
+import org.slf4j.LoggerFactory
+
+private val log = LoggerFactory.getLogger("no.nav.syfo.behandler")
 
 class BehandlerService(
     private val fastlegeClient: FastlegeClient,
@@ -28,13 +31,17 @@ class BehandlerService(
             token = token,
             callId = callId,
         )
-        return if (aktivFastlegeBehandler != null) {
+
+        if (aktivFastlegeBehandler?.personident != null) {
             val behandler = createOrGetBehandler(
                 behandler = aktivFastlegeBehandler,
                 personIdentNumber = personIdentNumber,
             )
-            listOf(behandler)
-        } else emptyList()
+
+            return listOf(behandler)
+        }
+
+        return emptyList()
     }
 
     private suspend fun getAktivFastlegeBehandler(
@@ -46,9 +53,10 @@ class BehandlerService(
             personIdentNumber = personIdentNumber,
             token = token,
             callId = callId,
-        )
+        ) ?: return null
 
-        if (fastlegeResponse?.foreldreEnhetHerId == null) {
+        if (fastlegeResponse.foreldreEnhetHerId == null) {
+            log.warn("Aktiv fastlege missing foreldreEnhetHerId so cannot request partnerinfo")
             return null
         }
 
