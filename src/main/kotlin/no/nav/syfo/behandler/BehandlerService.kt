@@ -1,13 +1,20 @@
 package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.database.*
+import no.nav.syfo.behandler.database.createBehandlerDialogmelding
+import no.nav.syfo.behandler.database.createBehandlerDialogmeldingArbeidstaker
+import no.nav.syfo.behandler.database.domain.PBehandlerDialogmelding
 import no.nav.syfo.behandler.database.domain.toBehandler
+import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
+import no.nav.syfo.behandler.database.getBehandlerDialogmeldingMedPersonIdentForPartnerId
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.domain.PersonIdentNumber
+import org.slf4j.LoggerFactory
+
+private val log = LoggerFactory.getLogger("no.nav.syfo.behandler")
 
 class BehandlerService(
     private val fastlegeClient: FastlegeClient,
@@ -24,13 +31,17 @@ class BehandlerService(
             token = token,
             callId = callId,
         )
-        return if (aktivFastlegeBehandler != null) {
+
+        if (aktivFastlegeBehandler?.personident != null) {
             val behandler = createOrGetBehandler(
                 behandler = aktivFastlegeBehandler,
                 personIdentNumber = personIdentNumber,
             )
-            listOf(behandler)
-        } else emptyList()
+
+            return listOf(behandler)
+        }
+
+        return emptyList()
     }
 
     private suspend fun getAktivFastlegeBehandler(
@@ -42,9 +53,10 @@ class BehandlerService(
             personIdentNumber = personIdentNumber,
             token = token,
             callId = callId,
-        )
+        ) ?: return null
 
-        if (fastlegeResponse?.foreldreEnhetHerId == null) {
+        if (fastlegeResponse.foreldreEnhetHerId == null) {
+            log.warn("Aktiv fastlege missing foreldreEnhetHerId so cannot request partnerinfo")
             return null
         }
 
@@ -65,9 +77,7 @@ class BehandlerService(
         behandler: Behandler,
         personIdentNumber: PersonIdentNumber,
     ): Behandler {
-        val pBehandlerForFastlege = database.getBehandlerDialogmeldingForPartnerId(
-            partnerId = behandler.partnerId,
-        )
+        val pBehandlerForFastlege = getBehandlerDialogmelding(behandler = behandler)
         if (pBehandlerForFastlege == null) {
             return createBehandlerDialogmelding(
                 behandler = behandler,
@@ -88,6 +98,17 @@ class BehandlerService(
         }
 
         return pBehandlerForFastlege.toBehandler()
+    }
+
+    private fun getBehandlerDialogmelding(behandler: Behandler): PBehandlerDialogmelding? {
+        if (behandler.personident != null) {
+            return database.getBehandlerDialogmeldingMedPersonIdentForPartnerId(
+                behandlerPersonIdent = behandler.personident,
+                partnerId = behandler.partnerId,
+            )
+        }
+
+        return null
     }
 
     private fun createBehandlerDialogmelding(

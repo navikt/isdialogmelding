@@ -34,20 +34,28 @@ class FastlegeRestMock {
                         )
                         UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FORELDREENHET_FNR.value -> call.respond(
                             HttpStatusCode.OK,
-                            generateFastlegeResponse()
+                            generateFastlegeResponse(UserConstants.FASTLEGE_FNR)
                         )
                         UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR.value -> call.respond(
                             HttpStatusCode.OK,
-                            generateFastlegeResponse(UserConstants.HERID_UTEN_PARTNERINFO)
+                            generateFastlegeResponse(UserConstants.FASTLEGE_FNR, UserConstants.HERID_UTEN_PARTNERINFO)
                         )
                         UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_HERID_FNR.value -> call.respond(
                             HttpStatusCode.OK,
-                            generateFastlegeResponse(UserConstants.OTHER_HERID)
+                            generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR, UserConstants.OTHER_HERID)
+                        )
+                        UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_SAMME_PARTNERINFO_FNR.value -> call.respond(
+                            HttpStatusCode.OK,
+                            generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR, UserConstants.HERID)
+                        )
+                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_FNR.value -> call.respond(
+                            HttpStatusCode.OK,
+                            generateFastlegeResponse(null, UserConstants.HERID)
                         )
 
                         else -> call.respond(
                             HttpStatusCode.OK,
-                            generateFastlegeResponse(UserConstants.HERID)
+                            generateFastlegeResponse(UserConstants.FASTLEGE_FNR, UserConstants.HERID)
                         )
                     }
                 }

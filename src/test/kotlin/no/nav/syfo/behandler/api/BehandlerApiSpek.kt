@@ -40,7 +40,7 @@ class BehandlerApiSpek : Spek({
                 )
                 describe("Happy path") {
                     it("should return list of BehandlerDialogmelding if request is successful") {
-                        val fastlegeResponse = generateFastlegeResponse(UserConstants.HERID)
+                        val fastlegeResponse = generateFastlegeResponse(UserConstants.FASTLEGE_FNR, UserConstants.HERID)
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -121,6 +121,28 @@ class BehandlerApiSpek : Spek({
                     }
 
                     it("should return empty list of BehandlerDialogmelding for arbeidstaker med fastlege uten partnerinfo") {
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(
+                                    NAV_PERSONIDENT_HEADER,
+                                    UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR.value
+                                )
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+
+                            val behandlerDialogmeldingList =
+                                objectMapper.readValue<List<BehandlerDialogmeldingDTO>>(response.content!!)
+
+                            behandlerDialogmeldingList.size shouldBeEqualTo 0
+
+                            database.getBehandlerDialogmeldingForArbeidstaker(
+                                UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR,
+                            ).size shouldBeEqualTo 0
+                        }
+                    }
+                    it("should return empty list of BehandlerDialogmelding for arbeidstaker med fastlege uten fnr") {
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))

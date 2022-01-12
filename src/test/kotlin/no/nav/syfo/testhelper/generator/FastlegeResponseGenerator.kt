@@ -1,13 +1,14 @@
 package no.nav.syfo.testhelper.generator
 
 import no.nav.syfo.behandler.fastlege.FastlegeResponse
+import no.nav.syfo.domain.PersonIdentNumber
 import java.time.LocalDate
 
-fun generateFastlegeResponse(foreldreEnhetHerId: Int? = null) = FastlegeResponse(
+fun generateFastlegeResponse(personident: PersonIdentNumber?, foreldreEnhetHerId: Int? = null) = FastlegeResponse(
     fornavn = "Dana",
     mellomnavn = "Katherine",
     etternavn = "Scully",
-    fnr = "12125678911",
+    fnr = personident?.value,
     herId = 1337,
     foreldreEnhetHerId = foreldreEnhetHerId,
     helsepersonellregisterId = 1234,
