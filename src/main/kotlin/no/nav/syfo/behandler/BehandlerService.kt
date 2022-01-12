@@ -1,13 +1,11 @@
 package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.database.createBehandlerDialogmelding
-import no.nav.syfo.behandler.database.createBehandlerDialogmeldingArbeidstaker
+import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.PBehandlerDialogmelding
 import no.nav.syfo.behandler.database.domain.toBehandler
-import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
-import no.nav.syfo.behandler.database.getBehandlerDialogmeldingMedPersonIdentForPartnerId
 import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.domain.hasRequiredIds
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
@@ -32,7 +30,7 @@ class BehandlerService(
             callId = callId,
         )
 
-        if (aktivFastlegeBehandler?.personident != null) {
+        if (aktivFastlegeBehandler != null && aktivFastlegeBehandler.hasRequiredIds()) {
             val behandler = createOrGetBehandler(
                 behandler = aktivFastlegeBehandler,
                 personIdentNumber = personIdentNumber,
@@ -106,9 +104,19 @@ class BehandlerService(
                 behandlerPersonIdent = behandler.personident,
                 partnerId = behandler.partnerId,
             )
+        } else if (behandler.hprId != null) {
+            return database.getBehandlerDialogmeldingMedHprIdForPartnerId(
+                hprId = behandler.hprId,
+                partnerId = behandler.partnerId,
+            )
+        } else if (behandler.herId != null) {
+            return database.getBehandlerDialogmeldingMedHerIdForPartnerId(
+                herId = behandler.herId,
+                partnerId = behandler.partnerId,
+            )
         }
 
-        return null
+        throw IllegalArgumentException("Behandler missing personident, hprId and herId")
     }
 
     private fun createBehandlerDialogmelding(

@@ -109,6 +109,72 @@ class BehandlerApiLagringSpek : Spek({
                     behandlerDialogmeldingForAnnenArbeidstakerList.size shouldBeEqualTo 1
                     behandlerDialogmeldingForArbeidstakerList.first() shouldBeEqualTo behandlerDialogmeldingForAnnenArbeidstakerList.first()
                 }
+                it("should store behandler for arbeidstaker with fastlege missing fnr") {
+                    with(
+                        handleRequest(HttpMethod.Get, url) {
+                            addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                            addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_FNR.value)
+                        }
+                    ) {
+                        response.status() shouldBeEqualTo HttpStatusCode.OK
+                    }
+
+                    val behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_FNR,
+                    )
+                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
+                    behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                }
+                it("should store behandler for arbeidstaker with fastlege missing hprId") {
+                    with(
+                        handleRequest(HttpMethod.Get, url) {
+                            addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                            addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_HPRID_FNR.value)
+                        }
+                    ) {
+                        response.status() shouldBeEqualTo HttpStatusCode.OK
+                    }
+
+                    val behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_HPRID_FNR,
+                    )
+                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
+                    behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                }
+                it("should store behandler for arbeidstaker with fastlege missing herId") {
+                    with(
+                        handleRequest(HttpMethod.Get, url) {
+                            addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                            addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_HERID_FNR.value)
+                        }
+                    ) {
+                        response.status() shouldBeEqualTo HttpStatusCode.OK
+                    }
+
+                    val behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_HERID_FNR,
+                    )
+                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
+                    behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                }
+                it("should not store behandler for arbeidstaker with fastlege missing fnr, hprId and herId") {
+                    with(
+                        handleRequest(HttpMethod.Get, url) {
+                            addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                            addHeader(
+                                NAV_PERSONIDENT_HEADER,
+                                UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_HPRID_HERID_FNR.value
+                            )
+                        }
+                    ) {
+                        response.status() shouldBeEqualTo HttpStatusCode.OK
+                    }
+
+                    val behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_HPRID_HERID_FNR,
+                    )
+                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 0
+                }
             }
             describe("Get list of BehandlerDialogmelding with behandlere in database") {
                 it("should not store behandler when fastlege is latest behandler stored for arbeidstaker") {

@@ -10,6 +10,7 @@ import no.nav.syfo.application.api.authentication.installContentNegotiation
 import no.nav.syfo.behandler.fastlege.FastlegeClient.Companion.FASTLEGE_PATH
 import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
+import no.nav.syfo.testhelper.generator.generateFastlegeResponseMissingIds
 import no.nav.syfo.testhelper.getRandomPort
 import no.nav.syfo.util.getPersonIdentHeader
 
@@ -48,9 +49,21 @@ class FastlegeRestMock {
                             HttpStatusCode.OK,
                             generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR, UserConstants.HERID)
                         )
+                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_HPRID_HERID_FNR.value -> call.respond(
+                            HttpStatusCode.OK,
+                            generateFastlegeResponseMissingIds(null, null, null)
+                        )
                         UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_FNR.value -> call.respond(
                             HttpStatusCode.OK,
-                            generateFastlegeResponse(null, UserConstants.HERID)
+                            generateFastlegeResponseMissingIds(null, 1337, 1234)
+                        )
+                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_HERID_FNR.value -> call.respond(
+                            HttpStatusCode.OK,
+                            generateFastlegeResponseMissingIds(UserConstants.FASTLEGE_FNR.value, null, 1234)
+                        )
+                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_HPRID_FNR.value -> call.respond(
+                            HttpStatusCode.OK,
+                            generateFastlegeResponseMissingIds(UserConstants.FASTLEGE_FNR.value, 1337, null)
                         )
 
                         else -> call.respond(

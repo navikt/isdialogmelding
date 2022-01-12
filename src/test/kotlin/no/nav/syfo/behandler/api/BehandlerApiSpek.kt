@@ -142,13 +142,13 @@ class BehandlerApiSpek : Spek({
                             ).size shouldBeEqualTo 0
                         }
                     }
-                    it("should return empty list of BehandlerDialogmelding for arbeidstaker med fastlege uten fnr") {
+                    it("should return empty list of BehandlerDialogmelding for arbeidstaker med fastlege som mangler fnr, hprId og herId") {
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                                 addHeader(
                                     NAV_PERSONIDENT_HEADER,
-                                    UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR.value
+                                    UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_HPRID_HERID_FNR.value
                                 )
                             }
                         ) {
@@ -160,7 +160,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingList.size shouldBeEqualTo 0
 
                             database.getBehandlerDialogmeldingForArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR,
+                                UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_HPRID_HERID_FNR,
                             ).size shouldBeEqualTo 0
                         }
                     }
