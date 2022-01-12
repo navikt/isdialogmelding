@@ -39,4 +39,4 @@ fun Behandler.toBehandlerDialogmeldingDTO() = BehandlerDialogmeldingDTO(
     telefon = this.telefon,
 )
 
-fun Behandler.hasRequiredIds(): Boolean = personident != null || herId != null || hprId != null
+fun Behandler.hasAnId(): Boolean = personident != null || herId != null || hprId != null

@@ -81,7 +81,7 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR.value)
+                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE.value)
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
@@ -92,7 +92,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingList.size shouldBeEqualTo 0
 
                             database.getBehandlerDialogmeldingForArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR,
+                                UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE,
                             ).size shouldBeEqualTo 0
                         }
                     }
@@ -103,7 +103,7 @@ class BehandlerApiSpek : Spek({
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                                 addHeader(
                                     NAV_PERSONIDENT_HEADER,
-                                    UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FORELDREENHET_FNR.value
+                                    UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET.value
                                 )
                             }
                         ) {
@@ -115,7 +115,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingList.size shouldBeEqualTo 0
 
                             database.getBehandlerDialogmeldingForArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FORELDREENHET_FNR,
+                                UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET,
                             ).size shouldBeEqualTo 0
                         }
                     }
@@ -126,7 +126,7 @@ class BehandlerApiSpek : Spek({
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                                 addHeader(
                                     NAV_PERSONIDENT_HEADER,
-                                    UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR.value
+                                    UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO.value
                                 )
                             }
                         ) {
@@ -138,7 +138,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingList.size shouldBeEqualTo 0
 
                             database.getBehandlerDialogmeldingForArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR,
+                                UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO,
                             ).size shouldBeEqualTo 0
                         }
                     }
@@ -148,7 +148,7 @@ class BehandlerApiSpek : Spek({
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                                 addHeader(
                                     NAV_PERSONIDENT_HEADER,
-                                    UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_HPRID_HERID_FNR.value
+                                    UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID.value
                                 )
                             }
                         ) {
@@ -160,7 +160,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingList.size shouldBeEqualTo 0
 
                             database.getBehandlerDialogmeldingForArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_HPRID_HERID_FNR,
+                                UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID,
                             ).size shouldBeEqualTo 0
                         }
                     }

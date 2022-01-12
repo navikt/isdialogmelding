@@ -33,7 +33,7 @@ fun generateFastlegeResponse(personident: PersonIdentNumber, foreldreEnhetHerId:
     )
 )
 
-fun generateFastlegeResponseMissingIds(fnr: String?, herId: Int?, hprId: Int?) = FastlegeResponse(
+fun generateFastlegeResponse(fnr: String?, herId: Int?, hprId: Int?) = FastlegeResponse(
     fornavn = "Dana",
     mellomnavn = "Katherine",
     etternavn = "Scully",

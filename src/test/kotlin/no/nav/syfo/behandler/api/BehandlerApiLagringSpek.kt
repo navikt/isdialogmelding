@@ -33,8 +33,8 @@ class BehandlerApiLagringSpek : Spek({
                 UserConstants.VEILEDER_IDENT,
             )
 
-            describe("Get list of BehandlerDialogmelding with empty database") {
-                it("should store behandler for arbeidstaker with fastlege") {
+            describe("Get behandler for arbeidstaker creates behandler-arbeidstaker relation if missing") {
+                it("creates relation for arbeidstaker with fastlege") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -44,13 +44,13 @@ class BehandlerApiLagringSpek : Spek({
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
 
-                    val behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
-                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
-                    behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 1
+                    behandlerForArbeidstakerList.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
                 }
-                it("multiple gets should store behandler once for arbeidstaker with fastlege") {
+                it("creates relation only once for multiple gets for arbeidstaker with fastlege") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -60,11 +60,11 @@ class BehandlerApiLagringSpek : Spek({
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
 
-                    var behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
+                    var behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
-                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
-                    behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 1
+                    behandlerForArbeidstakerList.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
 
                     with(
                         handleRequest(HttpMethod.Get, url) {
@@ -74,13 +74,13 @@ class BehandlerApiLagringSpek : Spek({
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
-                    behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
+                    behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
-                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
-                    behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 1
+                    behandlerForArbeidstakerList.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
                 }
-                it("gets for arbeidstakere with equal fastlege should store behandler once") {
+                it("creates two relations with equal behandler for gets for arbeidstakere with equal fastlege") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -98,86 +98,84 @@ class BehandlerApiLagringSpek : Spek({
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
 
-                    val behandlerDialogmeldingForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
-                    behandlerDialogmeldingForArbeidstakerList.size shouldBeEqualTo 1
-                    val behandlerDialogmeldingForAnnenArbeidstakerList =
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 1
+                    val behandlerForAnnenArbeidstakerList =
                         database.getBehandlerDialogmeldingForArbeidstaker(
                             UserConstants.ANNEN_ARBEIDSTAKER_FNR,
                         )
-                    behandlerDialogmeldingForAnnenArbeidstakerList.size shouldBeEqualTo 1
-                    behandlerDialogmeldingForArbeidstakerList.first() shouldBeEqualTo behandlerDialogmeldingForAnnenArbeidstakerList.first()
+                    behandlerForAnnenArbeidstakerList.size shouldBeEqualTo 1
+                    behandlerForArbeidstakerList.first() shouldBeEqualTo behandlerForAnnenArbeidstakerList.first()
                 }
-                it("should store behandler for arbeidstaker with fastlege missing fnr") {
+                it("creates relation for arbeidstaker with fastlege missing fnr") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                            addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_FNR.value)
+                            addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR.value)
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
 
-                    val behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
-                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_FNR,
+                    val behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR,
                     )
-                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
-                    behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 1
+                    behandlerForArbeidstakerList.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
                 }
-                it("should store behandler for arbeidstaker with fastlege missing hprId") {
+                it("creates relation for arbeidstaker with fastlege missing hprId") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                            addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_HPRID_FNR.value)
+                            addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_HPRID.value)
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
 
-                    val behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
-                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_HPRID_FNR,
+                    val behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_HPRID,
                     )
-                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
-                    behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 1
+                    behandlerForArbeidstakerList.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
                 }
-                it("should store behandler for arbeidstaker with fastlege missing herId") {
+                it("creates relation for arbeidstaker with fastlege missing herId") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                            addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_HERID_FNR.value)
+                            addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_HERID.value)
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
 
-                    val behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
-                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_HERID_FNR,
+                    val behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_HERID,
                     )
-                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 1
-                    behandlerDialogmeldingForArbeidstaker.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 1
+                    behandlerForArbeidstakerList.first().partnerId shouldBeEqualTo UserConstants.PARTNERID.toString()
                 }
-                it("should not store behandler for arbeidstaker with fastlege missing fnr, hprId and herId") {
+                it("creates no relation for arbeidstaker with fastlege missing fnr, hprId and herId") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                             addHeader(
                                 NAV_PERSONIDENT_HEADER,
-                                UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_HPRID_HERID_FNR.value
+                                UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID.value
                             )
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
 
-                    val behandlerDialogmeldingForArbeidstaker = database.getBehandlerDialogmeldingForArbeidstaker(
-                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_HPRID_HERID_FNR,
+                    val behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID,
                     )
-                    behandlerDialogmeldingForArbeidstaker.size shouldBeEqualTo 0
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 0
                 }
-            }
-            describe("Get list of BehandlerDialogmelding with behandlere in database") {
-                it("should not store behandler when fastlege is latest behandler stored for arbeidstaker") {
+                it("creates no relation when arbeidstakers fastlege equal to behandler in latest relation for arbeidstaker") {
                     database.createBehandlerDialogmeldingForArbeidstaker(
                         behandler = generateFastlegeResponse(
                             UserConstants.FASTLEGE_FNR,
@@ -199,13 +197,13 @@ class BehandlerApiLagringSpek : Spek({
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size shouldBeEqualTo 1
                 }
-                it("should store behandler for arbeidstaker when fastlege is stored for other arbeidstaker") {
+                it("creates relation when arbeidstakers fastlege equal to behandler in relation for other arbeidstaker") {
                     database.createBehandlerDialogmeldingForArbeidstaker(
                         behandler = generateFastlegeResponse(
                             UserConstants.FASTLEGE_FNR,
                             UserConstants.HERID
                         ).toBehandler(UserConstants.PARTNERID),
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_HERID_FNR
+                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_MED_FASTLEGE_MED_ANNEN_HERID
                     )
 
                     with(
@@ -221,7 +219,7 @@ class BehandlerApiLagringSpek : Spek({
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size shouldBeEqualTo 1
                 }
-                it("should store behandler when fastlege is not latest behandler for arbeidstaker") {
+                it("creates relation when arbeidstakers fastlege not equal to behandler in latest relation for arbeidstaker") {
                     val behandlerRef = database.createBehandlerDialogmeldingForArbeidstaker(
                         behandler = generateFastlegeResponse(
                             UserConstants.FASTLEGE_FNR,
@@ -239,15 +237,15 @@ class BehandlerApiLagringSpek : Spek({
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
 
-                    val behandlerDialogmeldingForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
-                    behandlerDialogmeldingForArbeidstakerList.size shouldBeEqualTo 2
-                    behandlerDialogmeldingForArbeidstakerList[0].behandlerRef shouldNotBeEqualTo behandlerRef
-                    behandlerDialogmeldingForArbeidstakerList[1].behandlerRef shouldBeEqualTo behandlerRef
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 2
+                    behandlerForArbeidstakerList[0].behandlerRef shouldNotBeEqualTo behandlerRef
+                    behandlerForArbeidstakerList[1].behandlerRef shouldBeEqualTo behandlerRef
                 }
 
-                it("should store behandler for arbeidstaker when fastlege is stored for arbeidstaker but other fastlege is latest behandler") {
+                it("creates relation when relation exists for arbeidstakers fastlege but other behandler is in latest relation for arbeidstaker") {
                     val behandlerRef = database.createBehandlerDialogmeldingForArbeidstaker(
                         behandler = generateFastlegeResponse(
                             UserConstants.FASTLEGE_FNR,
@@ -272,16 +270,16 @@ class BehandlerApiLagringSpek : Spek({
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
 
-                    val behandlerDialogmeldingForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
-                    behandlerDialogmeldingForArbeidstakerList.size shouldBeEqualTo 3
-                    behandlerDialogmeldingForArbeidstakerList[0].behandlerRef shouldBeEqualTo behandlerRef
-                    behandlerDialogmeldingForArbeidstakerList[1].behandlerRef shouldBeEqualTo otherBehandlerRef
-                    behandlerDialogmeldingForArbeidstakerList[2].behandlerRef shouldBeEqualTo behandlerRef
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 3
+                    behandlerForArbeidstakerList[0].behandlerRef shouldBeEqualTo behandlerRef
+                    behandlerForArbeidstakerList[1].behandlerRef shouldBeEqualTo otherBehandlerRef
+                    behandlerForArbeidstakerList[2].behandlerRef shouldBeEqualTo behandlerRef
                 }
 
-                it("should store behandler for arbeidstaker when other fastlege with equal partnerId exists for other arbeidstaker") {
+                it("creates relation when arbeidstakers fastlege has partnerId equal to behandler in relation for other arbeidstaker") {
                     val behandlerRef = database.createBehandlerDialogmeldingForArbeidstaker(
                         behandler = generateFastlegeResponse(
                             UserConstants.FASTLEGE_FNR,
@@ -295,18 +293,18 @@ class BehandlerApiLagringSpek : Spek({
                             addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                             addHeader(
                                 NAV_PERSONIDENT_HEADER,
-                                UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_SAMME_PARTNERINFO_FNR.value
+                                UserConstants.ARBEIDSTAKER_MED_ANNEN_FASTLEGE_SAMME_PARTNERINFO.value
                             )
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.OK
                     }
 
-                    val behandlerDialogmeldingForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
-                        UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_SAMME_PARTNERINFO_FNR,
+                    val behandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_MED_ANNEN_FASTLEGE_SAMME_PARTNERINFO,
                     )
-                    behandlerDialogmeldingForArbeidstakerList.size shouldBeEqualTo 1
-                    behandlerDialogmeldingForArbeidstakerList[0].behandlerRef shouldNotBeEqualTo behandlerRef
+                    behandlerForArbeidstakerList.size shouldBeEqualTo 1
+                    behandlerForArbeidstakerList[0].behandlerRef shouldNotBeEqualTo behandlerRef
                 }
             }
         }

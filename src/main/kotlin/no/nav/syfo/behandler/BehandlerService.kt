@@ -5,7 +5,7 @@ import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.PBehandlerDialogmelding
 import no.nav.syfo.behandler.database.domain.toBehandler
 import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.domain.hasRequiredIds
+import no.nav.syfo.behandler.domain.hasAnId
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
@@ -30,7 +30,7 @@ class BehandlerService(
             callId = callId,
         )
 
-        return if (aktivFastlegeBehandler != null && aktivFastlegeBehandler.hasRequiredIds()) {
+        return if (aktivFastlegeBehandler != null && aktivFastlegeBehandler.hasAnId()) {
             val behandler = createOrGetBehandler(
                 behandler = aktivFastlegeBehandler,
                 personIdentNumber = personIdentNumber,
