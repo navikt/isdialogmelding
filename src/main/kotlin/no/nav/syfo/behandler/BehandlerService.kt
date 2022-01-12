@@ -30,16 +30,13 @@ class BehandlerService(
             callId = callId,
         )
 
-        if (aktivFastlegeBehandler != null && aktivFastlegeBehandler.hasRequiredIds()) {
+        return if (aktivFastlegeBehandler != null && aktivFastlegeBehandler.hasRequiredIds()) {
             val behandler = createOrGetBehandler(
                 behandler = aktivFastlegeBehandler,
                 personIdentNumber = personIdentNumber,
             )
-
-            return listOf(behandler)
-        }
-
-        return emptyList()
+            listOf(behandler)
+        } else emptyList()
     }
 
     private suspend fun getAktivFastlegeBehandler(
@@ -99,24 +96,21 @@ class BehandlerService(
     }
 
     private fun getBehandlerDialogmelding(behandler: Behandler): PBehandlerDialogmelding? {
-        if (behandler.personident != null) {
-            return database.getBehandlerDialogmeldingMedPersonIdentForPartnerId(
+        return when {
+            behandler.personident != null -> database.getBehandlerDialogmeldingMedPersonIdentForPartnerId(
                 behandlerPersonIdent = behandler.personident,
                 partnerId = behandler.partnerId,
             )
-        } else if (behandler.hprId != null) {
-            return database.getBehandlerDialogmeldingMedHprIdForPartnerId(
+            behandler.hprId != null -> database.getBehandlerDialogmeldingMedHprIdForPartnerId(
                 hprId = behandler.hprId,
                 partnerId = behandler.partnerId,
             )
-        } else if (behandler.herId != null) {
-            return database.getBehandlerDialogmeldingMedHerIdForPartnerId(
+            behandler.herId != null -> database.getBehandlerDialogmeldingMedHerIdForPartnerId(
                 herId = behandler.herId,
                 partnerId = behandler.partnerId,
             )
+            else -> throw IllegalArgumentException("Behandler missing personident, hprId and herId")
         }
-
-        throw IllegalArgumentException("Behandler missing personident, hprId and herId")
     }
 
     private fun createBehandlerDialogmelding(
