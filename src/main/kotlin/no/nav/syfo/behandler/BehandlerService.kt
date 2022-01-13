@@ -1,13 +1,11 @@
 package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.database.createBehandlerDialogmelding
-import no.nav.syfo.behandler.database.createBehandlerDialogmeldingArbeidstaker
+import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.PBehandlerDialogmelding
 import no.nav.syfo.behandler.database.domain.toBehandler
-import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
-import no.nav.syfo.behandler.database.getBehandlerDialogmeldingMedPersonIdentForPartnerId
 import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.domain.hasAnId
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
@@ -32,16 +30,13 @@ class BehandlerService(
             callId = callId,
         )
 
-        if (aktivFastlegeBehandler?.personident != null) {
+        return if (aktivFastlegeBehandler != null && aktivFastlegeBehandler.hasAnId()) {
             val behandler = createOrGetBehandler(
                 behandler = aktivFastlegeBehandler,
                 personIdentNumber = personIdentNumber,
             )
-
-            return listOf(behandler)
-        }
-
-        return emptyList()
+            listOf(behandler)
+        } else emptyList()
     }
 
     private suspend fun getAktivFastlegeBehandler(
@@ -101,14 +96,21 @@ class BehandlerService(
     }
 
     private fun getBehandlerDialogmelding(behandler: Behandler): PBehandlerDialogmelding? {
-        if (behandler.personident != null) {
-            return database.getBehandlerDialogmeldingMedPersonIdentForPartnerId(
+        return when {
+            behandler.personident != null -> database.getBehandlerDialogmeldingMedPersonIdentForPartnerId(
                 behandlerPersonIdent = behandler.personident,
                 partnerId = behandler.partnerId,
             )
+            behandler.hprId != null -> database.getBehandlerDialogmeldingMedHprIdForPartnerId(
+                hprId = behandler.hprId,
+                partnerId = behandler.partnerId,
+            )
+            behandler.herId != null -> database.getBehandlerDialogmeldingMedHerIdForPartnerId(
+                herId = behandler.herId,
+                partnerId = behandler.partnerId,
+            )
+            else -> throw IllegalArgumentException("Behandler missing personident, hprId and herId")
         }
-
-        return null
     }
 
     private fun createBehandlerDialogmelding(

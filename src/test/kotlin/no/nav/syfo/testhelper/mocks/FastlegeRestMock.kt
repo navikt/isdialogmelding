@@ -29,28 +29,40 @@ class FastlegeRestMock {
             routing {
                 get(FASTLEGE_PATH) {
                     when (getPersonIdentHeader()) {
-                        UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR.value -> call.respond(
+                        UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE.value -> call.respond(
                             HttpStatusCode.NotFound,
                         )
-                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FORELDREENHET_FNR.value -> call.respond(
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET.value -> call.respond(
                             HttpStatusCode.OK,
                             generateFastlegeResponse(UserConstants.FASTLEGE_FNR)
                         )
-                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_PARTNERINFO_FNR.value -> call.respond(
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO.value -> call.respond(
                             HttpStatusCode.OK,
                             generateFastlegeResponse(UserConstants.FASTLEGE_FNR, UserConstants.HERID_UTEN_PARTNERINFO)
                         )
-                        UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_HERID_FNR.value -> call.respond(
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_MED_ANNEN_HERID.value -> call.respond(
                             HttpStatusCode.OK,
-                            generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR, UserConstants.OTHER_HERID)
+                            generateFastlegeResponse(UserConstants.FASTLEGE_FNR, UserConstants.OTHER_HERID)
                         )
-                        UserConstants.ARBEIDSTAKER_ANNEN_FASTLEGE_SAMME_PARTNERINFO_FNR.value -> call.respond(
+                        UserConstants.ARBEIDSTAKER_MED_ANNEN_FASTLEGE_SAMME_PARTNERINFO.value -> call.respond(
                             HttpStatusCode.OK,
                             generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR, UserConstants.HERID)
                         )
-                        UserConstants.ARBEIDSTAKER_FASTLEGE_UTEN_FNR_FNR.value -> call.respond(
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID.value -> call.respond(
                             HttpStatusCode.OK,
-                            generateFastlegeResponse(null, UserConstants.HERID)
+                            generateFastlegeResponse(null, null, null)
+                        )
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR.value -> call.respond(
+                            HttpStatusCode.OK,
+                            generateFastlegeResponse(null, 1337, 1234)
+                        )
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_HERID.value -> call.respond(
+                            HttpStatusCode.OK,
+                            generateFastlegeResponse(UserConstants.FASTLEGE_FNR.value, null, 1234)
+                        )
+                        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_HPRID.value -> call.respond(
+                            HttpStatusCode.OK,
+                            generateFastlegeResponse(UserConstants.FASTLEGE_FNR.value, 1337, null)
                         )
 
                         else -> call.respond(

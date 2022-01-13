@@ -50,9 +50,9 @@ fun Connection.createBehandlerDialogmelding(
         it.setString(5, behandler.mellomnavn)
         it.setString(6, behandler.etternavn)
         it.setString(7, behandler.partnerId.toString())
-        it.setString(8, behandler.herId.toString())
-        it.setString(9, behandler.parentHerId.toString())
-        it.setString(10, behandler.hprId.toString())
+        it.setString(8, behandler.herId?.toString())
+        it.setString(9, behandler.parentHerId?.toString())
+        it.setString(10, behandler.hprId?.toString())
         it.setString(11, behandler.kontor)
         it.setString(12, behandler.adresse)
         it.setString(13, behandler.postnummer)
@@ -116,16 +116,48 @@ const val queryCreateBehandlerDialogmelding =
             updated_at
     """
 
-const val queryGetBehandlerDialogmeldingForPartnerId =
+const val queryGetBehandlerDialogmeldingMedPersonIdentForPartnerId =
     """
         SELECT * FROM BEHANDLER_DIALOGMELDING WHERE personident = ? and partner_id = ?
     """
 
 fun DatabaseInterface.getBehandlerDialogmeldingMedPersonIdentForPartnerId(behandlerPersonIdent: PersonIdentNumber, partnerId: Int): PBehandlerDialogmelding? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerDialogmeldingForPartnerId)
+        connection.prepareStatement(queryGetBehandlerDialogmeldingMedPersonIdentForPartnerId)
             .use {
                 it.setString(1, behandlerPersonIdent.value)
+                it.setString(2, partnerId.toString())
+                it.executeQuery().toList { toPBehandlerDialogmelding() }
+            }
+    }.firstOrNull()
+}
+
+const val queryGetBehandlerDialogmeldingMedHprIdForPartnerId =
+    """
+        SELECT * FROM BEHANDLER_DIALOGMELDING WHERE hpr_id = ? and partner_id = ?
+    """
+
+fun DatabaseInterface.getBehandlerDialogmeldingMedHprIdForPartnerId(hprId: Int, partnerId: Int): PBehandlerDialogmelding? {
+    return this.connection.use { connection ->
+        connection.prepareStatement(queryGetBehandlerDialogmeldingMedHprIdForPartnerId)
+            .use {
+                it.setString(1, hprId.toString())
+                it.setString(2, partnerId.toString())
+                it.executeQuery().toList { toPBehandlerDialogmelding() }
+            }
+    }.firstOrNull()
+}
+
+const val queryGetBehandlerDialogmeldingMedHerIdForPartnerId =
+    """
+        SELECT * FROM BEHANDLER_DIALOGMELDING WHERE her_id = ? and partner_id = ?
+    """
+
+fun DatabaseInterface.getBehandlerDialogmeldingMedHerIdForPartnerId(herId: Int, partnerId: Int): PBehandlerDialogmelding? {
+    return this.connection.use { connection ->
+        connection.prepareStatement(queryGetBehandlerDialogmeldingMedHerIdForPartnerId)
+            .use {
+                it.setString(1, herId.toString())
                 it.setString(2, partnerId.toString())
                 it.executeQuery().toList { toPBehandlerDialogmelding() }
             }
