@@ -5,6 +5,7 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.syfo.behandler.BehandlerService
+import no.nav.syfo.behandler.domain.hasAnId
 import no.nav.syfo.behandler.domain.toBehandlerDialogmeldingDTO
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.domain.PersonIdentNumber
@@ -39,13 +40,19 @@ fun Route.registerBehandlerApi(
                     token = token,
                 )
                 if (hasAccess) {
-                    val behandlere = behandlerService.getBehandlere(
+                    val behandlerDialogmeldingDTOList = mutableListOf<BehandlerDialogmeldingDTO>()
+                    val fastlege = behandlerService.getAktivFastlegeMedPartnerId(
                         personIdentNumber = personIdentNumber,
                         token = token,
                         callId = callId,
                     )
-                    val behandlerDialogmeldingDTOList =
-                        behandlere.map { behandler -> behandler.toBehandlerDialogmeldingDTO() }
+                    if (fastlege != null && fastlege.hasAnId()) {
+                        val behandler = behandlerService.createOrGetBehandler(
+                            behandler = fastlege,
+                            arbeidstakerPersonIdent = personIdentNumber,
+                        )
+                        behandlerDialogmeldingDTOList.add(behandler.toBehandlerDialogmeldingDTO())
+                    }
                     call.respond(behandlerDialogmeldingDTOList)
                 } else {
                     val accessDeniedMessage = "Denied Veileder access to PersonIdent"

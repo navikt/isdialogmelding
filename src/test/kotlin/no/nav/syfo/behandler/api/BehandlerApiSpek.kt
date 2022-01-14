@@ -39,8 +39,8 @@ class BehandlerApiSpek : Spek({
                     UserConstants.VEILEDER_IDENT,
                 )
                 describe("Happy path") {
-                    it("should return list of BehandlerDialogmelding if request is successful") {
-                        val fastlegeResponse = generateFastlegeResponse(UserConstants.FASTLEGE_FNR, UserConstants.HERID)
+                    it("should return list of BehandlerDialogmelding and store behandler if request is successful") {
+                        val fastlegeResponse = generateFastlegeResponse()
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -81,7 +81,7 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE.value)
+                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR.value)
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
@@ -92,7 +92,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDialogmeldingList.size shouldBeEqualTo 0
 
                             database.getBehandlerDialogmeldingForArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE,
+                                UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR,
                             ).size shouldBeEqualTo 0
                         }
                     }
