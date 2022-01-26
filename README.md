@@ -94,3 +94,9 @@ Creating a docker image should be as simple as `docker build -t isdialogmelding 
 This application owns and consumes from the following topic:
 
 * isdialogmelding-behandler-dialogmelding-bestilling
+
+## Contact
+
+### For NAV employees
+
+We are available at the Slack channel `#isyfo`.
