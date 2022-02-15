@@ -32,6 +32,7 @@ fun main() {
     val environment = Environment()
     val mqSender = MQSender(environment)
     val wellKnownInternalAzureAD = getWellKnown(environment.azureAppWellKnownUrl)
+    val wellKnownInternalIdportenTokenX = getWellKnown(environment.idportenTokenXWellKnownUrl)
     val azureAdClient = AzureAdClient(
         azureAppClientId = environment.aadAppClient,
         azureAppClientSecret = environment.azureAppClientSecret,
@@ -53,6 +54,7 @@ fun main() {
                 environment = environment,
                 mqSender = mqSender,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
+                wellKnownInternalIdportenTokenX = wellKnownInternalIdportenTokenX,
                 azureAdClient = azureAdClient,
             )
         }

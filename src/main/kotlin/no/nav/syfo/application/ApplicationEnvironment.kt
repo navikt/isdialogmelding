@@ -7,6 +7,14 @@ data class Environment(
     val azureAppClientSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
     val azureOpenidConfigTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
     val azureAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),
+
+    val idportenTokenXClientId: String = getEnvVar("TOKEN_X_CLIENT_ID"),
+    val idportenTokenXWellKnownUrl: String = getEnvVar("TOKEN_X_WELL_KNOWN_URL"),
+    val aapSoknadApiClientId: String = getEnvVar("AAP_SOKNAD_API_CLIENT_ID"),
+    val personAPIAuthorizedConsumerClientIdList: List<String> = listOf(
+        aapSoknadApiClientId,
+    ),
+
     val electorPath: String = getEnvVar("ELECTOR_PATH"),
     val serviceuserUsername: String = getEnvVar("SERVICEUSER_USERNAME"),
     val serviceuserPassword: String = getEnvVar("SERVICEUSER_PASSWORD"),

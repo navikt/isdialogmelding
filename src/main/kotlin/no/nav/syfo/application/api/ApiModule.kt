@@ -10,6 +10,8 @@ import no.nav.syfo.application.api.authentication.*
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerService
+import no.nav.syfo.behandler.api.person.access.PersonAPIConsumerAccessService
+import no.nav.syfo.behandler.api.person.registerPersonBehandlerApi
 import no.nav.syfo.behandler.api.registerBehandlerApi
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
@@ -23,6 +25,7 @@ fun Application.apiModule(
     environment: Environment,
     mqSender: MQSender,
     wellKnownInternalAzureAD: WellKnown,
+    wellKnownInternalIdportenTokenX: WellKnown,
     azureAdClient: AzureAdClient,
 ) {
     installMetrics()
@@ -34,6 +37,11 @@ fun Application.apiModule(
                 acceptedAudienceList = listOf(environment.aadAppClient),
                 jwtIssuerType = JwtIssuerType.AZUREAD_V2,
                 wellKnown = wellKnownInternalAzureAD,
+            ),
+            JwtIssuer(
+                acceptedAudienceList = listOf(environment.idportenTokenXClientId),
+                jwtIssuerType = JwtIssuerType.IDPORTEN_TOKENX,
+                wellKnown = wellKnownInternalIdportenTokenX,
             ),
         ),
     )
@@ -63,6 +71,10 @@ fun Application.apiModule(
         mqSender = mqSender
     )
 
+    val personAPIConsumerAccessService = PersonAPIConsumerAccessService(
+        authorizedConsumerApplicationClientIdList = environment.personAPIAuthorizedConsumerClientIdList,
+    )
+
     routing {
         registerPodApi(
             applicationState = applicationState,
@@ -77,6 +89,12 @@ fun Application.apiModule(
             registerBehandlerApi(
                 behandlerService = behandlerService,
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+            )
+        }
+        authenticate(JwtIssuerType.IDPORTEN_TOKENX.name) {
+            registerPersonBehandlerApi(
+                behandlerService = behandlerService,
+                personAPIConsumerAccessService = personAPIConsumerAccessService,
             )
         }
     }

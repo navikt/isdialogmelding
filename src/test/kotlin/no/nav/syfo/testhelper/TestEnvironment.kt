@@ -15,6 +15,10 @@ fun testEnvironment(
     azureAppClientSecret = "isdialogmelding-secret",
     azureAppWellKnownUrl = "wellknown",
     azureOpenidConfigTokenEndpoint = azureOpenidConfigTokenEndpoint,
+    idportenTokenXClientId = "dev-gcp.teamsykefravr.isdialogmelding",
+    idportenTokenXWellKnownUrl = "wellknown-idporten-tokenx",
+    aapSoknadApiClientId = testAapSoknadApiClientId,
+    personAPIAuthorizedConsumerClientIdList = listOf(testAapSoknadApiClientId),
     electorPath = "/tmp",
     kafka = ApplicationEnvironmentKafka(
         aivenBootstrapServers = kafkaBootstrapServers,
@@ -45,6 +49,8 @@ fun testEnvironment(
     isdialogmeldingDbPassword = "password",
     toggleKafkaProcessingEnabled = true,
 )
+
+const val testAapSoknadApiClientId = "soknad-api-client-id"
 
 fun testAppState() = ApplicationState(
     alive = true,

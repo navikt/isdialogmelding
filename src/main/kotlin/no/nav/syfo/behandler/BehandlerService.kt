@@ -23,9 +23,11 @@ class BehandlerService(
         personIdentNumber: PersonIdentNumber,
         token: String,
         callId: String,
+        systemRequest: Boolean = false,
     ): Behandler? {
         val fastlegeResponse = fastlegeClient.fastlege(
             personIdentNumber = personIdentNumber,
+            systemRequest = systemRequest,
             token = token,
             callId = callId,
         ) ?: return null
@@ -37,6 +39,7 @@ class BehandlerService(
 
         val partnerinfoResponse = partnerinfoClient.partnerinfo(
             herId = fastlegeResponse.foreldreEnhetHerId.toString(),
+            systemRequest = systemRequest,
             token = token,
             callId = callId,
         )

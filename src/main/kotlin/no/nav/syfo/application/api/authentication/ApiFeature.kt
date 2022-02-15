@@ -1,6 +1,7 @@
 package no.nav.syfo.application.api.authentication
 
 import com.auth0.jwk.JwkProviderBuilder
+import com.auth0.jwt.JWT
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -12,6 +13,8 @@ import io.ktor.metrics.micrometer.*
 import io.ktor.response.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.api.access.ForbiddenAccessVeilederException
+import no.nav.syfo.behandler.api.person.access.ForbiddenPersonAPIConsumer
+import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.metric.METRICS_REGISTRY
 import no.nav.syfo.util.configureJacksonMapper
 import no.nav.syfo.util.getCallId
@@ -62,6 +65,12 @@ fun hasExpectedAudience(credentials: JWTCredential, expectedAudience: List<Strin
     return expectedAudience.any { credentials.payload.audience.contains(it) }
 }
 
+fun ApplicationCall.personIdent(): PersonIdentNumber? {
+    val token = this.request.headers[HttpHeaders.Authorization]?.removePrefix("Bearer ")
+    val decodedJWT = JWT.decode(token)
+    return decodedJWT.claims["pid"]?.asString()?.let { PersonIdentNumber(it) }
+}
+
 fun Application.installMetrics() {
     install(MicrometerMetrics) {
         registry = METRICS_REGISTRY
@@ -86,6 +95,9 @@ fun Application.installStatusPages() {
                 is ForbiddenAccessVeilederException -> {
                     log.warn(logExceptionMessage, cause)
                 }
+                is ForbiddenPersonAPIConsumer -> {
+                    log.warn(logExceptionMessage, cause)
+                }
                 else -> {
                     log.error(logExceptionMessage, cause)
                 }
@@ -101,6 +113,9 @@ fun Application.installStatusPages() {
                     HttpStatusCode.BadRequest
                 }
                 is ForbiddenAccessVeilederException -> {
+                    HttpStatusCode.Forbidden
+                }
+                is ForbiddenPersonAPIConsumer -> {
                     HttpStatusCode.Forbidden
                 }
                 else -> {
