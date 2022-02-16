@@ -4,14 +4,17 @@ import com.auth0.jwk.JwkProviderBuilder
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
+import io.ktor.client.features.*
 import io.ktor.features.*
-import io.ktor.metrics.micrometer.*
 import io.ktor.http.*
 import io.ktor.jackson.*
+import io.ktor.metrics.micrometer.*
 import io.ktor.response.*
 import net.logstash.logback.argument.StructuredArguments
+import no.nav.syfo.behandler.api.access.ForbiddenAccessVeilederException
 import no.nav.syfo.metric.METRICS_REGISTRY
-import no.nav.syfo.util.*
+import no.nav.syfo.util.configureJacksonMapper
+import no.nav.syfo.util.getCallId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URL
@@ -74,9 +77,44 @@ fun Application.installContentNegotiation() {
 fun Application.installStatusPages() {
     install(StatusPages) {
         exception<Throwable> { cause ->
-            call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
-            log.error("Caught exception", cause)
-            throw cause
+            val callId = getCallId()
+            val logExceptionMessage = "Caught exception, callId=$callId"
+            when (cause) {
+                is ResponseException -> {
+                    cause.response.status
+                }
+                is ForbiddenAccessVeilederException -> {
+                    log.warn(logExceptionMessage, cause)
+                }
+                else -> {
+                    log.error(logExceptionMessage, cause)
+                }
+            }
+
+            var isUnexpectedException = false
+
+            val responseStatus: HttpStatusCode = when (cause) {
+                is ResponseException -> {
+                    cause.response.status
+                }
+                is IllegalArgumentException -> {
+                    HttpStatusCode.BadRequest
+                }
+                is ForbiddenAccessVeilederException -> {
+                    HttpStatusCode.Forbidden
+                }
+                else -> {
+                    isUnexpectedException = true
+                    HttpStatusCode.InternalServerError
+                }
+            }
+
+            val message = if (isUnexpectedException) {
+                "The server reported an unexpected error and cannot complete the request."
+            } else {
+                cause.message ?: "Unknown error"
+            }
+            call.respond(responseStatus, message)
         }
     }
 }
