@@ -24,13 +24,24 @@ class PartnerinfoClient(
         herId: String,
         token: String,
         callId: String,
+        systemRequest: Boolean = false,
     ): PartnerinfoResponse? {
-        val oboToken =
-            azureAdClient.getOnBehalfOfToken(scopeClientId = syfoPartnerinfoClientId, token = token)?.accessToken
+        val newToken = if (systemRequest) {
+            azureAdClient.getSystemToken(
+                scopeClientId = syfoPartnerinfoClientId,
+            )?.accessToken
+                ?: throw RuntimeException("Failed to request partnerinfo from syfopartnerinfo: Failed to get System token")
+        } else {
+            azureAdClient.getOnBehalfOfToken(
+                scopeClientId = syfoPartnerinfoClientId,
+                token = token,
+            )?.accessToken
                 ?: throw RuntimeException("Failed to request partnerinfo from syfopartnerinfo: Failed to get OBO token")
+        }
+
         try {
             val response = httpClient.get<List<PartnerinfoResponse>>(partnerinfoBehandlerUrl) {
-                header(HttpHeaders.Authorization, bearerHeader(oboToken))
+                header(HttpHeaders.Authorization, bearerHeader(newToken))
                 header(NAV_CALL_ID_HEADER, callId)
                 accept(ContentType.Application.Json)
                 parameter(HERID_PARAM, herId)
