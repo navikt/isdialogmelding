@@ -13,20 +13,14 @@ class PdlMock {
     private val port = getRandomPort()
     val url = "http://localhost:$port"
     val name = "pdl"
-    val server = mockPdlServer(port)
-
-    private fun mockPdlServer(
-        port: Int,
-    ): NettyApplicationEngine {
-        return embeddedServer(
-            factory = Netty,
-            port = port
-        ) {
-            installContentNegotiation()
-            routing {
-                post {
-                    call.respond(generatePdlPersonResponse())
-                }
+    val server = embeddedServer(
+        factory = Netty,
+        port = port
+    ) {
+        installContentNegotiation()
+        routing {
+            post {
+                call.respond(generatePdlPersonResponse())
             }
         }
     }
