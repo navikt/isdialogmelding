@@ -8,9 +8,7 @@ import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
 import no.nav.syfo.domain.PersonIdentNumber
-import no.nav.syfo.util.NAV_CALL_ID_HEADER
-import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
-import no.nav.syfo.util.bearerHeader
+import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 
 class FastlegeClient(
@@ -18,21 +16,50 @@ class FastlegeClient(
     private val fastlegeRestClientId: String,
     fastlegeRestUrl: String
 ) {
-
     private val httpClient = httpClientDefault()
     private val finnFastlegeUrl: String = "$fastlegeRestUrl$FASTLEGE_PATH"
+    private val finnFastlegeSystemUrl: String = "$fastlegeRestUrl$FASTLEGE_SYSTEM_PATH"
 
     suspend fun fastlege(
-        personIdentNumber: PersonIdentNumber,
-        token: String,
         callId: String,
+        personIdentNumber: PersonIdentNumber,
+        systemRequest: Boolean = false,
+        token: String,
     ): FastlegeResponse? {
-        val oboToken =
-            azureAdClient.getOnBehalfOfToken(scopeClientId = fastlegeRestClientId, token = token)?.accessToken
-                ?: throw RuntimeException("Failed to request fastlege from fastlegerest: Failed to get OBO token")
+        val newToken: String
+        val url: String
+        if (systemRequest) {
+            newToken = azureAdClient.getSystemToken(
+                scopeClientId = fastlegeRestClientId,
+            )?.accessToken
+                ?: throw RuntimeException("Failed to request fastlege from fastlegeres: Failed to get System token")
+            url = finnFastlegeSystemUrl
+        } else {
+            newToken = azureAdClient.getOnBehalfOfToken(
+                scopeClientId = fastlegeRestClientId,
+                token = token,
+            )?.accessToken
+                ?: throw RuntimeException("Failed to request fastlege from fastlegeres Failed to get OBO token")
+            url = finnFastlegeUrl
+        }
+
+        return fastlege(
+            callId = callId,
+            personIdentNumber = personIdentNumber,
+            token = newToken,
+            url = url,
+        )
+    }
+
+    private suspend fun fastlege(
+        callId: String,
+        token: String,
+        personIdentNumber: PersonIdentNumber,
+        url: String,
+    ): FastlegeResponse? {
         try {
-            val response = httpClient.get<FastlegeResponse>(finnFastlegeUrl) {
-                header(HttpHeaders.Authorization, bearerHeader(oboToken))
+            val response = httpClient.get<FastlegeResponse>(url) {
+                header(HttpHeaders.Authorization, bearerHeader(token))
                 header(NAV_CALL_ID_HEADER, callId)
                 header(NAV_PERSONIDENT_HEADER, personIdentNumber.value)
                 accept(ContentType.Application.Json)
@@ -60,6 +87,7 @@ class FastlegeClient(
 
     companion object {
         const val FASTLEGE_PATH = "/fastlegerest/api/v2/fastlege"
+        const val FASTLEGE_SYSTEM_PATH = "/fastlegerest/api/system/v1/fastlege/aktiv/personident"
         private val log = LoggerFactory.getLogger(FastlegeClient::class.java)
     }
 }
