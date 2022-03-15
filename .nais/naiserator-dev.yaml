@@ -37,6 +37,8 @@ spec:
       memory: 384Mi
   ingresses:
     - "https://isdialogmelding.dev.intern.nav.no"
+  tokenx:
+    enabled: true
   accessPolicy:
     inbound:
       rules:
@@ -46,6 +48,9 @@ spec:
         - application: syfomodiaperson
           namespace: teamsykefravr
           cluster: dev-fss
+        - application: soknad-api
+          namespace: aap
+          cluster: dev-gcp
     outbound:
       external:
         - host: "syfopartnerinfo.dev-fss-pub.nais.io"
@@ -86,6 +91,8 @@ spec:
       value: Q1_ISDIALOGMELDING
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
       value: QA.Q414.IU03_UTSENDING
+    - name: AAP_SOKNAD_API_CLIENT_ID
+      value: "dev-gcp:aap:soknad-api"
     - name: FASTLEGEREST_CLIENT_ID
       value: "dev-gcp.teamsykefravr.fastlegerest"
     - name: FASTLEGEREST_URL

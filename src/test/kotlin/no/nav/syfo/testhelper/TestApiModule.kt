@@ -14,6 +14,7 @@ fun Application.testApiModule(
         environment = externalMockEnvironment.environment,
         mqSender = mockk(),
         wellKnownInternalAzureAD = externalMockEnvironment.wellKnownInternalAzureAD,
+        wellKnownInternalIdportenTokenX = externalMockEnvironment.wellKnownInternalIdportenTokenX,
         azureAdClient = AzureAdClient(
             azureAppClientId = externalMockEnvironment.environment.aadAppClient,
             azureAppClientSecret = externalMockEnvironment.environment.azureAppClientSecret,

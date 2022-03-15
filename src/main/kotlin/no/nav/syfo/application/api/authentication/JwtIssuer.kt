@@ -8,4 +8,5 @@ data class JwtIssuer(
 
 enum class JwtIssuerType {
     AZUREAD_V2,
+    IDPORTEN_TOKENX,
 }

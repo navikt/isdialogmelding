@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import no.nav.syfo.application.api.authentication.JWT_CLAIM_NAVIDENT
+import no.nav.syfo.behandler.api.person.access.JWT_CLAIM_CLIENT_ID
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -41,6 +42,33 @@ fun generateJWT(
         .withClaim("iat", now)
         .withClaim("exp", Date.from(expiry?.atZone(ZoneId.systemDefault())?.toInstant()))
         .withClaim(JWT_CLAIM_NAVIDENT, navIdent)
+        .sign(alg)
+}
+
+fun generateJWTIdporten(
+    audience: String,
+    clientId: String?,
+    issuer: String,
+    pid: String? = null,
+    expiry: LocalDateTime? = LocalDateTime.now().plusHours(1)
+): String {
+    val now = Date()
+    val key = getDefaultRSAKey()
+    val alg = Algorithm.RSA256(key.toRSAPublicKey(), key.toRSAPrivateKey())
+
+    return JWT.create()
+        .withKeyId(keyId)
+        .withIssuer(issuer)
+        .withAudience(audience)
+        .withJWTId(UUID.randomUUID().toString())
+        .withClaim("ver", "1.0")
+        .withClaim("nonce", "myNonce")
+        .withClaim("auth_time", now)
+        .withClaim("nbf", now)
+        .withClaim("iat", now)
+        .withClaim("exp", Date.from(expiry?.atZone(ZoneId.systemDefault())?.toInstant()))
+        .withClaim("pid", pid)
+        .withClaim(JWT_CLAIM_CLIENT_ID, clientId)
         .sign(alg)
 }
 

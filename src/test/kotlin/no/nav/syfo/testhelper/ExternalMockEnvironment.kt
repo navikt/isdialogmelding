@@ -33,6 +33,7 @@ class ExternalMockEnvironment private constructor() {
         pdlUrl = pdlMock.url,
     )
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
+    val wellKnownInternalIdportenTokenX = wellKnownInternalIdportenTokenX()
 
     companion object {
         val instance: ExternalMockEnvironment by lazy { ExternalMockEnvironment().also { it.externalApplicationMockMap.start() } }
