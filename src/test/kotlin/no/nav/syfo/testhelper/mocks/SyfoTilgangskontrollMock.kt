@@ -25,8 +25,12 @@ class SyfoTilgangskontrollMock {
         routing {
             get(TILGANGSKONTROLL_PERSON_PATH) {
                 when (getPersonIdentHeader()) {
-                    ARBEIDSTAKER_VEILEDER_NO_ACCESS.value -> call.respond(Tilgang(false, "Ingen tilgang"))
-                    else -> call.respond(Tilgang(true, ""))
+                    ARBEIDSTAKER_VEILEDER_NO_ACCESS.value -> call.respond(
+                        Tilgang(harTilgang = false)
+                    )
+                    else -> call.respond(
+                        Tilgang(harTilgang = true)
+                    )
                 }
             }
         }
