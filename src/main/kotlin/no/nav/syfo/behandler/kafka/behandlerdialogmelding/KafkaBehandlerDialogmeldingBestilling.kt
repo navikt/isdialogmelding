@@ -1,10 +1,10 @@
-package no.nav.syfo.behandler.kafka
+package no.nav.syfo.behandler.kafka.behandlerdialogmelding
 
 import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
-import org.apache.kafka.clients.consumer.ConsumerRecords
-import org.apache.kafka.clients.consumer.KafkaConsumer
+import no.nav.syfo.behandler.kafka.kafkaBehandlerDialogmeldingBestillingConsumerConfig
+import org.apache.kafka.clients.consumer.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
@@ -19,6 +19,7 @@ fun blockingApplicationLogicDialogmeldingBestilling(
     behandlerDialogmeldingService: BehandlerDialogmeldingService,
 ) {
     val consumerProperties = kafkaBehandlerDialogmeldingBestillingConsumerConfig(applicationEnvironmentKafka)
+
     val kafkaConsumerDialogmeldingBestilling = KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>(consumerProperties)
 
     kafkaConsumerDialogmeldingBestilling.subscribe(

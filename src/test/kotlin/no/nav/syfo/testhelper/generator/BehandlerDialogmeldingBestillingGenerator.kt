@@ -1,7 +1,7 @@
 package no.nav.syfo.testhelper.generator
 
 import no.nav.syfo.behandler.domain.DialogmeldingKode
-import no.nav.syfo.behandler.kafka.BehandlerDialogmeldingBestillingDTO
+import no.nav.syfo.behandler.kafka.behandlerdialogmelding.BehandlerDialogmeldingBestillingDTO
 import java.util.UUID
 
 fun generateBehandlerDialogmeldingBestillingDTO(behandlerRef: UUID, uuid: UUID) = BehandlerDialogmeldingBestillingDTO(

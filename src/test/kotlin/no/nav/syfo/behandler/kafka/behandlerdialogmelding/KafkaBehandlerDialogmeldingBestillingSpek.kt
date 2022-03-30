@@ -1,4 +1,4 @@
-package no.nav.syfo.behandler.kafka
+package no.nav.syfo.behandler.kafka.behandlerdialogmelding
 
 import io.ktor.server.testing.*
 import io.mockk.*
@@ -103,7 +103,7 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                             }
                         pBehandlerDialogmeldingBestilling shouldNotBeEqualTo null
                         pBehandlerDialogmeldingBestilling!!.uuid shouldBeEqualTo dialogmeldingBestillingUuid
-                        pBehandlerDialogmeldingBestilling.tekst shouldBeEqualTo dialogmeldingBestilling.dialogmeldingTekst
+                        pBehandlerDialogmeldingBestilling.tekst!! shouldBeEqualTo dialogmeldingBestilling.dialogmeldingTekst
                     }
                 }
                 describe("Should only persist once when duplicates") {
