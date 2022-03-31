@@ -26,6 +26,15 @@ fun kafkaSykmeldingConsumerConfig(
     }
 }
 
+fun kafkaDialogmeldingFromBehandlerConsumerConfig(
+    applicationEnvironmentKafka: ApplicationEnvironmentKafka,
+): Properties {
+    return kafkaConsumerConfig(applicationEnvironmentKafka).apply {
+        this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] =
+            JacksonKafkaDeserializerDialogmeldingFromBehandler::class.java.canonicalName
+    }
+}
+
 private fun kafkaConsumerConfig(
     applicationEnvironmentKafka: ApplicationEnvironmentKafka,
 ): Properties {

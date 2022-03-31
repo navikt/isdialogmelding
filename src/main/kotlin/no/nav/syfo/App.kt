@@ -13,8 +13,7 @@ import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
-import no.nav.syfo.behandler.kafka.launchKafkaTaskDialogmeldingBestilling
-import no.nav.syfo.behandler.kafka.launchKafkaTaskSykmelding
+import no.nav.syfo.behandler.kafka.*
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.cronjob.cronjobModule
@@ -91,6 +90,12 @@ fun main() {
         )
         if (environment.toggleKafkaProcessingSykmeldingEnabled) {
             launchKafkaTaskSykmelding(
+                applicationState = applicationState,
+                applicationEnvironmentKafka = environment.kafka,
+            )
+        }
+        if (environment.toggleKafkaProcessingDialogmeldingEnabled) {
+            launchKafkaTaskDialogmeldingFromBehandler(
                 applicationState = applicationState,
                 applicationEnvironmentKafka = environment.kafka,
             )
