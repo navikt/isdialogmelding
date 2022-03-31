@@ -4,7 +4,7 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
-import no.nav.syfo.behandler.kafka.toBehandlerDialogmeldingBestilling
+import no.nav.syfo.behandler.kafka.behandlerdialogmelding.toBehandlerDialogmeldingBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.testhelper.ExternalMockEnvironment

@@ -1,7 +1,7 @@
 package no.nav.syfo.testhelper
 
 import no.nav.common.KafkaEnvironment
-import no.nav.syfo.behandler.kafka.DIALOGMELDING_BESTILLING_TOPIC
+import no.nav.syfo.behandler.kafka.behandlerdialogmelding.DIALOGMELDING_BESTILLING_TOPIC
 
 fun testKafka(
     autoStart: Boolean = false,

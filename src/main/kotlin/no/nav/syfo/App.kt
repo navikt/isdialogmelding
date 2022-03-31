@@ -13,7 +13,8 @@ import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
-import no.nav.syfo.behandler.kafka.launchKafkaTask
+import no.nav.syfo.behandler.kafka.launchKafkaTaskDialogmeldingBestilling
+import no.nav.syfo.behandler.kafka.launchKafkaTaskSykmelding
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.cronjob.cronjobModule
@@ -63,35 +64,36 @@ fun main() {
     applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) {
         applicationState.ready = true
         logger.info("Application is ready")
-        if (environment.toggleKafkaProcessingEnabled) {
-            val pdlClient = PdlClient(
-                azureAdClient = azureAdClient,
-                pdlClientId = environment.pdlClientId,
-                pdlUrl = environment.pdlUrl,
-            )
-            val behandlerDialogmeldingService = BehandlerDialogmeldingService(
-                database = applicationDatabase,
-                pdlClient = pdlClient,
-            )
-
-            launchKafkaTask(
+        val pdlClient = PdlClient(
+            azureAdClient = azureAdClient,
+            pdlClientId = environment.pdlClientId,
+            pdlUrl = environment.pdlUrl,
+        )
+        val behandlerDialogmeldingService = BehandlerDialogmeldingService(
+            database = applicationDatabase,
+            pdlClient = pdlClient,
+        )
+        launchKafkaTaskDialogmeldingBestilling(
+            applicationState = applicationState,
+            applicationEnvironmentKafka = environment.kafka,
+            behandlerDialogmeldingService = behandlerDialogmeldingService,
+        )
+        val dialogmeldingService = DialogmeldingService(
+            behandlerDialogmeldingService = behandlerDialogmeldingService,
+            mqSender = mqSender,
+        )
+        cronjobModule(
+            applicationState = applicationState,
+            environment = environment,
+            mqSender = mqSender,
+            behandlerDialogmeldingService = behandlerDialogmeldingService,
+            dialogmeldingService = dialogmeldingService,
+        )
+        if (environment.toggleKafkaProcessingSykmeldingEnabled) {
+            launchKafkaTaskSykmelding(
                 applicationState = applicationState,
                 applicationEnvironmentKafka = environment.kafka,
-                behandlerDialogmeldingService = behandlerDialogmeldingService,
             )
-            val dialogmeldingService = DialogmeldingService(
-                behandlerDialogmeldingService = behandlerDialogmeldingService,
-                mqSender = mqSender,
-            )
-            cronjobModule(
-                applicationState = applicationState,
-                environment = environment,
-                mqSender = mqSender,
-                behandlerDialogmeldingService = behandlerDialogmeldingService,
-                dialogmeldingService = dialogmeldingService,
-            )
-        } else {
-            logger.info("Kafka-processing and cronjob disabled")
         }
     }
 

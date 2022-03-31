@@ -11,12 +11,29 @@ import java.util.*
 fun kafkaBehandlerDialogmeldingBestillingConsumerConfig(
     applicationEnvironmentKafka: ApplicationEnvironmentKafka,
 ): Properties {
+    return kafkaConsumerConfig(applicationEnvironmentKafka).apply {
+        this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] =
+            JacksonKafkaDeserializerBehandlerDialogmeldingBestilling::class.java.canonicalName
+    }
+}
+
+fun kafkaSykmeldingConsumerConfig(
+    applicationEnvironmentKafka: ApplicationEnvironmentKafka,
+): Properties {
+    return kafkaConsumerConfig(applicationEnvironmentKafka).apply {
+        this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] =
+            JacksonKafkaDeserializerSykmelding::class.java.canonicalName
+    }
+}
+
+private fun kafkaConsumerConfig(
+    applicationEnvironmentKafka: ApplicationEnvironmentKafka,
+): Properties {
     return Properties().apply {
         putAll(commonKafkaAivenConfig(applicationEnvironmentKafka))
 
         this[ConsumerConfig.GROUP_ID_CONFIG] = "isdialogmelding"
         this[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.canonicalName
-        this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JacksonKafkaDeserializer::class.java.canonicalName
         this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
         this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = "false"
         this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "1000"

@@ -5,7 +5,7 @@ import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.BehandlerDialogmeldingArbeidstaker
 import no.nav.syfo.behandler.domain.BehandlerDialogmeldingBestilling
-import no.nav.syfo.behandler.kafka.*
+import no.nav.syfo.behandler.kafka.behandlerdialogmelding.*
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.domain.PersonIdentNumber
 import org.slf4j.Logger

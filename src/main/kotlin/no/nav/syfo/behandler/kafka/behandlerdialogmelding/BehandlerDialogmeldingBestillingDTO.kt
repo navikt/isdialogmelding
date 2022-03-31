@@ -1,7 +1,7 @@
-package no.nav.syfo.behandler.kafka
+package no.nav.syfo.behandler.kafka.behandlerdialogmelding
 
-import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.*
+import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.domain.PersonIdentNumber
 import java.util.UUID
 
