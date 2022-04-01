@@ -9,58 +9,28 @@ import java.sql.*
 import java.time.Instant
 import java.util.*
 
-const val queryCreateBehandlerDialogmeldingArbeidstaker =
-    """
-        INSERT INTO BEHANDLER_DIALOGMELDING_ARBEIDSTAKER (
-            id,
-            uuid,
-            arbeidstaker_personident,
-            created_at,
-            behandler_dialogmelding_id
-            ) VALUES (DEFAULT, ?, ?, ?, ?) RETURNING id
-    """
-
-fun Connection.createBehandlerDialogmeldingArbeidstaker(
-    personIdentNumber: PersonIdentNumber,
-    behandlerDialogmeldingId: Int,
-) {
-    val uuid = UUID.randomUUID()
-    val idList = this.prepareStatement(queryCreateBehandlerDialogmeldingArbeidstaker).use {
-        it.setString(1, uuid.toString())
-        it.setString(2, personIdentNumber.value)
-        it.setTimestamp(3, Timestamp.from(Instant.now()))
-        it.setInt(4, behandlerDialogmeldingId)
-        it.executeQuery().toList { getInt("id") }
-    }
-
-    if (idList.size != 1) {
-        throw SQLException("Creating BehandlerDialogmeldingArbeidstaker failed, no rows affected.")
-    }
-}
-
 fun Connection.createBehandlerDialogmelding(
     behandler: Behandler,
 ): PBehandlerDialogmelding {
     val now = Timestamp.from(Instant.now())
     val behandlerDialogmeldingList = this.prepareStatement(queryCreateBehandlerDialogmelding).use {
         it.setString(1, behandler.behandlerRef.toString())
-        it.setString(2, behandler.type.name)
-        it.setString(3, behandler.personident?.value)
-        it.setString(4, behandler.fornavn)
-        it.setString(5, behandler.mellomnavn)
-        it.setString(6, behandler.etternavn)
-        it.setString(7, behandler.partnerId.toString())
-        it.setString(8, behandler.herId?.toString())
-        it.setString(9, behandler.parentHerId?.toString())
-        it.setString(10, behandler.hprId?.toString())
-        it.setString(11, behandler.kontor)
-        it.setString(12, behandler.adresse)
-        it.setString(13, behandler.postnummer)
-        it.setString(14, behandler.poststed)
-        it.setString(15, behandler.orgnummer?.value)
-        it.setString(16, behandler.telefon)
+        it.setString(2, behandler.personident?.value)
+        it.setString(3, behandler.fornavn)
+        it.setString(4, behandler.mellomnavn)
+        it.setString(5, behandler.etternavn)
+        it.setString(6, behandler.partnerId.toString())
+        it.setString(7, behandler.herId?.toString())
+        it.setString(8, behandler.parentHerId?.toString())
+        it.setString(9, behandler.hprId?.toString())
+        it.setString(10, behandler.kontor)
+        it.setString(11, behandler.adresse)
+        it.setString(12, behandler.postnummer)
+        it.setString(13, behandler.poststed)
+        it.setString(14, behandler.orgnummer?.value)
+        it.setString(15, behandler.telefon)
+        it.setTimestamp(16, now)
         it.setTimestamp(17, now)
-        it.setTimestamp(18, now)
         it.executeQuery().toList { toPBehandlerDialogmelding() }
     }
 
@@ -76,7 +46,6 @@ const val queryCreateBehandlerDialogmelding =
         INSERT INTO BEHANDLER_DIALOGMELDING (
             id,
             behandler_ref,
-            type,
             personident,
             fornavn,
             mellomnavn,
@@ -93,11 +62,10 @@ const val queryCreateBehandlerDialogmelding =
             telefon,
             created_at,
             updated_at
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             RETURNING
             id,
             behandler_ref,
-            type,
             personident,
             fornavn,
             mellomnavn,
@@ -217,7 +185,6 @@ fun ResultSet.toPBehandlerDialogmelding(): PBehandlerDialogmelding =
     PBehandlerDialogmelding(
         id = getInt("id"),
         behandlerRef = UUID.fromString(getString("behandler_ref")),
-        type = getString("type"),
         personident = getString("personident"),
         fornavn = getString("fornavn"),
         mellomnavn = getString("mellomnavn"),

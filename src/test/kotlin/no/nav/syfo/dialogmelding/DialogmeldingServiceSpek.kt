@@ -7,7 +7,8 @@ import no.nav.syfo.behandler.BehandlerDialogmeldingService
 import no.nav.syfo.behandler.kafka.behandlerdialogmelding.toBehandlerDialogmeldingBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
-import no.nav.syfo.testhelper.ExternalMockEnvironment
+import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
 import org.junit.Assert.assertTrue
 import org.spekframework.spek2.Spek
@@ -39,16 +40,30 @@ object DialogmeldingServiceSpek : Spek({
         behandlerDialogmeldingService = behandlerDialogmeldingService,
     )
 
+    val arbeidstakerPersonIdent = PersonIdentNumber("01010112345")
+    val uuid = UUID.randomUUID()
+    val behandlerRef = UUID.randomUUID()
+    val behandler = generateBehandler(behandlerRef, 1)
+
+    beforeEachTest {
+        database.dropData()
+        database.createBehandlerDialogmeldingForArbeidstaker(
+            behandler = behandler,
+            arbeidstakerPersonIdent = arbeidstakerPersonIdent,
+        )
+    }
+    afterEachTest {
+        database.dropData()
+    }
     describe("DialogmeldingService") {
         it("Sends correct message on MQ when foresporsel dialogmote-innkalling") {
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val uuid = UUID.randomUUID()
-            val behandlerRef = UUID.randomUUID()
             val melding = generateBehandlerDialogmeldingBestillingDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
+                arbeidstakerPersonIdent = arbeidstakerPersonIdent,
             ).toBehandlerDialogmeldingBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
@@ -73,11 +88,10 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val uuid = UUID.randomUUID()
-            val behandlerRef = UUID.randomUUID()
             val melding = generateBehandlerDialogmeldingEndreTidStedDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
+                arbeidstakerPersonIdent = arbeidstakerPersonIdent,
             ).toBehandlerDialogmeldingBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
@@ -102,11 +116,10 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val uuid = UUID.randomUUID()
-            val behandlerRef = UUID.randomUUID()
             val melding = generateBehandlerDialogmeldingBestillingReferatDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
+                arbeidstakerPersonIdent = arbeidstakerPersonIdent,
             ).toBehandlerDialogmeldingBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
@@ -131,11 +144,10 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val uuid = UUID.randomUUID()
-            val behandlerRef = UUID.randomUUID()
             val melding = generateBehandlerDialogmeldingBestillingAvlysningDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
+                arbeidstakerPersonIdent = arbeidstakerPersonIdent,
             ).toBehandlerDialogmeldingBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,

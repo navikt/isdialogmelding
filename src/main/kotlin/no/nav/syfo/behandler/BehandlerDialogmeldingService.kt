@@ -35,11 +35,17 @@ class BehandlerDialogmeldingService(
         database.incrementDialogmeldingBestillingSendtTries(uuid)
     }
 
-    suspend fun getBehandlerDialogmeldingArbeidstaker(personIdent: PersonIdentNumber): BehandlerDialogmeldingArbeidstaker {
+    suspend fun getBehandlerDialogmeldingArbeidstaker(
+        behandlerRef: UUID,
+        personIdent: PersonIdentNumber,
+    ): BehandlerDialogmeldingArbeidstaker {
+        val pBehandlerDialogmeldingArbeidstaker = database.getBehandlerDialogmeldingArbeidstaker(
+            personIdentNumber = personIdent,
+            behandlerRef = behandlerRef,
+        )
         val pdlNavn = pdlClient.person(personIdent)?.hentPerson?.navn?.first()
             ?: throw RuntimeException("PDL returned empty response")
-        return BehandlerDialogmeldingArbeidstaker(
-            arbeidstakerPersonident = personIdent,
+        return pBehandlerDialogmeldingArbeidstaker.toBehandlerDialogmeldingArbeidstaker(
             fornavn = pdlNavn.fornavn,
             mellomnavn = pdlNavn.mellomnavn,
             etternavn = pdlNavn.etternavn,

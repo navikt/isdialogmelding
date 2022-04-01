@@ -5,7 +5,6 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerDialogmeldingService
-import no.nav.syfo.behandler.database.createBehandlerDialogmelding
 import no.nav.syfo.behandler.database.getBehandlerDialogmeldingBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
@@ -73,16 +72,17 @@ class DialogmeldingCronjobSpek : Spek({
                     val behandlerRef = UUID.randomUUID()
                     val partnerId = random.nextInt()
                     val behandler = generateBehandler(behandlerRef, partnerId)
-                    database.connection.use {
-                        it.createBehandlerDialogmelding(behandler)
-                        it.commit()
-                    }
+                    database.createBehandlerDialogmeldingForArbeidstaker(
+                        behandler = behandler,
+                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
+                    )
 
                     val dialogmeldingBestillingUuid = UUID.randomUUID()
 
                     val dialogmeldingBestillingDTO = generateBehandlerDialogmeldingBestillingDTO(
                         uuid = dialogmeldingBestillingUuid,
                         behandlerRef = behandlerRef,
+                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
                     )
                     behandlerDialogmeldingService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
 

@@ -3,6 +3,8 @@ package no.nav.syfo.behandler
 import io.ktor.server.testing.*
 import io.mockk.mockk
 import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
+import no.nav.syfo.behandler.domain.BehandlerDialogmeldingArbeidstaker
+import no.nav.syfo.behandler.domain.BehandlerType
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.testhelper.ExternalMockEnvironment
 import no.nav.syfo.testhelper.UserConstants
@@ -37,7 +39,10 @@ class BehandlerServiceSpek : Spek({
                     val behandler =
                         behandlerService.createOrGetBehandler(
                             generateFastlegeResponse().toBehandler(UserConstants.PARTNERID),
-                            UserConstants.ARBEIDSTAKER_FNR
+                            BehandlerDialogmeldingArbeidstaker(
+                                type = BehandlerType.FASTLEGE,
+                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            )
                         )
 
                     val pBehandlerList = database.getBehandlerDialogmeldingForArbeidstaker(
@@ -48,18 +53,41 @@ class BehandlerServiceSpek : Spek({
                 }
                 it("lagrer behandler for arbeidstaker én gang når kallt flere ganger for samme behandler og arbeidstaker") {
                     val behandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
-                    behandlerService.createOrGetBehandler(behandler, UserConstants.ARBEIDSTAKER_FNR)
-                    behandlerService.createOrGetBehandler(behandler, UserConstants.ARBEIDSTAKER_FNR)
-
+                    behandlerService.createOrGetBehandler(
+                        behandler,
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        )
+                    )
+                    behandlerService.createOrGetBehandler(
+                        behandler,
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        )
+                    )
                     val pBehandlerList = database.getBehandlerDialogmeldingForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerList.size shouldBeEqualTo 1
                 }
-                it("lagrer én behandler koblet til begge arbeidstakere når kallt for to ulike arbeidstakere med samme behandler") {
+                it("lagrer én behandler koblet til begge arbeidstakere når kalt for to ulike arbeidstakere med samme behandler") {
                     val behandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
-                    behandlerService.createOrGetBehandler(behandler, UserConstants.ANNEN_ARBEIDSTAKER_FNR)
-                    behandlerService.createOrGetBehandler(behandler, UserConstants.ARBEIDSTAKER_FNR)
+                    behandlerService.createOrGetBehandler(
+                        behandler,
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ANNEN_ARBEIDSTAKER_FNR
+                        ),
+                    )
+                    behandlerService.createOrGetBehandler(
+                        behandler,
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        ),
+                    )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
@@ -76,7 +104,10 @@ class BehandlerServiceSpek : Spek({
                         generateFastlegeResponse(null, UserConstants.HERID, UserConstants.HPRID).toBehandler(UserConstants.PARTNERID)
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        UserConstants.ARBEIDSTAKER_FNR
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        ),
                     )
 
                     database.getBehandlerDialogmeldingForArbeidstaker(
@@ -92,7 +123,10 @@ class BehandlerServiceSpek : Spek({
                         ).toBehandler(UserConstants.PARTNERID)
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        UserConstants.ARBEIDSTAKER_FNR
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        ),
                     )
 
                     database.getBehandlerDialogmeldingForArbeidstaker(
@@ -108,7 +142,10 @@ class BehandlerServiceSpek : Spek({
                         ).toBehandler(UserConstants.PARTNERID)
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        UserConstants.ARBEIDSTAKER_FNR
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        ),
                     )
 
                     database.getBehandlerDialogmeldingForArbeidstaker(
@@ -122,7 +159,10 @@ class BehandlerServiceSpek : Spek({
                     assertThrows(IllegalArgumentException::class.java) {
                         behandlerService.createOrGetBehandler(
                             behandler,
-                            UserConstants.ARBEIDSTAKER_FNR
+                            BehandlerDialogmeldingArbeidstaker(
+                                type = BehandlerType.FASTLEGE,
+                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            ),
                         )
                     }
                     database.getBehandlerDialogmeldingForArbeidstaker(
@@ -138,8 +178,11 @@ class BehandlerServiceSpek : Spek({
                         )
 
                     behandlerService.createOrGetBehandler(
-                        behandler = behandler,
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        behandler,
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        ),
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
@@ -156,8 +199,11 @@ class BehandlerServiceSpek : Spek({
                             arbeidstakerPersonIdent = UserConstants.ANNEN_ARBEIDSTAKER_FNR
                         )
                     behandlerService.createOrGetBehandler(
-                        behandler = behandler,
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        behandler,
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        ),
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
@@ -177,7 +223,10 @@ class BehandlerServiceSpek : Spek({
                         )
                     behandlerService.createOrGetBehandler(
                         behandler = annenBehandler,
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        ),
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
@@ -200,8 +249,11 @@ class BehandlerServiceSpek : Spek({
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
                     )
                     behandlerService.createOrGetBehandler(
-                        behandler = behandler,
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        behandler,
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        ),
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
@@ -221,8 +273,11 @@ class BehandlerServiceSpek : Spek({
                         arbeidstakerPersonIdent = UserConstants.ANNEN_ARBEIDSTAKER_FNR
                     )
                     behandlerService.createOrGetBehandler(
-                        behandler = behandler,
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        behandler,
+                        BehandlerDialogmeldingArbeidstaker(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        ),
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(

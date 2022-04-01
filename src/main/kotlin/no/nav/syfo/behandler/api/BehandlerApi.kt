@@ -5,8 +5,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.access.validateVeilederAccess
-import no.nav.syfo.behandler.domain.hasAnId
-import no.nav.syfo.behandler.domain.toBehandlerDialogmeldingDTO
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.util.*
@@ -43,11 +42,19 @@ fun Route.registerBehandlerApi(
                     callId = callId,
                 )
                 if (fastlege != null && fastlege.hasAnId()) {
+                    val behandlerDialogmeldingArbeidstaker = BehandlerDialogmeldingArbeidstaker(
+                        type = BehandlerType.FASTLEGE,
+                        arbeidstakerPersonident = personIdentNumber,
+                    )
                     val behandler = behandlerService.createOrGetBehandler(
                         behandler = fastlege,
-                        arbeidstakerPersonIdent = personIdentNumber,
+                        behandlerDialogmeldingArbeidstaker = behandlerDialogmeldingArbeidstaker,
                     )
-                    behandlerDialogmeldingDTOList.add(behandler.toBehandlerDialogmeldingDTO())
+                    behandlerDialogmeldingDTOList.add(
+                        behandler.toBehandlerDialogmeldingDTO(
+                            behandlerType = BehandlerType.FASTLEGE,
+                        )
+                    )
                 }
                 call.respond(behandlerDialogmeldingDTOList)
             }

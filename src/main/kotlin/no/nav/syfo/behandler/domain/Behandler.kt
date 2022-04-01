@@ -7,7 +7,6 @@ import no.nav.syfo.domain.Virksomhetsnummer
 import java.util.*
 
 data class Behandler(
-    val type: BehandlerType,
     val behandlerRef: UUID,
     val personident: PersonIdentNumber?,
     val fornavn: String,
@@ -25,8 +24,10 @@ data class Behandler(
     val telefon: String?,
 )
 
-fun Behandler.toBehandlerDialogmeldingDTO() = BehandlerDialogmeldingDTO(
-    type = this.type.name,
+fun Behandler.toBehandlerDialogmeldingDTO(
+    behandlerType: BehandlerType,
+) = BehandlerDialogmeldingDTO(
+    type = behandlerType.name,
     behandlerRef = this.behandlerRef.toString(),
     fnr = this.personident?.value,
     fornavn = this.fornavn,
@@ -40,8 +41,10 @@ fun Behandler.toBehandlerDialogmeldingDTO() = BehandlerDialogmeldingDTO(
     telefon = this.telefon,
 )
 
-fun Behandler.toPersonBehandlerDTO() = PersonBehandlerDTO(
-    type = this.type.name,
+fun Behandler.toPersonBehandlerDTO(
+    behandlerType: BehandlerType,
+) = PersonBehandlerDTO(
+    type = behandlerType.name,
     behandlerRef = this.behandlerRef.toString(),
     fnr = this.personident?.value,
     fornavn = this.fornavn,

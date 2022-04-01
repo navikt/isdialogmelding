@@ -7,8 +7,7 @@ import io.ktor.routing.*
 import no.nav.syfo.application.api.authentication.personIdent
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.person.access.PersonAPIConsumerAccessService
-import no.nav.syfo.behandler.domain.hasAnId
-import no.nav.syfo.behandler.domain.toPersonBehandlerDTO
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
 import org.slf4j.Logger
@@ -44,11 +43,19 @@ fun Route.registerPersonBehandlerApi(
                     callId = callId,
                 )
                 if (fastlege != null && fastlege.hasAnId()) {
+                    val behandlerDialogmeldingArbeidstaker = BehandlerDialogmeldingArbeidstaker(
+                        type = BehandlerType.FASTLEGE,
+                        arbeidstakerPersonident = requestPersonIdent,
+                    )
                     val behandler = behandlerService.createOrGetBehandler(
                         behandler = fastlege,
-                        arbeidstakerPersonIdent = requestPersonIdent,
+                        behandlerDialogmeldingArbeidstaker = behandlerDialogmeldingArbeidstaker,
                     )
-                    personBehandlerDTOList.add(behandler.toPersonBehandlerDTO())
+                    personBehandlerDTOList.add(
+                        behandler.toPersonBehandlerDTO(
+                            behandlerType = BehandlerType.FASTLEGE,
+                        )
+                    )
                 }
                 call.respond(personBehandlerDTOList)
             } catch (e: IllegalArgumentException) {
