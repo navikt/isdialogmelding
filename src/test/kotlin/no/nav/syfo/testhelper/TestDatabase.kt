@@ -3,7 +3,7 @@ package no.nav.syfo.testhelper
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
-import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.PersonIdentNumber
 import org.flywaydb.core.Flyway
 import java.sql.Connection
@@ -51,7 +51,10 @@ fun DatabaseInterface.createBehandlerDialogmeldingForArbeidstaker(
         val behandlerDialogmelding =
             connection.createBehandlerDialogmelding(behandler)
         connection.createBehandlerDialogmeldingArbeidstaker(
-            arbeidstakerPersonIdent,
+            BehandlerDialogmeldingArbeidstaker(
+                type = BehandlerType.FASTLEGE,
+                arbeidstakerPersonident = arbeidstakerPersonIdent,
+            ),
             behandlerDialogmelding.id
         )
         connection.commit()
@@ -66,10 +69,10 @@ fun DatabaseInterface.dropData() {
         DELETE FROM BEHANDLER_DIALOGMELDING_BESTILLING
         """.trimIndent(),
         """
-        DELETE FROM BEHANDLER_DIALOGMELDING
+        DELETE FROM BEHANDLER_DIALOGMELDING_ARBEIDSTAKER
         """.trimIndent(),
         """
-        DELETE FROM BEHANDLER_DIALOGMELDING_ARBEIDSTAKER
+        DELETE FROM BEHANDLER_DIALOGMELDING
         """.trimIndent(),
     )
     this.connection.use { connection ->

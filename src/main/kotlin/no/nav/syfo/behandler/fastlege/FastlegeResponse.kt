@@ -1,7 +1,6 @@
 package no.nav.syfo.behandler.fastlege
 
 import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.domain.BehandlerType
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.domain.Virksomhetsnummer
 import java.time.LocalDate
@@ -48,7 +47,6 @@ data class FastlegeResponse(
 }
 
 fun FastlegeResponse.toBehandler(partnerId: Int) = Behandler(
-    type = BehandlerType.FASTLEGE,
     behandlerRef = UUID.randomUUID(),
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,

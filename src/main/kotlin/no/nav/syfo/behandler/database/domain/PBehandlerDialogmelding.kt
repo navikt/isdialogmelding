@@ -1,7 +1,6 @@
 package no.nav.syfo.behandler.database.domain
 
 import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.domain.BehandlerType
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.domain.Virksomhetsnummer
 import java.time.LocalDateTime
@@ -10,7 +9,6 @@ import java.util.*
 data class PBehandlerDialogmelding(
     val id: Int,
     val behandlerRef: UUID,
-    val type: String,
     val personident: String?,
     val fornavn: String,
     val mellomnavn: String?,
@@ -31,7 +29,6 @@ data class PBehandlerDialogmelding(
 
 fun PBehandlerDialogmelding.toBehandler() = Behandler(
     behandlerRef = this.behandlerRef,
-    type = BehandlerType.valueOf(this.type),
     personident = this.personident?.let { PersonIdentNumber(it) },
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,

@@ -17,7 +17,10 @@ class DialogmeldingService(
 ) {
     suspend fun sendMelding(melding: BehandlerDialogmeldingBestilling) {
         log.info("Sending dialogmelding to lege with partnerId: ${melding.behandler.partnerId}")
-        val arbeidstaker = behandlerDialogmeldingService.getBehandlerDialogmeldingArbeidstaker(melding.arbeidstakerPersonIdent)
+        val arbeidstaker = behandlerDialogmeldingService.getBehandlerDialogmeldingArbeidstaker(
+            melding.behandler.behandlerRef,
+            melding.arbeidstakerPersonIdent,
+        )
 
         val fellesformat: Fellesformat = opprettDialogmelding(melding, arbeidstaker)
 
