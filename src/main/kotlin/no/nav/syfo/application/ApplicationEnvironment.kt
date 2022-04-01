@@ -45,6 +45,7 @@ data class Environment(
     val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),
     val syfotilgangskontrollUrl: String = getEnvVar("SYFOTILGANGSKONTROLL_URL"),
     val toggleKafkaProcessingSykmeldingEnabled: Boolean = getEnvVar("TOGGLE_KAFKA_PROCESSING_SYKMELDING_ENABLED").toBoolean(),
+    val toggleKafkaProcessingDialogmeldingEnabled: Boolean = getEnvVar("TOGGLE_KAFKA_PROCESSING_DIALOGMELDING_ENABLED").toBoolean(),
 ) {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$isdialogmeldingDbHost:$isdialogmeldingDbPort/$isdialogmeldingDbName"
