@@ -12,7 +12,7 @@ import no.nav.syfo.application.api.authentication.getWellKnown
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.application.mq.MQSender
-import no.nav.syfo.behandler.BehandlerDialogmeldingService
+import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.kafka.*
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
@@ -68,24 +68,24 @@ fun main() {
             pdlClientId = environment.pdlClientId,
             pdlUrl = environment.pdlUrl,
         )
-        val behandlerDialogmeldingService = BehandlerDialogmeldingService(
+        val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
             database = applicationDatabase,
             pdlClient = pdlClient,
         )
         launchKafkaTaskDialogmeldingBestilling(
             applicationState = applicationState,
             applicationEnvironmentKafka = environment.kafka,
-            behandlerDialogmeldingService = behandlerDialogmeldingService,
+            dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
         )
         val dialogmeldingService = DialogmeldingService(
-            behandlerDialogmeldingService = behandlerDialogmeldingService,
+            dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
             mqSender = mqSender,
         )
         cronjobModule(
             applicationState = applicationState,
             environment = environment,
             mqSender = mqSender,
-            behandlerDialogmeldingService = behandlerDialogmeldingService,
+            dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
             dialogmeldingService = dialogmeldingService,
         )
         if (environment.toggleKafkaProcessingSykmeldingEnabled) {

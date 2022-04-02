@@ -1,11 +1,11 @@
-package no.nav.syfo.behandler.kafka.behandlerdialogmelding
+package no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling
 
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.domain.PersonIdentNumber
 import java.util.UUID
 
-data class BehandlerDialogmeldingBestillingDTO(
+data class DialogmeldingToBehandlerBestillingDTO(
     val behandlerRef: String,
     val personIdent: String,
     val dialogmeldingUuid: String,
@@ -17,9 +17,9 @@ data class BehandlerDialogmeldingBestillingDTO(
     val dialogmeldingVedlegg: ByteArray? = null,
 )
 
-fun BehandlerDialogmeldingBestillingDTO.toBehandlerDialogmeldingBestilling(
+fun DialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(
     behandler: Behandler,
-) = BehandlerDialogmeldingBestilling(
+) = DialogmeldingToBehandlerBestilling(
     uuid = UUID.fromString(this.dialogmeldingUuid),
     behandler = behandler,
     arbeidstakerPersonIdent = PersonIdentNumber(this.personIdent),

@@ -2,12 +2,12 @@ package no.nav.syfo.dialogmelding.converter
 
 import no.kith.xmlstds.msghead._2006_05_24.ObjectFactory
 import no.kith.xmlstds.msghead._2006_05_24.XMLDocument
-import no.nav.syfo.behandler.domain.BehandlerDialogmeldingBestilling
+import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 fun createVedleggDocument(
-    melding: BehandlerDialogmeldingBestilling,
+    melding: DialogmeldingToBehandlerBestilling,
 ): XMLDocument {
     val factory = ObjectFactory()
     val vedleggFactory = no.kith.xmlstds.base64container.ObjectFactory()

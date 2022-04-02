@@ -1,8 +1,8 @@
 package no.nav.syfo.behandler.kafka
 
 import no.nav.syfo.application.*
-import no.nav.syfo.behandler.BehandlerDialogmeldingService
-import no.nav.syfo.behandler.kafka.behandlerdialogmelding.blockingApplicationLogicDialogmeldingBestilling
+import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.blockingApplicationLogicDialogmeldingBestilling
 import no.nav.syfo.behandler.kafka.dialogmeldingfrombehandler.blockingApplicationLogicDialogmeldingFromBehandler
 import no.nav.syfo.behandler.kafka.sykmelding.blockingApplicationLogicSykmelding
 import org.slf4j.Logger
@@ -13,13 +13,13 @@ private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.behandler.kafka")
 fun launchKafkaTaskDialogmeldingBestilling(
     applicationState: ApplicationState,
     applicationEnvironmentKafka: ApplicationEnvironmentKafka,
-    behandlerDialogmeldingService: BehandlerDialogmeldingService,
+    dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
 ) {
     launchBackgroundTask(applicationState = applicationState) {
         blockingApplicationLogicDialogmeldingBestilling(
             applicationState = applicationState,
             applicationEnvironmentKafka = applicationEnvironmentKafka,
-            behandlerDialogmeldingService = behandlerDialogmeldingService,
+            dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
         )
     }
 }

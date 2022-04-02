@@ -3,8 +3,8 @@ package no.nav.syfo.dialogmelding
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.mq.MQSender
-import no.nav.syfo.behandler.BehandlerDialogmeldingService
-import no.nav.syfo.behandler.kafka.behandlerdialogmelding.toBehandlerDialogmeldingBestilling
+import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.toDialogmeldingToBehandlerBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.domain.PersonIdentNumber
@@ -29,7 +29,7 @@ object DialogmeldingServiceSpek : Spek({
         pdlClientId = environment.pdlClientId,
         pdlUrl = environment.pdlUrl,
     )
-    val behandlerDialogmeldingService = BehandlerDialogmeldingService(
+    val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
         database = database,
         pdlClient = pdlClient,
     )
@@ -37,7 +37,7 @@ object DialogmeldingServiceSpek : Spek({
 
     val dialogmeldingService = DialogmeldingService(
         mqSender = mqSender,
-        behandlerDialogmeldingService = behandlerDialogmeldingService,
+        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
     )
 
     val arbeidstakerPersonIdent = PersonIdentNumber("01010112345")
@@ -60,11 +60,11 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val melding = generateBehandlerDialogmeldingBestillingDTO(
+            val melding = generateDialogmeldingToBehandlerBestillingDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
                 arbeidstakerPersonIdent = arbeidstakerPersonIdent,
-            ).toBehandlerDialogmeldingBestilling(
+            ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
                     partnerId = 1,
@@ -88,11 +88,11 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val melding = generateBehandlerDialogmeldingEndreTidStedDTO(
+            val melding = generateDialogmeldingToBehandlerBestillingEndreTidStedDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
                 arbeidstakerPersonIdent = arbeidstakerPersonIdent,
-            ).toBehandlerDialogmeldingBestilling(
+            ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
                     partnerId = 1,
@@ -116,11 +116,11 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val melding = generateBehandlerDialogmeldingBestillingReferatDTO(
+            val melding = generateDialogmeldingToBehandlerBestillingReferatDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
                 arbeidstakerPersonIdent = arbeidstakerPersonIdent,
-            ).toBehandlerDialogmeldingBestilling(
+            ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
                     partnerId = 1,
@@ -144,11 +144,11 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val melding = generateBehandlerDialogmeldingBestillingAvlysningDTO(
+            val melding = generateDialogmeldingToBehandlerBestillingAvlysningDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
                 arbeidstakerPersonIdent = arbeidstakerPersonIdent,
-            ).toBehandlerDialogmeldingBestilling(
+            ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
                     partnerId = 1,

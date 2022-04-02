@@ -5,7 +5,7 @@ import no.nav.syfo.domain.PersonIdentNumber
 import java.sql.Timestamp
 import java.util.UUID
 
-data class PBehandlerDialogMeldingBestilling(
+data class PDialogmeldingToBehandlerBestilling(
     val id: Int,
     val uuid: UUID,
     val behandlerId: Int,
@@ -20,9 +20,9 @@ data class PBehandlerDialogMeldingBestilling(
     val sendtTries: Int,
 )
 
-fun PBehandlerDialogMeldingBestilling.toBehandlerDialogmeldingBestilling(
+fun PDialogmeldingToBehandlerBestilling.toDialogmeldingToBehandlerBestilling(
     behandler: Behandler,
-) = BehandlerDialogmeldingBestilling(
+) = DialogmeldingToBehandlerBestilling(
     uuid = this.uuid,
     behandler = behandler,
     arbeidstakerPersonIdent = PersonIdentNumber(this.arbeidstakerPersonIdent),

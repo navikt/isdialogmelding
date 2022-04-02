@@ -3,7 +3,7 @@ package no.nav.syfo.behandler.domain
 import no.nav.syfo.domain.PersonIdentNumber
 import java.util.UUID
 
-data class BehandlerDialogmeldingBestilling(
+data class DialogmeldingToBehandlerBestilling(
     val uuid: UUID,
     val behandler: Behandler,
     val arbeidstakerPersonIdent: PersonIdentNumber,

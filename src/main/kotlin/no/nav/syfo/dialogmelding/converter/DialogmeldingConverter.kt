@@ -2,11 +2,11 @@ package no.nav.syfo.dialogmelding.converter
 
 import no.kith.xmlstds.dialog._2006_10_11.ObjectFactory
 import no.kith.xmlstds.dialog._2006_10_11.XMLDialogmelding
-import no.nav.syfo.behandler.domain.BehandlerDialogmeldingBestilling
+import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
 import no.nav.syfo.behandler.domain.DialogmeldingType
 import java.util.*
 
-fun createDialogmelding(melding: BehandlerDialogmeldingBestilling): XMLDialogmelding {
+fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogmelding {
     val factory = ObjectFactory()
     val fellesFactory = no.kith.xmlstds.ObjectFactory()
 
