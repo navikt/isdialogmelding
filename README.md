@@ -25,7 +25,7 @@ Applikasjon for håndtering av dialogmeldinger i SYFO-domenet. Funksjonalitet:
 
 #### Requirements
 
-* JDK 11
+* JDK 17
 
 ## Download packages from Github Package Registry
 
