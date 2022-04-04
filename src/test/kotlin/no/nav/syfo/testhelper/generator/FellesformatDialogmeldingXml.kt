@@ -8,7 +8,7 @@ fun defaultFellesformatDialogmeldingXmlRegex(): Regex {
             "        <ns2:MsgInfo>\n" +
             "            <ns2:Type V=\"DIALOG_FORESPORSEL\" DN=\"Forespørsel\"/>\n" +
             "            <ns2:MIGversion>v1.2 2006-05-24</ns2:MIGversion>\n" +
-            "            <ns2:GenDate>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{0,7}</ns2:GenDate>\n" +
+            "            <ns2:GenDate>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{0,9}</ns2:GenDate>\n" +
             "            <ns2:MsgId>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns2:MsgId>\n" +
             "            <ns2:Ack V=\"J\" DN=\"Ja\"/>\n" +
             "            <ns2:ConversationRef>\n" +
