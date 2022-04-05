@@ -16,7 +16,7 @@ class DialogmeldingService(
     val mqSender: MQSender,
 ) {
     suspend fun sendMelding(melding: DialogmeldingToBehandlerBestilling) {
-        log.info("Sending dialogmelding to lege with partnerId: ${melding.behandler.partnerId}")
+        log.info("Sending dialogmelding to lege with partnerId: ${melding.behandler.kontor.partnerId}")
         val arbeidstaker = dialogmeldingToBehandlerService.getBehandlerDialogmeldingArbeidstaker(
             melding.behandler.behandlerRef,
             melding.arbeidstakerPersonIdent,

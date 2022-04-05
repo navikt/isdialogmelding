@@ -2,7 +2,8 @@ package no.nav.syfo.behandler
 
 import io.ktor.server.testing.*
 import io.mockk.mockk
-import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
+import no.nav.syfo.behandler.database.*
+import no.nav.syfo.behandler.database.domain.toBehandler
 import no.nav.syfo.behandler.domain.BehandlerDialogmeldingArbeidstaker
 import no.nav.syfo.behandler.domain.BehandlerType
 import no.nav.syfo.behandler.fastlege.toBehandler
@@ -11,8 +12,7 @@ import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.createBehandlerDialogmeldingForArbeidstaker
 import no.nav.syfo.testhelper.dropData
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldNotBeEqualTo
+import org.amshove.kluent.*
 import org.junit.Assert.assertThrows
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -50,6 +50,36 @@ class BehandlerServiceSpek : Spek({
                     )
                     pBehandlerList.size shouldBeEqualTo 1
                     pBehandlerList[0].behandlerRef shouldBeEqualTo behandler.behandlerRef
+                    val pBehandlerKontor = database.getBehandlerDialogmeldingKontorForId(pBehandlerList[0].kontorId)
+                    pBehandlerKontor.dialogmeldingEnabled shouldNotBeEqualTo null
+                }
+                it("lagrer behandler for arbeidstaker og setter dialogmeldingEnabled senere") {
+                    val behandler =
+                        behandlerService.createOrGetBehandler(
+                            generateFastlegeResponse().toBehandler(
+                                partnerId = UserConstants.PARTNERID,
+                                dialogmeldingEnabled = false,
+                            ),
+                            BehandlerDialogmeldingArbeidstaker(
+                                type = BehandlerType.FASTLEGE,
+                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            )
+                        )
+
+                    val pBehandlerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_FNR,
+                    )
+                    pBehandlerList.size shouldBeEqualTo 1
+                    val pBehandler = pBehandlerList[0]
+                    val behandlerFromDB = pBehandler.toBehandler(database.getBehandlerDialogmeldingKontorForId(pBehandler.kontorId))
+                    behandlerFromDB.behandlerRef shouldBeEqualTo behandler.behandlerRef
+                    behandlerFromDB.kontor.dialogmeldingEnabled shouldBeEqualTo false
+
+                    database.updateDialogMeldingEnabledForPartnerId(behandlerFromDB.kontor.partnerId)
+
+                    val behandlerFromDBUpdated = pBehandler.toBehandler(database.getBehandlerDialogmeldingKontorForId(pBehandler.kontorId))
+                    behandlerFromDBUpdated.behandlerRef shouldBeEqualTo behandler.behandlerRef
+                    behandlerFromDBUpdated.kontor.dialogmeldingEnabled shouldBeEqualTo true
                 }
                 it("lagrer behandler for arbeidstaker én gang når kallt flere ganger for samme behandler og arbeidstaker") {
                     val behandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
