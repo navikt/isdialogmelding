@@ -6,6 +6,7 @@ import no.kith.xmlstds.msghead._2006_05_24.XMLMsgHead
 import no.nav.xml.eiff._2.XMLEIFellesformat
 import java.io.StringWriter
 import javax.xml.bind.*
+import javax.xml.stream.XMLStreamReader
 import javax.xml.transform.stream.StreamResult
 
 object JAXB {
@@ -22,6 +23,13 @@ object JAXB {
         } catch (e: JAXBException) {
             throw RuntimeException(e)
         }
+    }
+
+    fun <T> unmarshallObject(xmlStreamReader: XMLStreamReader, wantedClass: Class<T>): T {
+        val jaxbContext: JAXBContext = JAXBContext.newInstance(wantedClass)
+        val unmarshaller: Unmarshaller = jaxbContext.createUnmarshaller()
+
+        return unmarshaller.unmarshal(xmlStreamReader) as T
     }
 
     init {
