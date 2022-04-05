@@ -1,16 +1,16 @@
-package no.nav.syfo.behandler.kafka.behandlerdialogmelding
+package no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling
 
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.behandler.BehandlerDialogmeldingService
+import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.database.createBehandlerDialogmelding
-import no.nav.syfo.behandler.database.getBehandlerDialogmeldingBestilling
+import no.nav.syfo.behandler.database.getBestillinger
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateBehandler
-import no.nav.syfo.testhelper.generator.generateBehandlerDialogmeldingBestillingDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingDTO
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeEqualTo
 import org.apache.kafka.clients.consumer.*
@@ -21,7 +21,7 @@ import java.time.Duration
 import java.util.Random
 import java.util.UUID
 
-class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
+class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
     with(TestApplicationEngine()) {
         start()
@@ -36,7 +36,7 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
             pdlClientId = environment.pdlClientId,
             pdlUrl = environment.pdlUrl,
         )
-        val behandlerDialogmeldingService = BehandlerDialogmeldingService(
+        val behandlerDialogmeldingService = DialogmeldingToBehandlerService(
             database = database,
             pdlClient = pdlClient,
         )
@@ -46,12 +46,12 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
             database.dropData()
         }
 
-        describe(KafkaBehandlerDialogmeldingBestillingSpek::class.java.simpleName) {
+        describe(KafkaDialogmeldingToBehandlerBestillingSpek::class.java.simpleName) {
 
             describe("Motta dialogmelding bestillinger") {
                 val partition = 0
-                val behandlerDialogmeldingBestillingTopicPartition = TopicPartition(
-                    DIALOGMELDING_BESTILLING_TOPIC,
+                val dialogmeldingToBehandlerBestillingTopicPartition = TopicPartition(
+                    DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
                     partition,
                 )
                 describe("Happy path") {
@@ -65,21 +65,21 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                         }
 
                         val dialogmeldingBestillingUuid = UUID.randomUUID()
-                        val dialogmeldingBestilling = generateBehandlerDialogmeldingBestillingDTO(
+                        val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
                             uuid = dialogmeldingBestillingUuid,
                             behandlerRef = behandlerRef,
                         )
                         val dialogmeldingBestillingRecord = ConsumerRecord(
-                            DIALOGMELDING_BESTILLING_TOPIC,
+                            DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
                             partition,
                             1,
                             dialogmeldingBestilling.dialogmeldingUuid,
                             dialogmeldingBestilling,
                         )
-                        val mockConsumer = mockk<KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>>()
+                        val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
                         every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
                             mapOf(
-                                behandlerDialogmeldingBestillingTopicPartition to listOf(
+                                dialogmeldingToBehandlerBestillingTopicPartition to listOf(
                                     dialogmeldingBestillingRecord,
                                 )
                             )
@@ -88,8 +88,8 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
 
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
-                                behandlerDialogmeldingService = behandlerDialogmeldingService,
-                                kafkaConsumerDialogmeldingBestilling = mockConsumer,
+                                dialogmeldingToBehandlerService = behandlerDialogmeldingService,
+                                kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
                             )
                         }
 
@@ -97,7 +97,7 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
 
                         val pBehandlerDialogmeldingBestilling =
                             database.connection.use {
-                                it.getBehandlerDialogmeldingBestilling(
+                                it.getBestillinger(
                                     uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
                                 )
                             }
@@ -117,28 +117,28 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                         }
 
                         val dialogmeldingBestillingUuid = UUID.randomUUID()
-                        val dialogmeldingBestilling = generateBehandlerDialogmeldingBestillingDTO(
+                        val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
                             uuid = dialogmeldingBestillingUuid,
                             behandlerRef = behandlerRef,
                         )
                         val dialogmeldingBestillingRecord = ConsumerRecord(
-                            DIALOGMELDING_BESTILLING_TOPIC,
+                            DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
                             partition,
                             2,
                             dialogmeldingBestilling.dialogmeldingUuid,
                             dialogmeldingBestilling,
                         )
                         val dialogmeldingBestillingRecordDuplicate = ConsumerRecord(
-                            DIALOGMELDING_BESTILLING_TOPIC,
+                            DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
                             partition,
                             3,
                             dialogmeldingBestilling.dialogmeldingUuid,
                             dialogmeldingBestilling,
                         )
-                        val mockConsumer = mockk<KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>>()
+                        val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
                         every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
                             mapOf(
-                                behandlerDialogmeldingBestillingTopicPartition to listOf(
+                                dialogmeldingToBehandlerBestillingTopicPartition to listOf(
                                     dialogmeldingBestillingRecord,
                                     dialogmeldingBestillingRecordDuplicate,
                                 )
@@ -148,8 +148,8 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
 
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
-                                behandlerDialogmeldingService = behandlerDialogmeldingService,
-                                kafkaConsumerDialogmeldingBestilling = mockConsumer,
+                                dialogmeldingToBehandlerService = behandlerDialogmeldingService,
+                                kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
                             )
                         }
 
@@ -157,7 +157,7 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
 
                         val pBehandlerDialogmeldingBestilling =
                             database.connection.use {
-                                it.getBehandlerDialogmeldingBestilling(
+                                it.getBestillinger(
                                     uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
                                 )
                             }
@@ -170,21 +170,21 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
                         val behandlerRef = UUID.randomUUID()
 
                         val dialogmeldingBestillingUuid = UUID.randomUUID()
-                        val dialogmeldingBestilling = generateBehandlerDialogmeldingBestillingDTO(
+                        val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
                             uuid = dialogmeldingBestillingUuid,
                             behandlerRef = behandlerRef,
                         )
                         val dialogmeldingBestillingRecord = ConsumerRecord(
-                            DIALOGMELDING_BESTILLING_TOPIC,
+                            DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
                             partition,
                             1,
                             dialogmeldingBestilling.dialogmeldingUuid,
                             dialogmeldingBestilling,
                         )
-                        val mockConsumer = mockk<KafkaConsumer<String, BehandlerDialogmeldingBestillingDTO>>()
+                        val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
                         every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
                             mapOf(
-                                behandlerDialogmeldingBestillingTopicPartition to listOf(
+                                dialogmeldingToBehandlerBestillingTopicPartition to listOf(
                                     dialogmeldingBestillingRecord,
                                 )
                             )
@@ -193,15 +193,15 @@ class KafkaBehandlerDialogmeldingBestillingSpek : Spek({
 
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
-                                behandlerDialogmeldingService = behandlerDialogmeldingService,
-                                kafkaConsumerDialogmeldingBestilling = mockConsumer,
+                                dialogmeldingToBehandlerService = behandlerDialogmeldingService,
+                                kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
                             )
                         }
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
                         val pBehandlerDialogmeldingBestilling =
                             database.connection.use {
-                                it.getBehandlerDialogmeldingBestilling(
+                                it.getBestillinger(
                                     uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
                                 )
                             }

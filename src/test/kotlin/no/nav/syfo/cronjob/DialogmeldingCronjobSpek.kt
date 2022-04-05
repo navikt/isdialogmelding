@@ -4,14 +4,14 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.mq.MQSender
-import no.nav.syfo.behandler.BehandlerDialogmeldingService
-import no.nav.syfo.behandler.database.getBehandlerDialogmeldingBestilling
+import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.behandler.database.getBestillinger
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateBehandler
-import no.nav.syfo.testhelper.generator.generateBehandlerDialogmeldingBestillingDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingDTO
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeEqualTo
 import org.spekframework.spek2.Spek
@@ -44,18 +44,18 @@ class DialogmeldingCronjobSpek : Spek({
                 externalMockEnvironment = externalMockEnvironment,
             )
 
-            val behandlerDialogmeldingService = BehandlerDialogmeldingService(
+            val behandlerDialogmeldingService = DialogmeldingToBehandlerService(
                 database = database,
                 pdlClient = pdlClient,
             )
 
             val dialogmeldingService = DialogmeldingService(
-                behandlerDialogmeldingService = behandlerDialogmeldingService,
+                dialogmeldingToBehandlerService = behandlerDialogmeldingService,
                 mqSender = mqSenderMock,
             )
 
             val dialogmeldingSendCronjob = DialogmeldingSendCronjob(
-                behandlerDialogmeldingService = behandlerDialogmeldingService,
+                dialogmeldingToBehandlerService = behandlerDialogmeldingService,
                 dialogmeldingService = dialogmeldingService,
                 mqSender = mqSenderMock,
             )
@@ -79,7 +79,7 @@ class DialogmeldingCronjobSpek : Spek({
 
                     val dialogmeldingBestillingUuid = UUID.randomUUID()
 
-                    val dialogmeldingBestillingDTO = generateBehandlerDialogmeldingBestillingDTO(
+                    val dialogmeldingBestillingDTO = generateDialogmeldingToBehandlerBestillingDTO(
                         uuid = dialogmeldingBestillingUuid,
                         behandlerRef = behandlerRef,
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
@@ -87,7 +87,7 @@ class DialogmeldingCronjobSpek : Spek({
                     behandlerDialogmeldingService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
 
                     val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
-                        connection.getBehandlerDialogmeldingBestilling(
+                        connection.getBestillinger(
                             uuid = dialogmeldingBestillingUuid,
                         )
                     }
@@ -103,7 +103,7 @@ class DialogmeldingCronjobSpek : Spek({
                     verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
 
                     val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
-                        connection.getBehandlerDialogmeldingBestilling(
+                        connection.getBestillinger(
                             uuid = dialogmeldingBestillingUuid,
                         )
                     }

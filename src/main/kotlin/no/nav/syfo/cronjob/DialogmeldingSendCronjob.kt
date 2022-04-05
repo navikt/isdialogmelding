@@ -2,12 +2,12 @@ package no.nav.syfo.cronjob
 
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.application.mq.MQSender
-import no.nav.syfo.behandler.BehandlerDialogmeldingService
+import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import org.slf4j.LoggerFactory
 
 class DialogmeldingSendCronjob(
-    val behandlerDialogmeldingService: BehandlerDialogmeldingService,
+    val dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
     val dialogmeldingService: DialogmeldingService,
     val mqSender: MQSender,
 ) : DialogmeldingCronjob {
@@ -22,16 +22,16 @@ class DialogmeldingSendCronjob(
     suspend fun dialogmeldingSendJob(): DialogmeldingCronjobResult {
         val sendingResult = DialogmeldingCronjobResult()
 
-        val dialogmeldingBestillingListe = behandlerDialogmeldingService.getDialogmeldingBestillingListe()
-        dialogmeldingBestillingListe.forEach { dialogmeldingBestillling ->
+        val bestillinger = dialogmeldingToBehandlerService.getBestillinger()
+        bestillinger.forEach { bestilling ->
             try {
-                dialogmeldingService.sendMelding(dialogmeldingBestillling)
-                behandlerDialogmeldingService.setDialogmeldingBestillingSendt(dialogmeldingBestillling.uuid)
+                dialogmeldingService.sendMelding(bestilling)
+                dialogmeldingToBehandlerService.setDialogmeldingBestillingSendt(bestilling.uuid)
                 sendingResult.updated++
                 COUNT_CRONJOB_DIALOGMELDING_SEND_COUNT.increment()
             } catch (e: Exception) {
                 log.error("Exception caught while attempting sending of dialogmelding", e)
-                behandlerDialogmeldingService.incrementDialogmeldingBestillingSendtTries(dialogmeldingBestillling.uuid)
+                dialogmeldingToBehandlerService.incrementDialogmeldingBestillingSendtTries(bestilling.uuid)
                 sendingResult.failed++
                 COUNT_CRONJOB_DIALOGMELDING_FAIL_COUNT.increment()
             }

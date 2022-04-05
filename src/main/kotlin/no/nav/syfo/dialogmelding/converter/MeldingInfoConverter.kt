@@ -6,7 +6,7 @@ import no.nav.syfo.behandler.domain.*
 import java.time.LocalDateTime
 
 fun createMsgInfo(
-    melding: BehandlerDialogmeldingBestilling,
+    melding: DialogmeldingToBehandlerBestilling,
     arbeidstaker: BehandlerDialogmeldingArbeidstaker,
 ): XMLMsgInfo {
     val factory = ObjectFactory()

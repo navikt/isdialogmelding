@@ -2,8 +2,8 @@ package no.nav.syfo.behandler.database
 
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
-import no.nav.syfo.behandler.database.domain.PBehandlerDialogMeldingBestilling
-import no.nav.syfo.behandler.domain.BehandlerDialogmeldingBestilling
+import no.nav.syfo.behandler.database.domain.PDialogmeldingToBehandlerBestilling
+import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
 import java.sql.*
 import java.time.Instant
 import java.util.UUID
@@ -29,20 +29,20 @@ const val queryCreateBehandlerDialogmeldingBestilling =
     """
 
 fun Connection.createBehandlerDialogmeldingBestilling(
-    behandlerDialogmeldingBestilling: BehandlerDialogmeldingBestilling,
+    dialogmeldingToBehandlerBestilling: DialogmeldingToBehandlerBestilling,
     behandlerId: Int,
 ) {
     val now = Timestamp.from(Instant.now())
     val idList = this.prepareStatement(queryCreateBehandlerDialogmeldingBestilling).use {
-        it.setString(1, behandlerDialogmeldingBestilling.uuid.toString())
+        it.setString(1, dialogmeldingToBehandlerBestilling.uuid.toString())
         it.setInt(2, behandlerId)
-        it.setString(3, behandlerDialogmeldingBestilling.arbeidstakerPersonIdent.value)
-        it.setString(4, behandlerDialogmeldingBestilling.parentRef)
-        it.setString(5, behandlerDialogmeldingBestilling.conversationUuid.toString())
-        it.setString(6, behandlerDialogmeldingBestilling.type.name)
-        it.setInt(7, behandlerDialogmeldingBestilling.kode.value)
-        it.setString(8, behandlerDialogmeldingBestilling.tekst)
-        it.setBytes(9, behandlerDialogmeldingBestilling.vedlegg)
+        it.setString(3, dialogmeldingToBehandlerBestilling.arbeidstakerPersonIdent.value)
+        it.setString(4, dialogmeldingToBehandlerBestilling.parentRef)
+        it.setString(5, dialogmeldingToBehandlerBestilling.conversationUuid.toString())
+        it.setString(6, dialogmeldingToBehandlerBestilling.type.name)
+        it.setInt(7, dialogmeldingToBehandlerBestilling.kode.value)
+        it.setString(8, dialogmeldingToBehandlerBestilling.tekst)
+        it.setBytes(9, dialogmeldingToBehandlerBestilling.vedlegg)
         it.setTimestamp(10, null)
         it.setInt(11, 0)
         it.setTimestamp(12, now)
@@ -93,35 +93,35 @@ fun DatabaseInterface.incrementDialogmeldingBestillingSendtTries(
     }
 }
 
-const val queryGetBehandlerDialogmeldingBestilling =
+const val queryGetBestillinger =
     """
         SELECT * FROM BEHANDLER_DIALOGMELDING_BESTILLING WHERE uuid = ?
     """
 
-fun Connection.getBehandlerDialogmeldingBestilling(uuid: UUID): PBehandlerDialogMeldingBestilling? {
-    return this.prepareStatement(queryGetBehandlerDialogmeldingBestilling)
+fun Connection.getBestillinger(uuid: UUID): PDialogmeldingToBehandlerBestilling? {
+    return this.prepareStatement(queryGetBestillinger)
         .use {
             it.setString(1, uuid.toString())
             it.executeQuery().toList { toPBehandlerDialogmeldingBestilling() }
         }.firstOrNull()
 }
 
-const val queryGetBehandlerDialogmeldingBestillingNotSendt =
+const val queryGetBestillingerNotSent =
     """
         SELECT * FROM BEHANDLER_DIALOGMELDING_BESTILLING WHERE sendt is NULL
     """
 
-fun DatabaseInterface.getBehandlerDialogmeldingBestillingNotSendt(): List<PBehandlerDialogMeldingBestilling> {
+fun DatabaseInterface.getDialogmeldingToBehandlerBestillingNotSendt(): List<PDialogmeldingToBehandlerBestilling> {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerDialogmeldingBestillingNotSendt)
+        connection.prepareStatement(queryGetBestillingerNotSent)
             .use {
                 it.executeQuery().toList { toPBehandlerDialogmeldingBestilling() }
             }
     }
 }
 
-fun ResultSet.toPBehandlerDialogmeldingBestilling(): PBehandlerDialogMeldingBestilling =
-    PBehandlerDialogMeldingBestilling(
+fun ResultSet.toPBehandlerDialogmeldingBestilling(): PDialogmeldingToBehandlerBestilling =
+    PDialogmeldingToBehandlerBestilling(
         id = getInt("id"),
         uuid = UUID.fromString(getString("uuid")),
         behandlerId = getInt("behandler_id"),

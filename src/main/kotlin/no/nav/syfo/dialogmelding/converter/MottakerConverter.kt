@@ -2,10 +2,10 @@ package no.nav.syfo.dialogmelding.converter
 
 import no.kith.xmlstds.msghead._2006_05_24.ObjectFactory
 import no.kith.xmlstds.msghead._2006_05_24.XMLReceiver
-import no.nav.syfo.behandler.domain.BehandlerDialogmeldingBestilling
+import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
 
 fun createReceiver(
-    melding: BehandlerDialogmeldingBestilling,
+    melding: DialogmeldingToBehandlerBestilling,
 ): XMLReceiver {
     val factory = ObjectFactory()
     return factory.createXMLReceiver()
