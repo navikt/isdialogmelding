@@ -1,6 +1,7 @@
 package no.nav.syfo.behandler.fastlege
 
 import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.domain.BehandlerKontor
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.domain.Virksomhetsnummer
 import java.time.LocalDate
@@ -48,18 +49,20 @@ data class FastlegeResponse(
 
 fun FastlegeResponse.toBehandler(partnerId: Int) = Behandler(
     behandlerRef = UUID.randomUUID(),
+    kontor = BehandlerKontor(
+        partnerId = partnerId,
+        herId = this.foreldreEnhetHerId,
+        navn = this.fastlegekontor.navn,
+        adresse = this.fastlegekontor.postadresse?.adresse,
+        postnummer = this.fastlegekontor.postadresse?.postnummer,
+        poststed = this.fastlegekontor.postadresse?.poststed,
+        orgnummer = this.fastlegekontor.orgnummer?.let { Virksomhetsnummer(it) },
+    ),
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
     etternavn = this.etternavn,
-    partnerId = partnerId,
     herId = this.herId,
-    parentHerId = this.foreldreEnhetHerId,
     hprId = this.helsepersonellregisterId,
     personident = this.fnr?.let { PersonIdentNumber(it) },
-    kontor = this.fastlegekontor.navn,
-    adresse = this.fastlegekontor.postadresse?.adresse,
-    postnummer = this.fastlegekontor.postadresse?.postnummer,
-    poststed = this.fastlegekontor.postadresse?.poststed,
     telefon = this.fastlegekontor.telefon,
-    orgnummer = this.fastlegekontor.orgnummer?.let { Virksomhetsnummer(it) },
 )

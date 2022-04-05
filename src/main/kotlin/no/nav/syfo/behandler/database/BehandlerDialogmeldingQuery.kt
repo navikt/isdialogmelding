@@ -11,26 +11,21 @@ import java.util.*
 
 fun Connection.createBehandlerDialogmelding(
     behandler: Behandler,
+    kontorId: Int,
 ): PBehandlerDialogmelding {
     val now = Timestamp.from(Instant.now())
     val behandlerDialogmeldingList = this.prepareStatement(queryCreateBehandlerDialogmelding).use {
         it.setString(1, behandler.behandlerRef.toString())
-        it.setString(2, behandler.personident?.value)
-        it.setString(3, behandler.fornavn)
-        it.setString(4, behandler.mellomnavn)
-        it.setString(5, behandler.etternavn)
-        it.setString(6, behandler.partnerId.toString())
+        it.setInt(2, kontorId)
+        it.setString(3, behandler.personident?.value)
+        it.setString(4, behandler.fornavn)
+        it.setString(5, behandler.mellomnavn)
+        it.setString(6, behandler.etternavn)
         it.setString(7, behandler.herId?.toString())
-        it.setString(8, behandler.parentHerId?.toString())
-        it.setString(9, behandler.hprId?.toString())
-        it.setString(10, behandler.kontor)
-        it.setString(11, behandler.adresse)
-        it.setString(12, behandler.postnummer)
-        it.setString(13, behandler.poststed)
-        it.setString(14, behandler.orgnummer?.value)
-        it.setString(15, behandler.telefon)
-        it.setTimestamp(16, now)
-        it.setTimestamp(17, now)
+        it.setString(8, behandler.hprId?.toString())
+        it.setString(9, behandler.telefon)
+        it.setTimestamp(10, now)
+        it.setTimestamp(11, now)
         it.executeQuery().toList { toPBehandlerDialogmelding() }
     }
 
@@ -46,39 +41,27 @@ const val queryCreateBehandlerDialogmelding =
         INSERT INTO BEHANDLER_DIALOGMELDING (
             id,
             behandler_ref,
+            kontor_id,
             personident,
             fornavn,
             mellomnavn,
             etternavn,
-            partner_id,
             her_id,
-            parent_her_id,
             hpr_id,
-            kontor,
-            adresse,
-            postnummer,
-            poststed,
-            orgnummer,
             telefon,
             created_at,
             updated_at
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             RETURNING
             id,
             behandler_ref,
+            kontor_id,
             personident,
             fornavn,
             mellomnavn,
             etternavn,
-            partner_id,
             her_id,
-            parent_her_id,
             hpr_id,
-            kontor,
-            adresse,
-            postnummer,
-            poststed,
-            orgnummer,
             telefon,
             created_at,
             updated_at
@@ -86,7 +69,8 @@ const val queryCreateBehandlerDialogmelding =
 
 const val queryGetBehandlerDialogmeldingMedPersonIdentForPartnerId =
     """
-        SELECT * FROM BEHANDLER_DIALOGMELDING WHERE personident = ? and partner_id = ?
+        SELECT B.* FROM BEHANDLER_DIALOGMELDING B INNER JOIN BEHANDLER_DIALOGMELDING_KONTOR K ON (K.id = B.kontor_id) 
+        WHERE B.personident = ? and K.partner_id = ?
     """
 
 fun DatabaseInterface.getBehandlerDialogmeldingMedPersonIdentForPartnerId(behandlerPersonIdent: PersonIdentNumber, partnerId: Int): PBehandlerDialogmelding? {
@@ -102,7 +86,8 @@ fun DatabaseInterface.getBehandlerDialogmeldingMedPersonIdentForPartnerId(behand
 
 const val queryGetBehandlerDialogmeldingMedHprIdForPartnerId =
     """
-        SELECT * FROM BEHANDLER_DIALOGMELDING WHERE hpr_id = ? and partner_id = ?
+        SELECT B.* FROM BEHANDLER_DIALOGMELDING B INNER JOIN BEHANDLER_DIALOGMELDING_KONTOR K ON (K.id = B.kontor_id) 
+        WHERE B.hpr_id = ? and K.partner_id = ?
     """
 
 fun DatabaseInterface.getBehandlerDialogmeldingMedHprIdForPartnerId(hprId: Int, partnerId: Int): PBehandlerDialogmelding? {
@@ -118,7 +103,8 @@ fun DatabaseInterface.getBehandlerDialogmeldingMedHprIdForPartnerId(hprId: Int, 
 
 const val queryGetBehandlerDialogmeldingMedHerIdForPartnerId =
     """
-        SELECT * FROM BEHANDLER_DIALOGMELDING WHERE her_id = ? and partner_id = ?
+        SELECT B.* FROM BEHANDLER_DIALOGMELDING B INNER JOIN BEHANDLER_DIALOGMELDING_KONTOR K ON (K.id = B.kontor_id) 
+        WHERE B.her_id = ? and K.partner_id = ?
     """
 
 fun DatabaseInterface.getBehandlerDialogmeldingMedHerIdForPartnerId(herId: Int, partnerId: Int): PBehandlerDialogmelding? {
@@ -185,19 +171,13 @@ fun ResultSet.toPBehandlerDialogmelding(): PBehandlerDialogmelding =
     PBehandlerDialogmelding(
         id = getInt("id"),
         behandlerRef = UUID.fromString(getString("behandler_ref")),
+        kontorId = getInt("kontor_id"),
         personident = getString("personident"),
         fornavn = getString("fornavn"),
         mellomnavn = getString("mellomnavn"),
         etternavn = getString("etternavn"),
-        partnerId = getString("partner_id"),
         herId = getString("her_id"),
-        parentHerId = getString("parent_her_id"),
         hprId = getString("hpr_id"),
-        kontor = getString("kontor"),
-        adresse = getString("adresse"),
-        postnummer = getString("postnummer"),
-        poststed = getString("poststed"),
-        orgnummer = getString("orgnummer"),
         telefon = getString("telefon"),
         createdAt = getTimestamp("created_at").toLocalDateTime(),
         updatedAt = getTimestamp("updated_at").toLocalDateTime(),

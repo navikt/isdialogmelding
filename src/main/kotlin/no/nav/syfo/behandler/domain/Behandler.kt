@@ -3,7 +3,6 @@ package no.nav.syfo.behandler.domain
 import no.nav.syfo.behandler.api.BehandlerDialogmeldingDTO
 import no.nav.syfo.behandler.api.person.PersonBehandlerDTO
 import no.nav.syfo.domain.PersonIdentNumber
-import no.nav.syfo.domain.Virksomhetsnummer
 import java.util.*
 
 data class Behandler(
@@ -12,16 +11,10 @@ data class Behandler(
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,
-    val partnerId: Int,
     val herId: Int?,
-    val parentHerId: Int?,
     val hprId: Int?,
-    val kontor: String?,
-    val adresse: String?,
-    val postnummer: String?,
-    val poststed: String?,
-    val orgnummer: Virksomhetsnummer?,
     val telefon: String?,
+    val kontor: BehandlerKontor,
 )
 
 fun Behandler.toBehandlerDialogmeldingDTO(
@@ -33,11 +26,11 @@ fun Behandler.toBehandlerDialogmeldingDTO(
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
     etternavn = this.etternavn,
-    orgnummer = this.orgnummer?.value,
-    kontor = this.kontor,
-    adresse = this.adresse,
-    postnummer = this.postnummer,
-    poststed = this.poststed,
+    orgnummer = this.kontor.orgnummer?.value,
+    kontor = this.kontor.navn,
+    adresse = this.kontor.adresse,
+    postnummer = this.kontor.postnummer,
+    poststed = this.kontor.poststed,
     telefon = this.telefon,
 )
 
@@ -50,11 +43,11 @@ fun Behandler.toPersonBehandlerDTO(
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
     etternavn = this.etternavn,
-    orgnummer = this.orgnummer?.value,
-    kontor = this.kontor,
-    adresse = this.adresse,
-    postnummer = this.postnummer,
-    poststed = this.poststed,
+    orgnummer = this.kontor.orgnummer?.value,
+    kontor = this.kontor.navn,
+    adresse = this.kontor.adresse,
+    postnummer = this.kontor.postnummer,
+    poststed = this.kontor.poststed,
     telefon = this.telefon,
 )
 

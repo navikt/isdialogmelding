@@ -48,8 +48,14 @@ fun DatabaseInterface.createBehandlerDialogmeldingForArbeidstaker(
     arbeidstakerPersonIdent: PersonIdentNumber,
 ): UUID {
     this.connection.use { connection ->
+        val pBehandlerKontor = connection.getBehandlerDialogmeldingKontorForPartnerId(behandler.kontor.partnerId)
+        val kontorId = if (pBehandlerKontor != null) {
+            pBehandlerKontor.id
+        } else {
+            connection.createBehandlerDialogmeldingKontor(behandler.kontor)
+        }
         val behandlerDialogmelding =
-            connection.createBehandlerDialogmelding(behandler)
+            connection.createBehandlerDialogmelding(behandler, kontorId)
         connection.createBehandlerDialogmeldingArbeidstaker(
             BehandlerDialogmeldingArbeidstaker(
                 type = BehandlerType.FASTLEGE,

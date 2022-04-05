@@ -1,0 +1,13 @@
+package no.nav.syfo.behandler.domain
+
+import no.nav.syfo.domain.Virksomhetsnummer
+
+data class BehandlerKontor(
+    val partnerId: Int,
+    val herId: Int?,
+    val navn: String?,
+    val adresse: String?,
+    val postnummer: String?,
+    val poststed: String?,
+    val orgnummer: Virksomhetsnummer?,
+)
