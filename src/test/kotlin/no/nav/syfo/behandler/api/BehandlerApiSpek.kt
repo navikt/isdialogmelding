@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import no.nav.syfo.behandler.database.getBehandlerDialogmeldingForArbeidstaker
+import no.nav.syfo.behandler.database.getBehandlerForArbeidstaker
 import no.nav.syfo.behandler.domain.BehandlerType
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
@@ -31,7 +31,7 @@ class BehandlerApiSpek : Spek({
         }
 
         describe(BehandlerApiSpek::class.java.simpleName) {
-            describe("Get list of BehandlerDialogmelding for PersonIdent") {
+            describe("Get list of Behandler for PersonIdent") {
                 val url = "$behandlerPath$behandlerPersonident"
                 val validToken = generateJWT(
                     externalMockEnvironment.environment.aadAppClient,
@@ -39,7 +39,7 @@ class BehandlerApiSpek : Spek({
                     UserConstants.VEILEDER_IDENT,
                 )
                 describe("Happy path") {
-                    it("should return list of BehandlerDialogmelding and store behandler if request is successful") {
+                    it("should return list of Behandler and store behandler if request is successful") {
                         val fastlegeResponse = generateFastlegeResponse()
                         with(
                             handleRequest(HttpMethod.Get, url) {
@@ -49,35 +49,35 @@ class BehandlerApiSpek : Spek({
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
 
-                            val behandlerDialogmeldingList =
-                                objectMapper.readValue<List<BehandlerDialogmeldingDTO>>(response.content!!)
-                            behandlerDialogmeldingList.size shouldBeEqualTo 1
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
 
-                            val behandlerDialogmeldingForPersonList = database.getBehandlerDialogmeldingForArbeidstaker(
+                            val behandlerForPersonList = database.getBehandlerForArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_FNR,
                             )
-                            behandlerDialogmeldingForPersonList.size shouldBeEqualTo 1
+                            behandlerForPersonList.size shouldBeEqualTo 1
 
-                            val behandlerDialogmeldingDTO = behandlerDialogmeldingList.first()
-                            behandlerDialogmeldingDTO.fornavn shouldBeEqualTo fastlegeResponse.fornavn
-                            behandlerDialogmeldingDTO.mellomnavn shouldBeEqualTo fastlegeResponse.mellomnavn
-                            behandlerDialogmeldingDTO.etternavn shouldBeEqualTo fastlegeResponse.etternavn
-                            behandlerDialogmeldingDTO.adresse shouldBeEqualTo fastlegeResponse.fastlegekontor.postadresse?.adresse
-                            behandlerDialogmeldingDTO.postnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.postadresse?.postnummer
-                            behandlerDialogmeldingDTO.poststed shouldBeEqualTo fastlegeResponse.fastlegekontor.postadresse?.poststed
-                            behandlerDialogmeldingDTO.telefon shouldBeEqualTo fastlegeResponse.fastlegekontor.telefon
-                            behandlerDialogmeldingDTO.orgnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.orgnummer
-                            behandlerDialogmeldingDTO.kontor shouldBeEqualTo fastlegeResponse.fastlegekontor.navn
-                            behandlerDialogmeldingDTO.type shouldBeEqualTo BehandlerType.FASTLEGE.name
-                            behandlerDialogmeldingDTO.behandlerRef shouldBeEqualTo behandlerDialogmeldingForPersonList.first().behandlerRef.toString()
-                            behandlerDialogmeldingDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
+                            val behandlerDTO = behandlerList.first()
+                            behandlerDTO.fornavn shouldBeEqualTo fastlegeResponse.fornavn
+                            behandlerDTO.mellomnavn shouldBeEqualTo fastlegeResponse.mellomnavn
+                            behandlerDTO.etternavn shouldBeEqualTo fastlegeResponse.etternavn
+                            behandlerDTO.adresse shouldBeEqualTo fastlegeResponse.fastlegekontor.postadresse?.adresse
+                            behandlerDTO.postnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.postadresse?.postnummer
+                            behandlerDTO.poststed shouldBeEqualTo fastlegeResponse.fastlegekontor.postadresse?.poststed
+                            behandlerDTO.telefon shouldBeEqualTo fastlegeResponse.fastlegekontor.telefon
+                            behandlerDTO.orgnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.orgnummer
+                            behandlerDTO.kontor shouldBeEqualTo fastlegeResponse.fastlegekontor.navn
+                            behandlerDTO.type shouldBeEqualTo BehandlerType.FASTLEGE.name
+                            behandlerDTO.behandlerRef shouldBeEqualTo behandlerForPersonList.first().behandlerRef.toString()
+                            behandlerDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
 
-                            database.getBehandlerDialogmeldingForArbeidstaker(
+                            database.getBehandlerForArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_FNR,
                             ).size shouldBeEqualTo 1
                         }
                     }
-                    it("should return empty list of BehandlerDialogmelding for arbeidstaker uten fastlege") {
+                    it("should return empty list of Behandler for arbeidstaker uten fastlege") {
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -86,18 +86,18 @@ class BehandlerApiSpek : Spek({
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
 
-                            val behandlerDialogmeldingList =
-                                objectMapper.readValue<List<BehandlerDialogmeldingDTO>>(response.content!!)
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
 
-                            behandlerDialogmeldingList.size shouldBeEqualTo 0
+                            behandlerList.size shouldBeEqualTo 0
 
-                            database.getBehandlerDialogmeldingForArbeidstaker(
+                            database.getBehandlerForArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR,
                             ).size shouldBeEqualTo 0
                         }
                     }
 
-                    it("should return empty list of BehandlerDialogmelding for arbeidstaker med fastlege uten foreldreEnhetHerId") {
+                    it("should return empty list of Behandler for arbeidstaker med fastlege uten foreldreEnhetHerId") {
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -109,18 +109,18 @@ class BehandlerApiSpek : Spek({
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
 
-                            val behandlerDialogmeldingList =
-                                objectMapper.readValue<List<BehandlerDialogmeldingDTO>>(response.content!!)
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
 
-                            behandlerDialogmeldingList.size shouldBeEqualTo 0
+                            behandlerList.size shouldBeEqualTo 0
 
-                            database.getBehandlerDialogmeldingForArbeidstaker(
+                            database.getBehandlerForArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET,
                             ).size shouldBeEqualTo 0
                         }
                     }
 
-                    it("should return empty list of BehandlerDialogmelding for arbeidstaker med fastlege uten partnerinfo") {
+                    it("should return empty list of Behandler for arbeidstaker med fastlege uten partnerinfo") {
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -132,17 +132,17 @@ class BehandlerApiSpek : Spek({
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
 
-                            val behandlerDialogmeldingList =
-                                objectMapper.readValue<List<BehandlerDialogmeldingDTO>>(response.content!!)
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
 
-                            behandlerDialogmeldingList.size shouldBeEqualTo 0
+                            behandlerList.size shouldBeEqualTo 0
 
-                            database.getBehandlerDialogmeldingForArbeidstaker(
+                            database.getBehandlerForArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO,
                             ).size shouldBeEqualTo 0
                         }
                     }
-                    it("should return empty list of BehandlerDialogmelding for arbeidstaker med fastlege som mangler fnr, hprId og herId") {
+                    it("should return empty list of Behandler for arbeidstaker med fastlege som mangler fnr, hprId og herId") {
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -154,12 +154,12 @@ class BehandlerApiSpek : Spek({
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
 
-                            val behandlerDialogmeldingList =
-                                objectMapper.readValue<List<BehandlerDialogmeldingDTO>>(response.content!!)
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
 
-                            behandlerDialogmeldingList.size shouldBeEqualTo 0
+                            behandlerList.size shouldBeEqualTo 0
 
-                            database.getBehandlerDialogmeldingForArbeidstaker(
+                            database.getBehandlerForArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID,
                             ).size shouldBeEqualTo 0
                         }

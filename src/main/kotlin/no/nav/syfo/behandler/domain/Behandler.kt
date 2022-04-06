@@ -1,6 +1,6 @@
 package no.nav.syfo.behandler.domain
 
-import no.nav.syfo.behandler.api.BehandlerDialogmeldingDTO
+import no.nav.syfo.behandler.api.BehandlerDTO
 import no.nav.syfo.behandler.api.person.PersonBehandlerDTO
 import no.nav.syfo.domain.PersonIdentNumber
 import java.util.*
@@ -17,9 +17,9 @@ data class Behandler(
     val kontor: BehandlerKontor,
 )
 
-fun Behandler.toBehandlerDialogmeldingDTO(
+fun Behandler.toBehandlerDTO(
     behandlerType: BehandlerType,
-) = BehandlerDialogmeldingDTO(
+) = BehandlerDTO(
     type = behandlerType.name,
     behandlerRef = this.behandlerRef.toString(),
     fnr = this.personident?.value,

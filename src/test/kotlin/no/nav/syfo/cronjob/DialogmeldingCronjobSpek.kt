@@ -72,7 +72,7 @@ class DialogmeldingCronjobSpek : Spek({
                     val behandlerRef = UUID.randomUUID()
                     val partnerId = random.nextInt()
                     val behandler = generateBehandler(behandlerRef, partnerId)
-                    database.createBehandlerDialogmeldingForArbeidstaker(
+                    database.createBehandlerForArbeidstaker(
                         behandler = behandler,
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
                     )

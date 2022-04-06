@@ -60,7 +60,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         val behandler = generateBehandler(behandlerRef, partnerId)
                         database.connection.use {
                             val kontorId = it.createBehandlerDialogmeldingKontor(behandler.kontor)
-                            it.createBehandlerDialogmelding(behandler, kontorId)
+                            it.createBehandler(behandler, kontorId)
                             it.commit()
                         }
 
@@ -113,7 +113,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         val behandler = generateBehandler(behandlerRef, partnerId)
                         database.connection.use {
                             val kontorId = it.createBehandlerDialogmeldingKontor(behandler.kontor)
-                            it.createBehandlerDialogmelding(behandler, kontorId)
+                            it.createBehandler(behandler, kontorId)
                             it.commit()
                         }
 

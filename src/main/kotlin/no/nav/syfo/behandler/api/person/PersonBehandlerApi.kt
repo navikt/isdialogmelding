@@ -59,7 +59,7 @@ fun Route.registerPersonBehandlerApi(
                 }
                 call.respond(personBehandlerDTOList)
             } catch (e: IllegalArgumentException) {
-                val illegalArgumentMessage = "Could not retrieve list of BehandlerDialogmelding for PersonIdent"
+                val illegalArgumentMessage = "Could not retrieve list of Behandler for PersonIdent"
                 log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)
                 call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
             }

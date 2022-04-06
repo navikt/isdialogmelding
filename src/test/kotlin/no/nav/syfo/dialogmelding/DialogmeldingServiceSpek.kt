@@ -47,7 +47,7 @@ object DialogmeldingServiceSpek : Spek({
 
     beforeEachTest {
         database.dropData()
-        database.createBehandlerDialogmeldingForArbeidstaker(
+        database.createBehandlerForArbeidstaker(
             behandler = behandler,
             arbeidstakerPersonIdent = arbeidstakerPersonIdent,
         )

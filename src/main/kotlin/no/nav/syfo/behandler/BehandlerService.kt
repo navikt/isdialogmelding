@@ -64,7 +64,7 @@ class BehandlerService(
         }
 
         val pBehandlereForArbeidstakerIdList =
-            database.getBehandlerDialogmeldingForArbeidstaker(
+            database.getBehandlerForArbeidstaker(
                 personIdentNumber = behandlerDialogmeldingArbeidstaker.arbeidstakerPersonident,
             ).map { it.id }
 
@@ -82,17 +82,17 @@ class BehandlerService(
         )
     }
 
-    private fun getBehandler(behandler: Behandler): PBehandlerDialogmelding? {
+    private fun getBehandler(behandler: Behandler): PBehandler? {
         return when {
-            behandler.personident != null -> database.getBehandlerDialogmeldingMedPersonIdentForPartnerId(
+            behandler.personident != null -> database.getBehandlerMedPersonIdentForPartnerId(
                 behandlerPersonIdent = behandler.personident,
                 partnerId = behandler.kontor.partnerId,
             )
-            behandler.hprId != null -> database.getBehandlerDialogmeldingMedHprIdForPartnerId(
+            behandler.hprId != null -> database.getBehandlerMedHprIdForPartnerId(
                 hprId = behandler.hprId,
                 partnerId = behandler.kontor.partnerId,
             )
-            behandler.herId != null -> database.getBehandlerDialogmeldingMedHerIdForPartnerId(
+            behandler.herId != null -> database.getBehandlerMedHerIdForPartnerId(
                 herId = behandler.herId,
                 partnerId = behandler.kontor.partnerId,
             )
@@ -111,7 +111,7 @@ class BehandlerService(
             } else {
                 connection.createBehandlerDialogmeldingKontor(behandler.kontor)
             }
-            val pBehandlerDialogmelding = connection.createBehandlerDialogmelding(
+            val pBehandlerDialogmelding = connection.createBehandler(
                 behandler = behandler,
                 kontorId = kontorId,
             )
