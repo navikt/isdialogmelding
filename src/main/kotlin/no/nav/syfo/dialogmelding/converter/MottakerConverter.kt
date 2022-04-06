@@ -11,10 +11,10 @@ fun createReceiver(
     return factory.createXMLReceiver()
         .withOrganisation(
             factory.createXMLOrganisation()
-                .withOrganisationName(melding.behandler.kontor)
+                .withOrganisationName(melding.behandler.kontor.navn)
                 .withIdent(
                     factory.createXMLIdent()
-                        .withId(melding.behandler.parentHerId.toString())
+                        .withId(melding.behandler.kontor.herId.toString())
                         .withTypeId(
                             factory.createXMLCV()
                                 .withDN("Identifikator fra Helsetjenesteenhetsregisteret (HER-id)")
@@ -24,7 +24,7 @@ fun createReceiver(
                 )
                 .withIdent(
                     factory.createXMLIdent()
-                        .withId(melding.behandler.orgnummer!!.value)
+                        .withId(melding.behandler.kontor.orgnummer!!.value)
                         .withTypeId(
                             factory.createXMLCV()
                                 .withDN("Organisasjonsnummeret i Enhetsregisteret")
@@ -39,9 +39,9 @@ fun createReceiver(
                                 .withDN("Besøksadresse")
                                 .withV("RES")
                         )
-                        .withStreetAdr(melding.behandler.adresse)
-                        .withPostalCode(melding.behandler.postnummer)
-                        .withCity(melding.behandler.poststed)
+                        .withStreetAdr(melding.behandler.kontor.adresse)
+                        .withPostalCode(melding.behandler.kontor.postnummer)
+                        .withCity(melding.behandler.kontor.poststed)
                 )
                 .withHealthcareProfessional(
                     factory.createXMLHealthcareProfessional()

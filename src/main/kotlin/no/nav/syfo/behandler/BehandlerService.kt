@@ -2,8 +2,7 @@ package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
-import no.nav.syfo.behandler.database.domain.PBehandlerDialogmelding
-import no.nav.syfo.behandler.database.domain.toBehandler
+import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerDialogmeldingArbeidstaker
 import no.nav.syfo.behandler.fastlege.FastlegeClient
@@ -78,22 +77,24 @@ class BehandlerService(
             )
         }
 
-        return pBehandler.toBehandler()
+        return pBehandler.toBehandler(
+            kontor = database.getBehandlerDialogmeldingKontorForId(pBehandler.kontorId)
+        )
     }
 
     private fun getBehandler(behandler: Behandler): PBehandlerDialogmelding? {
         return when {
             behandler.personident != null -> database.getBehandlerDialogmeldingMedPersonIdentForPartnerId(
                 behandlerPersonIdent = behandler.personident,
-                partnerId = behandler.partnerId,
+                partnerId = behandler.kontor.partnerId,
             )
             behandler.hprId != null -> database.getBehandlerDialogmeldingMedHprIdForPartnerId(
                 hprId = behandler.hprId,
-                partnerId = behandler.partnerId,
+                partnerId = behandler.kontor.partnerId,
             )
             behandler.herId != null -> database.getBehandlerDialogmeldingMedHerIdForPartnerId(
                 herId = behandler.herId,
-                partnerId = behandler.partnerId,
+                partnerId = behandler.kontor.partnerId,
             )
             else -> throw IllegalArgumentException("Behandler missing personident, hprId and herId")
         }
@@ -104,8 +105,15 @@ class BehandlerService(
         behandler: Behandler,
     ): Behandler {
         database.connection.use { connection ->
+            val pBehandlerKontor = connection.getBehandlerDialogmeldingKontorForPartnerId(behandler.kontor.partnerId)
+            val kontorId = if (pBehandlerKontor != null) {
+                pBehandlerKontor.id
+            } else {
+                connection.createBehandlerDialogmeldingKontor(behandler.kontor)
+            }
             val pBehandlerDialogmelding = connection.createBehandlerDialogmelding(
                 behandler = behandler,
+                kontorId = kontorId,
             )
             connection.createBehandlerDialogmeldingArbeidstaker(
                 behandlerDialogmeldingArbeidstaker = behandlerDialogmeldingArbeidstaker,
@@ -113,7 +121,9 @@ class BehandlerService(
             )
             connection.commit()
 
-            return pBehandlerDialogmelding.toBehandler()
+            return pBehandlerDialogmelding.toBehandler(
+                database.getBehandlerDialogmeldingKontorForId(pBehandlerDialogmelding.kontorId)
+            )
         }
     }
 

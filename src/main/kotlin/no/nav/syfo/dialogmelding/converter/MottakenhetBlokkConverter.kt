@@ -10,7 +10,7 @@ fun createMottakenhetBlokk(
 ): XMLMottakenhetBlokk {
     val factory = ObjectFactory()
     return factory.createXMLMottakenhetBlokk()
-        .withPartnerReferanse(melding.behandler.partnerId.toString())
+        .withPartnerReferanse(melding.behandler.kontor.partnerId.toString())
         .withEbRole("Saksbehandler")
         .withEbService(if (melding.type == DialogmeldingType.DIALOG_NOTAT) "HenvendelseFraSaksbehandler" else "DialogmoteInnkalling")
         .withEbAction(if (melding.type == DialogmeldingType.DIALOG_NOTAT) "Henvendelse" else "MoteInnkalling")

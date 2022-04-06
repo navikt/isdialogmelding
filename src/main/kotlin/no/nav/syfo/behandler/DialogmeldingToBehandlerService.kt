@@ -21,8 +21,11 @@ class DialogmeldingToBehandlerService(
     fun getBestillinger(): List<DialogmeldingToBehandlerBestilling> {
         return database.getDialogmeldingToBehandlerBestillingNotSendt()
             .map { pBehandlerDialogMeldingBestilling ->
+                val pBehandlerDialogmelding = database.getBehandlerDialogmeldingForId(pBehandlerDialogMeldingBestilling.behandlerId)!!
                 pBehandlerDialogMeldingBestilling.toDialogmeldingToBehandlerBestilling(
-                    database.getBehandlerDialogmeldingForId(pBehandlerDialogMeldingBestilling.behandlerId)!!.toBehandler()
+                    pBehandlerDialogmelding.toBehandler(
+                        kontor = database.getBehandlerDialogmeldingKontorForId(pBehandlerDialogmelding.kontorId)
+                    )
                 )
             }
     }
@@ -61,7 +64,9 @@ class DialogmeldingToBehandlerService(
             log.error("Unknown behandlerRef $behandlerRef in dialogmeldingToBehandlerBestilling ${dialogmeldingToBehandlerBestillingDTO.dialogmeldingUuid}")
         } else {
             val dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(
-                behandler = pBehandler.toBehandler()
+                behandler = pBehandler.toBehandler(
+                    kontor = database.getBehandlerDialogmeldingKontorForId(pBehandler.kontorId)
+                )
             )
             database.connection.use { connection ->
                 val pBehandlerDialogmeldingBestilling = connection.getBestillinger(

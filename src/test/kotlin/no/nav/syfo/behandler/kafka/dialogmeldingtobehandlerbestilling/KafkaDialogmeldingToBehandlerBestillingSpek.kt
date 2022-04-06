@@ -4,8 +4,7 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
-import no.nav.syfo.behandler.database.createBehandlerDialogmelding
-import no.nav.syfo.behandler.database.getBestillinger
+import no.nav.syfo.behandler.database.*
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.testhelper.*
@@ -60,7 +59,8 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         val partnerId = random.nextInt()
                         val behandler = generateBehandler(behandlerRef, partnerId)
                         database.connection.use {
-                            it.createBehandlerDialogmelding(behandler)
+                            val kontorId = it.createBehandlerDialogmeldingKontor(behandler.kontor)
+                            it.createBehandlerDialogmelding(behandler, kontorId)
                             it.commit()
                         }
 
@@ -112,7 +112,8 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         val partnerId = random.nextInt()
                         val behandler = generateBehandler(behandlerRef, partnerId)
                         database.connection.use {
-                            it.createBehandlerDialogmelding(behandler)
+                            val kontorId = it.createBehandlerDialogmeldingKontor(behandler.kontor)
+                            it.createBehandlerDialogmelding(behandler, kontorId)
                             it.commit()
                         }
 
