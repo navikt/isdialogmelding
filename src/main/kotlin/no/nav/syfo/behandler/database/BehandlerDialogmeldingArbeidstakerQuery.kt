@@ -11,13 +11,13 @@ import java.util.UUID
 
 const val queryCreateBehandlerDialogmeldingArbeidstaker =
     """
-        INSERT INTO BEHANDLER_DIALOGMELDING_ARBEIDSTAKER (
+        INSERT INTO BEHANDLER_ARBEIDSTAKER (
             id,
             uuid,
             type,
             arbeidstaker_personident,
             created_at,
-            behandler_dialogmelding_id
+            behandler_id
             ) VALUES (DEFAULT, ?, ?, ?, ?, ?) RETURNING id
     """
 
@@ -42,12 +42,12 @@ fun Connection.createBehandlerDialogmeldingArbeidstaker(
 
 const val queryGetBehandlerDialogmeldingArbeidstaker =
     """
-        SELECT BEHANDLER_DIALOGMELDING_ARBEIDSTAKER.* 
-        FROM BEHANDLER_DIALOGMELDING
-        INNER JOIN BEHANDLER_DIALOGMELDING_ARBEIDSTAKER ON (BEHANDLER_DIALOGMELDING_ARBEIDSTAKER.behandler_dialogmelding_id = BEHANDLER_DIALOGMELDING.id)
-        WHERE BEHANDLER_DIALOGMELDING_ARBEIDSTAKER.arbeidstaker_personident = ?
-        AND BEHANDLER_DIALOGMELDING.behandler_ref = ?
-        ORDER BY BEHANDLER_DIALOGMELDING_ARBEIDSTAKER.created_at DESC
+        SELECT BEHANDLER_ARBEIDSTAKER.* 
+        FROM BEHANDLER
+        INNER JOIN BEHANDLER_ARBEIDSTAKER ON (BEHANDLER_ARBEIDSTAKER.behandler_id = BEHANDLER.id)
+        WHERE BEHANDLER_ARBEIDSTAKER.arbeidstaker_personident = ?
+        AND BEHANDLER.behandler_ref = ?
+        ORDER BY BEHANDLER_ARBEIDSTAKER.created_at DESC
     """
 
 fun DatabaseInterface.getBehandlerDialogmeldingArbeidstaker(

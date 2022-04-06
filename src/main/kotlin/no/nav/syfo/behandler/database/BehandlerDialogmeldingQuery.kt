@@ -38,7 +38,7 @@ fun Connection.createBehandlerDialogmelding(
 
 const val queryCreateBehandlerDialogmelding =
     """
-        INSERT INTO BEHANDLER_DIALOGMELDING (
+        INSERT INTO BEHANDLER (
             id,
             behandler_ref,
             kontor_id,
@@ -69,7 +69,7 @@ const val queryCreateBehandlerDialogmelding =
 
 const val queryGetBehandlerDialogmeldingMedPersonIdentForPartnerId =
     """
-        SELECT B.* FROM BEHANDLER_DIALOGMELDING B INNER JOIN BEHANDLER_DIALOGMELDING_KONTOR K ON (K.id = B.kontor_id) 
+        SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
         WHERE B.personident = ? and K.partner_id = ?
     """
 
@@ -86,7 +86,7 @@ fun DatabaseInterface.getBehandlerDialogmeldingMedPersonIdentForPartnerId(behand
 
 const val queryGetBehandlerDialogmeldingMedHprIdForPartnerId =
     """
-        SELECT B.* FROM BEHANDLER_DIALOGMELDING B INNER JOIN BEHANDLER_DIALOGMELDING_KONTOR K ON (K.id = B.kontor_id) 
+        SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
         WHERE B.hpr_id = ? and K.partner_id = ?
     """
 
@@ -103,7 +103,7 @@ fun DatabaseInterface.getBehandlerDialogmeldingMedHprIdForPartnerId(hprId: Int, 
 
 const val queryGetBehandlerDialogmeldingMedHerIdForPartnerId =
     """
-        SELECT B.* FROM BEHANDLER_DIALOGMELDING B INNER JOIN BEHANDLER_DIALOGMELDING_KONTOR K ON (K.id = B.kontor_id) 
+        SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
         WHERE B.her_id = ? and K.partner_id = ?
     """
 
@@ -120,7 +120,7 @@ fun DatabaseInterface.getBehandlerDialogmeldingMedHerIdForPartnerId(herId: Int, 
 
 const val queryGetBehandlerDialogmeldingForId =
     """
-        SELECT * FROM BEHANDLER_DIALOGMELDING WHERE id = ?
+        SELECT * FROM BEHANDLER WHERE id = ?
     """
 
 fun DatabaseInterface.getBehandlerDialogmeldingForId(id: Int): PBehandlerDialogmelding? {
@@ -135,7 +135,7 @@ fun DatabaseInterface.getBehandlerDialogmeldingForId(id: Int): PBehandlerDialogm
 
 const val queryGetBehandlerDialogmeldingForUuid =
     """
-        SELECT * FROM BEHANDLER_DIALOGMELDING WHERE behandler_ref = ?
+        SELECT * FROM BEHANDLER WHERE behandler_ref = ?
     """
 
 fun DatabaseInterface.getBehandlerDialogmeldingForUuid(behandlerRef: UUID): PBehandlerDialogmelding? {
@@ -150,11 +150,11 @@ fun DatabaseInterface.getBehandlerDialogmeldingForUuid(behandlerRef: UUID): PBeh
 
 const val queryGetBehandlerDialogmeldingForArbeidstakerPersonIdent =
     """
-        SELECT BEHANDLER_DIALOGMELDING.* 
-        FROM BEHANDLER_DIALOGMELDING
-        INNER JOIN BEHANDLER_DIALOGMELDING_ARBEIDSTAKER ON BEHANDLER_DIALOGMELDING_ARBEIDSTAKER.behandler_dialogmelding_id = BEHANDLER_DIALOGMELDING.id
-        AND BEHANDLER_DIALOGMELDING_ARBEIDSTAKER.arbeidstaker_personident = ?
-        ORDER BY BEHANDLER_DIALOGMELDING_ARBEIDSTAKER.created_at DESC
+        SELECT BEHANDLER.* 
+        FROM BEHANDLER
+        INNER JOIN BEHANDLER_ARBEIDSTAKER ON BEHANDLER_ARBEIDSTAKER.behandler_id = BEHANDLER.id
+        AND BEHANDLER_ARBEIDSTAKER.arbeidstaker_personident = ?
+        ORDER BY BEHANDLER_ARBEIDSTAKER.created_at DESC
     """
 
 fun DatabaseInterface.getBehandlerDialogmeldingForArbeidstaker(personIdentNumber: PersonIdentNumber): List<PBehandlerDialogmelding> {
