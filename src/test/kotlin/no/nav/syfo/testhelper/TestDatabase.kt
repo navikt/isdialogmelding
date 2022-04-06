@@ -75,13 +75,13 @@ fun DatabaseInterface.dropData() {
         DELETE FROM BEHANDLER_DIALOGMELDING_BESTILLING
         """.trimIndent(),
         """
-        DELETE FROM BEHANDLER_DIALOGMELDING_ARBEIDSTAKER
+        DELETE FROM BEHANDLER_ARBEIDSTAKER
         """.trimIndent(),
         """
-        DELETE FROM BEHANDLER_DIALOGMELDING
+        DELETE FROM BEHANDLER
         """.trimIndent(),
         """
-        DELETE FROM BEHANDLER_DIALOGMELDING_KONTOR
+        DELETE FROM BEHANDLER_KONTOR
         """.trimIndent(),
     )
     this.connection.use { connection ->

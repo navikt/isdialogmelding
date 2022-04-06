@@ -9,7 +9,7 @@ import java.time.OffsetDateTime
 
 const val queryCreateBehandlerDialogmeldingKontor =
     """
-        INSERT INTO BEHANDLER_DIALOGMELDING_KONTOR (
+        INSERT INTO BEHANDLER_KONTOR (
             id,
             partner_id,
             her_id,
@@ -56,7 +56,7 @@ fun Connection.createBehandlerDialogmeldingKontor(
 
 const val queryUpdateDialogmeldingEnabled =
     """
-        UPDATE BEHANDLER_DIALOGMELDING_KONTOR SET dialogmelding_enabled=? WHERE partner_id=?
+        UPDATE BEHANDLER_KONTOR SET dialogmelding_enabled=? WHERE partner_id=?
     """
 
 fun DatabaseInterface.updateDialogMeldingEnabledForPartnerId(partnerId: Int) {
@@ -75,7 +75,7 @@ fun DatabaseInterface.updateDialogMeldingEnabledForPartnerId(partnerId: Int) {
 }
 const val queryGetBehandlerDialogmeldingKontorForId =
     """
-        SELECT * FROM BEHANDLER_DIALOGMELDING_KONTOR WHERE id = ?
+        SELECT * FROM BEHANDLER_KONTOR WHERE id = ?
     """
 
 fun DatabaseInterface.getBehandlerDialogmeldingKontorForId(id: Int): PBehandlerDialogmeldingKontor {
@@ -90,7 +90,7 @@ fun DatabaseInterface.getBehandlerDialogmeldingKontorForId(id: Int): PBehandlerD
 
 const val queryGetBehandlerDialogmeldingKontorForPartnerId =
     """
-        SELECT * FROM BEHANDLER_DIALOGMELDING_KONTOR WHERE partner_id = ?
+        SELECT * FROM BEHANDLER_KONTOR WHERE partner_id = ?
     """
 
 fun Connection.getBehandlerDialogmeldingKontorForPartnerId(partnerId: Int): PBehandlerDialogmeldingKontor? {
