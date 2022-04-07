@@ -44,18 +44,18 @@ class DialogmeldingCronjobSpek : Spek({
                 externalMockEnvironment = externalMockEnvironment,
             )
 
-            val behandlerDialogmeldingService = DialogmeldingToBehandlerService(
+            val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
                 database = database,
                 pdlClient = pdlClient,
             )
 
             val dialogmeldingService = DialogmeldingService(
-                dialogmeldingToBehandlerService = behandlerDialogmeldingService,
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                 mqSender = mqSenderMock,
             )
 
             val dialogmeldingSendCronjob = DialogmeldingSendCronjob(
-                dialogmeldingToBehandlerService = behandlerDialogmeldingService,
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                 dialogmeldingService = dialogmeldingService,
                 mqSender = mqSenderMock,
             )
@@ -84,7 +84,7 @@ class DialogmeldingCronjobSpek : Spek({
                         behandlerRef = behandlerRef,
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
                     )
-                    behandlerDialogmeldingService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
+                    dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
 
                     val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
                         connection.getBestillinger(

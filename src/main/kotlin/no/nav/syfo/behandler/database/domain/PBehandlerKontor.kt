@@ -4,7 +4,7 @@ import no.nav.syfo.behandler.domain.BehandlerKontor
 import no.nav.syfo.domain.Virksomhetsnummer
 import java.time.OffsetDateTime
 
-data class PBehandlerDialogmeldingKontor(
+data class PBehandlerKontor(
     val id: Int,
     val partnerId: String,
     val herId: String?,
@@ -18,7 +18,7 @@ data class PBehandlerDialogmeldingKontor(
     val updatedAt: OffsetDateTime,
 )
 
-fun PBehandlerDialogmeldingKontor.toBehandlerKontor() = BehandlerKontor(
+fun PBehandlerKontor.toBehandlerKontor() = BehandlerKontor(
     partnerId = this.partnerId.toInt(),
     herId = this.herId?.toInt(),
     navn = this.navn,

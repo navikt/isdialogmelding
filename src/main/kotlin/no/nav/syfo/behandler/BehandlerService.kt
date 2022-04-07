@@ -4,7 +4,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.domain.BehandlerDialogmeldingArbeidstaker
+import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
@@ -53,32 +53,32 @@ class BehandlerService(
 
     fun createOrGetBehandler(
         behandler: Behandler,
-        behandlerDialogmeldingArbeidstaker: BehandlerDialogmeldingArbeidstaker,
+        behandlerArbeidstakerRelasjon: BehandlerArbeidstakerRelasjon,
     ): Behandler {
         val pBehandler = getBehandler(behandler = behandler)
         if (pBehandler == null) {
             return createBehandlerForArbeidstaker(
                 behandler = behandler,
-                behandlerDialogmeldingArbeidstaker = behandlerDialogmeldingArbeidstaker,
+                behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
             )
         }
 
         val pBehandlereForArbeidstakerIdList =
             database.getBehandlerForArbeidstaker(
-                personIdentNumber = behandlerDialogmeldingArbeidstaker.arbeidstakerPersonident,
+                personIdentNumber = behandlerArbeidstakerRelasjon.arbeidstakerPersonident,
             ).map { it.id }
 
         val isBytteAvBehandler = pBehandlereForArbeidstakerIdList.firstOrNull() != pBehandler.id
         val behandlerIkkeKnyttetTilArbeidstaker = !pBehandlereForArbeidstakerIdList.contains(pBehandler.id)
         if (isBytteAvBehandler || behandlerIkkeKnyttetTilArbeidstaker) {
             addBehandlerToArbeidstaker(
-                behandlerDialogmeldingArbeidstaker = behandlerDialogmeldingArbeidstaker,
+                behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
                 behandlerId = pBehandler.id,
             )
         }
 
         return pBehandler.toBehandler(
-            kontor = database.getBehandlerDialogmeldingKontorForId(pBehandler.kontorId)
+            kontor = database.getBehandlerKontorForId(pBehandler.kontorId)
         )
     }
 
@@ -101,40 +101,40 @@ class BehandlerService(
     }
 
     private fun createBehandlerForArbeidstaker(
-        behandlerDialogmeldingArbeidstaker: BehandlerDialogmeldingArbeidstaker,
+        behandlerArbeidstakerRelasjon: BehandlerArbeidstakerRelasjon,
         behandler: Behandler,
     ): Behandler {
         database.connection.use { connection ->
-            val pBehandlerKontor = connection.getBehandlerDialogmeldingKontorForPartnerId(behandler.kontor.partnerId)
+            val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)
             val kontorId = if (pBehandlerKontor != null) {
                 pBehandlerKontor.id
             } else {
-                connection.createBehandlerDialogmeldingKontor(behandler.kontor)
+                connection.createBehandlerKontor(behandler.kontor)
             }
-            val pBehandlerDialogmelding = connection.createBehandler(
+            val pBehandler = connection.createBehandler(
                 behandler = behandler,
                 kontorId = kontorId,
             )
-            connection.createBehandlerDialogmeldingArbeidstaker(
-                behandlerDialogmeldingArbeidstaker = behandlerDialogmeldingArbeidstaker,
-                behandlerDialogmeldingId = pBehandlerDialogmelding.id,
+            connection.createBehandlerArbeidstakerRelasjon(
+                behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
+                behandlerId = pBehandler.id,
             )
             connection.commit()
 
-            return pBehandlerDialogmelding.toBehandler(
-                database.getBehandlerDialogmeldingKontorForId(pBehandlerDialogmelding.kontorId)
+            return pBehandler.toBehandler(
+                database.getBehandlerKontorForId(pBehandler.kontorId)
             )
         }
     }
 
     private fun addBehandlerToArbeidstaker(
-        behandlerDialogmeldingArbeidstaker: BehandlerDialogmeldingArbeidstaker,
+        behandlerArbeidstakerRelasjon: BehandlerArbeidstakerRelasjon,
         behandlerId: Int,
     ) {
         database.connection.use { connection ->
-            connection.createBehandlerDialogmeldingArbeidstaker(
-                behandlerDialogmeldingArbeidstaker = behandlerDialogmeldingArbeidstaker,
-                behandlerDialogmeldingId = behandlerId,
+            connection.createBehandlerArbeidstakerRelasjon(
+                behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
+                behandlerId = behandlerId,
             )
             connection.commit()
         }

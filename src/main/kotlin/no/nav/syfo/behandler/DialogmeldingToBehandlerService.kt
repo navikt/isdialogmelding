@@ -3,7 +3,7 @@ package no.nav.syfo.behandler
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.*
-import no.nav.syfo.behandler.domain.BehandlerDialogmeldingArbeidstaker
+import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
 import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.*
 import no.nav.syfo.client.pdl.PdlClient
@@ -24,7 +24,7 @@ class DialogmeldingToBehandlerService(
                 val pBehandler = database.getBehandlerForId(pDialogmeldingToBehandlerBestilling.behandlerId)!!
                 pDialogmeldingToBehandlerBestilling.toDialogmeldingToBehandlerBestilling(
                     pBehandler.toBehandler(
-                        kontor = database.getBehandlerDialogmeldingKontorForId(pBehandler.kontorId)
+                        kontor = database.getBehandlerKontorForId(pBehandler.kontorId)
                     )
                 )
             }
@@ -38,17 +38,17 @@ class DialogmeldingToBehandlerService(
         database.incrementDialogmeldingBestillingSendtTries(uuid)
     }
 
-    suspend fun getBehandlerDialogmeldingArbeidstaker(
+    suspend fun getBehandlerArbeidstakerRelasjon(
         behandlerRef: UUID,
         personIdent: PersonIdentNumber,
-    ): BehandlerDialogmeldingArbeidstaker {
-        val pBehandlerDialogmeldingArbeidstaker = database.getBehandlerDialogmeldingArbeidstaker(
+    ): BehandlerArbeidstakerRelasjon {
+        val pBehandlerArbeidstaker = database.getBehandlerArbeidstakerRelasjon(
             personIdentNumber = personIdent,
             behandlerRef = behandlerRef,
         )
         val pdlNavn = pdlClient.person(personIdent)?.hentPerson?.navn?.first()
             ?: throw RuntimeException("PDL returned empty response")
-        return pBehandlerDialogmeldingArbeidstaker.toBehandlerDialogmeldingArbeidstaker(
+        return pBehandlerArbeidstaker.toBehandlerArbeidstakerRelasjon(
             fornavn = pdlNavn.fornavn,
             mellomnavn = pdlNavn.mellomnavn,
             etternavn = pdlNavn.etternavn,
@@ -65,7 +65,7 @@ class DialogmeldingToBehandlerService(
         } else {
             val dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(
                 behandler = pBehandler.toBehandler(
-                    kontor = database.getBehandlerDialogmeldingKontorForId(pBehandler.kontorId)
+                    kontor = database.getBehandlerKontorForId(pBehandler.kontorId)
                 )
             )
             database.connection.use { connection ->

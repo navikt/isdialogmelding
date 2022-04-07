@@ -21,7 +21,7 @@ data class PBehandler(
 )
 
 fun PBehandler.toBehandler(
-    kontor: PBehandlerDialogmeldingKontor,
+    kontor: PBehandlerKontor,
 ) = Behandler(
     behandlerRef = this.behandlerRef,
     kontor = kontor.toBehandlerKontor(),
