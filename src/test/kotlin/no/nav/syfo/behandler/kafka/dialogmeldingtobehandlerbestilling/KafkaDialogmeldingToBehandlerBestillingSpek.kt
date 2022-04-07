@@ -35,7 +35,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
             pdlClientId = environment.pdlClientId,
             pdlUrl = environment.pdlUrl,
         )
-        val behandlerDialogmeldingService = DialogmeldingToBehandlerService(
+        val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
             database = database,
             pdlClient = pdlClient,
         )
@@ -59,7 +59,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         val partnerId = random.nextInt()
                         val behandler = generateBehandler(behandlerRef, partnerId)
                         database.connection.use {
-                            val kontorId = it.createBehandlerDialogmeldingKontor(behandler.kontor)
+                            val kontorId = it.createBehandlerKontor(behandler.kontor)
                             it.createBehandler(behandler, kontorId)
                             it.commit()
                         }
@@ -88,7 +88,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
-                                dialogmeldingToBehandlerService = behandlerDialogmeldingService,
+                                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                                 kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
                             )
                         }
@@ -112,7 +112,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         val partnerId = random.nextInt()
                         val behandler = generateBehandler(behandlerRef, partnerId)
                         database.connection.use {
-                            val kontorId = it.createBehandlerDialogmeldingKontor(behandler.kontor)
+                            val kontorId = it.createBehandlerKontor(behandler.kontor)
                             it.createBehandler(behandler, kontorId)
                             it.commit()
                         }
@@ -149,7 +149,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
-                                dialogmeldingToBehandlerService = behandlerDialogmeldingService,
+                                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                                 kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
                             )
                         }
@@ -194,7 +194,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
                         runBlocking {
                             pollAndProcessDialogmeldingBestilling(
-                                dialogmeldingToBehandlerService = behandlerDialogmeldingService,
+                                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                                 kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
                             )
                         }

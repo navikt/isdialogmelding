@@ -4,18 +4,18 @@ import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.PersonIdentNumber
 import java.time.LocalDateTime
 
-data class PBehandlerDialogmeldingArbeidstaker(
+data class PBehandlerArbeidstaker(
     val id: Int,
     val type: String,
     val arbeidstakerPersonident: String,
     val createdAt: LocalDateTime,
 )
 
-fun PBehandlerDialogmeldingArbeidstaker.toBehandlerDialogmeldingArbeidstaker(
+fun PBehandlerArbeidstaker.toBehandlerArbeidstakerRelasjon(
     fornavn: String,
     mellomnavn: String?,
     etternavn: String,
-) = BehandlerDialogmeldingArbeidstaker(
+) = BehandlerArbeidstakerRelasjon(
     type = BehandlerType.valueOf(this.type),
     arbeidstakerPersonident = PersonIdentNumber(this.arbeidstakerPersonident),
     fornavn = fornavn,

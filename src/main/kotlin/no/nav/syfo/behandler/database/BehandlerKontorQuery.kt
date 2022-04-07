@@ -2,12 +2,12 @@ package no.nav.syfo.behandler.database
 
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
-import no.nav.syfo.behandler.database.domain.PBehandlerDialogmeldingKontor
+import no.nav.syfo.behandler.database.domain.PBehandlerKontor
 import no.nav.syfo.behandler.domain.BehandlerKontor
 import java.sql.*
 import java.time.OffsetDateTime
 
-const val queryCreateBehandlerDialogmeldingKontor =
+const val queryCreateBehandlerKontor =
     """
         INSERT INTO BEHANDLER_KONTOR (
             id,
@@ -25,11 +25,11 @@ const val queryCreateBehandlerDialogmeldingKontor =
             RETURNING ID;
     """
 
-fun Connection.createBehandlerDialogmeldingKontor(
+fun Connection.createBehandlerKontor(
     kontor: BehandlerKontor,
 ): Int {
     val now = OffsetDateTime.now()
-    val behandlerDialogmeldingKontorList = this.prepareStatement(queryCreateBehandlerDialogmeldingKontor).use {
+    val behandlerKontorList = this.prepareStatement(queryCreateBehandlerKontor).use {
         it.setString(1, kontor.partnerId.toString())
         it.setString(2, kontor.herId?.toString())
         it.setString(3, kontor.navn)
@@ -47,11 +47,11 @@ fun Connection.createBehandlerDialogmeldingKontor(
         it.executeQuery().toList { getInt("id") }
     }
 
-    if (behandlerDialogmeldingKontorList.size != 1) {
-        throw SQLException("Creating BehandlerDialogmeldingKontor failed, no rows affected.")
+    if (behandlerKontorList.size != 1) {
+        throw SQLException("Creating BehandlerKontor failed, no rows affected.")
     }
 
-    return behandlerDialogmeldingKontorList.first()
+    return behandlerKontorList.first()
 }
 
 const val queryUpdateDialogmeldingEnabled =
@@ -68,41 +68,41 @@ fun DatabaseInterface.updateDialogMeldingEnabledForPartnerId(partnerId: Int) {
                 it.executeUpdate()
             }
         if (rowCount != 1) {
-            throw RuntimeException("No row in DIALOG_MELDING_KONTOR with partner_id $partnerId")
+            throw RuntimeException("No row in BEHANDLER_KONTOR with partner_id $partnerId")
         }
         connection.commit()
     }
 }
-const val queryGetBehandlerDialogmeldingKontorForId =
+const val queryGetBehandlerKontorForId =
     """
         SELECT * FROM BEHANDLER_KONTOR WHERE id = ?
     """
 
-fun DatabaseInterface.getBehandlerDialogmeldingKontorForId(id: Int): PBehandlerDialogmeldingKontor {
+fun DatabaseInterface.getBehandlerKontorForId(id: Int): PBehandlerKontor {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerDialogmeldingKontorForId)
+        connection.prepareStatement(queryGetBehandlerKontorForId)
             .use {
                 it.setInt(1, id)
-                it.executeQuery().toList { toPBehandlerDialogmeldingKontor() }
+                it.executeQuery().toList { toPBehandlerKontor() }
             }
     }.first()
 }
 
-const val queryGetBehandlerDialogmeldingKontorForPartnerId =
+const val queryGetBehandlerKontorForPartnerId =
     """
         SELECT * FROM BEHANDLER_KONTOR WHERE partner_id = ?
     """
 
-fun Connection.getBehandlerDialogmeldingKontorForPartnerId(partnerId: Int): PBehandlerDialogmeldingKontor? {
-    return prepareStatement(queryGetBehandlerDialogmeldingKontorForPartnerId)
+fun Connection.getBehandlerKontorForPartnerId(partnerId: Int): PBehandlerKontor? {
+    return prepareStatement(queryGetBehandlerKontorForPartnerId)
         .use {
             it.setString(1, partnerId.toString())
-            it.executeQuery().toList { toPBehandlerDialogmeldingKontor() }
+            it.executeQuery().toList { toPBehandlerKontor() }
         }.firstOrNull()
 }
 
-fun ResultSet.toPBehandlerDialogmeldingKontor(): PBehandlerDialogmeldingKontor =
-    PBehandlerDialogmeldingKontor(
+fun ResultSet.toPBehandlerKontor(): PBehandlerKontor =
+    PBehandlerKontor(
         id = getInt("id"),
         partnerId = getString("partner_id"),
         herId = getString("her_id"),

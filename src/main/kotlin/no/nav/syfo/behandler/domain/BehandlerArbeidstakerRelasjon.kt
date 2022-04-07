@@ -2,7 +2,7 @@ package no.nav.syfo.behandler.domain
 
 import no.nav.syfo.domain.PersonIdentNumber
 
-data class BehandlerDialogmeldingArbeidstaker(
+data class BehandlerArbeidstakerRelasjon(
     val type: BehandlerType,
     val arbeidstakerPersonident: PersonIdentNumber,
     val fornavn: String = "",

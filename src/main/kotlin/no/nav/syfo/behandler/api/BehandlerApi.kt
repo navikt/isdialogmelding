@@ -38,13 +38,13 @@ fun Route.registerBehandlerApi(
                     callId = callId,
                 )
                 if (fastlege != null && fastlege.hasAnId()) {
-                    val behandlerDialogmeldingArbeidstaker = BehandlerDialogmeldingArbeidstaker(
+                    val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
                         type = BehandlerType.FASTLEGE,
                         arbeidstakerPersonident = personIdentNumber,
                     )
                     val behandler = behandlerService.createOrGetBehandler(
                         behandler = fastlege,
-                        behandlerDialogmeldingArbeidstaker = behandlerDialogmeldingArbeidstaker,
+                        behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
                     )
                     behandlerDTOList.add(
                         behandler.toBehandlerDTO(
