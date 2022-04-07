@@ -2,19 +2,19 @@ package no.nav.syfo.behandler.database
 
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
-import no.nav.syfo.behandler.database.domain.PBehandlerDialogmelding
+import no.nav.syfo.behandler.database.domain.PBehandler
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.domain.PersonIdentNumber
 import java.sql.*
 import java.time.Instant
 import java.util.*
 
-fun Connection.createBehandlerDialogmelding(
+fun Connection.createBehandler(
     behandler: Behandler,
     kontorId: Int,
-): PBehandlerDialogmelding {
+): PBehandler {
     val now = Timestamp.from(Instant.now())
-    val behandlerDialogmeldingList = this.prepareStatement(queryCreateBehandlerDialogmelding).use {
+    val behandlerList = this.prepareStatement(queryCreateBehandler).use {
         it.setString(1, behandler.behandlerRef.toString())
         it.setInt(2, kontorId)
         it.setString(3, behandler.personident?.value)
@@ -26,17 +26,17 @@ fun Connection.createBehandlerDialogmelding(
         it.setString(9, behandler.telefon)
         it.setTimestamp(10, now)
         it.setTimestamp(11, now)
-        it.executeQuery().toList { toPBehandlerDialogmelding() }
+        it.executeQuery().toList { toPBehandler() }
     }
 
-    if (behandlerDialogmeldingList.size != 1) {
-        throw SQLException("Creating BehandlerDialogmelding failed, no rows affected.")
+    if (behandlerList.size != 1) {
+        throw SQLException("Creating Behandler failed, no rows affected.")
     }
 
-    return behandlerDialogmeldingList.first()
+    return behandlerList.first()
 }
 
-const val queryCreateBehandlerDialogmelding =
+const val queryCreateBehandler =
     """
         INSERT INTO BEHANDLER (
             id,
@@ -67,88 +67,88 @@ const val queryCreateBehandlerDialogmelding =
             updated_at
     """
 
-const val queryGetBehandlerDialogmeldingMedPersonIdentForPartnerId =
+const val queryGetBehandlerMedPersonIdentForPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
         WHERE B.personident = ? and K.partner_id = ?
     """
 
-fun DatabaseInterface.getBehandlerDialogmeldingMedPersonIdentForPartnerId(behandlerPersonIdent: PersonIdentNumber, partnerId: Int): PBehandlerDialogmelding? {
+fun DatabaseInterface.getBehandlerMedPersonIdentForPartnerId(behandlerPersonIdent: PersonIdentNumber, partnerId: Int): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerDialogmeldingMedPersonIdentForPartnerId)
+        connection.prepareStatement(queryGetBehandlerMedPersonIdentForPartnerId)
             .use {
                 it.setString(1, behandlerPersonIdent.value)
                 it.setString(2, partnerId.toString())
-                it.executeQuery().toList { toPBehandlerDialogmelding() }
+                it.executeQuery().toList { toPBehandler() }
             }
     }.firstOrNull()
 }
 
-const val queryGetBehandlerDialogmeldingMedHprIdForPartnerId =
+const val queryGetBehandlerMedHprIdForPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
         WHERE B.hpr_id = ? and K.partner_id = ?
     """
 
-fun DatabaseInterface.getBehandlerDialogmeldingMedHprIdForPartnerId(hprId: Int, partnerId: Int): PBehandlerDialogmelding? {
+fun DatabaseInterface.getBehandlerMedHprIdForPartnerId(hprId: Int, partnerId: Int): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerDialogmeldingMedHprIdForPartnerId)
+        connection.prepareStatement(queryGetBehandlerMedHprIdForPartnerId)
             .use {
                 it.setString(1, hprId.toString())
                 it.setString(2, partnerId.toString())
-                it.executeQuery().toList { toPBehandlerDialogmelding() }
+                it.executeQuery().toList { toPBehandler() }
             }
     }.firstOrNull()
 }
 
-const val queryGetBehandlerDialogmeldingMedHerIdForPartnerId =
+const val queryGetBehandlerMedHerIdForPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
         WHERE B.her_id = ? and K.partner_id = ?
     """
 
-fun DatabaseInterface.getBehandlerDialogmeldingMedHerIdForPartnerId(herId: Int, partnerId: Int): PBehandlerDialogmelding? {
+fun DatabaseInterface.getBehandlerMedHerIdForPartnerId(herId: Int, partnerId: Int): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerDialogmeldingMedHerIdForPartnerId)
+        connection.prepareStatement(queryGetBehandlerMedHerIdForPartnerId)
             .use {
                 it.setString(1, herId.toString())
                 it.setString(2, partnerId.toString())
-                it.executeQuery().toList { toPBehandlerDialogmelding() }
+                it.executeQuery().toList { toPBehandler() }
             }
     }.firstOrNull()
 }
 
-const val queryGetBehandlerDialogmeldingForId =
+const val queryGetBehandlerForId =
     """
         SELECT * FROM BEHANDLER WHERE id = ?
     """
 
-fun DatabaseInterface.getBehandlerDialogmeldingForId(id: Int): PBehandlerDialogmelding? {
+fun DatabaseInterface.getBehandlerForId(id: Int): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerDialogmeldingForId)
+        connection.prepareStatement(queryGetBehandlerForId)
             .use {
                 it.setInt(1, id)
-                it.executeQuery().toList { toPBehandlerDialogmelding() }
+                it.executeQuery().toList { toPBehandler() }
             }
     }.firstOrNull()
 }
 
-const val queryGetBehandlerDialogmeldingForUuid =
+const val queryGetBehandlerForUuid =
     """
         SELECT * FROM BEHANDLER WHERE behandler_ref = ?
     """
 
-fun DatabaseInterface.getBehandlerDialogmeldingForUuid(behandlerRef: UUID): PBehandlerDialogmelding? {
+fun DatabaseInterface.getBehandlerForUuid(behandlerRef: UUID): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerDialogmeldingForUuid)
+        connection.prepareStatement(queryGetBehandlerForUuid)
             .use {
                 it.setString(1, behandlerRef.toString())
-                it.executeQuery().toList { toPBehandlerDialogmelding() }
+                it.executeQuery().toList { toPBehandler() }
             }
     }.firstOrNull()
 }
 
-const val queryGetBehandlerDialogmeldingForArbeidstakerPersonIdent =
+const val queryGetBehandlerForArbeidstakerPersonIdent =
     """
         SELECT BEHANDLER.* 
         FROM BEHANDLER
@@ -157,18 +157,18 @@ const val queryGetBehandlerDialogmeldingForArbeidstakerPersonIdent =
         ORDER BY BEHANDLER_ARBEIDSTAKER.created_at DESC
     """
 
-fun DatabaseInterface.getBehandlerDialogmeldingForArbeidstaker(personIdentNumber: PersonIdentNumber): List<PBehandlerDialogmelding> {
+fun DatabaseInterface.getBehandlerForArbeidstaker(personIdentNumber: PersonIdentNumber): List<PBehandler> {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerDialogmeldingForArbeidstakerPersonIdent)
+        connection.prepareStatement(queryGetBehandlerForArbeidstakerPersonIdent)
             .use {
                 it.setString(1, personIdentNumber.value)
-                it.executeQuery().toList { toPBehandlerDialogmelding() }
+                it.executeQuery().toList { toPBehandler() }
             }
     }
 }
 
-fun ResultSet.toPBehandlerDialogmelding(): PBehandlerDialogmelding =
-    PBehandlerDialogmelding(
+fun ResultSet.toPBehandler(): PBehandler =
+    PBehandler(
         id = getInt("id"),
         behandlerRef = UUID.fromString(getString("behandler_ref")),
         kontorId = getInt("kontor_id"),

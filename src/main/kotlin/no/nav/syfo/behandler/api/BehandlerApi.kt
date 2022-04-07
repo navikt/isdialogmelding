@@ -9,10 +9,6 @@ import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.util.*
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-private val log: Logger = LoggerFactory.getLogger("no.nav.syfo")
 
 const val behandlerPath = "/api/v1/behandler"
 const val behandlerPersonident = "/personident"
@@ -35,7 +31,7 @@ fun Route.registerBehandlerApi(
                 personIdentToAccess = personIdentNumber,
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
             ) {
-                val behandlerDialogmeldingDTOList = mutableListOf<BehandlerDialogmeldingDTO>()
+                val behandlerDTOList = mutableListOf<BehandlerDTO>()
                 val fastlege = behandlerService.getAktivFastlegeMedPartnerId(
                     personIdentNumber = personIdentNumber,
                     token = token,
@@ -50,13 +46,13 @@ fun Route.registerBehandlerApi(
                         behandler = fastlege,
                         behandlerDialogmeldingArbeidstaker = behandlerDialogmeldingArbeidstaker,
                     )
-                    behandlerDialogmeldingDTOList.add(
-                        behandler.toBehandlerDialogmeldingDTO(
+                    behandlerDTOList.add(
+                        behandler.toBehandlerDTO(
                             behandlerType = BehandlerType.FASTLEGE,
                         )
                     )
                 }
-                call.respond(behandlerDialogmeldingDTOList)
+                call.respond(behandlerDTOList)
             }
         }
     }

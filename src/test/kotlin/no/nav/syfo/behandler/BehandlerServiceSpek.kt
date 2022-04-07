@@ -9,7 +9,7 @@ import no.nav.syfo.behandler.domain.BehandlerType
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.testhelper.ExternalMockEnvironment
 import no.nav.syfo.testhelper.UserConstants
-import no.nav.syfo.testhelper.createBehandlerDialogmeldingForArbeidstaker
+import no.nav.syfo.testhelper.createBehandlerForArbeidstaker
 import no.nav.syfo.testhelper.dropData
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
 import org.amshove.kluent.*
@@ -45,7 +45,7 @@ class BehandlerServiceSpek : Spek({
                             )
                         )
 
-                    val pBehandlerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val pBehandlerList = database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerList.size shouldBeEqualTo 1
@@ -66,7 +66,7 @@ class BehandlerServiceSpek : Spek({
                             )
                         )
 
-                    val pBehandlerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val pBehandlerList = database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerList.size shouldBeEqualTo 1
@@ -97,7 +97,7 @@ class BehandlerServiceSpek : Spek({
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         )
                     )
-                    val pBehandlerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val pBehandlerList = database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerList.size shouldBeEqualTo 1
@@ -119,10 +119,10 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
-                    val pBehandlerForAnnenArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val pBehandlerForAnnenArbeidstakerList = database.getBehandlerForArbeidstaker(
                         UserConstants.ANNEN_ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 1
@@ -140,7 +140,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    database.getBehandlerDialogmeldingForArbeidstaker(
+                    database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size shouldBeEqualTo 1
                 }
@@ -159,7 +159,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    database.getBehandlerDialogmeldingForArbeidstaker(
+                    database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size shouldBeEqualTo 1
                 }
@@ -178,7 +178,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    database.getBehandlerDialogmeldingForArbeidstaker(
+                    database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size shouldBeEqualTo 1
                 }
@@ -195,14 +195,14 @@ class BehandlerServiceSpek : Spek({
                             ),
                         )
                     }
-                    database.getBehandlerDialogmeldingForArbeidstaker(
+                    database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size shouldBeEqualTo 0
                 }
                 it("lagrer ikke behandler for arbeidstaker når samme behandler er siste lagrede behandler for arbeidstaker") {
                     val behandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
                     val existingBehandlerRef =
-                        database.createBehandlerDialogmeldingForArbeidstaker(
+                        database.createBehandlerForArbeidstaker(
                             behandler = behandler,
                             arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
                         )
@@ -215,7 +215,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 1
@@ -224,7 +224,7 @@ class BehandlerServiceSpek : Spek({
                 it("lagrer behandler for arbeidstaker når samme behandler er lagret for annen arbeidstaker") {
                     val behandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
                     val existingBehandlerRef =
-                        database.createBehandlerDialogmeldingForArbeidstaker(
+                        database.createBehandlerForArbeidstaker(
                             behandler = behandler,
                             arbeidstakerPersonIdent = UserConstants.ANNEN_ARBEIDSTAKER_FNR
                         )
@@ -236,7 +236,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 1
@@ -247,7 +247,7 @@ class BehandlerServiceSpek : Spek({
                     val annenBehandler =
                         generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR).toBehandler(UserConstants.PARTNERID)
                     val existingBehandlerRef =
-                        database.createBehandlerDialogmeldingForArbeidstaker(
+                        database.createBehandlerForArbeidstaker(
                             behandler = behandler,
                             arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
                         )
@@ -259,7 +259,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 2
@@ -270,11 +270,11 @@ class BehandlerServiceSpek : Spek({
                     val behandler = generateFastlegeResponse(UserConstants.FASTLEGE_FNR).toBehandler(UserConstants.PARTNERID)
                     val annenBehandler =
                         generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR).toBehandler(UserConstants.PARTNERID)
-                    database.createBehandlerDialogmeldingForArbeidstaker(
+                    database.createBehandlerForArbeidstaker(
                         behandler = behandler,
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
                     )
-                    database.createBehandlerDialogmeldingForArbeidstaker(
+                    database.createBehandlerForArbeidstaker(
                         behandler = annenBehandler,
                         arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
                     )
@@ -286,7 +286,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 3
@@ -298,7 +298,7 @@ class BehandlerServiceSpek : Spek({
                     val behandler = generateFastlegeResponse(UserConstants.FASTLEGE_FNR).toBehandler(UserConstants.PARTNERID)
                     val annenBehandler =
                         generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR).toBehandler(UserConstants.PARTNERID)
-                    database.createBehandlerDialogmeldingForArbeidstaker(
+                    database.createBehandlerForArbeidstaker(
                         behandler = annenBehandler,
                         arbeidstakerPersonIdent = UserConstants.ANNEN_ARBEIDSTAKER_FNR
                     )
@@ -310,7 +310,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerDialogmeldingForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 1

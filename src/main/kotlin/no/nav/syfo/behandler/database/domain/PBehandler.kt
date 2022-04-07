@@ -5,7 +5,7 @@ import no.nav.syfo.domain.PersonIdentNumber
 import java.time.LocalDateTime
 import java.util.*
 
-data class PBehandlerDialogmelding(
+data class PBehandler(
     val id: Int,
     val behandlerRef: UUID,
     val kontorId: Int,
@@ -20,7 +20,7 @@ data class PBehandlerDialogmelding(
     val updatedAt: LocalDateTime,
 )
 
-fun PBehandlerDialogmelding.toBehandler(
+fun PBehandler.toBehandler(
     kontor: PBehandlerDialogmeldingKontor,
 ) = Behandler(
     behandlerRef = this.behandlerRef,

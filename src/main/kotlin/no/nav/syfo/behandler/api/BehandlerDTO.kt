@@ -1,6 +1,6 @@
 package no.nav.syfo.behandler.api
 
-data class BehandlerDialogmeldingDTO(
+data class BehandlerDTO(
     val type: String,
     val behandlerRef: String,
     val fnr: String?,

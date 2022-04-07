@@ -20,11 +20,11 @@ class DialogmeldingToBehandlerService(
 ) {
     fun getBestillinger(): List<DialogmeldingToBehandlerBestilling> {
         return database.getDialogmeldingToBehandlerBestillingNotSendt()
-            .map { pBehandlerDialogMeldingBestilling ->
-                val pBehandlerDialogmelding = database.getBehandlerDialogmeldingForId(pBehandlerDialogMeldingBestilling.behandlerId)!!
-                pBehandlerDialogMeldingBestilling.toDialogmeldingToBehandlerBestilling(
-                    pBehandlerDialogmelding.toBehandler(
-                        kontor = database.getBehandlerDialogmeldingKontorForId(pBehandlerDialogmelding.kontorId)
+            .map { pDialogmeldingToBehandlerBestilling ->
+                val pBehandler = database.getBehandlerForId(pDialogmeldingToBehandlerBestilling.behandlerId)!!
+                pDialogmeldingToBehandlerBestilling.toDialogmeldingToBehandlerBestilling(
+                    pBehandler.toBehandler(
+                        kontor = database.getBehandlerDialogmeldingKontorForId(pBehandler.kontorId)
                     )
                 )
             }
@@ -59,7 +59,7 @@ class DialogmeldingToBehandlerService(
         dialogmeldingToBehandlerBestillingDTO: DialogmeldingToBehandlerBestillingDTO,
     ) {
         val behandlerRef = UUID.fromString(dialogmeldingToBehandlerBestillingDTO.behandlerRef)
-        val pBehandler = database.getBehandlerDialogmeldingForUuid(behandlerRef)
+        val pBehandler = database.getBehandlerForUuid(behandlerRef)
         if (pBehandler == null) {
             log.error("Unknown behandlerRef $behandlerRef in dialogmeldingToBehandlerBestilling ${dialogmeldingToBehandlerBestillingDTO.dialogmeldingUuid}")
         } else {
@@ -69,11 +69,11 @@ class DialogmeldingToBehandlerService(
                 )
             )
             database.connection.use { connection ->
-                val pBehandlerDialogmeldingBestilling = connection.getBestillinger(
+                val pDialogmeldingToBehandlerBestilling = connection.getBestillinger(
                     uuid = dialogmeldingToBehandlerBestilling.uuid
                 )
 
-                if (pBehandlerDialogmeldingBestilling == null) {
+                if (pDialogmeldingToBehandlerBestilling == null) {
                     connection.createBehandlerDialogmeldingBestilling(
                         dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestilling,
                         behandlerId = pBehandler.id,

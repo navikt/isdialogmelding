@@ -43,7 +43,7 @@ class TestDatabaseNotResponding : DatabaseInterface {
     }
 }
 
-fun DatabaseInterface.createBehandlerDialogmeldingForArbeidstaker(
+fun DatabaseInterface.createBehandlerForArbeidstaker(
     behandler: Behandler,
     arbeidstakerPersonIdent: PersonIdentNumber,
 ): UUID {
@@ -54,18 +54,18 @@ fun DatabaseInterface.createBehandlerDialogmeldingForArbeidstaker(
         } else {
             connection.createBehandlerDialogmeldingKontor(behandler.kontor)
         }
-        val behandlerDialogmelding =
-            connection.createBehandlerDialogmelding(behandler, kontorId)
+        val createdBehandler =
+            connection.createBehandler(behandler, kontorId)
         connection.createBehandlerDialogmeldingArbeidstaker(
             BehandlerDialogmeldingArbeidstaker(
                 type = BehandlerType.FASTLEGE,
                 arbeidstakerPersonident = arbeidstakerPersonIdent,
             ),
-            behandlerDialogmelding.id
+            createdBehandler.id
         )
         connection.commit()
 
-        return behandlerDialogmelding.behandlerRef
+        return createdBehandler.behandlerRef
     }
 }
 
