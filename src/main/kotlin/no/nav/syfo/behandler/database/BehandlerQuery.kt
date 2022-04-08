@@ -16,16 +16,17 @@ fun Connection.createBehandler(
     val now = Timestamp.from(Instant.now())
     val behandlerList = this.prepareStatement(queryCreateBehandler).use {
         it.setString(1, behandler.behandlerRef.toString())
-        it.setInt(2, kontorId)
-        it.setString(3, behandler.personident?.value)
-        it.setString(4, behandler.fornavn)
-        it.setString(5, behandler.mellomnavn)
-        it.setString(6, behandler.etternavn)
-        it.setString(7, behandler.herId?.toString())
-        it.setString(8, behandler.hprId?.toString())
-        it.setString(9, behandler.telefon)
-        it.setTimestamp(10, now)
+        it.setString(2, "LEGE") // default value for now, will be changed later
+        it.setInt(3, kontorId)
+        it.setString(4, behandler.personident?.value)
+        it.setString(5, behandler.fornavn)
+        it.setString(6, behandler.mellomnavn)
+        it.setString(7, behandler.etternavn)
+        it.setString(8, behandler.herId?.toString())
+        it.setString(9, behandler.hprId?.toString())
+        it.setString(10, behandler.telefon)
         it.setTimestamp(11, now)
+        it.setTimestamp(12, now)
         it.executeQuery().toList { toPBehandler() }
     }
 
@@ -41,6 +42,7 @@ const val queryCreateBehandler =
         INSERT INTO BEHANDLER (
             id,
             behandler_ref,
+            kategori,
             kontor_id,
             personident,
             fornavn,
@@ -51,7 +53,7 @@ const val queryCreateBehandler =
             telefon,
             created_at,
             updated_at
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             RETURNING
             id,
             behandler_ref,
