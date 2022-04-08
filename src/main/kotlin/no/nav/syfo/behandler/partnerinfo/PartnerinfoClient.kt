@@ -47,7 +47,17 @@ class PartnerinfoClient(
                 parameter(HERID_PARAM, herId)
             }
             COUNT_CALL_PARTNERINFO_SUCCESS.increment()
-            return response.firstOrNull()
+
+            if (response.isEmpty()) {
+                log.warn("Response from syfopartnerinfo for herId $herId is empty")
+                COUNT_CALL_PARTNERINFO_EMPTY_RESPONSE.increment()
+            }
+            if (response.size > 1) {
+                log.warn("Response from syfopartnerinfo for herId $herId contains more than one partnerId: ${response.map { it.partnerId }}")
+                COUNT_CALL_PARTNERINFO_MULTIPLE_RESPONSE.increment()
+            }
+
+            return response.maxByOrNull { it.partnerId }
         } catch (e: ClientRequestException) {
             handleUnexpectedResponseException(e.response, e.message, callId)
         } catch (e: ServerResponseException) {

@@ -316,6 +316,31 @@ class BehandlerServiceSpek : Spek({
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 1
                     pBehandlerForArbeidstakerList[0].behandlerRef shouldNotBeEqualTo annenBehandler.behandlerRef
                 }
+                it("lagrer behandler for arbeidstaker når samme behandler er lagret for arbeidstaker, men med annen partnerId") {
+                    val behandler = generateFastlegeResponse(UserConstants.FASTLEGE_FNR).toBehandler(UserConstants.PARTNERID)
+                    val sammeBehandlerAnnenPartnerId =
+                        generateFastlegeResponse(UserConstants.FASTLEGE_FNR).toBehandler(UserConstants.OTHER_PARTNERID)
+                    val existingBehandlerRef =
+                        database.createBehandlerForArbeidstaker(
+                            behandler = behandler,
+                            arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        )
+
+                    behandlerService.createOrGetBehandler(
+                        behandler = sammeBehandlerAnnenPartnerId,
+                        BehandlerArbeidstakerRelasjon(
+                            type = BehandlerType.FASTLEGE,
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                        ),
+                    )
+
+                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_FNR,
+                    )
+                    pBehandlerForArbeidstakerList.size shouldBeEqualTo 2
+                    pBehandlerForArbeidstakerList[0].behandlerRef shouldNotBeEqualTo existingBehandlerRef
+                    pBehandlerForArbeidstakerList[1].behandlerRef shouldBeEqualTo existingBehandlerRef
+                }
             }
         }
     }
