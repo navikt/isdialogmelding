@@ -5,9 +5,11 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.syfo.behandler.database.getBehandlerForArbeidstaker
+import no.nav.syfo.behandler.database.getBehandlerKontorForId
 import no.nav.syfo.behandler.domain.BehandlerType
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
+import no.nav.syfo.testhelper.UserConstants.OTHER_PARTNERID
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
 import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
@@ -142,6 +144,34 @@ class BehandlerApiSpek : Spek({
                             ).size shouldBeEqualTo 0
                         }
                     }
+
+                    it("should return list of Behandler (with Kontor with largest partnerId) for arbeidstaker with fastlege with multiple partnerinfo") {
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(
+                                    NAV_PERSONIDENT_HEADER,
+                                    UserConstants.ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO.value
+                                )
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+
+                            behandlerList.size shouldBeEqualTo 1
+
+                            val behandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
+                                UserConstants.ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO,
+                            )
+                            behandlerForArbeidstakerList.size shouldBeEqualTo 1
+                            val behandlerKontor =
+                                database.getBehandlerKontorForId(behandlerForArbeidstakerList.first().kontorId)
+                            behandlerKontor.partnerId shouldBeEqualTo OTHER_PARTNERID.toString()
+                        }
+                    }
+
                     it("should return empty list of Behandler for arbeidstaker med fastlege som mangler fnr, hprId og herId") {
                         with(
                             handleRequest(HttpMethod.Get, url) {

@@ -28,6 +28,10 @@ private suspend fun PipelineContext<out Unit, ApplicationCall>.fastlegerestRespo
             HttpStatusCode.OK,
             generateFastlegeResponse(UserConstants.HERID_UTEN_PARTNERINFO)
         )
+        UserConstants.ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO.value -> call.respond(
+            HttpStatusCode.OK,
+            generateFastlegeResponse(UserConstants.HERID_MED_FLERE_PARTNERINFO)
+        )
         UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID.value -> call.respond(
             HttpStatusCode.OK,
             generateFastlegeResponse(null, null, null)

@@ -30,6 +30,13 @@ class SyfopartnerInfoMock {
                         HttpStatusCode.OK,
                         emptyList<PartnerinfoResponse>()
                     )
+                    UserConstants.HERID_MED_FLERE_PARTNERINFO.toString() -> call.respond(
+                        HttpStatusCode.OK,
+                        listOf(
+                            generatePartnerinfoResponse(UserConstants.PARTNERID),
+                            generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID)
+                        )
+                    )
                     UserConstants.OTHER_HERID.toString() -> call.respond(
                         HttpStatusCode.OK, listOf(generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID))
                     )
