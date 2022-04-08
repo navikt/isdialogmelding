@@ -39,7 +39,7 @@ fun Route.registerBehandlerApi(
                 )
                 if (fastlege != null && fastlege.hasAnId()) {
                     val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
-                        type = BehandlerType.FASTLEGE,
+                        type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
                         arbeidstakerPersonident = personIdentNumber,
                     )
                     val behandler = behandlerService.createOrGetBehandler(
@@ -48,7 +48,7 @@ fun Route.registerBehandlerApi(
                     )
                     behandlerDTOList.add(
                         behandler.toBehandlerDTO(
-                            behandlerType = BehandlerType.FASTLEGE,
+                            behandlerType = BehandlerArbeidstakerRelasjonType.FASTLEGE,
                         )
                     )
                 }

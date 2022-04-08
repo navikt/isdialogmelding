@@ -3,6 +3,7 @@ package no.nav.syfo.behandler.api.person
 data class PersonBehandlerDTO(
     val type: String,
     val behandlerRef: String,
+    val kategori: String,
     val fnr: String?,
     val fornavn: String,
     val mellomnavn: String?,

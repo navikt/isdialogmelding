@@ -5,7 +5,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.syfo.behandler.database.getBehandlerForArbeidstaker
-import no.nav.syfo.behandler.domain.BehandlerType
+import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonType
+import no.nav.syfo.behandler.domain.BehandlerKategori
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
 import no.nav.syfo.util.bearerHeader
@@ -71,7 +72,8 @@ class PersonBehandlerApiSpek : Spek({
                             personBehandlerDTO.telefon shouldBeEqualTo fastlegeResponse.fastlegekontor.telefon
                             personBehandlerDTO.orgnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.orgnummer
                             personBehandlerDTO.kontor shouldBeEqualTo fastlegeResponse.fastlegekontor.navn
-                            personBehandlerDTO.type shouldBeEqualTo BehandlerType.FASTLEGE.name
+                            personBehandlerDTO.type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.FASTLEGE.name
+                            personBehandlerDTO.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
                             personBehandlerDTO.behandlerRef shouldBeEqualTo behandlerForPersonList.first().behandlerRef.toString()
                             personBehandlerDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
 

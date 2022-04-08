@@ -19,9 +19,10 @@ const val queryCreateBehandlerKontor =
             poststed,
             orgnummer,
             dialogmelding_enabled,
+            system,
             created_at,
             updated_at
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             RETURNING ID;
     """
 
@@ -42,8 +43,9 @@ fun Connection.createBehandlerKontor(
         } else {
             it.setNull(8, Types.TIMESTAMP_WITH_TIMEZONE)
         }
-        it.setObject(9, now)
+        it.setString(9, kontor.system)
         it.setObject(10, now)
+        it.setObject(11, now)
         it.executeQuery().toList { getInt("id") }
     }
 
@@ -73,6 +75,27 @@ fun DatabaseInterface.updateDialogMeldingEnabledForPartnerId(partnerId: Int) {
         connection.commit()
     }
 }
+
+const val queryUpdateSystemForKontor =
+    """
+        UPDATE BEHANDLER_KONTOR SET system=? WHERE partner_id=?
+    """
+
+fun DatabaseInterface.updateSystemForPartnerId(partnerId: Int, system: String) {
+    return this.connection.use { connection ->
+        val rowCount = connection.prepareStatement(queryUpdateSystemForKontor)
+            .use {
+                it.setString(1, system)
+                it.setString(2, partnerId.toString())
+                it.executeUpdate()
+            }
+        if (rowCount != 1) {
+            throw RuntimeException("No row in BEHANDLER_KONTOR with partner_id $partnerId")
+        }
+        connection.commit()
+    }
+}
+
 const val queryGetBehandlerKontorForId =
     """
         SELECT * FROM BEHANDLER_KONTOR WHERE id = ?
@@ -114,6 +137,7 @@ fun ResultSet.toPBehandlerKontor(): PBehandlerKontor =
         dialogmeldingEnabled = getObject("dialogmelding_enabled")?.let {
             getObject("dialogmelding_enabled", OffsetDateTime::class.java)
         },
+        system = getString("system"),
         createdAt = getObject("created_at", OffsetDateTime::class.java),
         updatedAt = getObject("updated_at", OffsetDateTime::class.java),
     )

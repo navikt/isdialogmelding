@@ -11,4 +11,5 @@ data class BehandlerKontor(
     val poststed: String?,
     val orgnummer: Virksomhetsnummer?,
     val dialogmeldingEnabled: Boolean,
+    val system: String?,
 )
