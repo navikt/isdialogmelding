@@ -3,14 +3,15 @@ package no.nav.syfo.behandler.kafka.dialogmeldingfrombehandler
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.testhelper.*
-import no.nav.syfo.testhelper.generator.*
+import no.nav.syfo.testhelper.ExternalMockEnvironment
+import no.nav.syfo.testhelper.dropData
+import no.nav.syfo.testhelper.generator.generateDialogmeldingFromBehandlerDTO
 import org.apache.kafka.clients.consumer.*
 import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.time.Duration
-import java.util.UUID
+import java.util.*
 
 class KafkaDialogmeldingFromBehandlerSpek : Spek({
 
