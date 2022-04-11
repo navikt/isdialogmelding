@@ -6,9 +6,11 @@ import java.io.StringReader
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.XMLStreamReader
 
-private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.util.XmlUtil")
+@PublishedApi
+internal val log: Logger = LoggerFactory.getLogger("no.nav.syfo.util.XmlUtil")
 
-private fun <T> getUnmarshalledObject(xmlStreamReader: XMLStreamReader, localName: String, objectClass: Class<T>): T {
+@PublishedApi
+internal inline fun <reified T> getUnmarshalledObject(xmlStreamReader: XMLStreamReader, localName: String): T {
     while (xmlStreamReader.hasNext()) {
         if (xmlStreamReader.isStartElement && xmlStreamReader.localName == localName) {
             break
@@ -16,10 +18,10 @@ private fun <T> getUnmarshalledObject(xmlStreamReader: XMLStreamReader, localNam
         xmlStreamReader.next()
     }
 
-    return JAXB.unmarshallObject(xmlStreamReader, objectClass)
+    return JAXB.unmarshallObject(xmlStreamReader)
 }
 
-fun <T> getObjectFromXmlString(xml: String, localName: String, objectClass: Class<T>): T {
+inline fun <reified T> getObjectFromXmlString(xml: String, localName: String): T {
     val reader = StringReader(xml)
 
     reader.use {
@@ -27,7 +29,7 @@ fun <T> getObjectFromXmlString(xml: String, localName: String, objectClass: Clas
         val xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader)
 
         try {
-            return getUnmarshalledObject(xmlStreamReader, localName, objectClass)
+            return getUnmarshalledObject(xmlStreamReader, localName)
         } catch (e: Exception) {
             log.warn("Fikk en feil ved lesing av xml med XmlStreamReader ${e.message}")
             throw RuntimeException(e)

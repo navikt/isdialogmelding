@@ -64,7 +64,7 @@ fun updateBehandlerOffice(
 
 private fun getPartnerReferanse(fellesformatXML: String, navLogid: String, msgId: String): String {
     return try {
-        val mottakenhetBlokk = getObjectFromXmlString(fellesformatXML, "MottakenhetBlokk", XMLMottakenhetBlokk::class.java)
+        val mottakenhetBlokk = getObjectFromXmlString<XMLMottakenhetBlokk>(fellesformatXML, "MottakenhetBlokk")
         mottakenhetBlokk.partnerReferanse
     } catch (e: Exception) {
         log.warn("Noe gikk galt ved henting av partnerReferanse fra dialogmelding fra behandler: navLogId: $navLogid, msgId: $msgId", e)
