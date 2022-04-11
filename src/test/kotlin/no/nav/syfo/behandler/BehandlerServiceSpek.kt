@@ -75,7 +75,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerFromDB.behandlerRef shouldBeEqualTo behandler.behandlerRef
                     behandlerFromDB.kontor.dialogmeldingEnabled shouldBeEqualTo false
 
-                    database.updateDialogMeldingEnabledForPartnerId(behandlerFromDB.kontor.partnerId)
+                    database.updateDialogMeldingEnabled(behandlerFromDB.kontor.partnerId)
 
                     val behandlerFromDBUpdated = pBehandler.toBehandler(database.getBehandlerKontorForId(pBehandler.kontorId))
                     behandlerFromDBUpdated.behandlerRef shouldBeEqualTo behandler.behandlerRef
@@ -109,7 +109,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerFromDBUpdated.behandlerRef shouldBeEqualTo behandler.behandlerRef
                     behandlerFromDBUpdated.kontor.system shouldBeEqualTo "EPJ-systemet"
                 }
-                it("lagrer behandler for arbeidstaker én gang når kallt flere ganger for samme behandler og arbeidstaker") {
+                it("lagrer behandler for arbeidstaker én gang når kalt flere ganger for samme behandler og arbeidstaker") {
                     val behandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
                     behandlerService.createOrGetBehandler(
                         behandler,

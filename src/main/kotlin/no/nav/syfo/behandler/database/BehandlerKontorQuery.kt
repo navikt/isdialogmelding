@@ -61,7 +61,7 @@ const val queryUpdateDialogmeldingEnabled =
         UPDATE BEHANDLER_KONTOR SET dialogmelding_enabled=? WHERE partner_id=?
     """
 
-fun DatabaseInterface.updateDialogMeldingEnabledForPartnerId(partnerId: Int) {
+fun DatabaseInterface.updateDialogMeldingEnabled(partnerId: Int): Boolean {
     return this.connection.use { connection ->
         val rowCount = connection.prepareStatement(queryUpdateDialogmeldingEnabled)
             .use {
@@ -69,10 +69,9 @@ fun DatabaseInterface.updateDialogMeldingEnabledForPartnerId(partnerId: Int) {
                 it.setString(2, partnerId.toString())
                 it.executeUpdate()
             }
-        if (rowCount != 1) {
-            throw RuntimeException("No row in BEHANDLER_KONTOR with partner_id $partnerId")
-        }
         connection.commit()
+
+        rowCount > 0
     }
 }
 
