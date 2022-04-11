@@ -25,8 +25,8 @@ object JAXB {
         }
     }
 
-    fun <T> unmarshallObject(xmlStreamReader: XMLStreamReader, wantedClass: Class<T>): T {
-        val jaxbContext: JAXBContext = JAXBContext.newInstance(wantedClass)
+    inline fun <reified T> unmarshallObject(xmlStreamReader: XMLStreamReader): T {
+        val jaxbContext: JAXBContext = JAXBContext.newInstance(T::class.java)
         val unmarshaller: Unmarshaller = jaxbContext.createUnmarshaller()
 
         return unmarshaller.unmarshal(xmlStreamReader) as T

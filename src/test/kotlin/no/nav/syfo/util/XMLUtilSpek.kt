@@ -14,21 +14,20 @@ class XMLUtilSpek : Spek({
 
         describe("getObjectFromXmlString") {
             it("return object of given class from an xml string") {
-                val mottakenhetBlokk =
-                    getObjectFromXmlString(fellesformatXml, "MottakenhetBlokk", XMLMottakenhetBlokk::class.java)
-                val notat = getObjectFromXmlString(completeFellesformatXml, "Notat", XMLNotat::class.java)
+                val mottakenhetBlokk = getObjectFromXmlString<XMLMottakenhetBlokk>(fellesformatXml, "MottakenhetBlokk")
+                val notat = getObjectFromXmlString<XMLNotat>(completeFellesformatXml, "Notat")
 
                 mottakenhetBlokk.partnerReferanse shouldBeEqualTo partnerRef
                 notat.dokIdNotat shouldBeEqualTo dokIdNotat
             }
             it("throw exception if localName doesn't match class") {
                 assertThrows(RuntimeException::class.java) {
-                    getObjectFromXmlString(completeFellesformatXml, "partnerReferanse", XMLMottakenhetBlokk::class.java)
+                    getObjectFromXmlString<XMLMottakenhetBlokk>(completeFellesformatXml, "partnerReferanse")
                 }
             }
             it("throw exception if wanted tag isn't found") {
                 assertThrows(RuntimeException::class.java) {
-                    getObjectFromXmlString(completeFellesformatXml, "NotXmlClass", NotXmlClass::class.java)
+                    getObjectFromXmlString<NotXmlClass>(completeFellesformatXml, "NotXmlClass")
                 }
             }
         }
