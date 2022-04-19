@@ -15,10 +15,11 @@ data class Behandler(
     val hprId: Int?,
     val telefon: String?,
     val kontor: BehandlerKontor,
+    val kategori: BehandlerKategori,
 )
 
 fun Behandler.toBehandlerDTO(
-    behandlerType: BehandlerType,
+    behandlerType: BehandlerArbeidstakerRelasjonType,
 ) = BehandlerDTO(
     type = behandlerType.name,
     behandlerRef = this.behandlerRef.toString(),
@@ -35,10 +36,11 @@ fun Behandler.toBehandlerDTO(
 )
 
 fun Behandler.toPersonBehandlerDTO(
-    behandlerType: BehandlerType,
+    behandlerType: BehandlerArbeidstakerRelasjonType,
 ) = PersonBehandlerDTO(
     type = behandlerType.name,
     behandlerRef = this.behandlerRef.toString(),
+    kategori = this.kategori.name,
     fnr = this.personident?.value,
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,

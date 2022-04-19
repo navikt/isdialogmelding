@@ -13,10 +13,8 @@ data class ReceivedSykmeldingDTO(
     val msgId: String,
     val legekontorOrgNr: String?,
     val legekontorHerId: String?,
-    val legekontorReshId: String?,
     val legekontorOrgName: String,
     val mottattDato: LocalDateTime,
-    val rulesetVersion: String?,
     val partnerreferanse: String?,
     val fellesformat: String,
 )
@@ -48,7 +46,6 @@ data class Behandler(
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,
-    val aktoerId: String,
     val fnr: String,
     val hpr: String?,
     val her: String?,

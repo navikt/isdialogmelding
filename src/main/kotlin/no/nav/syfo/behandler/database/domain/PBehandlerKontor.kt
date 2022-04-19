@@ -13,6 +13,7 @@ data class PBehandlerKontor(
     val postnummer: String?,
     val poststed: String?,
     val orgnummer: String?,
+    val system: String?,
     val dialogmeldingEnabled: OffsetDateTime?,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
@@ -27,4 +28,5 @@ fun PBehandlerKontor.toBehandlerKontor() = BehandlerKontor(
     poststed = this.poststed,
     orgnummer = this.orgnummer?.let { Virksomhetsnummer(it) },
     dialogmeldingEnabled = (this.dialogmeldingEnabled != null),
+    system = this.system,
 )

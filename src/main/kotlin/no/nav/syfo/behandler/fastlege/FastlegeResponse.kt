@@ -1,7 +1,6 @@
 package no.nav.syfo.behandler.fastlege
 
-import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.domain.BehandlerKontor
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.domain.Virksomhetsnummer
 import java.time.LocalDate
@@ -61,6 +60,7 @@ fun FastlegeResponse.toBehandler(
         poststed = this.fastlegekontor.postadresse?.poststed,
         orgnummer = this.fastlegekontor.orgnummer?.let { Virksomhetsnummer(it) },
         dialogmeldingEnabled = dialogmeldingEnabled,
+        system = null,
     ),
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
@@ -69,4 +69,5 @@ fun FastlegeResponse.toBehandler(
     hprId = this.helsepersonellregisterId,
     personident = this.fnr?.let { PersonIdentNumber(it) },
     telefon = this.fastlegekontor.telefon,
+    kategori = BehandlerKategori.LEGE,
 )

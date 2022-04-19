@@ -16,7 +16,7 @@ fun Connection.createBehandler(
     val now = Timestamp.from(Instant.now())
     val behandlerList = this.prepareStatement(queryCreateBehandler).use {
         it.setString(1, behandler.behandlerRef.toString())
-        it.setString(2, "LEGE") // default value for now, will be changed later
+        it.setString(2, behandler.kategori.name)
         it.setInt(3, kontorId)
         it.setString(4, behandler.personident?.value)
         it.setString(5, behandler.fornavn)
@@ -57,6 +57,7 @@ const val queryCreateBehandler =
             RETURNING
             id,
             behandler_ref,
+            kategori,
             kontor_id,
             personident,
             fornavn,
@@ -173,6 +174,7 @@ fun ResultSet.toPBehandler(): PBehandler =
     PBehandler(
         id = getInt("id"),
         behandlerRef = UUID.fromString(getString("behandler_ref")),
+        kategori = getString("kategori"),
         kontorId = getInt("kontor_id"),
         personident = getString("personident"),
         fornavn = getString("fornavn"),

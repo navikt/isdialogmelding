@@ -6,7 +6,7 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.syfo.behandler.database.getBehandlerForArbeidstaker
 import no.nav.syfo.behandler.database.getBehandlerKontorForId
-import no.nav.syfo.behandler.domain.BehandlerType
+import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonType
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import no.nav.syfo.testhelper.UserConstants.OTHER_PARTNERID
@@ -70,7 +70,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDTO.telefon shouldBeEqualTo fastlegeResponse.fastlegekontor.telefon
                             behandlerDTO.orgnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.orgnummer
                             behandlerDTO.kontor shouldBeEqualTo fastlegeResponse.fastlegekontor.navn
-                            behandlerDTO.type shouldBeEqualTo BehandlerType.FASTLEGE.name
+                            behandlerDTO.type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.FASTLEGE.name
                             behandlerDTO.behandlerRef shouldBeEqualTo behandlerForPersonList.first().behandlerRef.toString()
                             behandlerDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
 

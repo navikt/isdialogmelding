@@ -1,6 +1,6 @@
 package no.nav.syfo.behandler.database.domain
 
-import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.PersonIdentNumber
 import java.time.LocalDateTime
 import java.util.*
@@ -16,6 +16,7 @@ data class PBehandler(
     val herId: String?,
     val hprId: String?,
     val telefon: String?,
+    val kategori: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
@@ -32,4 +33,5 @@ fun PBehandler.toBehandler(
     herId = this.herId?.toInt(),
     hprId = this.hprId?.toInt(),
     telefon = this.telefon,
+    kategori = BehandlerKategori.valueOf(this.kategori),
 )
