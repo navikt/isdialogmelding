@@ -98,6 +98,7 @@ fun main() {
             launchKafkaTaskDialogmeldingFromBehandler(
                 applicationState = applicationState,
                 applicationEnvironmentKafka = environment.kafka,
+                database = applicationDatabase,
             )
         }
     }

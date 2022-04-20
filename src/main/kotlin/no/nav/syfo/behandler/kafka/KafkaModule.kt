@@ -1,9 +1,10 @@
 package no.nav.syfo.behandler.kafka
 
 import no.nav.syfo.application.*
+import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
-import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.blockingApplicationLogicDialogmeldingBestilling
 import no.nav.syfo.behandler.kafka.dialogmeldingfrombehandler.blockingApplicationLogicDialogmeldingFromBehandler
+import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.blockingApplicationLogicDialogmeldingBestilling
 import no.nav.syfo.behandler.kafka.sykmelding.blockingApplicationLogicSykmelding
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -39,11 +40,13 @@ fun launchKafkaTaskSykmelding(
 fun launchKafkaTaskDialogmeldingFromBehandler(
     applicationState: ApplicationState,
     applicationEnvironmentKafka: ApplicationEnvironmentKafka,
+    database: DatabaseInterface,
 ) {
     launchBackgroundTask(applicationState = applicationState) {
         blockingApplicationLogicDialogmeldingFromBehandler(
             applicationState = applicationState,
             applicationEnvironmentKafka = applicationEnvironmentKafka,
+            database = database,
         )
     }
 }

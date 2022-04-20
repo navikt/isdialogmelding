@@ -1,6 +1,7 @@
 package no.nav.syfo.util
 
 import no.kith.xmlstds.dialog._2006_10_11.XMLNotat
+import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.generator.*
 import no.nav.xml.eiff._2.XMLMottakenhetBlokk
 import org.amshove.kluent.shouldBeEqualTo
@@ -17,7 +18,7 @@ class XMLUtilSpek : Spek({
                 val mottakenhetBlokk = getObjectFromXmlString<XMLMottakenhetBlokk>(fellesformatXml, "MottakenhetBlokk")
                 val notat = getObjectFromXmlString<XMLNotat>(completeFellesformatXml, "Notat")
 
-                mottakenhetBlokk.partnerReferanse shouldBeEqualTo partnerRef
+                mottakenhetBlokk.partnerReferanse shouldBeEqualTo UserConstants.PARTNERID.toString()
                 notat.dokIdNotat shouldBeEqualTo dokIdNotat
             }
             it("throw exception if localName doesn't match class") {
