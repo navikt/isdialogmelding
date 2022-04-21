@@ -45,12 +45,6 @@ fun createReceiver(
                 )
                 .withHealthcareProfessional(
                     factory.createXMLHealthcareProfessional()
-                        .withRoleToPatient(
-                            factory.createXMLCV()
-                                .withV("6")
-                                .withS("2.16.578.1.12.4.1.1.9034")
-                                .withDN("Fastlege")
-                        )
                         .withFamilyName(melding.behandler.etternavn)
                         .withMiddleName(melding.behandler.mellomnavn)
                         .withGivenName(melding.behandler.fornavn)
