@@ -1,6 +1,6 @@
 package no.nav.syfo.behandler.api.access
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import io.ktor.util.pipeline.*
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.domain.PersonIdentNumber

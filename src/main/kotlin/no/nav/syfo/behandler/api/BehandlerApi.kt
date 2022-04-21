@@ -1,8 +1,8 @@
 package no.nav.syfo.behandler.api
 
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.access.validateVeilederAccess
 import no.nav.syfo.behandler.domain.*

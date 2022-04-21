@@ -1,9 +1,9 @@
 package no.nav.syfo.behandler.api.person
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.syfo.application.api.authentication.personIdent
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.person.access.PersonAPIConsumerAccessService
