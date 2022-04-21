@@ -5,7 +5,18 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-fun generateSykmeldingDTO(uuid: UUID) = ReceivedSykmeldingDTO(
+fun generateSykmeldingDTO(
+    uuid: UUID,
+    mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
+    behandletTidspunkt: LocalDateTime = LocalDateTime.now(),
+    personNrLege: String = "02020212345",
+    behandlerFnr: String = "02020212345",
+    herId: String = "123",
+    hprId: String = "321",
+    legeHelsepersonellkategori: String = "LE",
+    partnerreferanse: String? = "123",
+    avsenderSystemNavn: String = "EPJ-systemet",
+) = ReceivedSykmeldingDTO(
     sykmelding = Sykmelding(
         id = "",
         msgId = "",
@@ -13,14 +24,14 @@ fun generateSykmeldingDTO(uuid: UUID) = ReceivedSykmeldingDTO(
             hovedDiagnose = null,
             biDiagnoser = emptyList(),
         ),
-        behandletTidspunkt = LocalDateTime.now(),
+        behandletTidspunkt = behandletTidspunkt,
         behandler = Behandler(
             fornavn = "Anne",
             mellomnavn = "",
             etternavn = "Lege",
-            fnr = "02020212345",
-            hpr = "321",
-            her = "123",
+            fnr = behandlerFnr,
+            hpr = hprId,
+            her = herId,
             adresse = Adresse(
                 gate = "",
                 postnummer = 0,
@@ -31,7 +42,7 @@ fun generateSykmeldingDTO(uuid: UUID) = ReceivedSykmeldingDTO(
             tlf = "",
         ),
         avsenderSystem = AvsenderSystem(
-            navn = "EPJ-systemet",
+            navn = avsenderSystemNavn,
             versjon = "1.0",
         ),
         syketilfelleStartDato = LocalDate.now(),
@@ -39,15 +50,15 @@ fun generateSykmeldingDTO(uuid: UUID) = ReceivedSykmeldingDTO(
         navnFastlege = "",
     ),
     personNrPasient = "01010112345",
-    personNrLege = "02020212345",
-    legeHelsepersonellkategori = "LE",
-    legeHprNr = null,
+    personNrLege = personNrLege,
+    legeHelsepersonellkategori = legeHelsepersonellkategori,
+    legeHprNr = hprId,
     navLogId = "",
     msgId = uuid.toString(),
     legekontorOrgNr = null,
     legekontorHerId = null,
     legekontorOrgName = "",
-    mottattDato = LocalDateTime.now(),
-    partnerreferanse = "123",
+    mottattDato = mottattTidspunkt,
+    partnerreferanse = partnerreferanse,
     fellesformat = "",
 )

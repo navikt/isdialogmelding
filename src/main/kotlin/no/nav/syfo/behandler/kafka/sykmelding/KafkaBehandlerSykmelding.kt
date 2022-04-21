@@ -85,7 +85,7 @@ private fun validateReceivedSykmelding(
         COUNT_MOTTATT_SYKMELDING_IGNORED_MISMATCHED.increment()
         return false
     }
-    if (receivedSykmeldingDTO.partnerreferanse == null) {
+    if (receivedSykmeldingDTO.partnerreferanse.isNullOrBlank()) {
         log.info("Ignoring Received sykmelding record from $sykmeldingMottattDato with key ${consumerRecord.key()} since no partnerId")
         COUNT_MOTTATT_SYKMELDING_IGNORED_PARTNERID.increment()
         return false
