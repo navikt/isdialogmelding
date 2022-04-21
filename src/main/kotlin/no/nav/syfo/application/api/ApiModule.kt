@@ -13,8 +13,6 @@ import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.person.access.PersonAPIConsumerAccessService
 import no.nav.syfo.behandler.api.person.registerPersonBehandlerApi
 import no.nav.syfo.behandler.api.registerBehandlerApi
-import no.nav.syfo.behandler.fastlege.FastlegeClient
-import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
@@ -27,6 +25,7 @@ fun Application.apiModule(
     wellKnownInternalAzureAD: WellKnown,
     wellKnownInternalIdportenTokenX: WellKnown,
     azureAdClient: AzureAdClient,
+    behandlerService: BehandlerService,
 ) {
     installMetrics()
     installContentNegotiation()
@@ -52,21 +51,6 @@ fun Application.apiModule(
         tilgangskontrollBaseUrl = environment.syfotilgangskontrollUrl,
     )
 
-    val fastlegeClient = FastlegeClient(
-        azureAdClient = azureAdClient,
-        fastlegeRestClientId = environment.fastlegeRestClientId,
-        fastlegeRestUrl = environment.fastlegeRestUrl,
-    )
-    val partnerinfoClient = PartnerinfoClient(
-        azureAdClient = azureAdClient,
-        syfoPartnerinfoClientId = environment.syfoPartnerinfoClientId,
-        syfoPartnerinfoUrl = environment.syfoPartnerinfoUrl,
-    )
-    val behandlerService = BehandlerService(
-        fastlegeClient = fastlegeClient,
-        partnerinfoClient = partnerinfoClient,
-        database = database,
-    )
     val oppfolgingsplanService = OppfolgingsplanService(
         mqSender = mqSender
     )

@@ -1,8 +1,16 @@
 package no.nav.syfo.behandler.domain
 
-enum class BehandlerKategori {
-    LEGE,
-    TANNLEGE,
-    FYSIOTERAPEUT,
-    KIROPRAKTOR,
+enum class BehandlerKategori(
+    val kategoriKode: String,
+) {
+    FYSIOTERAPEUT("FT"),
+    KIROPRAKTOR("KI"),
+    LEGE("LE"),
+    MANUELLTERAPEUT("MT"),
+    TANNLEGE("TL");
+
+    companion object {
+        fun fromKategoriKode(kategori: String?): BehandlerKategori? =
+            values().firstOrNull { it.kategoriKode == kategori }
+    }
 }

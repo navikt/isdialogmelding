@@ -12,8 +12,11 @@ import no.nav.syfo.application.api.authentication.getWellKnown
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.kafka.*
+import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.cronjob.cronjobModule
@@ -38,6 +41,22 @@ fun main() {
         azureAppClientSecret = environment.azureAppClientSecret,
         azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
     )
+    val fastlegeClient = FastlegeClient(
+        azureAdClient = azureAdClient,
+        fastlegeRestClientId = environment.fastlegeRestClientId,
+        fastlegeRestUrl = environment.fastlegeRestUrl,
+    )
+    val partnerinfoClient = PartnerinfoClient(
+        azureAdClient = azureAdClient,
+        syfoPartnerinfoClientId = environment.syfoPartnerinfoClientId,
+        syfoPartnerinfoUrl = environment.syfoPartnerinfoUrl,
+    )
+    val behandlerService = BehandlerService(
+        fastlegeClient = fastlegeClient,
+        partnerinfoClient = partnerinfoClient,
+        database = applicationDatabase,
+    )
+
     val applicationEngineEnvironment = applicationEngineEnvironment {
         log = logger
         config = HoconApplicationConfig(ConfigFactory.load())
@@ -56,13 +75,14 @@ fun main() {
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
                 wellKnownInternalIdportenTokenX = wellKnownInternalIdportenTokenX,
                 azureAdClient = azureAdClient,
+                behandlerService = behandlerService,
             )
         }
     }
 
     applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) {
         applicationState.ready = true
-        logger.info("Application is ready")
+        logger.info("Application is ready, running Java VM ${Runtime.version()}")
         val pdlClient = PdlClient(
             azureAdClient = azureAdClient,
             pdlClientId = environment.pdlClientId,
@@ -92,6 +112,7 @@ fun main() {
             launchKafkaTaskSykmelding(
                 applicationState = applicationState,
                 applicationEnvironmentKafka = environment.kafka,
+                behandlerService = behandlerService,
             )
         }
         if (environment.toggleKafkaProcessingDialogmeldingEnabled) {

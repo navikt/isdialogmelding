@@ -77,21 +77,19 @@ fun DatabaseInterface.updateDialogMeldingEnabled(partnerId: Int): Boolean {
 
 const val queryUpdateSystemForKontor =
     """
-        UPDATE BEHANDLER_KONTOR SET system=? WHERE partner_id=?
+        UPDATE BEHANDLER_KONTOR SET system=?,updated_at=? WHERE partner_id=?
     """
 
-fun DatabaseInterface.updateSystemForPartnerId(partnerId: Int, system: String) {
-    return this.connection.use { connection ->
-        val rowCount = connection.prepareStatement(queryUpdateSystemForKontor)
-            .use {
-                it.setString(1, system)
-                it.setString(2, partnerId.toString())
-                it.executeUpdate()
-            }
-        if (rowCount != 1) {
-            throw RuntimeException("No row in BEHANDLER_KONTOR with partner_id $partnerId")
+fun Connection.updateSystemForPartnerId(partnerId: Int, system: String) {
+    val rowCount = prepareStatement(queryUpdateSystemForKontor)
+        .use {
+            it.setString(1, system)
+            it.setObject(2, OffsetDateTime.now())
+            it.setString(3, partnerId.toString())
+            it.executeUpdate()
         }
-        connection.commit()
+    if (rowCount != 1) {
+        throw RuntimeException("No row in BEHANDLER_KONTOR with partner_id $partnerId")
     }
 }
 
