@@ -51,11 +51,7 @@ fun main() {
         syfoPartnerinfoClientId = environment.syfoPartnerinfoClientId,
         syfoPartnerinfoUrl = environment.syfoPartnerinfoUrl,
     )
-    val behandlerService = BehandlerService(
-        fastlegeClient = fastlegeClient,
-        partnerinfoClient = partnerinfoClient,
-        database = applicationDatabase,
-    )
+    lateinit var behandlerService: BehandlerService
 
     val applicationEngineEnvironment = applicationEngineEnvironment {
         log = logger
@@ -67,6 +63,13 @@ fun main() {
 
         module {
             databaseModule(environment = environment)
+
+            behandlerService = BehandlerService(
+                fastlegeClient = fastlegeClient,
+                partnerinfoClient = partnerinfoClient,
+                database = applicationDatabase,
+            )
+
             apiModule(
                 applicationState = applicationState,
                 database = applicationDatabase,
