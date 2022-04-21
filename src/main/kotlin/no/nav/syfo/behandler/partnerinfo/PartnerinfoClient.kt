@@ -1,6 +1,7 @@
 package no.nav.syfo.behandler.partnerinfo
 
-import io.ktor.client.features.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -40,12 +41,12 @@ class PartnerinfoClient(
         }
 
         try {
-            val response = httpClient.get<List<PartnerinfoResponse>>(partnerinfoBehandlerUrl) {
+            val response = httpClient.get(partnerinfoBehandlerUrl) {
                 header(HttpHeaders.Authorization, bearerHeader(newToken))
                 header(NAV_CALL_ID_HEADER, callId)
                 accept(ContentType.Application.Json)
                 parameter(HERID_PARAM, herId)
-            }
+            }.body<List<PartnerinfoResponse>>()
             COUNT_CALL_PARTNERINFO_SUCCESS.increment()
 
             if (response.isEmpty()) {

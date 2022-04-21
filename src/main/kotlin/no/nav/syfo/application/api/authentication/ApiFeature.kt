@@ -2,21 +2,22 @@ package no.nav.syfo.application.api.authentication
 
 import com.auth0.jwk.JwkProviderBuilder
 import com.auth0.jwt.JWT
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.auth.jwt.*
-import io.ktor.client.features.*
-import io.ktor.features.*
+import io.ktor.client.plugins.*
 import io.ktor.http.*
-import io.ktor.jackson.*
-import io.ktor.metrics.micrometer.*
-import io.ktor.response.*
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.metrics.micrometer.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.api.access.ForbiddenAccessVeilederException
 import no.nav.syfo.behandler.api.person.access.ForbiddenPersonAPIConsumer
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.metric.METRICS_REGISTRY
-import no.nav.syfo.util.configureJacksonMapper
+import no.nav.syfo.util.configure
 import no.nav.syfo.util.getCallId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -37,7 +38,7 @@ fun Application.installJwtAuthentication(
     }
 }
 
-fun Authentication.Configuration.configureJwt(
+fun AuthenticationConfig.configureJwt(
     jwtIssuer: JwtIssuer,
 ) {
     val jwkProviderSelvbetjening = JwkProviderBuilder(URL(jwtIssuer.wellKnown.jwks_uri))
@@ -79,15 +80,16 @@ fun Application.installMetrics() {
 
 fun Application.installContentNegotiation() {
     install(ContentNegotiation) {
-        jackson(block = configureJacksonMapper())
+        jackson { configure() }
     }
 }
 
 fun Application.installStatusPages() {
     install(StatusPages) {
-        exception<Throwable> { cause ->
-            val callId = getCallId()
+        exception<Throwable> { call, cause ->
+            val callId = call.getCallId()
             val logExceptionMessage = "Caught exception, callId=$callId"
+            val log = call.application.log
             when (cause) {
                 is ResponseException -> {
                     cause.response.status

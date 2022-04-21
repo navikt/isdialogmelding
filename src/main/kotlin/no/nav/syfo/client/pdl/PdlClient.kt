@@ -30,7 +30,7 @@ class PdlClient(
             ?: throw RuntimeException("PDL-call failed: Could not get system token from AzureAD")
 
         val response: HttpResponse = httpClient.post(pdlUrl) {
-            body = request
+            setBody(request)
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Authorization, bearerHeader(token))
             header(TEMA_HEADER, ALLE_TEMA_HEADERVERDI)
@@ -38,7 +38,7 @@ class PdlClient(
 
         when (response.status) {
             HttpStatusCode.OK -> {
-                val pdlPersonReponse = response.receive<PdlPersonResponse>()
+                val pdlPersonReponse = response.body<PdlPersonResponse>()
                 return if (pdlPersonReponse.errors != null && pdlPersonReponse.errors.isNotEmpty()) {
                     COUNT_CALL_PDL_FAIL.increment()
                     pdlPersonReponse.errors.forEach {
