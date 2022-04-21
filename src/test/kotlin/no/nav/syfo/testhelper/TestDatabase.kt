@@ -2,7 +2,9 @@ package no.nav.syfo.testhelper
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.*
+import no.nav.syfo.behandler.database.domain.PBehandlerArbeidstaker
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.PersonIdentNumber
 import org.flywaydb.core.Flyway
@@ -47,6 +49,7 @@ class TestDatabaseNotResponding : DatabaseInterface {
 fun DatabaseInterface.createBehandlerForArbeidstaker(
     behandler: Behandler,
     arbeidstakerPersonIdent: PersonIdentNumber,
+    relasjonstype: BehandlerArbeidstakerRelasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
 ): UUID {
     this.connection.use { connection ->
         val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)
@@ -59,7 +62,7 @@ fun DatabaseInterface.createBehandlerForArbeidstaker(
             connection.createBehandler(behandler, kontorId)
         connection.createBehandlerArbeidstakerRelasjon(
             BehandlerArbeidstakerRelasjon(
-                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                type = relasjonstype,
                 arbeidstakerPersonident = arbeidstakerPersonIdent,
                 mottatt = OffsetDateTime.now(),
             ),
@@ -69,6 +72,61 @@ fun DatabaseInterface.createBehandlerForArbeidstaker(
 
         return createdBehandler.behandlerRef
     }
+}
+
+fun DatabaseInterface.createBehandlerAndTwoArbeidstakerRelasjoner(
+    behandler: Behandler,
+    arbeidstakerPersonIdent: PersonIdentNumber,
+    otherArbeidstakerPersonIdent: PersonIdentNumber,
+    relasjonstype: BehandlerArbeidstakerRelasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+    otherRelasjonstype: BehandlerArbeidstakerRelasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+): UUID {
+    this.connection.use { connection ->
+        val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)
+        val kontorId = pBehandlerKontor?.id ?: connection.createBehandlerKontor(behandler.kontor)
+        val createdBehandler =
+            connection.createBehandler(behandler, kontorId)
+        connection.createBehandlerArbeidstakerRelasjon(
+            BehandlerArbeidstakerRelasjon(
+                type = relasjonstype,
+                arbeidstakerPersonident = arbeidstakerPersonIdent,
+                mottatt = OffsetDateTime.now(),
+            ),
+            createdBehandler.id
+        )
+        connection.createBehandlerArbeidstakerRelasjon(
+            BehandlerArbeidstakerRelasjon(
+                type = otherRelasjonstype,
+                arbeidstakerPersonident = otherArbeidstakerPersonIdent,
+                mottatt = OffsetDateTime.now(),
+            ),
+            createdBehandler.id
+        )
+        connection.commit()
+
+        return createdBehandler.behandlerRef
+    }
+}
+
+const val queryGetBehandlerArbeidstakerRelasjoner =
+    """
+        SELECT * 
+        FROM BEHANDLER_ARBEIDSTAKER
+        WHERE arbeidstaker_personident = ?
+        ORDER BY BEHANDLER_ARBEIDSTAKER.created_at DESC
+    """
+
+fun DatabaseInterface.getBehandlerArbeidstakerRelasjoner(
+    personIdentNumber: PersonIdentNumber,
+): List<PBehandlerArbeidstaker> {
+    val pBehandlerArbeidstakerListe = this.connection.use { connection ->
+        connection.prepareStatement(queryGetBehandlerArbeidstakerRelasjoner)
+            .use {
+                it.setString(1, personIdentNumber.value)
+                it.executeQuery().toList { toPBehandlerArbeidstaker() }
+            }
+    }
+    return pBehandlerArbeidstakerListe
 }
 
 fun DatabaseInterface.dropData() {

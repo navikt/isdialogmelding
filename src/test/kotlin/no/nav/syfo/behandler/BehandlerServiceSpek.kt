@@ -1,11 +1,13 @@
 package no.nav.syfo.behandler
 
 import io.ktor.server.testing.*
-import io.mockk.mockk
+import io.mockk.*
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.toBehandler
+import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.fastlege.toBehandler
+import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.testhelper.ExternalMockEnvironment
 import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.createBehandlerForArbeidstaker
@@ -24,14 +26,21 @@ class BehandlerServiceSpek : Spek({
 
             val externalMockEnvironment = ExternalMockEnvironment.instance
             val database = externalMockEnvironment.database
+            val fastlegeClientMock = mockk<FastlegeClient>()
+            val partnerinfoClientMock = mockk<PartnerinfoClient>()
             val behandlerService = BehandlerService(
-                fastlegeClient = mockk(),
-                partnerinfoClient = mockk(),
-                database = database
+                fastlegeClient = fastlegeClientMock,
+                partnerinfoClient = partnerinfoClientMock,
+                database = database,
+                externalMockEnvironment.environment.toggleSykmeldingbehandlere,
             )
 
             afterEachTest {
                 database.dropData()
+                clearMocks(
+                    fastlegeClientMock,
+                    partnerinfoClientMock,
+                )
             }
 
             describe("createOrGetBehandler") {

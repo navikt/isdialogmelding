@@ -1,6 +1,7 @@
 package no.nav.syfo.behandler.database.domain
 
-import no.nav.syfo.behandler.domain.*
+import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.domain.BehandlerKategori
 import no.nav.syfo.domain.PersonIdentNumber
 import java.time.OffsetDateTime
 import java.util.*

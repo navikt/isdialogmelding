@@ -11,6 +11,7 @@ import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.PersonIdentNumber
 import org.slf4j.LoggerFactory
 import java.sql.Connection
+import java.time.OffsetDateTime
 
 private val log = LoggerFactory.getLogger("no.nav.syfo.behandler")
 
@@ -18,7 +19,46 @@ class BehandlerService(
     private val fastlegeClient: FastlegeClient,
     private val partnerinfoClient: PartnerinfoClient,
     private val database: DatabaseInterface,
+    private val toggleSykmeldingbehandlere: Boolean,
 ) {
+    suspend fun getBehandlere(
+        personIdentNumber: PersonIdentNumber,
+        token: String,
+        callId: String,
+    ): List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>> {
+
+        val fastlege = getAktivFastlegeBehandler(
+            personIdentNumber = personIdentNumber,
+            token = token,
+            callId = callId,
+        )
+        val behandlere = mutableListOf<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>()
+        if (fastlege != null && fastlege.hasAnId()) {
+            val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
+                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                arbeidstakerPersonident = personIdentNumber,
+                mottatt = OffsetDateTime.now(),
+            )
+            val behandler = createOrGetBehandler(
+                behandler = fastlege,
+                behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
+            )
+            behandlere.add(Pair(behandler, BehandlerArbeidstakerRelasjonstype.FASTLEGE))
+        }
+
+        if (toggleSykmeldingbehandlere) {
+            database.getSykmeldereExtended(personIdentNumber)
+                .forEach { (pBehandler, pBehandlerKontor) ->
+                    behandlere.add(
+                        Pair(
+                            pBehandler.toBehandler(pBehandlerKontor),
+                            BehandlerArbeidstakerRelasjonstype.SYKMELDER,
+                        )
+                    )
+                }
+        }
+        return behandlere.removeDuplicates()
+    }
 
     suspend fun getAktivFastlegeBehandler(
         personIdentNumber: PersonIdentNumber,

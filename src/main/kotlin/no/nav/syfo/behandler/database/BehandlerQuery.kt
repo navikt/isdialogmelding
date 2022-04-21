@@ -2,7 +2,7 @@ package no.nav.syfo.behandler.database
 
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
-import no.nav.syfo.behandler.database.domain.PBehandler
+import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.domain.PartnerId

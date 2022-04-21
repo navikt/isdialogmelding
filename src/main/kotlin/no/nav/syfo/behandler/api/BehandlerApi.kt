@@ -9,7 +9,6 @@ import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.util.*
-import java.time.OffsetDateTime
 
 const val behandlerPath = "/api/v1/behandler"
 const val behandlerPersonident = "/personident"
@@ -32,28 +31,15 @@ fun Route.registerBehandlerApi(
                 personIdentToAccess = personIdentNumber,
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
             ) {
-                val behandlerDTOList = mutableListOf<BehandlerDTO>()
-                val fastlege = behandlerService.getAktivFastlegeBehandler(
+
+                val behandlere = behandlerService.getBehandlere(
                     personIdentNumber = personIdentNumber,
                     token = token,
                     callId = callId,
                 )
-                if (fastlege != null && fastlege.hasAnId()) {
-                    val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
-                        type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                        arbeidstakerPersonident = personIdentNumber,
-                        mottatt = OffsetDateTime.now(),
-                    )
-                    val behandler = behandlerService.createOrGetBehandler(
-                        behandler = fastlege,
-                        behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
-                    )
-                    behandlerDTOList.add(
-                        behandler.toBehandlerDTO(
-                            behandlerType = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                        )
-                    )
-                }
+
+                val behandlerDTOList = behandlere.toBehandlerDTOList()
+
                 call.respond(behandlerDTOList)
             }
         }
