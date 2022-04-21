@@ -107,6 +107,9 @@ class BehandlerService(
         database.connection.use { connection ->
             val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)
             val kontorId = if (pBehandlerKontor != null) {
+                if (pBehandlerKontor.system == null && behandler.kontor.system != null) {
+                    connection.updateSystemForPartnerId(behandler.kontor.partnerId, behandler.kontor.system)
+                }
                 pBehandlerKontor.id
             } else {
                 connection.createBehandlerKontor(behandler.kontor)

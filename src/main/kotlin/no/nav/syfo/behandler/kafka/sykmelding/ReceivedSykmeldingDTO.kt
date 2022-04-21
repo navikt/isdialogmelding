@@ -28,7 +28,7 @@ data class Sykmelding(
     val avsenderSystem: AvsenderSystem,
     val syketilfelleStartDato: LocalDate?,
     val signaturDato: LocalDateTime,
-    val navnFastlege: String?
+    val navnFastlege: String?,
 )
 
 data class MedisinskVurdering(
@@ -39,7 +39,7 @@ data class MedisinskVurdering(
 data class Diagnose(
     val system: String,
     val kode: String,
-    val tekst: String?
+    val tekst: String?,
 )
 
 data class Behandler(
@@ -50,7 +50,7 @@ data class Behandler(
     val hpr: String?,
     val her: String?,
     val adresse: Adresse,
-    val tlf: String?
+    val tlf: String?,
 )
 
 data class Adresse(
@@ -63,5 +63,5 @@ data class Adresse(
 
 data class AvsenderSystem(
     val navn: String,
-    val versjon: String
+    val versjon: String,
 )

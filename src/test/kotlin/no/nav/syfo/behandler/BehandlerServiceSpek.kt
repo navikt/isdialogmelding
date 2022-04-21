@@ -103,7 +103,10 @@ class BehandlerServiceSpek : Spek({
                     behandlerFromDB.behandlerRef shouldBeEqualTo behandler.behandlerRef
                     behandlerFromDB.kontor.system shouldBe null
 
-                    database.updateSystemForPartnerId(behandlerFromDB.kontor.partnerId, "EPJ-systemet")
+                    database.connection.use {
+                        it.updateSystemForPartnerId(behandlerFromDB.kontor.partnerId, "EPJ-systemet")
+                        it.commit()
+                    }
 
                     val behandlerFromDBUpdated = pBehandler.toBehandler(database.getBehandlerKontorForId(pBehandler.kontorId))
                     behandlerFromDBUpdated.behandlerRef shouldBeEqualTo behandler.behandlerRef
