@@ -3,8 +3,7 @@ package no.nav.syfo.behandler
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.*
-import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
@@ -67,14 +66,20 @@ class BehandlerService(
             )
         }
 
-        val pBehandlereForArbeidstakerIdList =
-            database.getBehandlerForArbeidstaker(
+        val pBehandlereForArbeidstakerList =
+            database.getBehandlerForArbeidstakerMedType(
                 personIdentNumber = behandlerArbeidstakerRelasjon.arbeidstakerPersonident,
-            ).map { it.id }
+            )
 
-        val isBytteAvBehandler = pBehandlereForArbeidstakerIdList.firstOrNull() != pBehandler.id
-        val behandlerIkkeKnyttetTilArbeidstaker = !pBehandlereForArbeidstakerIdList.contains(pBehandler.id)
-        if (isBytteAvBehandler || behandlerIkkeKnyttetTilArbeidstaker) {
+        val isBytteAvFastlege = behandlerArbeidstakerRelasjon.type == BehandlerArbeidstakerRelasjonType.FASTLEGE &&
+            pBehandlereForArbeidstakerList
+            .filter { (_, behandlerType) -> behandlerType == BehandlerArbeidstakerRelasjonType.FASTLEGE.name }
+            .map { (pBehandler, _) -> pBehandler.id }.firstOrNull() != pBehandler.id
+
+        val behandlerIkkeKnyttetTilArbeidstaker = !pBehandlereForArbeidstakerList
+            .map { (pBehandler, _) -> pBehandler.id }.contains(pBehandler.id)
+
+        if (isBytteAvFastlege || behandlerIkkeKnyttetTilArbeidstaker) {
             addBehandlerToArbeidstaker(
                 behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
                 behandlerId = pBehandler.id,

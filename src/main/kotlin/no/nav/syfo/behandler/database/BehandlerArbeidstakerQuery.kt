@@ -53,7 +53,7 @@ const val queryGetBehandlerArbeidstakerRelasjon =
 fun DatabaseInterface.getBehandlerArbeidstakerRelasjon(
     personIdentNumber: PersonIdentNumber,
     behandlerRef: UUID,
-): PBehandlerArbeidstaker {
+): List<PBehandlerArbeidstaker> {
     val pBehandlerArbeidstakerListe = this.connection.use { connection ->
         connection.prepareStatement(queryGetBehandlerArbeidstakerRelasjon)
             .use {
@@ -62,7 +62,7 @@ fun DatabaseInterface.getBehandlerArbeidstakerRelasjon(
                 it.executeQuery().toList { toPBehandlerArbeidstaker() }
             }
     }
-    return pBehandlerArbeidstakerListe.first()
+    return pBehandlerArbeidstakerListe
 }
 
 fun ResultSet.toPBehandlerArbeidstaker(): PBehandlerArbeidstaker =

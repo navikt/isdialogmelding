@@ -45,7 +45,7 @@ class DialogmeldingToBehandlerService(
         val pBehandlerArbeidstaker = database.getBehandlerArbeidstakerRelasjon(
             personIdentNumber = personIdent,
             behandlerRef = behandlerRef,
-        )
+        ).first()
         val pdlNavn = pdlClient.person(personIdent)?.hentPerson?.navn?.first()
             ?: throw RuntimeException("PDL returned empty response")
         return pBehandlerArbeidstaker.toBehandlerArbeidstakerRelasjon(

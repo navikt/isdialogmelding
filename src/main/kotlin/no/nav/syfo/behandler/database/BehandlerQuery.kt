@@ -153,21 +153,25 @@ fun DatabaseInterface.getBehandlerForUuid(behandlerRef: UUID): PBehandler? {
 
 const val queryGetBehandlerForArbeidstakerPersonIdent =
     """
-        SELECT BEHANDLER.* 
+        SELECT BEHANDLER.*,BEHANDLER_ARBEIDSTAKER.type 
         FROM BEHANDLER
         INNER JOIN BEHANDLER_ARBEIDSTAKER ON BEHANDLER_ARBEIDSTAKER.behandler_id = BEHANDLER.id
         AND BEHANDLER_ARBEIDSTAKER.arbeidstaker_personident = ?
         ORDER BY BEHANDLER_ARBEIDSTAKER.created_at DESC
     """
 
-fun DatabaseInterface.getBehandlerForArbeidstaker(personIdentNumber: PersonIdentNumber): List<PBehandler> {
+fun DatabaseInterface.getBehandlerForArbeidstakerMedType(personIdentNumber: PersonIdentNumber): List<Pair<PBehandler, String>> {
     return this.connection.use { connection ->
         connection.prepareStatement(queryGetBehandlerForArbeidstakerPersonIdent)
             .use {
                 it.setString(1, personIdentNumber.value)
-                it.executeQuery().toList { toPBehandler() }
+                it.executeQuery().toList { Pair(toPBehandler(), getString("type")) }
             }
     }
+}
+
+fun DatabaseInterface.getBehandlerForArbeidstaker(personIdentNumber: PersonIdentNumber): List<PBehandler> {
+    return getBehandlerForArbeidstakerMedType(personIdentNumber).map { it.first }
 }
 
 fun ResultSet.toPBehandler(): PBehandler =

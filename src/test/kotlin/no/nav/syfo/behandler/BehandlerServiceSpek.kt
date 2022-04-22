@@ -273,7 +273,7 @@ class BehandlerServiceSpek : Spek({
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 1
                     pBehandlerForArbeidstakerList[0].behandlerRef shouldBeEqualTo existingBehandlerRef
                 }
-                it("lagrer behandler for arbeidstaker når behandler er annen enn siste lagrede behandler for arbeidstaker") {
+                it("lagrer behandler for arbeidstaker når fastlege er annen enn siste lagrede fastlege for arbeidstaker") {
                     val behandler = generateFastlegeResponse(UserConstants.FASTLEGE_FNR).toBehandler(UserConstants.PARTNERID)
                     val annenBehandler =
                         generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR).toBehandler(UserConstants.PARTNERID)
@@ -297,7 +297,7 @@ class BehandlerServiceSpek : Spek({
                     pBehandlerForArbeidstakerList[0].behandlerRef shouldNotBeEqualTo existingBehandlerRef
                     pBehandlerForArbeidstakerList[1].behandlerRef shouldBeEqualTo existingBehandlerRef
                 }
-                it("lagrer behandler for arbeidstaker når behandler er lagret for arbeidstaker men annen behandler er siste lagrede behandler for arbeidstaker") {
+                it("lagrer behandler for arbeidstaker når fastlege er lagret for arbeidstaker men annen behandler er siste lagrede fastlege for arbeidstaker") {
                     val behandler = generateFastlegeResponse(UserConstants.FASTLEGE_FNR).toBehandler(UserConstants.PARTNERID)
                     val annenBehandler =
                         generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR).toBehandler(UserConstants.PARTNERID)
