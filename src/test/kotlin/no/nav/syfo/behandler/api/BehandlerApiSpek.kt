@@ -73,10 +73,6 @@ class BehandlerApiSpek : Spek({
                             behandlerDTO.type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.FASTLEGE.name
                             behandlerDTO.behandlerRef shouldBeEqualTo behandlerForPersonList.first().behandlerRef.toString()
                             behandlerDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
-
-                            database.getBehandlerForArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_FNR,
-                            ).size shouldBeEqualTo 1
                         }
                     }
                     it("should return empty list of Behandler for arbeidstaker uten fastlege") {
