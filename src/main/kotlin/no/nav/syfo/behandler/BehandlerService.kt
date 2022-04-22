@@ -61,6 +61,10 @@ class BehandlerService(
                 behandler = behandler,
                 behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
             )
+        } else {
+            updateBehandler(
+                behandler = behandler,
+            )
         }
 
         val pBehandlereForArbeidstakerIdList =
@@ -107,7 +111,7 @@ class BehandlerService(
         database.connection.use { connection ->
             val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)
             val kontorId = if (pBehandlerKontor != null) {
-                if (pBehandlerKontor.system == null && behandler.kontor.system != null) {
+                if (!behandler.kontor.system.isNullOrBlank() && pBehandlerKontor.system != behandler.kontor.system) {
                     connection.updateSystemForPartnerId(behandler.kontor.partnerId, behandler.kontor.system)
                 }
                 pBehandlerKontor.id
@@ -127,6 +131,18 @@ class BehandlerService(
             return pBehandler.toBehandler(
                 database.getBehandlerKontorForId(pBehandler.kontorId)
             )
+        }
+    }
+
+    private fun updateBehandler(
+        behandler: Behandler,
+    ) {
+        database.connection.use { connection ->
+            val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)!!
+            if (!behandler.kontor.system.isNullOrBlank() && pBehandlerKontor.system != behandler.kontor.system) {
+                connection.updateSystemForPartnerId(behandler.kontor.partnerId, behandler.kontor.system)
+            }
+            connection.commit()
         }
     }
 
