@@ -22,7 +22,7 @@ fun generateFastlegeResponse() = FastlegeResponse(
     fastlegekontor = FastlegeResponse.Fastlegekontor(
         navn = "Fastlegens kontor",
         besoeksadresse = null,
-        postadresse = null,
+        postadresse = generateFastlegeResponseAdresse(),
         telefon = "",
         epost = "",
         orgnummer = null,
@@ -50,7 +50,7 @@ fun generateFastlegeResponse(personident: PersonIdentNumber) = FastlegeResponse(
     fastlegekontor = FastlegeResponse.Fastlegekontor(
         navn = "Fastlegens kontor",
         besoeksadresse = null,
-        postadresse = null,
+        postadresse = generateFastlegeResponseAdresse(),
         telefon = "",
         epost = "",
         orgnummer = null,
@@ -78,7 +78,7 @@ fun generateFastlegeResponse(foreldreEnhetHerId: Int?) = FastlegeResponse(
     fastlegekontor = FastlegeResponse.Fastlegekontor(
         navn = "Fastlegens kontor",
         besoeksadresse = null,
-        postadresse = null,
+        postadresse = generateFastlegeResponseAdresse(),
         telefon = "",
         epost = "",
         orgnummer = null,
@@ -106,7 +106,7 @@ fun generateFastlegeResponse(personident: PersonIdentNumber?, herId: Int?, hprId
     fastlegekontor = FastlegeResponse.Fastlegekontor(
         navn = "Fastlegens kontor",
         besoeksadresse = null,
-        postadresse = null,
+        postadresse = generateFastlegeResponseAdresse(),
         telefon = "",
         epost = "",
         orgnummer = null,
@@ -115,4 +115,10 @@ fun generateFastlegeResponse(personident: PersonIdentNumber?, herId: Int?, hprId
         fom = LocalDate.now().minusDays(10),
         tom = LocalDate.now().plusDays(10),
     )
+)
+
+fun generateFastlegeResponseAdresse() = FastlegeResponse.Fastlegekontor.Adresse(
+    adresse = "Storgata 1",
+    postnummer = "0651",
+    poststed = "Oslo",
 )

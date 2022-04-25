@@ -9,6 +9,7 @@ import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.domain.PersonIdentNumber
 import org.slf4j.LoggerFactory
+import java.sql.Connection
 
 private val log = LoggerFactory.getLogger("no.nav.syfo.behandler")
 
@@ -116,9 +117,10 @@ class BehandlerService(
         database.connection.use { connection ->
             val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)
             val kontorId = if (pBehandlerKontor != null) {
-                if (!behandler.kontor.system.isNullOrBlank() && pBehandlerKontor.system != behandler.kontor.system) {
-                    connection.updateSystemForPartnerId(behandler.kontor.partnerId, behandler.kontor.system)
-                }
+                connection.updateBehandlerKontor(
+                    behandler = behandler,
+                    pBehandlerKontor = pBehandlerKontor,
+                )
                 pBehandlerKontor.id
             } else {
                 connection.createBehandlerKontor(behandler.kontor)
@@ -144,10 +146,23 @@ class BehandlerService(
     ) {
         database.connection.use { connection ->
             val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)!!
-            if (!behandler.kontor.system.isNullOrBlank() && pBehandlerKontor.system != behandler.kontor.system) {
-                connection.updateSystemForPartnerId(behandler.kontor.partnerId, behandler.kontor.system)
-            }
+            connection.updateBehandlerKontor(
+                behandler = behandler,
+                pBehandlerKontor = pBehandlerKontor,
+            )
             connection.commit()
+        }
+    }
+
+    private fun Connection.updateBehandlerKontor(
+        behandler: Behandler,
+        pBehandlerKontor: PBehandlerKontor,
+    ) {
+        if (!behandler.kontor.system.isNullOrBlank() && pBehandlerKontor.system != behandler.kontor.system) {
+            updateSystemForPartnerId(behandler.kontor.partnerId, behandler.kontor.system)
+        }
+        if (behandler.kontor.harKomplettAdresse()) {
+            updateAdresseForPartnerId(behandler.kontor.partnerId, behandler.kontor)
         }
     }
 

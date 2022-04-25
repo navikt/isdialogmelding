@@ -434,6 +434,58 @@ class KafkaSykmeldingSpek : Spek({
                         kontorAfterSecondMessage!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfterSecondMessage.system shouldBeEqualTo newSykmelding.sykmelding.avsenderSystem.navn
                     }
+                    it("fastlege-oppslag should update adresse for kontor") {
+                        val fastlegeBehandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
+                        val sykmelding = generateSykmeldingDTO(
+                            uuid = UUID.randomUUID(),
+                            personNrPasient = UserConstants.ARBEIDSTAKER_FNR.value,
+                            personNrLege = fastlegeBehandler.personident!!.value,
+                            behandlerFnr = fastlegeBehandler.personident!!.value,
+                            herId = fastlegeBehandler.herId.toString(),
+                            hprId = fastlegeBehandler.hprId.toString(),
+                            partnerreferanse = UserConstants.PARTNERID.toString(),
+                            kontorHerId = UserConstants.HERID.toString(),
+                        )
+                        val sykmeldingRecord = ConsumerRecord(
+                            SYKMELDING_TOPIC,
+                            partition,
+                            1,
+                            sykmelding.msgId,
+                            sykmelding,
+                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                            mapOf(
+                                sykmeldingTopicPartition to listOf(
+                                    sykmeldingRecord,
+                                )
+                            )
+                        )
+                        runBlocking {
+                            pollAndProcessSykmelding(
+                                kafkaConsumerSykmelding = mockConsumer,
+                                behandlerService = behandlerService,
+                            )
+                        }
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+
+                        val kontorAfter = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
+                        kontorAfter.poststed shouldBe null
+
+                        behandlerService.createOrGetBehandler(
+                            fastlegeBehandler,
+                            BehandlerArbeidstakerRelasjon(
+                                type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            )
+                        )
+
+                        val kontorAfterFastlegeOppslag = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        kontorAfterFastlegeOppslag!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
+                        kontorAfterFastlegeOppslag.adresse shouldBeEqualTo fastlegeBehandler.kontor.adresse
+                        kontorAfterFastlegeOppslag.postnummer shouldBeEqualTo fastlegeBehandler.kontor.postnummer
+                        kontorAfterFastlegeOppslag.poststed shouldBeEqualTo fastlegeBehandler.kontor.poststed
+                    }
                 }
                 describe("Invalid sykmelding") {
                     it("should ignore when mismatched behandler fnr") {
