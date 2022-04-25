@@ -93,6 +93,26 @@ fun Connection.updateSystemForPartnerId(partnerId: Int, system: String) {
     }
 }
 
+const val queryUpdateAdresseForKontor =
+    """
+        UPDATE BEHANDLER_KONTOR SET adresse=?,postnummer=?,poststed=?,updated_at=? WHERE partner_id=?
+    """
+
+fun Connection.updateAdresseForPartnerId(partnerId: Int, kontor: BehandlerKontor) {
+    val rowCount = prepareStatement(queryUpdateAdresseForKontor)
+        .use {
+            it.setString(1, kontor.adresse)
+            it.setString(2, kontor.postnummer)
+            it.setString(3, kontor.poststed)
+            it.setObject(4, OffsetDateTime.now())
+            it.setString(5, partnerId.toString())
+            it.executeUpdate()
+        }
+    if (rowCount != 1) {
+        throw RuntimeException("No row in BEHANDLER_KONTOR with partner_id $partnerId")
+    }
+}
+
 const val queryGetBehandlerKontorForId =
     """
         SELECT * FROM BEHANDLER_KONTOR WHERE id = ?

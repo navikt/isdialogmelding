@@ -13,3 +13,5 @@ data class BehandlerKontor(
     val dialogmeldingEnabled: Boolean,
     val system: String?,
 )
+
+fun BehandlerKontor.harKomplettAdresse() = !adresse.isNullOrBlank() && !postnummer.isNullOrBlank() && !poststed.isNullOrBlank()
