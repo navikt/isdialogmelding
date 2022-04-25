@@ -58,18 +58,19 @@ fun processSykmelding(
     consumerRecords: ConsumerRecords<String, ReceivedSykmeldingDTO>,
 ) {
     consumerRecords.forEach {
-        val receivedSykmeldingDTO = it.value()
-        if (receivedSykmeldingDTO.mottattDato.isAfter(PROCESS_SYKMELDING_INCOMING_AFTER)) {
-            COUNT_MOTTATT_SYKMELDING.increment()
+        it.value().let { receivedSykmeldingDTO ->
+            if (receivedSykmeldingDTO.mottattDato.isAfter(PROCESS_SYKMELDING_INCOMING_AFTER)) {
+                COUNT_MOTTATT_SYKMELDING.increment()
 
-            if (validateReceivedSykmelding(it)) {
-                log.info("Received sykmelding record from ${receivedSykmeldingDTO.mottattDato} with key ${it.key()} and partnerId ${receivedSykmeldingDTO.partnerreferanse}")
+                if (validateReceivedSykmelding(it)) {
+                    log.info("Received sykmelding record from ${receivedSykmeldingDTO.mottattDato} with key ${it.key()} and partnerId ${receivedSykmeldingDTO.partnerreferanse}")
 
-                createAndStoreBehandlerFromSykmelding(
-                    receivedSykmeldingDTO = receivedSykmeldingDTO,
-                    behandlerService = behandlerService,
-                )
-                COUNT_MOTTATT_SYKMELDING_SUCCESS.increment()
+                    createAndStoreBehandlerFromSykmelding(
+                        receivedSykmeldingDTO = receivedSykmeldingDTO,
+                        behandlerService = behandlerService,
+                    )
+                    COUNT_MOTTATT_SYKMELDING_SUCCESS.increment()
+                }
             }
         }
     }
