@@ -12,6 +12,7 @@ import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
+import io.micrometer.core.instrument.distribution.DistributionStatisticConfig
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.api.access.ForbiddenAccessVeilederException
 import no.nav.syfo.behandler.api.person.access.ForbiddenPersonAPIConsumer
@@ -22,6 +23,7 @@ import no.nav.syfo.util.getCallId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URL
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.application.api.authentication")
@@ -75,6 +77,10 @@ fun ApplicationCall.personIdent(): PersonIdentNumber? {
 fun Application.installMetrics() {
     install(MicrometerMetrics) {
         registry = METRICS_REGISTRY
+        distributionStatisticConfig = DistributionStatisticConfig.Builder()
+            .percentilesHistogram(true)
+            .maximumExpectedValue(Duration.ofSeconds(20).toNanos().toDouble())
+            .build()
     }
 }
 
