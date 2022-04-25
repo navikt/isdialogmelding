@@ -58,7 +58,7 @@ fun processSykmelding(
     consumerRecords: ConsumerRecords<String, ReceivedSykmeldingDTO>,
 ) {
     consumerRecords.forEach {
-        it.value().let { receivedSykmeldingDTO ->
+        it.value()?.let { receivedSykmeldingDTO ->
             if (receivedSykmeldingDTO.mottattDato.isAfter(PROCESS_SYKMELDING_INCOMING_AFTER)) {
                 COUNT_MOTTATT_SYKMELDING.increment()
 
