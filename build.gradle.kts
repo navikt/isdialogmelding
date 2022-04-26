@@ -79,8 +79,11 @@ dependencies {
     implementation("no.nav.syfotjenester:kith-hodemelding:${Versions.syfotjenester}")
 
     // Kafka
-    implementation("org.apache.kafka:kafka_2.13:${Versions.kafka}")
-    testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded}")
+    val excludeLog4j = fun ExternalModuleDependency.() {
+        exclude(group = "log4j")
+    }
+    implementation("org.apache.kafka:kafka_2.13:${Versions.kafka}", excludeLog4j)
+    testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded}", excludeLog4j)
 
     // Database
     implementation("org.flywaydb:flyway-core:${Versions.flyway}")
