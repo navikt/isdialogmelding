@@ -27,6 +27,7 @@ import java.time.*
 import java.util.UUID
 
 class KafkaSykmeldingSpek : Spek({
+
     val objectMapper: ObjectMapper = configuredJacksonMapper()
 
     with(TestApplicationEngine()) {
@@ -65,12 +66,11 @@ class KafkaSykmeldingSpek : Spek({
         }
 
         describe(KafkaSykmeldingSpek::class.java.simpleName) {
-
             describe("Motta sykmelding") {
-                val partition = 0
+                val kafkaPartition = 0
                 val sykmeldingTopicPartition = TopicPartition(
                     SYKMELDING_TOPIC,
-                    partition,
+                    kafkaPartition,
                 )
 
                 describe("Happy path") {
@@ -78,20 +78,9 @@ class KafkaSykmeldingSpek : Spek({
                         val sykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         val kontorBefore = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
                         val behandlerBefore = database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         kontorBefore shouldBe null
@@ -113,6 +102,9 @@ class KafkaSykmeldingSpek : Spek({
                         behandlerAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
                         behandlerAfter[0].kategori shouldBeEqualTo BehandlerKategori.LEGE.name
                         behandlerAfter[0].herId shouldBeEqualTo sykmelding.sykmelding.behandler.her
+                        behandlerAfter[0].fornavn shouldBeEqualTo sykmelding.sykmelding.behandler.fornavn
+                        behandlerAfter[0].etternavn shouldBeEqualTo sykmelding.sykmelding.behandler.etternavn
+                        behandlerAfter[0].telefon shouldBeEqualTo sykmelding.sykmelding.behandler.tlf
 
                         val behandlerRelasjonAfter = database.getBehandlerArbeidstakerRelasjon(
                             personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
@@ -121,24 +113,37 @@ class KafkaSykmeldingSpek : Spek({
                         behandlerRelasjonAfter.size shouldBeEqualTo 1
                         behandlerRelasjonAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.SYKMELDER.name
                     }
+                    it("should capitalize behandlernavn and remove telephone-prefix") {
+                        val sykmelding = generateSykmeldingDTO(
+                            uuid = UUID.randomUUID(),
+                            fornavnLege = "ANNE",
+                            etternavnLege = "LEGE",
+                            telefonLege = "tel:99999999"
+                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
+                        runBlocking {
+                            pollAndProcessSykmelding(
+                                kafkaConsumerSykmelding = mockConsumer,
+                                behandlerService = behandlerService,
+                            )
+                        }
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+                        val behandlerAfter = database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        behandlerAfter.size shouldBeEqualTo 1
+                        behandlerAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
+                        behandlerAfter[0].fornavn shouldBeEqualTo "Anne"
+                        behandlerAfter[0].etternavn shouldBeEqualTo "Lege"
+                        behandlerAfter[0].telefon shouldBeEqualTo "99999999"
+                    }
                     it("should add second behandler from incoming sykmelding") {
                         val sykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -159,20 +164,9 @@ class KafkaSykmeldingSpek : Spek({
                             herId = "1234",
                             hprId = "4321",
                         )
-                        val newSykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            2,
-                            newSykmelding.msgId,
-                            newSykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    newSykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -209,20 +203,9 @@ class KafkaSykmeldingSpek : Spek({
                             partnerreferanse = UserConstants.PARTNERID.toString(),
                             kontorHerId = UserConstants.HERID.toString(),
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -253,20 +236,9 @@ class KafkaSykmeldingSpek : Spek({
                         val sykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -283,20 +255,9 @@ class KafkaSykmeldingSpek : Spek({
                         val newSykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
                         )
-                        val newSykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            newSykmelding.msgId,
-                            newSykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    newSykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -332,20 +293,9 @@ class KafkaSykmeldingSpek : Spek({
                             uuid = UUID.randomUUID(),
                             personNrPasient = UserConstants.ARBEIDSTAKER_FNR.value,
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -377,20 +327,9 @@ class KafkaSykmeldingSpek : Spek({
                         val sykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -408,20 +347,9 @@ class KafkaSykmeldingSpek : Spek({
                             uuid = UUID.randomUUID(),
                             avsenderSystemNavn = "Nytt systemnavn",
                         )
-                        val newSykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            newSykmelding.msgId,
-                            newSykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    newSykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -446,20 +374,9 @@ class KafkaSykmeldingSpek : Spek({
                             partnerreferanse = UserConstants.PARTNERID.toString(),
                             kontorHerId = UserConstants.HERID.toString(),
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -494,20 +411,9 @@ class KafkaSykmeldingSpek : Spek({
                             personNrLege = "01010112345",
                             behandlerFnr = "01010112346",
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -527,20 +433,9 @@ class KafkaSykmeldingSpek : Spek({
                             uuid = UUID.randomUUID(),
                             legeHelsepersonellkategori = "XX",
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -560,20 +455,9 @@ class KafkaSykmeldingSpek : Spek({
                             uuid = UUID.randomUUID(),
                             partnerreferanse = "",
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -590,20 +474,9 @@ class KafkaSykmeldingSpek : Spek({
                             uuid = UUID.randomUUID(),
                             mottattTidspunkt = LocalDateTime.of(LocalDate.of(2021, Month.SEPTEMBER, 1), LocalTime.of(0, 0))
                         )
-                        val sykmeldingRecord = ConsumerRecord(
-                            SYKMELDING_TOPIC,
-                            partition,
-                            1,
-                            sykmelding.msgId,
-                            sykmelding,
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                            mapOf(
-                                sykmeldingTopicPartition to listOf(
-                                    sykmeldingRecord,
-                                )
-                            )
-                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
                         runBlocking {
                             pollAndProcessSykmelding(
                                 kafkaConsumerSykmelding = mockConsumer,
@@ -623,3 +496,28 @@ class KafkaSykmeldingSpek : Spek({
         }
     }
 })
+
+private fun consumerRecords(
+    sykmeldingTopicPartition: TopicPartition,
+    kafkaPartition: Int,
+    sykmelding: ReceivedSykmeldingDTO,
+    offset: Long = 1,
+) = ConsumerRecords(
+    mapOf(
+        sykmeldingTopicPartition to listOf(
+            consumerRecord(kafkaPartition, sykmelding, offset),
+        )
+    )
+)
+
+private fun consumerRecord(
+    kafkaPartition: Int,
+    sykmelding: ReceivedSykmeldingDTO,
+    offset: Long = 1,
+) = ConsumerRecord(
+    SYKMELDING_TOPIC,
+    kafkaPartition,
+    offset,
+    sykmelding.msgId,
+    sykmelding,
+)
