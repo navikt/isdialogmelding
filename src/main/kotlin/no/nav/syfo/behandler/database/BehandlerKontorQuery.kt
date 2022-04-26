@@ -76,14 +76,14 @@ fun DatabaseInterface.updateDialogMeldingEnabled(partnerId: PartnerId): Boolean 
     }
 }
 
-const val queryUpdateSystemForKontor =
+const val queryUpdateSystem =
     """
         UPDATE BEHANDLER_KONTOR SET system=?,updated_at=? WHERE partner_id=?
     """
 
 // TODO: Velg om vi skal bruke kolonne eller tabell i navn med en oppdatering
 fun Connection.updateSystem(partnerId: PartnerId, system: String) {
-    val rowCount = prepareStatement(queryUpdateSystemForKontor)
+    val rowCount = prepareStatement(queryUpdateSystem)
         .use {
             it.setString(1, system)
             it.setObject(2, OffsetDateTime.now())
@@ -95,13 +95,13 @@ fun Connection.updateSystem(partnerId: PartnerId, system: String) {
     }
 }
 
-const val queryUpdateAdresseForKontor =
+const val queryUpdateAdresse =
     """
         UPDATE BEHANDLER_KONTOR SET adresse=?,postnummer=?,poststed=?,updated_at=? WHERE partner_id=?
     """
 
 fun Connection.updateAdresse(partnerId: PartnerId, kontor: BehandlerKontor) {
-    val rowCount = prepareStatement(queryUpdateAdresseForKontor)
+    val rowCount = prepareStatement(queryUpdateAdresse)
         .use {
             it.setString(1, kontor.adresse)
             it.setString(2, kontor.postnummer)
@@ -115,14 +115,14 @@ fun Connection.updateAdresse(partnerId: PartnerId, kontor: BehandlerKontor) {
     }
 }
 
-const val queryGetBehandlerKontorForId =
+const val queryGetBehandlerKontorById =
     """
         SELECT * FROM BEHANDLER_KONTOR WHERE id = ?
     """
 
-fun DatabaseInterface.getBehandlerKontorForId(id: Int): PBehandlerKontor {
+fun DatabaseInterface.getBehandlerKontorById(id: Int): PBehandlerKontor {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerKontorForId)
+        connection.prepareStatement(queryGetBehandlerKontorById)
             .use {
                 it.setInt(1, id)
                 it.executeQuery().toList { toPBehandlerKontor() }
@@ -130,14 +130,13 @@ fun DatabaseInterface.getBehandlerKontorForId(id: Int): PBehandlerKontor {
     }.first()
 }
 
-// TODO: update query strings som ender på ForPartnerId
-const val queryGetBehandlerKontorForPartnerId =
+const val queryGetBehandlerKontor =
     """
         SELECT * FROM BEHANDLER_KONTOR WHERE partner_id = ?
     """
 
 fun Connection.getBehandlerKontor(partnerId: PartnerId): PBehandlerKontor? {
-    return prepareStatement(queryGetBehandlerKontorForPartnerId)
+    return prepareStatement(queryGetBehandlerKontor)
         .use {
             it.setString(1, partnerId.toString())
             it.executeQuery().toList { toPBehandlerKontor() }

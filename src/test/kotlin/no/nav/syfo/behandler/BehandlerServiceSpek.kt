@@ -45,12 +45,12 @@ class BehandlerServiceSpek : Spek({
                             )
                         )
 
-                    val pBehandlerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerList.size shouldBeEqualTo 1
                     pBehandlerList[0].behandlerRef shouldBeEqualTo behandler.behandlerRef
-                    val pBehandlerKontor = database.getBehandlerKontorForId(pBehandlerList[0].kontorId)
+                    val pBehandlerKontor = database.getBehandlerKontorById(pBehandlerList[0].kontorId)
                     pBehandlerKontor.dialogmeldingEnabled shouldNotBeEqualTo null
                 }
                 it("lagrer behandler for arbeidstaker og setter dialogmeldingEnabled senere") {
@@ -66,18 +66,18 @@ class BehandlerServiceSpek : Spek({
                             )
                         )
 
-                    val pBehandlerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerList.size shouldBeEqualTo 1
                     val pBehandler = pBehandlerList[0]
-                    val behandlerFromDB = pBehandler.toBehandler(database.getBehandlerKontorForId(pBehandler.kontorId))
+                    val behandlerFromDB = pBehandler.toBehandler(database.getBehandlerKontorById(pBehandler.kontorId))
                     behandlerFromDB.behandlerRef shouldBeEqualTo behandler.behandlerRef
                     behandlerFromDB.kontor.dialogmeldingEnabled shouldBeEqualTo false
 
                     database.updateDialogMeldingEnabled(behandlerFromDB.kontor.partnerId)
 
-                    val behandlerFromDBUpdated = pBehandler.toBehandler(database.getBehandlerKontorForId(pBehandler.kontorId))
+                    val behandlerFromDBUpdated = pBehandler.toBehandler(database.getBehandlerKontorById(pBehandler.kontorId))
                     behandlerFromDBUpdated.behandlerRef shouldBeEqualTo behandler.behandlerRef
                     behandlerFromDBUpdated.kontor.dialogmeldingEnabled shouldBeEqualTo true
                 }
@@ -94,12 +94,12 @@ class BehandlerServiceSpek : Spek({
                             )
                         )
 
-                    val pBehandlerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerList.size shouldBeEqualTo 1
                     val pBehandler = pBehandlerList[0]
-                    val behandlerFromDB = pBehandler.toBehandler(database.getBehandlerKontorForId(pBehandler.kontorId))
+                    val behandlerFromDB = pBehandler.toBehandler(database.getBehandlerKontorById(pBehandler.kontorId))
                     behandlerFromDB.behandlerRef shouldBeEqualTo behandler.behandlerRef
                     behandlerFromDB.kontor.system shouldBe null
 
@@ -108,7 +108,7 @@ class BehandlerServiceSpek : Spek({
                         it.commit()
                     }
 
-                    val behandlerFromDBUpdated = pBehandler.toBehandler(database.getBehandlerKontorForId(pBehandler.kontorId))
+                    val behandlerFromDBUpdated = pBehandler.toBehandler(database.getBehandlerKontorById(pBehandler.kontorId))
                     behandlerFromDBUpdated.behandlerRef shouldBeEqualTo behandler.behandlerRef
                     behandlerFromDBUpdated.kontor.system shouldBeEqualTo "EPJ-systemet"
                 }
@@ -128,7 +128,7 @@ class BehandlerServiceSpek : Spek({
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         )
                     )
-                    val pBehandlerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerList.size shouldBeEqualTo 1
@@ -150,10 +150,10 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
-                    val pBehandlerForAnnenArbeidstakerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerForAnnenArbeidstakerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ANNEN_ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 1
@@ -171,7 +171,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    database.getBehandlerForArbeidstaker(
+                    database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size shouldBeEqualTo 1
                 }
@@ -190,7 +190,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    database.getBehandlerForArbeidstaker(
+                    database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size shouldBeEqualTo 1
                 }
@@ -209,7 +209,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    database.getBehandlerForArbeidstaker(
+                    database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size shouldBeEqualTo 1
                 }
@@ -226,7 +226,7 @@ class BehandlerServiceSpek : Spek({
                             ),
                         )
                     }
-                    database.getBehandlerForArbeidstaker(
+                    database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size shouldBeEqualTo 0
                 }
@@ -246,7 +246,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 1
@@ -267,7 +267,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 1
@@ -290,7 +290,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 2
@@ -317,7 +317,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 3
@@ -341,7 +341,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 1
@@ -365,7 +365,7 @@ class BehandlerServiceSpek : Spek({
                         ),
                     )
 
-                    val pBehandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
+                    val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerForArbeidstakerList.size shouldBeEqualTo 2

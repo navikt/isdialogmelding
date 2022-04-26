@@ -68,8 +68,9 @@ class BehandlerService(
             )
         }
 
+        // TODO: Bytte navn på funksjon, slik at den også får med at den oppdaterer relasjon
         val pBehandlereForArbeidstakerList =
-            database.getBehandlerForArbeidstakerMedType(
+            database.getBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker(
                 personIdentNumber = behandlerArbeidstakerRelasjon.arbeidstakerPersonident,
             )
 
@@ -95,21 +96,21 @@ class BehandlerService(
         }
 
         return pBehandler.toBehandler(
-            kontor = database.getBehandlerKontorForId(pBehandler.kontorId)
+            kontor = database.getBehandlerKontorById(pBehandler.kontorId)
         )
     }
 
     private fun getBehandler(behandler: Behandler): PBehandler? {
         return when {
-            behandler.personident != null -> database.getBehandlerMedPersonIdent(
+            behandler.personident != null -> database.getBehandlerByBehandlerPersonIdentAndPartnerId(
                 behandlerPersonIdent = behandler.personident,
                 partnerId = behandler.kontor.partnerId,
             )
-            behandler.hprId != null -> database.getBehandlerMedHprId(
+            behandler.hprId != null -> database.getBehandlerByHprIdAndPartnerId(
                 hprId = behandler.hprId,
                 partnerId = behandler.kontor.partnerId,
             )
-            behandler.herId != null -> database.getBehandlerMedHerId(
+            behandler.herId != null -> database.getBehandlerByHerIdAndPartnerId(
                 herId = behandler.herId,
                 partnerId = behandler.kontor.partnerId,
             )
@@ -143,7 +144,7 @@ class BehandlerService(
             connection.commit()
 
             return pBehandler.toBehandler(
-                database.getBehandlerKontorForId(pBehandler.kontorId)
+                database.getBehandlerKontorById(pBehandler.kontorId)
             )
         }
     }

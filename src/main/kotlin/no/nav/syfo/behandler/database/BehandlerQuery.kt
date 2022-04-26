@@ -71,16 +71,15 @@ const val queryCreateBehandler =
             updated_at
     """
 
-const val queryGetBehandlerMedPersonIdentForPartnerId =
+const val queryGetBehandlerByBehandlerPersonIdentAndPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
         WHERE B.personident = ? and K.partner_id = ?
     """
 
-// TODO: hva gjør personident?
-fun DatabaseInterface.getBehandlerMedPersonIdent(behandlerPersonIdent: PersonIdentNumber, partnerId: PartnerId): PBehandler? {
+fun DatabaseInterface.getBehandlerByBehandlerPersonIdentAndPartnerId(behandlerPersonIdent: PersonIdentNumber, partnerId: PartnerId): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerMedPersonIdentForPartnerId)
+        connection.prepareStatement(queryGetBehandlerByBehandlerPersonIdentAndPartnerId)
             .use {
                 it.setString(1, behandlerPersonIdent.value)
                 it.setString(2, partnerId.toString())
@@ -89,15 +88,15 @@ fun DatabaseInterface.getBehandlerMedPersonIdent(behandlerPersonIdent: PersonIde
     }.firstOrNull()
 }
 
-const val queryGetBehandlerMedHprIdForPartnerId =
+const val queryGetBehandlerByHprIdAndPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
         WHERE B.hpr_id = ? and K.partner_id = ?
     """
 
-fun DatabaseInterface.getBehandlerMedHprId(hprId: Int, partnerId: PartnerId): PBehandler? {
+fun DatabaseInterface.getBehandlerByHprIdAndPartnerId(hprId: Int, partnerId: PartnerId): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerMedHprIdForPartnerId)
+        connection.prepareStatement(queryGetBehandlerByHprIdAndPartnerId)
             .use {
                 it.setString(1, hprId.toString())
                 it.setString(2, partnerId.toString())
@@ -106,15 +105,16 @@ fun DatabaseInterface.getBehandlerMedHprId(hprId: Int, partnerId: PartnerId): PB
     }.firstOrNull()
 }
 
-const val queryGetBehandlerMedHerIdForPartnerId =
+//TODO: bør Her-id være en egen klasse
+const val queryGetBehandlerByHerIdAndPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
         WHERE B.her_id = ? and K.partner_id = ?
     """
 
-fun DatabaseInterface.getBehandlerMedHerId(herId: Int, partnerId: PartnerId): PBehandler? {
+fun DatabaseInterface.getBehandlerByHerIdAndPartnerId(herId: Int, partnerId: PartnerId): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerMedHerIdForPartnerId)
+        connection.prepareStatement(queryGetBehandlerByHerIdAndPartnerId)
             .use {
                 it.setString(1, herId.toString())
                 it.setString(2, partnerId.toString())
@@ -123,14 +123,14 @@ fun DatabaseInterface.getBehandlerMedHerId(herId: Int, partnerId: PartnerId): PB
     }.firstOrNull()
 }
 
-const val queryGetBehandlerForId =
+const val queryGetBehandlerById =
     """
         SELECT * FROM BEHANDLER WHERE id = ?
     """
 
-fun DatabaseInterface.getBehandlerForId(id: Int): PBehandler? {
+fun DatabaseInterface.getBehandlerById(id: Int): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerForId)
+        connection.prepareStatement(queryGetBehandlerById)
             .use {
                 it.setInt(1, id)
                 it.executeQuery().toList { toPBehandler() }
@@ -138,14 +138,14 @@ fun DatabaseInterface.getBehandlerForId(id: Int): PBehandler? {
     }.firstOrNull()
 }
 
-const val queryGetBehandlerForUuid =
+const val queryGetBehandlerByBehandlerRef =
     """
         SELECT * FROM BEHANDLER WHERE behandler_ref = ?
     """
 
-fun DatabaseInterface.getBehandlerForUuid(behandlerRef: UUID): PBehandler? {
+fun DatabaseInterface.getBehandlerByBehandlerRef(behandlerRef: UUID): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerForUuid)
+        connection.prepareStatement(queryGetBehandlerByBehandlerRef)
             .use {
                 it.setString(1, behandlerRef.toString())
                 it.executeQuery().toList { toPBehandler() }
@@ -153,7 +153,7 @@ fun DatabaseInterface.getBehandlerForUuid(behandlerRef: UUID): PBehandler? {
     }.firstOrNull()
 }
 
-const val queryGetBehandlerForArbeidstakerPersonIdent =
+const val queryGetBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker =
     """
         SELECT BEHANDLER.*,BEHANDLER_ARBEIDSTAKER.type 
         FROM BEHANDLER
@@ -162,9 +162,10 @@ const val queryGetBehandlerForArbeidstakerPersonIdent =
         ORDER BY BEHANDLER_ARBEIDSTAKER.updated_at DESC
     """
 
-fun DatabaseInterface.getBehandlerForArbeidstakerMedType(personIdentNumber: PersonIdentNumber): List<Pair<PBehandler, String>> {
+//TODO: iterere på dette funksjonsnavnet
+fun DatabaseInterface.getBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker(personIdentNumber: PersonIdentNumber): List<Pair<PBehandler, String>> {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerForArbeidstakerPersonIdent)
+        connection.prepareStatement(queryGetBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker)
             .use {
                 it.setString(1, personIdentNumber.value)
                 it.executeQuery().toList { Pair(toPBehandler(), getString("type")) }
@@ -172,8 +173,8 @@ fun DatabaseInterface.getBehandlerForArbeidstakerMedType(personIdentNumber: Pers
     }
 }
 
-fun DatabaseInterface.getBehandlerForArbeidstaker(personIdentNumber: PersonIdentNumber): List<PBehandler> {
-    return getBehandlerForArbeidstakerMedType(personIdentNumber).map { it.first }
+fun DatabaseInterface.getBehandlerByArbeidstaker(personIdentNumber: PersonIdentNumber): List<PBehandler> {
+    return getBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker(personIdentNumber).map { it.first }
 }
 
 fun ResultSet.toPBehandler(): PBehandler =
