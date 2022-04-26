@@ -4,6 +4,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.PBehandlerKontor
 import no.nav.syfo.behandler.domain.BehandlerKontor
+import no.nav.syfo.domain.PartnerId
 import java.sql.*
 import java.time.OffsetDateTime
 
@@ -61,7 +62,7 @@ const val queryUpdateDialogmeldingEnabled =
         UPDATE BEHANDLER_KONTOR SET dialogmelding_enabled=? WHERE partner_id=?
     """
 
-fun DatabaseInterface.updateDialogMeldingEnabled(partnerId: Int): Boolean {
+fun DatabaseInterface.updateDialogMeldingEnabled(partnerId: PartnerId): Boolean {
     return this.connection.use { connection ->
         val rowCount = connection.prepareStatement(queryUpdateDialogmeldingEnabled)
             .use {
@@ -80,7 +81,8 @@ const val queryUpdateSystemForKontor =
         UPDATE BEHANDLER_KONTOR SET system=?,updated_at=? WHERE partner_id=?
     """
 
-fun Connection.updateSystemForPartnerId(partnerId: Int, system: String) {
+// TODO: Velg om vi skal bruke kolonne eller tabell i navn med en oppdatering
+fun Connection.updateSystem(partnerId: PartnerId, system: String) {
     val rowCount = prepareStatement(queryUpdateSystemForKontor)
         .use {
             it.setString(1, system)
@@ -98,7 +100,7 @@ const val queryUpdateAdresseForKontor =
         UPDATE BEHANDLER_KONTOR SET adresse=?,postnummer=?,poststed=?,updated_at=? WHERE partner_id=?
     """
 
-fun Connection.updateAdresseForPartnerId(partnerId: Int, kontor: BehandlerKontor) {
+fun Connection.updateAdresse(partnerId: PartnerId, kontor: BehandlerKontor) {
     val rowCount = prepareStatement(queryUpdateAdresseForKontor)
         .use {
             it.setString(1, kontor.adresse)
@@ -128,12 +130,13 @@ fun DatabaseInterface.getBehandlerKontorForId(id: Int): PBehandlerKontor {
     }.first()
 }
 
+// TODO: update query strings som ender på ForPartnerId
 const val queryGetBehandlerKontorForPartnerId =
     """
         SELECT * FROM BEHANDLER_KONTOR WHERE partner_id = ?
     """
 
-fun Connection.getBehandlerKontorForPartnerId(partnerId: Int): PBehandlerKontor? {
+fun Connection.getBehandlerKontor(partnerId: PartnerId): PBehandlerKontor? {
     return prepareStatement(queryGetBehandlerKontorForPartnerId)
         .use {
             it.setString(1, partnerId.toString())

@@ -4,7 +4,7 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.BehandlerService
-import no.nav.syfo.behandler.database.getBehandlerKontorForPartnerId
+import no.nav.syfo.behandler.database.getBehandlerKontor
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonType
 import no.nav.syfo.behandler.fastlege.toBehandler
@@ -51,7 +51,7 @@ class KafkaDialogmeldingFromBehandlerSpek : Spek({
                         }
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontor = database.connection.getBehandlerKontorForPartnerId(UserConstants.PARTNERID)
+                        val kontor = database.connection.getBehandlerKontor(UserConstants.PARTNERID)
                         kontor?.dialogmeldingEnabled shouldNotBe null
                     }
                 }
@@ -69,7 +69,7 @@ class KafkaDialogmeldingFromBehandlerSpek : Spek({
                         }
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontor = database.connection.getBehandlerKontorForPartnerId(UserConstants.PARTNERID)
+                        val kontor = database.connection.getBehandlerKontor(UserConstants.PARTNERID)
                         kontor `should be` null
                     }
 
@@ -86,7 +86,7 @@ class KafkaDialogmeldingFromBehandlerSpek : Spek({
                         }
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontor = database.connection.getBehandlerKontorForPartnerId(UserConstants.PARTNERID)
+                        val kontor = database.connection.getBehandlerKontor(UserConstants.PARTNERID)
                         kontor shouldNotBe null
                         kontor!!.dialogmeldingEnabled `should be` null
                     }

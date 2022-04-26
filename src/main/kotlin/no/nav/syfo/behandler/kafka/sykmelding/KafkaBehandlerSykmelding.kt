@@ -5,8 +5,7 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.kafka.kafkaSykmeldingConsumerConfig
-import no.nav.syfo.domain.PersonIdentNumber
-import no.nav.syfo.domain.Virksomhetsnummer
+import no.nav.syfo.domain.*
 import no.nav.syfo.util.capitalize
 import org.apache.kafka.clients.consumer.*
 import org.slf4j.Logger
@@ -118,7 +117,7 @@ private fun createAndStoreBehandlerFromSykmelding(
         hprId = sykmeldingBehandler.hpr?.toInt(),
         telefon = sykmeldingBehandler.tlf?.removePrefix("tel:"),
         kontor = BehandlerKontor(
-            partnerId = partnerId.toInt(),
+            partnerId = PartnerId(partnerId.toInt()),
             herId = receivedSykmeldingDTO.legekontorHerId?.toInt(),
             navn = receivedSykmeldingDTO.legekontorOrgName,
             adresse = sykmeldingBehandler.adresse.gate,

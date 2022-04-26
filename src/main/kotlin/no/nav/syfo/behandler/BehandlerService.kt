@@ -7,6 +7,7 @@ import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
+import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.PersonIdentNumber
 import org.slf4j.LoggerFactory
 import java.sql.Connection
@@ -46,7 +47,7 @@ class BehandlerService(
 
         return if (partnerinfoResponse != null) {
             fastlegeResponse.toBehandler(
-                partnerId = partnerinfoResponse.partnerId,
+                partnerId = PartnerId(partnerinfoResponse.partnerId),
             )
         } else null
     }
@@ -100,15 +101,15 @@ class BehandlerService(
 
     private fun getBehandler(behandler: Behandler): PBehandler? {
         return when {
-            behandler.personident != null -> database.getBehandlerMedPersonIdentForPartnerId(
+            behandler.personident != null -> database.getBehandlerMedPersonIdent(
                 behandlerPersonIdent = behandler.personident,
                 partnerId = behandler.kontor.partnerId,
             )
-            behandler.hprId != null -> database.getBehandlerMedHprIdForPartnerId(
+            behandler.hprId != null -> database.getBehandlerMedHprId(
                 hprId = behandler.hprId,
                 partnerId = behandler.kontor.partnerId,
             )
-            behandler.herId != null -> database.getBehandlerMedHerIdForPartnerId(
+            behandler.herId != null -> database.getBehandlerMedHerId(
                 herId = behandler.herId,
                 partnerId = behandler.kontor.partnerId,
             )
@@ -121,7 +122,7 @@ class BehandlerService(
         behandler: Behandler,
     ): Behandler {
         database.connection.use { connection ->
-            val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)
+            val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)
             val kontorId = if (pBehandlerKontor != null) {
                 connection.updateBehandlerKontor(
                     behandler = behandler,
@@ -151,7 +152,7 @@ class BehandlerService(
         behandler: Behandler,
     ) {
         database.connection.use { connection ->
-            val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)!!
+            val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)!!
             connection.updateBehandlerKontor(
                 behandler = behandler,
                 pBehandlerKontor = pBehandlerKontor,
@@ -165,10 +166,10 @@ class BehandlerService(
         pBehandlerKontor: PBehandlerKontor,
     ) {
         if (!behandler.kontor.system.isNullOrBlank() && pBehandlerKontor.system != behandler.kontor.system) {
-            updateSystemForPartnerId(behandler.kontor.partnerId, behandler.kontor.system)
+            updateSystem(behandler.kontor.partnerId, behandler.kontor.system)
         }
         if (behandler.kontor.harKomplettAdresse()) {
-            updateAdresseForPartnerId(behandler.kontor.partnerId, behandler.kontor)
+            updateAdresse(behandler.kontor.partnerId, behandler.kontor)
         }
     }
 

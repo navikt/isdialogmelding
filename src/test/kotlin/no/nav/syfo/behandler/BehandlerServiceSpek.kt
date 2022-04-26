@@ -104,7 +104,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerFromDB.kontor.system shouldBe null
 
                     database.connection.use {
-                        it.updateSystemForPartnerId(behandlerFromDB.kontor.partnerId, "EPJ-systemet")
+                        it.updateSystem(behandlerFromDB.kontor.partnerId, "EPJ-systemet")
                         it.commit()
                     }
 

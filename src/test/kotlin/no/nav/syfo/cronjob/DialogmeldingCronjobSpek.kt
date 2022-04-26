@@ -9,6 +9,7 @@ import no.nav.syfo.behandler.database.getBestillinger
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateBehandler
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingDTO
@@ -70,7 +71,7 @@ class DialogmeldingCronjobSpek : Spek({
             describe("Cronjob sender bestilte dialogmeldinger") {
                 it("Sender bestilt dialogmelding") {
                     val behandlerRef = UUID.randomUUID()
-                    val partnerId = random.nextInt()
+                    val partnerId = PartnerId(random.nextInt())
                     val behandler = generateBehandler(behandlerRef, partnerId)
                     database.createBehandlerForArbeidstaker(
                         behandler = behandler,

@@ -14,6 +14,7 @@ import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
@@ -81,7 +82,7 @@ class KafkaSykmeldingSpek : Spek({
                         every { mockConsumer.poll(any<Duration>()) } returns
                             consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-                        val kontorBefore = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        val kontorBefore = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         val behandlerBefore = database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         kontorBefore shouldBe null
                         behandlerBefore.size shouldBeEqualTo 0
@@ -93,7 +94,7 @@ class KafkaSykmeldingSpek : Spek({
                             )
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontorAfter = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfter.herId shouldBeEqualTo sykmelding.legekontorHerId
 
@@ -151,7 +152,7 @@ class KafkaSykmeldingSpek : Spek({
                             )
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontorAfter = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
 
                         val behandlerAfter = database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
@@ -213,7 +214,7 @@ class KafkaSykmeldingSpek : Spek({
                             )
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontorAfter = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfter.herId shouldBeEqualTo sykmelding.legekontorHerId
 
@@ -250,7 +251,7 @@ class KafkaSykmeldingSpek : Spek({
                             )
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontorAfter = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
 
                         val behandlerAfter = database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
@@ -354,7 +355,7 @@ class KafkaSykmeldingSpek : Spek({
                             )
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontorAfter = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
 
                         val behandlerAfter = database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
@@ -375,7 +376,7 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 2) { mockConsumer.commitSync() }
 
-                        val kontorAfterSecondMessage = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        val kontorAfterSecondMessage = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontorAfterSecondMessage!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfterSecondMessage.system shouldBeEqualTo newSykmelding.sykmelding.avsenderSystem.navn
                     }
@@ -402,7 +403,7 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
 
-                        val kontorAfter = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfter.poststed shouldBe null
 
@@ -414,7 +415,7 @@ class KafkaSykmeldingSpek : Spek({
                             )
                         )
 
-                        val kontorAfterFastlegeOppslag = database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                        val kontorAfterFastlegeOppslag = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontorAfterFastlegeOppslag!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfterFastlegeOppslag.adresse shouldBeEqualTo fastlegeBehandler.kontor.adresse
                         kontorAfterFastlegeOppslag.postnummer shouldBeEqualTo fastlegeBehandler.kontor.postnummer
@@ -439,7 +440,7 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
                         val kontorAfter =
-                            database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                            database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         val behandlerAfter =
                             database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         kontorAfter shouldBe null
@@ -461,7 +462,7 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
                         val kontorAfter =
-                            database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                            database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         val behandlerAfter =
                             database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         kontorAfter shouldBe null
@@ -502,7 +503,7 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
                         val kontorAfter =
-                            database.connection.getBehandlerKontorForPartnerId(sykmelding.partnerreferanse!!.toInt())
+                            database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         val behandlerAfter =
                             database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         kontorAfter shouldBe null

@@ -7,6 +7,7 @@ import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.toDialogmeldingToBehandlerBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
@@ -43,7 +44,7 @@ object DialogmeldingServiceSpek : Spek({
     val arbeidstakerPersonIdent = PersonIdentNumber("01010112345")
     val uuid = UUID.randomUUID()
     val behandlerRef = UUID.randomUUID()
-    val behandler = generateBehandler(behandlerRef, 1)
+    val behandler = generateBehandler(behandlerRef, PartnerId(1))
 
     beforeEachTest {
         database.dropData()
@@ -67,7 +68,7 @@ object DialogmeldingServiceSpek : Spek({
             ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
-                    partnerId = 1,
+                    partnerId = PartnerId(1),
                 ),
             )
 
@@ -95,7 +96,7 @@ object DialogmeldingServiceSpek : Spek({
             ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
-                    partnerId = 1,
+                    partnerId = PartnerId(1),
                 ),
             )
 
@@ -123,7 +124,7 @@ object DialogmeldingServiceSpek : Spek({
             ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
-                    partnerId = 1,
+                    partnerId = PartnerId(1),
                 ),
             )
 
@@ -151,7 +152,7 @@ object DialogmeldingServiceSpek : Spek({
             ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
-                    partnerId = 1,
+                    partnerId = PartnerId(1),
                 ),
             )
 

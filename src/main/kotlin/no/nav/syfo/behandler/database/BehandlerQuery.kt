@@ -4,6 +4,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.PBehandler
 import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.PersonIdentNumber
 import java.sql.*
 import java.time.OffsetDateTime
@@ -76,7 +77,8 @@ const val queryGetBehandlerMedPersonIdentForPartnerId =
         WHERE B.personident = ? and K.partner_id = ?
     """
 
-fun DatabaseInterface.getBehandlerMedPersonIdentForPartnerId(behandlerPersonIdent: PersonIdentNumber, partnerId: Int): PBehandler? {
+// TODO: hva gjør personident?
+fun DatabaseInterface.getBehandlerMedPersonIdent(behandlerPersonIdent: PersonIdentNumber, partnerId: PartnerId): PBehandler? {
     return this.connection.use { connection ->
         connection.prepareStatement(queryGetBehandlerMedPersonIdentForPartnerId)
             .use {
@@ -93,7 +95,7 @@ const val queryGetBehandlerMedHprIdForPartnerId =
         WHERE B.hpr_id = ? and K.partner_id = ?
     """
 
-fun DatabaseInterface.getBehandlerMedHprIdForPartnerId(hprId: Int, partnerId: Int): PBehandler? {
+fun DatabaseInterface.getBehandlerMedHprId(hprId: Int, partnerId: PartnerId): PBehandler? {
     return this.connection.use { connection ->
         connection.prepareStatement(queryGetBehandlerMedHprIdForPartnerId)
             .use {
@@ -110,7 +112,7 @@ const val queryGetBehandlerMedHerIdForPartnerId =
         WHERE B.her_id = ? and K.partner_id = ?
     """
 
-fun DatabaseInterface.getBehandlerMedHerIdForPartnerId(herId: Int, partnerId: Int): PBehandler? {
+fun DatabaseInterface.getBehandlerMedHerId(herId: Int, partnerId: PartnerId): PBehandler? {
     return this.connection.use { connection ->
         connection.prepareStatement(queryGetBehandlerMedHerIdForPartnerId)
             .use {

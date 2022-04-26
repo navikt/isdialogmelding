@@ -5,6 +5,7 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.updateDialogMeldingEnabled
 import no.nav.syfo.behandler.kafka.kafkaDialogmeldingFromBehandlerConsumerConfig
+import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.util.getObjectFromXmlString
 import no.nav.xml.eiff._2.XMLMottakenhetBlokk
 import org.apache.kafka.clients.consumer.ConsumerRecords
@@ -74,10 +75,10 @@ fun updateBehandlerOffice(
     }
 }
 
-private fun getPartnerId(fellesformatXML: String, navLogid: String, msgId: String): Int? {
+private fun getPartnerId(fellesformatXML: String, navLogid: String, msgId: String): PartnerId? {
     return try {
         val mottakenhetBlokk = getObjectFromXmlString<XMLMottakenhetBlokk>(fellesformatXML, "MottakenhetBlokk")
-        mottakenhetBlokk.partnerReferanse.toInt()
+        PartnerId(mottakenhetBlokk.partnerReferanse.toInt())
     } catch (e: Exception) {
         log.warn("Can't find partnerId in dialogmelding from behandler: navLogId: $navLogid, msgId: $msgId", e)
         null
