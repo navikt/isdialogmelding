@@ -178,7 +178,7 @@ class KafkaSykmeldingSpek : Spek({
                         val behandlerAfterSecondSykmelding = database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         behandlerAfterSecondSykmelding.size shouldBeEqualTo 2
                     }
-                    it("sykmelding from existing fastlege should leave behandler unchanged") {
+                    it("sykmelding from existing fastlege should add new sykmelder-relation") {
                         val behandler =
                             behandlerService.createOrGetBehandler(
                                 generateFastlegeResponse().toBehandler(UserConstants.PARTNERID),
@@ -217,20 +217,24 @@ class KafkaSykmeldingSpek : Spek({
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfter.herId shouldBeEqualTo sykmelding.legekontorHerId
 
-                        val pBehandlerListAfter = database.getBehandlerForArbeidstaker(
+                        val pBehandlerListAfter = database.getBehandlerForArbeidstakerMedType(
                             UserConstants.ARBEIDSTAKER_FNR,
                         )
-                        pBehandlerListAfter.size shouldBeEqualTo 1
-                        pBehandlerListAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
-                        pBehandlerListAfter[0].kategori shouldBeEqualTo BehandlerKategori.LEGE.name
-                        pBehandlerListAfter[0].herId shouldBeEqualTo sykmelding.sykmelding.behandler.her
+                        pBehandlerListAfter.size shouldBeEqualTo 2
+                        pBehandlerListAfter[0].first.personident shouldBeEqualTo sykmelding.personNrLege
+                        pBehandlerListAfter[0].first.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
+                        pBehandlerListAfter[0].second shouldBeEqualTo BehandlerArbeidstakerRelasjonType.SYKMELDER.name
+                        pBehandlerListAfter[1].first.personident shouldBeEqualTo sykmelding.personNrLege
+                        pBehandlerListAfter[1].first.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
+                        pBehandlerListAfter[1].second shouldBeEqualTo BehandlerArbeidstakerRelasjonType.FASTLEGE.name
 
                         val behandlerRelasjonAfter = database.getBehandlerArbeidstakerRelasjon(
                             personIdentNumber = UserConstants.ARBEIDSTAKER_FNR,
                             behandlerRef = behandler.behandlerRef,
                         )
-                        behandlerRelasjonAfter.size shouldBeEqualTo 1
-                        behandlerRelasjonAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.FASTLEGE.name
+                        behandlerRelasjonAfter.size shouldBeEqualTo 2
+                        behandlerRelasjonAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.SYKMELDER.name
+                        behandlerRelasjonAfter[1].type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.FASTLEGE.name
                     }
                     it("should not create duplicate when same sykmelder twice") {
                         val sykmelding = generateSykmeldingDTO(
@@ -252,6 +256,12 @@ class KafkaSykmeldingSpek : Spek({
                         val behandlerAfter = database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         behandlerAfter.size shouldBeEqualTo 1
 
+                        val behandlerRelasjonAfter = database.getBehandlerArbeidstakerRelasjon(
+                            personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
+                            behandlerRef = behandlerAfter[0].behandlerRef,
+                        )
+                        behandlerRelasjonAfter.size shouldBeEqualTo 1
+
                         val newSykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
                         )
@@ -268,6 +278,13 @@ class KafkaSykmeldingSpek : Spek({
 
                         val behandlerAfterSecondSykmelding = database.getBehandlerForArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         behandlerAfterSecondSykmelding.size shouldBeEqualTo 1
+
+                        val behandlerRelasjonAfterSecondSykmelding = database.getBehandlerArbeidstakerRelasjon(
+                            personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
+                            behandlerRef = behandlerAfter[0].behandlerRef,
+                        )
+                        behandlerRelasjonAfterSecondSykmelding.size shouldBeEqualTo 1
+                        behandlerRelasjonAfterSecondSykmelding[0].updatedAt shouldBeGreaterThan behandlerRelasjonAfter[0].updatedAt
                     }
                     it("behandler from sykmelding should not shadow existing fastlege") {
                         val url = "$behandlerPath$behandlerPersonident"

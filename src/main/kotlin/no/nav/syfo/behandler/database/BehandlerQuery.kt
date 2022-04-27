@@ -6,14 +6,14 @@ import no.nav.syfo.behandler.database.domain.PBehandler
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.domain.PersonIdentNumber
 import java.sql.*
-import java.time.Instant
+import java.time.OffsetDateTime
 import java.util.*
 
 fun Connection.createBehandler(
     behandler: Behandler,
     kontorId: Int,
 ): PBehandler {
-    val now = Timestamp.from(Instant.now())
+    val now = OffsetDateTime.now()
     val behandlerList = this.prepareStatement(queryCreateBehandler).use {
         it.setString(1, behandler.behandlerRef.toString())
         it.setString(2, behandler.kategori.name)
@@ -25,8 +25,8 @@ fun Connection.createBehandler(
         it.setString(8, behandler.herId?.toString())
         it.setString(9, behandler.hprId?.toString())
         it.setString(10, behandler.telefon)
-        it.setTimestamp(11, now)
-        it.setTimestamp(12, now)
+        it.setObject(11, now)
+        it.setObject(12, now)
         it.executeQuery().toList { toPBehandler() }
     }
 
@@ -157,7 +157,7 @@ const val queryGetBehandlerForArbeidstakerPersonIdent =
         FROM BEHANDLER
         INNER JOIN BEHANDLER_ARBEIDSTAKER ON BEHANDLER_ARBEIDSTAKER.behandler_id = BEHANDLER.id
         AND BEHANDLER_ARBEIDSTAKER.arbeidstaker_personident = ?
-        ORDER BY BEHANDLER_ARBEIDSTAKER.created_at DESC
+        ORDER BY BEHANDLER_ARBEIDSTAKER.updated_at DESC
     """
 
 fun DatabaseInterface.getBehandlerForArbeidstakerMedType(personIdentNumber: PersonIdentNumber): List<Pair<PBehandler, String>> {
@@ -187,6 +187,6 @@ fun ResultSet.toPBehandler(): PBehandler =
         herId = getString("her_id"),
         hprId = getString("hpr_id"),
         telefon = getString("telefon"),
-        createdAt = getTimestamp("created_at").toLocalDateTime(),
-        updatedAt = getTimestamp("updated_at").toLocalDateTime(),
+        createdAt = getObject("created_at", OffsetDateTime::class.java),
+        updatedAt = getObject("updated_at", OffsetDateTime::class.java),
     )

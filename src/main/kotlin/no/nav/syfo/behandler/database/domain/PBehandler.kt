@@ -2,7 +2,7 @@ package no.nav.syfo.behandler.database.domain
 
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.PersonIdentNumber
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.*
 
 data class PBehandler(
@@ -17,8 +17,8 @@ data class PBehandler(
     val hprId: String?,
     val telefon: String?,
     val kategori: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
+    val createdAt: OffsetDateTime,
+    val updatedAt: OffsetDateTime,
 )
 
 fun PBehandler.toBehandler(
