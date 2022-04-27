@@ -17,7 +17,7 @@ fun PBehandlerArbeidstaker.toBehandlerArbeidstakerRelasjon(
     mellomnavn: String?,
     etternavn: String,
 ) = BehandlerArbeidstakerRelasjon(
-    type = BehandlerArbeidstakerRelasjonType.valueOf(this.type),
+    type = BehandlerArbeidstakerRelasjonstype.valueOf(this.type),
     arbeidstakerPersonident = PersonIdentNumber(this.arbeidstakerPersonident),
     fornavn = fornavn,
     mellomnavn = mellomnavn,

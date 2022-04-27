@@ -6,7 +6,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.getBehandlerKontor
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonType
+import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
@@ -103,7 +103,7 @@ fun addBehandlerAndKontorToDatabase(behandlerService: BehandlerService) {
     )
 
     val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
-        type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+        type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
         arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
     )
 

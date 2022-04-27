@@ -20,7 +20,7 @@ class BehandlerService(
     private val database: DatabaseInterface,
 ) {
 
-    suspend fun getAktivFastlegeMedPartnerId(
+    suspend fun getAktivFastlegeBehandler(
         personIdentNumber: PersonIdentNumber,
         token: String,
         callId: String,
@@ -70,17 +70,17 @@ class BehandlerService(
 
         // TODO: Bytte navn på funksjon, slik at den også får med at den oppdaterer relasjon
         val pBehandlereForArbeidstakerList =
-            database.getBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker(
-                personIdentNumber = behandlerArbeidstakerRelasjon.arbeidstakerPersonident,
+            database.getBehandlerAndRelasjonstypeList(
+                arbeidstakerIdent = behandlerArbeidstakerRelasjon.arbeidstakerPersonident,
             )
 
-        val isBytteAvFastlege = behandlerArbeidstakerRelasjon.type == BehandlerArbeidstakerRelasjonType.FASTLEGE &&
+        val isBytteAvFastlege = behandlerArbeidstakerRelasjon.type == BehandlerArbeidstakerRelasjonstype.FASTLEGE &&
             pBehandlereForArbeidstakerList
-            .filter { (_, behandlerType) -> behandlerType == BehandlerArbeidstakerRelasjonType.FASTLEGE.name }
+            .filter { (_, behandlerType) -> behandlerType == BehandlerArbeidstakerRelasjonstype.FASTLEGE }
             .map { (pBehandler, _) -> pBehandler.id }.firstOrNull() != pBehandler.id
 
         val behandlerIkkeKnyttetTilArbeidstaker = !pBehandlereForArbeidstakerList
-            .filter { (_, behandlerType) -> behandlerType == behandlerArbeidstakerRelasjon.type.name }
+            .filter { (_, behandlerType) -> behandlerType == behandlerArbeidstakerRelasjon.type }
             .map { (pBehandler, _) -> pBehandler.id }.contains(pBehandler.id)
 
         if (isBytteAvFastlege || behandlerIkkeKnyttetTilArbeidstaker) {
@@ -88,7 +88,7 @@ class BehandlerService(
                 behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
                 behandlerId = pBehandler.id,
             )
-        } else if (behandlerArbeidstakerRelasjon.type == BehandlerArbeidstakerRelasjonType.SYKMELDER) {
+        } else if (behandlerArbeidstakerRelasjon.type == BehandlerArbeidstakerRelasjonstype.SYKMELDER) {
             database.updateBehandlerArbeidstakerRelasjon(
                 behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
                 behandlerId = pBehandler.id,

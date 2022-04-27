@@ -58,7 +58,7 @@ fun DatabaseInterface.createBehandlerForArbeidstaker(
             connection.createBehandler(behandler, kontorId)
         connection.createBehandlerArbeidstakerRelasjon(
             BehandlerArbeidstakerRelasjon(
-                type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                 arbeidstakerPersonident = arbeidstakerPersonIdent,
             ),
             createdBehandler.id

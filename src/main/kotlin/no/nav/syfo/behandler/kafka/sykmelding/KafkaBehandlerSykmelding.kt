@@ -131,7 +131,7 @@ private fun createAndStoreBehandlerFromSykmelding(
     )
 
     val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
-        type = BehandlerArbeidstakerRelasjonType.SYKMELDER,
+        type = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
         arbeidstakerPersonident = arbeidstakerPersonident,
     )
     behandlerService.createOrGetBehandler(

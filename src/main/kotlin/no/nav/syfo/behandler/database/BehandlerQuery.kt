@@ -4,6 +4,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.PBehandler
 import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.PersonIdentNumber
 import java.sql.*
@@ -153,7 +154,7 @@ fun DatabaseInterface.getBehandlerByBehandlerRef(behandlerRef: UUID): PBehandler
     }.firstOrNull()
 }
 
-const val queryGetBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker =
+const val queryGetBehandlerAndRelasjonstype =
     """
         SELECT BEHANDLER.*,BEHANDLER_ARBEIDSTAKER.type 
         FROM BEHANDLER
@@ -162,19 +163,18 @@ const val queryGetBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker =
         ORDER BY BEHANDLER_ARBEIDSTAKER.updated_at DESC
     """
 
-//TODO: iterere på dette funksjonsnavnet
-fun DatabaseInterface.getBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker(personIdentNumber: PersonIdentNumber): List<Pair<PBehandler, String>> {
+fun DatabaseInterface.getBehandlerAndRelasjonstypeList(arbeidstakerIdent: PersonIdentNumber): List<Pair<PBehandler, BehandlerArbeidstakerRelasjonstype>> {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker)
+        connection.prepareStatement(queryGetBehandlerAndRelasjonstype)
             .use {
-                it.setString(1, personIdentNumber.value)
-                it.executeQuery().toList { Pair(toPBehandler(), getString("type")) }
+                it.setString(1, arbeidstakerIdent.value)
+                it.executeQuery().toList { Pair(toPBehandler(), BehandlerArbeidstakerRelasjonstype.valueOf(getString("type"))) }
             }
     }
 }
 
 fun DatabaseInterface.getBehandlerByArbeidstaker(personIdentNumber: PersonIdentNumber): List<PBehandler> {
-    return getBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker(personIdentNumber).map { it.first }
+    return getBehandlerAndRelasjonstypeList(personIdentNumber).map { it.first }
 }
 
 fun ResultSet.toPBehandler(): PBehandler =

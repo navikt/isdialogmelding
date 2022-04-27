@@ -112,7 +112,7 @@ class KafkaSykmeldingSpek : Spek({
                             behandlerRef = behandlerAfter[0].behandlerRef,
                         )
                         behandlerRelasjonAfter.size shouldBeEqualTo 1
-                        behandlerRelasjonAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.SYKMELDER.name
+                        behandlerRelasjonAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.SYKMELDER.name
                     }
                     it("should capitalize behandlernavn and remove telephone-prefix") {
                         val sykmelding = generateSykmeldingDTO(
@@ -184,7 +184,7 @@ class KafkaSykmeldingSpek : Spek({
                             behandlerService.createOrGetBehandler(
                                 generateFastlegeResponse().toBehandler(UserConstants.PARTNERID),
                                 BehandlerArbeidstakerRelasjon(
-                                    type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                                    type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                                     arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                                 )
                             )
@@ -218,24 +218,24 @@ class KafkaSykmeldingSpek : Spek({
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfter.herId shouldBeEqualTo sykmelding.legekontorHerId
 
-                        val pBehandlerListAfter = database.getBehandlerAndArbeidstakerrelasjonstypeByArbeidstaker(
+                        val pBehandlerListAfter = database.getBehandlerAndRelasjonstypeList(
                             UserConstants.ARBEIDSTAKER_FNR,
                         )
                         pBehandlerListAfter.size shouldBeEqualTo 2
                         pBehandlerListAfter[0].first.personident shouldBeEqualTo sykmelding.personNrLege
                         pBehandlerListAfter[0].first.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
-                        pBehandlerListAfter[0].second shouldBeEqualTo BehandlerArbeidstakerRelasjonType.SYKMELDER.name
+                        pBehandlerListAfter[0].second shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.SYKMELDER
                         pBehandlerListAfter[1].first.personident shouldBeEqualTo sykmelding.personNrLege
                         pBehandlerListAfter[1].first.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
-                        pBehandlerListAfter[1].second shouldBeEqualTo BehandlerArbeidstakerRelasjonType.FASTLEGE.name
+                        pBehandlerListAfter[1].second shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.FASTLEGE
 
                         val behandlerRelasjonAfter = database.getBehandlerArbeidstakerRelasjon(
                             personIdentNumber = UserConstants.ARBEIDSTAKER_FNR,
                             behandlerRef = behandler.behandlerRef,
                         )
                         behandlerRelasjonAfter.size shouldBeEqualTo 2
-                        behandlerRelasjonAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.SYKMELDER.name
-                        behandlerRelasjonAfter[1].type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.FASTLEGE.name
+                        behandlerRelasjonAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.SYKMELDER.name
+                        behandlerRelasjonAfter[1].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.FASTLEGE.name
                     }
                     it("should not create duplicate when same sykmelder twice") {
                         val sykmelding = generateSykmeldingDTO(
@@ -410,7 +410,7 @@ class KafkaSykmeldingSpek : Spek({
                         behandlerService.createOrGetBehandler(
                             fastlegeBehandler,
                             BehandlerArbeidstakerRelasjon(
-                                type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             )
                         )

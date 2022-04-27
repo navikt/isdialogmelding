@@ -5,7 +5,7 @@ import io.mockk.mockk
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.toBehandler
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonType
+import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.testhelper.ExternalMockEnvironment
 import no.nav.syfo.testhelper.UserConstants
@@ -40,7 +40,7 @@ class BehandlerServiceSpek : Spek({
                         behandlerService.createOrGetBehandler(
                             generateFastlegeResponse().toBehandler(UserConstants.PARTNERID),
                             BehandlerArbeidstakerRelasjon(
-                                type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                             )
                         )
@@ -61,7 +61,7 @@ class BehandlerServiceSpek : Spek({
                                 dialogmeldingEnabled = false,
                             ),
                             BehandlerArbeidstakerRelasjon(
-                                type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                             )
                         )
@@ -89,7 +89,7 @@ class BehandlerServiceSpek : Spek({
                                 dialogmeldingEnabled = false,
                             ),
                             BehandlerArbeidstakerRelasjon(
-                                type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                             )
                         )
@@ -117,14 +117,14 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         )
                     )
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         )
                     )
@@ -138,14 +138,14 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ANNEN_ARBEIDSTAKER_FNR
                         ),
                     )
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         ),
                     )
@@ -166,7 +166,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         ),
                     )
@@ -185,7 +185,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         ),
                     )
@@ -204,7 +204,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         ),
                     )
@@ -221,7 +221,7 @@ class BehandlerServiceSpek : Spek({
                         behandlerService.createOrGetBehandler(
                             behandler,
                             BehandlerArbeidstakerRelasjon(
-                                type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                             ),
                         )
@@ -241,7 +241,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         ),
                     )
@@ -262,7 +262,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         ),
                     )
@@ -285,7 +285,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler = annenBehandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         ),
                     )
@@ -312,7 +312,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         ),
                     )
@@ -336,7 +336,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         ),
                     )
@@ -360,7 +360,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerService.createOrGetBehandler(
                         behandler = sammeBehandlerAnnenPartnerId,
                         BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         ),
                     )
