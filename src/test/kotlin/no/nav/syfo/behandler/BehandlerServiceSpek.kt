@@ -75,7 +75,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerFromDB.behandlerRef shouldBeEqualTo behandler.behandlerRef
                     behandlerFromDB.kontor.dialogmeldingEnabled shouldBeEqualTo false
 
-                    database.updateDialogMeldingEnabled(behandlerFromDB.kontor.partnerId)
+                    database.updateBehandlerKontorDialogmeldingEnabled(behandlerFromDB.kontor.partnerId)
 
                     val behandlerFromDBUpdated = pBehandler.toBehandler(database.getBehandlerKontorById(pBehandler.kontorId))
                     behandlerFromDBUpdated.behandlerRef shouldBeEqualTo behandler.behandlerRef
@@ -104,7 +104,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerFromDB.kontor.system shouldBe null
 
                     database.connection.use {
-                        it.updateSystem(behandlerFromDB.kontor.partnerId, "EPJ-systemet")
+                        it.updateBehandlerKontorSystem(behandlerFromDB.kontor.partnerId, "EPJ-systemet")
                         it.commit()
                     }
 

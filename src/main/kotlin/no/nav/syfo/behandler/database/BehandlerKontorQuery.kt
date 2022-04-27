@@ -57,14 +57,14 @@ fun Connection.createBehandlerKontor(
     return behandlerKontorList.first()
 }
 
-const val queryUpdateDialogmeldingEnabled =
+const val queryUpdateBehandlerKontorDialogmeldingEnabled =
     """
         UPDATE BEHANDLER_KONTOR SET dialogmelding_enabled=? WHERE partner_id=?
     """
 
-fun DatabaseInterface.updateDialogMeldingEnabled(partnerId: PartnerId): Boolean {
+fun DatabaseInterface.updateBehandlerKontorDialogmeldingEnabled(partnerId: PartnerId): Boolean {
     return this.connection.use { connection ->
-        val rowCount = connection.prepareStatement(queryUpdateDialogmeldingEnabled)
+        val rowCount = connection.prepareStatement(queryUpdateBehandlerKontorDialogmeldingEnabled)
             .use {
                 it.setObject(1, OffsetDateTime.now())
                 it.setString(2, partnerId.toString())
@@ -76,14 +76,13 @@ fun DatabaseInterface.updateDialogMeldingEnabled(partnerId: PartnerId): Boolean 
     }
 }
 
-const val queryUpdateSystem =
+const val queryUpdateBehandlerKontorSystem =
     """
         UPDATE BEHANDLER_KONTOR SET system=?,updated_at=? WHERE partner_id=?
     """
 
-// TODO: Velg om vi skal bruke kolonne eller tabell i navn med en oppdatering
-fun Connection.updateSystem(partnerId: PartnerId, system: String) {
-    val rowCount = prepareStatement(queryUpdateSystem)
+fun Connection.updateBehandlerKontorSystem(partnerId: PartnerId, system: String) {
+    val rowCount = prepareStatement(queryUpdateBehandlerKontorSystem)
         .use {
             it.setString(1, system)
             it.setObject(2, OffsetDateTime.now())
@@ -95,13 +94,13 @@ fun Connection.updateSystem(partnerId: PartnerId, system: String) {
     }
 }
 
-const val queryUpdateAdresse =
+const val queryUpdateBehandlerKontorAddress =
     """
         UPDATE BEHANDLER_KONTOR SET adresse=?,postnummer=?,poststed=?,updated_at=? WHERE partner_id=?
     """
 
-fun Connection.updateAdresse(partnerId: PartnerId, kontor: BehandlerKontor) {
-    val rowCount = prepareStatement(queryUpdateAdresse)
+fun Connection.updateBehandlerKontorAddress(partnerId: PartnerId, kontor: BehandlerKontor) {
+    val rowCount = prepareStatement(queryUpdateBehandlerKontorAddress)
         .use {
             it.setString(1, kontor.adresse)
             it.setString(2, kontor.postnummer)

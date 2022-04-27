@@ -68,7 +68,6 @@ class BehandlerService(
             )
         }
 
-        // TODO: Bytte navn på funksjon, slik at den også får med at den oppdaterer relasjon
         val pBehandlereForArbeidstakerList =
             database.getBehandlerAndRelasjonstypeList(
                 arbeidstakerIdent = behandlerArbeidstakerRelasjon.arbeidstakerPersonident,
@@ -167,10 +166,10 @@ class BehandlerService(
         pBehandlerKontor: PBehandlerKontor,
     ) {
         if (!behandler.kontor.system.isNullOrBlank() && pBehandlerKontor.system != behandler.kontor.system) {
-            updateSystem(behandler.kontor.partnerId, behandler.kontor.system)
+            updateBehandlerKontorSystem(behandler.kontor.partnerId, behandler.kontor.system)
         }
         if (behandler.kontor.harKomplettAdresse()) {
-            updateAdresse(behandler.kontor.partnerId, behandler.kontor)
+            updateBehandlerKontorAddress(behandler.kontor.partnerId, behandler.kontor)
         }
     }
 

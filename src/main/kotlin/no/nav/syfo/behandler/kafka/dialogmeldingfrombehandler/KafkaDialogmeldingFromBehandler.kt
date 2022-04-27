@@ -3,7 +3,7 @@ package no.nav.syfo.behandler.kafka.dialogmeldingfrombehandler
 import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.database.updateDialogMeldingEnabled
+import no.nav.syfo.behandler.database.updateBehandlerKontorDialogmeldingEnabled
 import no.nav.syfo.behandler.kafka.kafkaDialogmeldingFromBehandlerConsumerConfig
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.util.getObjectFromXmlString
@@ -66,7 +66,7 @@ fun updateBehandlerOffice(
         )
 
         partnerId?.let { id ->
-            val dialogmeldingEnabled = database.updateDialogMeldingEnabled(id)
+            val dialogmeldingEnabled = database.updateBehandlerKontorDialogmeldingEnabled(id)
             if (dialogmeldingEnabled)
                 log.info("Behandlerkontor with partnerId: $id is ready for dialogmelding")
             else

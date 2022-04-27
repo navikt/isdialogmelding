@@ -106,7 +106,6 @@ fun DatabaseInterface.getBehandlerByHprIdAndPartnerId(hprId: Int, partnerId: Par
     }.firstOrNull()
 }
 
-//TODO: bør Her-id være en egen klasse
 const val queryGetBehandlerByHerIdAndPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
