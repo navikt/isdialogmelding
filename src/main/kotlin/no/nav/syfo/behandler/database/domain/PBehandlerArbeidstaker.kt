@@ -2,13 +2,14 @@ package no.nav.syfo.behandler.database.domain
 
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.PersonIdentNumber
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 data class PBehandlerArbeidstaker(
     val id: Int,
     val type: String,
     val arbeidstakerPersonident: String,
-    val createdAt: LocalDateTime,
+    val createdAt: OffsetDateTime,
+    val updatedAt: OffsetDateTime,
 )
 
 fun PBehandlerArbeidstaker.toBehandlerArbeidstakerRelasjon(

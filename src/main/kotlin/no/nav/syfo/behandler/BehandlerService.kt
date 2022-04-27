@@ -78,10 +78,16 @@ class BehandlerService(
             .map { (pBehandler, _) -> pBehandler.id }.firstOrNull() != pBehandler.id
 
         val behandlerIkkeKnyttetTilArbeidstaker = !pBehandlereForArbeidstakerList
+            .filter { (_, behandlerType) -> behandlerType == behandlerArbeidstakerRelasjon.type.name }
             .map { (pBehandler, _) -> pBehandler.id }.contains(pBehandler.id)
 
         if (isBytteAvFastlege || behandlerIkkeKnyttetTilArbeidstaker) {
             addBehandlerToArbeidstaker(
+                behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
+                behandlerId = pBehandler.id,
+            )
+        } else if (behandlerArbeidstakerRelasjon.type == BehandlerArbeidstakerRelasjonType.SYKMELDER) {
+            database.updateBehandlerArbeidstakerRelasjon(
                 behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
                 behandlerId = pBehandler.id,
             )
