@@ -2,17 +2,13 @@ package no.nav.syfo.testhelper.mocks
 
 import io.ktor.server.application.*
 import io.ktor.http.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
-import no.nav.syfo.application.api.authentication.installContentNegotiation
 import no.nav.syfo.behandler.fastlege.FastlegeClient.Companion.FASTLEGE_PATH
 import no.nav.syfo.behandler.fastlege.FastlegeClient.Companion.FASTLEGE_SYSTEM_PATH
 import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
-import no.nav.syfo.testhelper.getRandomPort
 import no.nav.syfo.util.getPersonIdentHeader
 
 private suspend fun PipelineContext<out Unit, ApplicationCall>.fastlegerestResponse() {
@@ -44,23 +40,14 @@ private suspend fun PipelineContext<out Unit, ApplicationCall>.fastlegerestRespo
     }
 }
 
-class FastlegeRestMock {
-    private val port = getRandomPort()
-    val url = "http://localhost:$port"
-
-    val name = "fastlegerest"
-    val server = embeddedServer(
-        factory = Netty,
-        port = port,
-    ) {
-        installContentNegotiation()
-        routing {
-            get(FASTLEGE_PATH) {
-                this.fastlegerestResponse()
-            }
-            get(FASTLEGE_SYSTEM_PATH) {
-                this.fastlegerestResponse()
-            }
+class FastlegeRestMock : MockServer() {
+    override val name = "fastlegerest"
+    override val routingConfiguration: Routing.() -> Unit = {
+        get(FASTLEGE_PATH) {
+            this.fastlegerestResponse()
+        }
+        get(FASTLEGE_SYSTEM_PATH) {
+            this.fastlegerestResponse()
         }
     }
 }

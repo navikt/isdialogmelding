@@ -1,7 +1,6 @@
 package no.nav.syfo.testhelper
 
 import no.nav.syfo.application.*
-import java.net.ServerSocket
 
 fun testEnvironment(
     azureOpenidConfigTokenEndpoint: String,
@@ -57,7 +56,3 @@ fun testAppState() = ApplicationState(
     alive = true,
     ready = true,
 )
-
-fun getRandomPort() = ServerSocket(0).use {
-    it.localPort
-}

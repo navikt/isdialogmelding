@@ -4,12 +4,10 @@ import io.ktor.server.application.*
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.nav.syfo.application.api.authentication.personIdent
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.person.access.PersonAPIConsumerAccessService
 import no.nav.syfo.behandler.domain.*
-import no.nav.syfo.util.getBearerHeader
-import no.nav.syfo.util.getCallId
+import no.nav.syfo.util.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -28,7 +26,7 @@ fun Route.registerPersonBehandlerApi(
             try {
                 val token = getBearerHeader()
                     ?: throw IllegalArgumentException("No Authorization header supplied")
-                val requestPersonIdent = call.personIdent()
+                val requestPersonIdent = call.personIdentFromToken()
                     ?: throw IllegalArgumentException("No PersonIdent found in token")
 
                 personAPIConsumerAccessService.validateConsumerApplicationClientId(
