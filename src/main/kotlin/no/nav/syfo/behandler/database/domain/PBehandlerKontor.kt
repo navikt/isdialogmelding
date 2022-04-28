@@ -1,6 +1,7 @@
 package no.nav.syfo.behandler.database.domain
 
 import no.nav.syfo.behandler.domain.BehandlerKontor
+import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.Virksomhetsnummer
 import java.time.OffsetDateTime
 
@@ -20,7 +21,7 @@ data class PBehandlerKontor(
 )
 
 fun PBehandlerKontor.toBehandlerKontor() = BehandlerKontor(
-    partnerId = this.partnerId.toInt(),
+    partnerId = PartnerId(this.partnerId.toInt()),
     herId = this.herId?.toInt(),
     navn = this.navn,
     adresse = this.adresse,

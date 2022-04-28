@@ -33,15 +33,15 @@ class SyfopartnerInfoMock {
                     UserConstants.HERID_MED_FLERE_PARTNERINFO.toString() -> call.respond(
                         HttpStatusCode.OK,
                         listOf(
-                            generatePartnerinfoResponse(UserConstants.PARTNERID),
-                            generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID)
+                            generatePartnerinfoResponse(UserConstants.PARTNERID.value),
+                            generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID.value)
                         )
                     )
                     UserConstants.OTHER_HERID.toString() -> call.respond(
-                        HttpStatusCode.OK, listOf(generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID))
+                        HttpStatusCode.OK, listOf(generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID.value))
                     )
                     else -> call.respond(
-                        HttpStatusCode.OK, listOf(generatePartnerinfoResponse(UserConstants.PARTNERID))
+                        HttpStatusCode.OK, listOf(generatePartnerinfoResponse(UserConstants.PARTNERID.value))
                     )
                 }
             }

@@ -32,14 +32,14 @@ fun Route.registerBehandlerApi(
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
             ) {
                 val behandlerDTOList = mutableListOf<BehandlerDTO>()
-                val fastlege = behandlerService.getAktivFastlegeMedPartnerId(
+                val fastlege = behandlerService.getAktivFastlegeBehandler(
                     personIdentNumber = personIdentNumber,
                     token = token,
                     callId = callId,
                 )
                 if (fastlege != null && fastlege.hasAnId()) {
                     val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
-                        type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                        type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                         arbeidstakerPersonident = personIdentNumber,
                     )
                     val behandler = behandlerService.createOrGetBehandler(
@@ -48,7 +48,7 @@ fun Route.registerBehandlerApi(
                     )
                     behandlerDTOList.add(
                         behandler.toBehandlerDTO(
-                            behandlerType = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                            behandlerType = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                         )
                     )
                 }

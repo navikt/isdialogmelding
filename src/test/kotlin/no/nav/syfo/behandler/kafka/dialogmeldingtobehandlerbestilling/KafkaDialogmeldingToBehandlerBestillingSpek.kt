@@ -7,6 +7,7 @@ import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateBehandler
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingDTO
@@ -56,7 +57,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                 describe("Happy path") {
                     it("should persist incoming bestillinger") {
                         val behandlerRef = UUID.randomUUID()
-                        val partnerId = random.nextInt()
+                        val partnerId = PartnerId(random.nextInt())
                         val behandler = generateBehandler(behandlerRef, partnerId)
                         database.connection.use {
                             val kontorId = it.createBehandlerKontor(behandler.kontor)
@@ -109,7 +110,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                 describe("Should only persist once when duplicates") {
                     it("Should only persist once when duplicates") {
                         val behandlerRef = UUID.randomUUID()
-                        val partnerId = random.nextInt()
+                        val partnerId = PartnerId(random.nextInt())
                         val behandler = generateBehandler(behandlerRef, partnerId)
                         database.connection.use {
                             val kontorId = it.createBehandlerKontor(behandler.kontor)

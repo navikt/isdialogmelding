@@ -4,6 +4,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.PBehandlerKontor
 import no.nav.syfo.behandler.domain.BehandlerKontor
+import no.nav.syfo.domain.PartnerId
 import java.sql.*
 import java.time.OffsetDateTime
 
@@ -56,14 +57,14 @@ fun Connection.createBehandlerKontor(
     return behandlerKontorList.first()
 }
 
-const val queryUpdateDialogmeldingEnabled =
+const val queryUpdateBehandlerKontorDialogmeldingEnabled =
     """
         UPDATE BEHANDLER_KONTOR SET dialogmelding_enabled=? WHERE partner_id=?
     """
 
-fun DatabaseInterface.updateDialogMeldingEnabled(partnerId: Int): Boolean {
+fun DatabaseInterface.updateBehandlerKontorDialogmeldingEnabled(partnerId: PartnerId): Boolean {
     return this.connection.use { connection ->
-        val rowCount = connection.prepareStatement(queryUpdateDialogmeldingEnabled)
+        val rowCount = connection.prepareStatement(queryUpdateBehandlerKontorDialogmeldingEnabled)
             .use {
                 it.setObject(1, OffsetDateTime.now())
                 it.setString(2, partnerId.toString())
@@ -75,13 +76,13 @@ fun DatabaseInterface.updateDialogMeldingEnabled(partnerId: Int): Boolean {
     }
 }
 
-const val queryUpdateSystemForKontor =
+const val queryUpdateBehandlerKontorSystem =
     """
         UPDATE BEHANDLER_KONTOR SET system=?,updated_at=? WHERE partner_id=?
     """
 
-fun Connection.updateSystemForPartnerId(partnerId: Int, system: String) {
-    val rowCount = prepareStatement(queryUpdateSystemForKontor)
+fun Connection.updateBehandlerKontorSystem(partnerId: PartnerId, system: String) {
+    val rowCount = prepareStatement(queryUpdateBehandlerKontorSystem)
         .use {
             it.setString(1, system)
             it.setObject(2, OffsetDateTime.now())
@@ -93,13 +94,13 @@ fun Connection.updateSystemForPartnerId(partnerId: Int, system: String) {
     }
 }
 
-const val queryUpdateAdresseForKontor =
+const val queryUpdateBehandlerKontorAddress =
     """
         UPDATE BEHANDLER_KONTOR SET adresse=?,postnummer=?,poststed=?,updated_at=? WHERE partner_id=?
     """
 
-fun Connection.updateAdresseForPartnerId(partnerId: Int, kontor: BehandlerKontor) {
-    val rowCount = prepareStatement(queryUpdateAdresseForKontor)
+fun Connection.updateBehandlerKontorAddress(partnerId: PartnerId, kontor: BehandlerKontor) {
+    val rowCount = prepareStatement(queryUpdateBehandlerKontorAddress)
         .use {
             it.setString(1, kontor.adresse)
             it.setString(2, kontor.postnummer)
@@ -113,14 +114,14 @@ fun Connection.updateAdresseForPartnerId(partnerId: Int, kontor: BehandlerKontor
     }
 }
 
-const val queryGetBehandlerKontorForId =
+const val queryGetBehandlerKontorById =
     """
         SELECT * FROM BEHANDLER_KONTOR WHERE id = ?
     """
 
-fun DatabaseInterface.getBehandlerKontorForId(id: Int): PBehandlerKontor {
+fun DatabaseInterface.getBehandlerKontorById(id: Int): PBehandlerKontor {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerKontorForId)
+        connection.prepareStatement(queryGetBehandlerKontorById)
             .use {
                 it.setInt(1, id)
                 it.executeQuery().toList { toPBehandlerKontor() }
@@ -128,13 +129,13 @@ fun DatabaseInterface.getBehandlerKontorForId(id: Int): PBehandlerKontor {
     }.first()
 }
 
-const val queryGetBehandlerKontorForPartnerId =
+const val queryGetBehandlerKontor =
     """
         SELECT * FROM BEHANDLER_KONTOR WHERE partner_id = ?
     """
 
-fun Connection.getBehandlerKontorForPartnerId(partnerId: Int): PBehandlerKontor? {
-    return prepareStatement(queryGetBehandlerKontorForPartnerId)
+fun Connection.getBehandlerKontor(partnerId: PartnerId): PBehandlerKontor? {
+    return prepareStatement(queryGetBehandlerKontor)
         .use {
             it.setString(1, partnerId.toString())
             it.executeQuery().toList { toPBehandlerKontor() }

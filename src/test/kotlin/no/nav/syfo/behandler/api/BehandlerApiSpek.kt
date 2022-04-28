@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import no.nav.syfo.behandler.database.getBehandlerForArbeidstaker
-import no.nav.syfo.behandler.database.getBehandlerKontorForId
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonType
+import no.nav.syfo.behandler.database.getBehandlerByArbeidstaker
+import no.nav.syfo.behandler.database.getBehandlerKontorById
+import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import no.nav.syfo.testhelper.UserConstants.OTHER_PARTNERID
@@ -55,7 +55,7 @@ class BehandlerApiSpek : Spek({
                                 objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
                             behandlerList.size shouldBeEqualTo 1
 
-                            val behandlerForPersonList = database.getBehandlerForArbeidstaker(
+                            val behandlerForPersonList = database.getBehandlerByArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_FNR,
                             )
                             behandlerForPersonList.size shouldBeEqualTo 1
@@ -70,7 +70,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDTO.telefon shouldBeEqualTo fastlegeResponse.fastlegekontor.telefon
                             behandlerDTO.orgnummer shouldBeEqualTo fastlegeResponse.fastlegekontor.orgnummer
                             behandlerDTO.kontor shouldBeEqualTo fastlegeResponse.fastlegekontor.navn
-                            behandlerDTO.type shouldBeEqualTo BehandlerArbeidstakerRelasjonType.FASTLEGE.name
+                            behandlerDTO.type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.FASTLEGE.name
                             behandlerDTO.behandlerRef shouldBeEqualTo behandlerForPersonList.first().behandlerRef.toString()
                             behandlerDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
                         }
@@ -89,7 +89,7 @@ class BehandlerApiSpek : Spek({
 
                             behandlerList.size shouldBeEqualTo 0
 
-                            database.getBehandlerForArbeidstaker(
+                            database.getBehandlerByArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR,
                             ).size shouldBeEqualTo 0
                         }
@@ -112,7 +112,7 @@ class BehandlerApiSpek : Spek({
 
                             behandlerList.size shouldBeEqualTo 0
 
-                            database.getBehandlerForArbeidstaker(
+                            database.getBehandlerByArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET,
                             ).size shouldBeEqualTo 0
                         }
@@ -135,7 +135,7 @@ class BehandlerApiSpek : Spek({
 
                             behandlerList.size shouldBeEqualTo 0
 
-                            database.getBehandlerForArbeidstaker(
+                            database.getBehandlerByArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO,
                             ).size shouldBeEqualTo 0
                         }
@@ -158,12 +158,12 @@ class BehandlerApiSpek : Spek({
 
                             behandlerList.size shouldBeEqualTo 1
 
-                            val behandlerForArbeidstakerList = database.getBehandlerForArbeidstaker(
+                            val behandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO,
                             )
                             behandlerForArbeidstakerList.size shouldBeEqualTo 1
                             val behandlerKontor =
-                                database.getBehandlerKontorForId(behandlerForArbeidstakerList.first().kontorId)
+                                database.getBehandlerKontorById(behandlerForArbeidstakerList.first().kontorId)
                             behandlerKontor.partnerId shouldBeEqualTo OTHER_PARTNERID.toString()
                         }
                     }
@@ -185,7 +185,7 @@ class BehandlerApiSpek : Spek({
 
                             behandlerList.size shouldBeEqualTo 0
 
-                            database.getBehandlerForArbeidstaker(
+                            database.getBehandlerByArbeidstaker(
                                 UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID,
                             ).size shouldBeEqualTo 0
                         }

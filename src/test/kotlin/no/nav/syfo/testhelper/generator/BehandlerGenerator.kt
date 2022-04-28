@@ -1,11 +1,10 @@
 package no.nav.syfo.testhelper.generator
 
 import no.nav.syfo.behandler.domain.*
-import no.nav.syfo.domain.PersonIdentNumber
-import no.nav.syfo.domain.Virksomhetsnummer
+import no.nav.syfo.domain.*
 import java.util.UUID
 
-fun generateBehandler(behandlerRef: UUID, partnerId: Int) = Behandler(
+fun generateBehandler(behandlerRef: UUID, partnerId: PartnerId) = Behandler(
     behandlerRef = behandlerRef,
     kontor = BehandlerKontor(
         partnerId = partnerId,

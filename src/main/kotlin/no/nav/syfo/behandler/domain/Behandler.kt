@@ -19,7 +19,7 @@ data class Behandler(
 )
 
 fun Behandler.toBehandlerDTO(
-    behandlerType: BehandlerArbeidstakerRelasjonType,
+    behandlerType: BehandlerArbeidstakerRelasjonstype,
 ) = BehandlerDTO(
     type = behandlerType.name,
     behandlerRef = this.behandlerRef.toString(),
@@ -36,7 +36,7 @@ fun Behandler.toBehandlerDTO(
 )
 
 fun Behandler.toPersonBehandlerDTO(
-    behandlerType: BehandlerArbeidstakerRelasjonType,
+    behandlerType: BehandlerArbeidstakerRelasjonstype,
 ) = PersonBehandlerDTO(
     type = behandlerType.name,
     behandlerRef = this.behandlerRef.toString(),

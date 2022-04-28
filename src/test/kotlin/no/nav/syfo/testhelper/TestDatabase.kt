@@ -48,7 +48,7 @@ fun DatabaseInterface.createBehandlerForArbeidstaker(
     arbeidstakerPersonIdent: PersonIdentNumber,
 ): UUID {
     this.connection.use { connection ->
-        val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)
+        val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)
         val kontorId = if (pBehandlerKontor != null) {
             pBehandlerKontor.id
         } else {
@@ -58,7 +58,7 @@ fun DatabaseInterface.createBehandlerForArbeidstaker(
             connection.createBehandler(behandler, kontorId)
         connection.createBehandlerArbeidstakerRelasjon(
             BehandlerArbeidstakerRelasjon(
-                type = BehandlerArbeidstakerRelasjonType.FASTLEGE,
+                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                 arbeidstakerPersonident = arbeidstakerPersonIdent,
             ),
             createdBehandler.id

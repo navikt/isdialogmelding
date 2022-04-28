@@ -7,6 +7,7 @@ import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
+import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.PersonIdentNumber
 import org.slf4j.LoggerFactory
 import java.sql.Connection
@@ -19,7 +20,7 @@ class BehandlerService(
     private val database: DatabaseInterface,
 ) {
 
-    suspend fun getAktivFastlegeMedPartnerId(
+    suspend fun getAktivFastlegeBehandler(
         personIdentNumber: PersonIdentNumber,
         token: String,
         callId: String,
@@ -46,7 +47,7 @@ class BehandlerService(
 
         return if (partnerinfoResponse != null) {
             fastlegeResponse.toBehandler(
-                partnerId = partnerinfoResponse.partnerId,
+                partnerId = PartnerId(partnerinfoResponse.partnerId),
             )
         } else null
     }
@@ -68,17 +69,17 @@ class BehandlerService(
         }
 
         val pBehandlereForArbeidstakerList =
-            database.getBehandlerForArbeidstakerMedType(
-                personIdentNumber = behandlerArbeidstakerRelasjon.arbeidstakerPersonident,
+            database.getBehandlerAndRelasjonstypeList(
+                arbeidstakerIdent = behandlerArbeidstakerRelasjon.arbeidstakerPersonident,
             )
 
-        val isBytteAvFastlege = behandlerArbeidstakerRelasjon.type == BehandlerArbeidstakerRelasjonType.FASTLEGE &&
+        val isBytteAvFastlege = behandlerArbeidstakerRelasjon.type == BehandlerArbeidstakerRelasjonstype.FASTLEGE &&
             pBehandlereForArbeidstakerList
-            .filter { (_, behandlerType) -> behandlerType == BehandlerArbeidstakerRelasjonType.FASTLEGE.name }
+            .filter { (_, behandlerType) -> behandlerType == BehandlerArbeidstakerRelasjonstype.FASTLEGE }
             .map { (pBehandler, _) -> pBehandler.id }.firstOrNull() != pBehandler.id
 
         val behandlerIkkeKnyttetTilArbeidstaker = !pBehandlereForArbeidstakerList
-            .filter { (_, behandlerType) -> behandlerType == behandlerArbeidstakerRelasjon.type.name }
+            .filter { (_, behandlerType) -> behandlerType == behandlerArbeidstakerRelasjon.type }
             .map { (pBehandler, _) -> pBehandler.id }.contains(pBehandler.id)
 
         if (isBytteAvFastlege || behandlerIkkeKnyttetTilArbeidstaker) {
@@ -86,7 +87,7 @@ class BehandlerService(
                 behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
                 behandlerId = pBehandler.id,
             )
-        } else if (behandlerArbeidstakerRelasjon.type == BehandlerArbeidstakerRelasjonType.SYKMELDER) {
+        } else if (behandlerArbeidstakerRelasjon.type == BehandlerArbeidstakerRelasjonstype.SYKMELDER) {
             database.updateBehandlerArbeidstakerRelasjon(
                 behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
                 behandlerId = pBehandler.id,
@@ -94,21 +95,21 @@ class BehandlerService(
         }
 
         return pBehandler.toBehandler(
-            kontor = database.getBehandlerKontorForId(pBehandler.kontorId)
+            kontor = database.getBehandlerKontorById(pBehandler.kontorId)
         )
     }
 
     private fun getBehandler(behandler: Behandler): PBehandler? {
         return when {
-            behandler.personident != null -> database.getBehandlerMedPersonIdentForPartnerId(
+            behandler.personident != null -> database.getBehandlerByBehandlerPersonIdentAndPartnerId(
                 behandlerPersonIdent = behandler.personident,
                 partnerId = behandler.kontor.partnerId,
             )
-            behandler.hprId != null -> database.getBehandlerMedHprIdForPartnerId(
+            behandler.hprId != null -> database.getBehandlerByHprIdAndPartnerId(
                 hprId = behandler.hprId,
                 partnerId = behandler.kontor.partnerId,
             )
-            behandler.herId != null -> database.getBehandlerMedHerIdForPartnerId(
+            behandler.herId != null -> database.getBehandlerByHerIdAndPartnerId(
                 herId = behandler.herId,
                 partnerId = behandler.kontor.partnerId,
             )
@@ -121,7 +122,7 @@ class BehandlerService(
         behandler: Behandler,
     ): Behandler {
         database.connection.use { connection ->
-            val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)
+            val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)
             val kontorId = if (pBehandlerKontor != null) {
                 connection.updateBehandlerKontor(
                     behandler = behandler,
@@ -142,7 +143,7 @@ class BehandlerService(
             connection.commit()
 
             return pBehandler.toBehandler(
-                database.getBehandlerKontorForId(pBehandler.kontorId)
+                database.getBehandlerKontorById(pBehandler.kontorId)
             )
         }
     }
@@ -151,7 +152,7 @@ class BehandlerService(
         behandler: Behandler,
     ) {
         database.connection.use { connection ->
-            val pBehandlerKontor = connection.getBehandlerKontorForPartnerId(behandler.kontor.partnerId)!!
+            val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)!!
             connection.updateBehandlerKontor(
                 behandler = behandler,
                 pBehandlerKontor = pBehandlerKontor,
@@ -165,10 +166,10 @@ class BehandlerService(
         pBehandlerKontor: PBehandlerKontor,
     ) {
         if (!behandler.kontor.system.isNullOrBlank() && pBehandlerKontor.system != behandler.kontor.system) {
-            updateSystemForPartnerId(behandler.kontor.partnerId, behandler.kontor.system)
+            updateBehandlerKontorSystem(behandler.kontor.partnerId, behandler.kontor.system)
         }
         if (behandler.kontor.harKomplettAdresse()) {
-            updateAdresseForPartnerId(behandler.kontor.partnerId, behandler.kontor)
+            updateBehandlerKontorAddress(behandler.kontor.partnerId, behandler.kontor)
         }
     }
 

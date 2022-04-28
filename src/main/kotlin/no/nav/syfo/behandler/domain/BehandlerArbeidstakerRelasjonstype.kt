@@ -1,6 +1,6 @@
 package no.nav.syfo.behandler.domain
 
-enum class BehandlerArbeidstakerRelasjonType {
+enum class BehandlerArbeidstakerRelasjonstype {
     FASTLEGE,
     SYKMELDER,
 }
