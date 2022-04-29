@@ -12,6 +12,7 @@ fun defaultFellesformatDialogmeldingXmlRegex(): Regex {
             "            <ns2:MsgId>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns2:MsgId>\n" +
             "            <ns2:Ack V=\"J\" DN=\"Ja\"/>\n" +
             "            <ns2:ConversationRef>\n" +
+            "                <ns2:RefToParent>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns2:RefToParent>\n" +
             "                <ns2:RefToConversation>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns2:RefToConversation>\n" +
             "            </ns2:ConversationRef>\n" +
             "            <ns2:Sender>\n" +
