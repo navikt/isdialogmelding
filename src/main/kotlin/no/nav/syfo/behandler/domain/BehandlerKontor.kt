@@ -2,6 +2,7 @@ package no.nav.syfo.behandler.domain
 
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.Virksomhetsnummer
+import java.time.OffsetDateTime
 
 data class BehandlerKontor(
     val partnerId: PartnerId,
@@ -13,6 +14,7 @@ data class BehandlerKontor(
     val orgnummer: Virksomhetsnummer?,
     val dialogmeldingEnabled: Boolean,
     val system: String?,
+    val kildeTidspunkt: OffsetDateTime,
 )
 
 fun BehandlerKontor.harKomplettAdresse() = !adresse.isNullOrBlank() && !postnummer.isNullOrBlank() && !poststed.isNullOrBlank()

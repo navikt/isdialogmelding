@@ -126,16 +126,21 @@ private fun createAndStoreBehandlerFromSykmelding(
             orgnummer = receivedSykmeldingDTO.legekontorOrgNr?.let { Virksomhetsnummer(it) },
             dialogmeldingEnabled = false,
             system = receivedSykmeldingDTO.sykmelding.avsenderSystem.navn,
+            kildeTidspunkt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
         ),
         kategori = behandlerKategori,
+        kildeTidspunkt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
     )
 
     val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
         type = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
         arbeidstakerPersonident = arbeidstakerPersonident,
+        kildeTidspunkt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
     )
     behandlerService.createOrGetBehandler(
         behandler = sykmelder,
         behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
     )
 }
+
+private fun LocalDateTime.toOffsetDateTime() = ZonedDateTime.of(this, ZoneId.of("Europe/Oslo")).toOffsetDateTime()

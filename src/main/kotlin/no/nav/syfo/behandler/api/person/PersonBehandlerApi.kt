@@ -12,6 +12,7 @@ import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.OffsetDateTime
 
 private val log: Logger = LoggerFactory.getLogger("no.nav.syfo")
 
@@ -46,6 +47,7 @@ fun Route.registerPersonBehandlerApi(
                     val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
                         type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                         arbeidstakerPersonident = requestPersonIdent,
+                        kildeTidspunkt = OffsetDateTime.now(),
                     )
                     val behandler = behandlerService.createOrGetBehandler(
                         behandler = fastlege,

@@ -7,6 +7,7 @@ import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.PersonIdentNumber
 import org.flywaydb.core.Flyway
 import java.sql.Connection
+import java.time.OffsetDateTime
 import java.util.*
 
 class TestDatabase : DatabaseInterface {
@@ -60,6 +61,7 @@ fun DatabaseInterface.createBehandlerForArbeidstaker(
             BehandlerArbeidstakerRelasjon(
                 type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                 arbeidstakerPersonident = arbeidstakerPersonIdent,
+                kildeTidspunkt = OffsetDateTime.now(),
             ),
             createdBehandler.id
         )

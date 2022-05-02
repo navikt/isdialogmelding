@@ -165,10 +165,19 @@ class BehandlerService(
         behandler: Behandler,
         pBehandlerKontor: PBehandlerKontor,
     ) {
-        if (!behandler.kontor.system.isNullOrBlank() && pBehandlerKontor.system != behandler.kontor.system) {
-            updateBehandlerKontorSystem(behandler.kontor.partnerId, behandler.kontor.system)
+        if (!behandler.kontor.system.isNullOrBlank() &&
+            (
+                pBehandlerKontor.system.isNullOrBlank() ||
+                    (
+                        pBehandlerKontor.system != behandler.kontor.system && behandler.kontor.kildeTidspunkt.isAfter(
+                                pBehandlerKontor.kildeTidspunkt
+                            )
+                        )
+                )
+        ) {
+            updateBehandlerKontorSystem(behandler.kontor.partnerId, behandler.kontor)
         }
-        if (behandler.kontor.harKomplettAdresse()) {
+        if (behandler.kontor.harKomplettAdresse() && behandler.kontor.kildeTidspunkt.isAfter(pBehandlerKontor.kildeTidspunkt)) {
             updateBehandlerKontorAddress(behandler.kontor.partnerId, behandler.kontor)
         }
     }

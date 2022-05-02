@@ -186,6 +186,7 @@ class KafkaSykmeldingSpek : Spek({
                                 BehandlerArbeidstakerRelasjon(
                                     type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                                     arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                                    kildeTidspunkt = OffsetDateTime.now(),
                                 )
                             )
 
@@ -380,6 +381,48 @@ class KafkaSykmeldingSpek : Spek({
                         kontorAfterSecondMessage!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfterSecondMessage.system shouldBeEqualTo newSykmelding.sykmelding.avsenderSystem.navn
                     }
+                    it("should not update system for kontor if kildeTidspunkt older than the one already stored") {
+                        val sykmelding = generateSykmeldingDTO(
+                            uuid = UUID.randomUUID(),
+                            avsenderSystemNavn = "Systemnavnet"
+                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
+                        runBlocking {
+                            pollAndProcessSykmelding(
+                                kafkaConsumerSykmelding = mockConsumer,
+                                behandlerService = behandlerService,
+                            )
+                        }
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+                        val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
+                        kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
+
+                        val behandlerAfter = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        behandlerAfter.size shouldBeEqualTo 1
+
+                        val newSykmelding = generateSykmeldingDTO(
+                            uuid = UUID.randomUUID(),
+                            avsenderSystemNavn = "Systemnavnet tidligere",
+                            mottattTidspunkt = LocalDateTime.now().minusDays(1),
+                            behandletTidspunkt = LocalDateTime.now().minusDays(1),
+                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
+
+                        runBlocking {
+                            pollAndProcessSykmelding(
+                                kafkaConsumerSykmelding = mockConsumer,
+                                behandlerService = behandlerService,
+                            )
+                        }
+                        verify(exactly = 2) { mockConsumer.commitSync() }
+
+                        val kontorAfterSecondMessage = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
+                        kontorAfterSecondMessage!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
+                        kontorAfterSecondMessage.system shouldBeEqualTo sykmelding.sykmelding.avsenderSystem.navn
+                    }
                     it("fastlege-oppslag should update adresse for kontor") {
                         val fastlegeBehandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
                         val sykmelding = generateSykmeldingDTO(
@@ -391,6 +434,8 @@ class KafkaSykmeldingSpek : Spek({
                             hprId = fastlegeBehandler.hprId.toString(),
                             partnerreferanse = UserConstants.PARTNERID.toString(),
                             kontorHerId = UserConstants.HERID.toString(),
+                            mottattTidspunkt = LocalDateTime.now().minusMinutes(1),
+                            behandletTidspunkt = LocalDateTime.now().minusMinutes(1),
                         )
                         every { mockConsumer.poll(any<Duration>()) } returns
                             consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
@@ -412,6 +457,7 @@ class KafkaSykmeldingSpek : Spek({
                             BehandlerArbeidstakerRelasjon(
                                 type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                                kildeTidspunkt = OffsetDateTime.now(),
                             )
                         )
 
