@@ -114,7 +114,7 @@ class KafkaSykmeldingSpek : Spek({
                         behandlerRelasjonAfter.size shouldBeEqualTo 1
                         behandlerRelasjonAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.SYKMELDER.name
                     }
-                    it("should capitalize behandlernavn and remove telephone-prefix") {
+                    it("should remove telephone-prefix") {
                         val sykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
                             fornavnLege = "ANNE",
@@ -134,8 +134,8 @@ class KafkaSykmeldingSpek : Spek({
                         val behandlerAfter = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         behandlerAfter.size shouldBeEqualTo 1
                         behandlerAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
-                        behandlerAfter[0].fornavn shouldBeEqualTo "Anne"
-                        behandlerAfter[0].etternavn shouldBeEqualTo "Lege"
+                        behandlerAfter[0].fornavn shouldBeEqualTo sykmelding.sykmelding.behandler.fornavn
+                        behandlerAfter[0].etternavn shouldBeEqualTo sykmelding.sykmelding.behandler.etternavn
                         behandlerAfter[0].telefon shouldBeEqualTo "99999999"
                     }
                     it("should add second behandler from incoming sykmelding") {
