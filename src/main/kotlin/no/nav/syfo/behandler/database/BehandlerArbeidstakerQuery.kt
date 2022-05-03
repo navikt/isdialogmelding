@@ -18,8 +18,9 @@ const val queryCreateBehandlerArbeidstakerRelasjon =
             arbeidstaker_personident,
             created_at,
             updated_at,
-            behandler_id
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?) RETURNING id
+            behandler_id,
+            mottatt
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?) RETURNING id
     """
 
 fun Connection.createBehandlerArbeidstakerRelasjon(
@@ -35,6 +36,7 @@ fun Connection.createBehandlerArbeidstakerRelasjon(
         it.setObject(4, now)
         it.setObject(5, now)
         it.setInt(6, behandlerId)
+        it.setObject(7, behandlerArbeidstakerRelasjon.mottatt)
         it.executeQuery().toList { getInt("id") }
     }
 
@@ -45,8 +47,8 @@ fun Connection.createBehandlerArbeidstakerRelasjon(
 
 const val queryUpdateBehandlerArbeidstakerRelasjon =
     """
-        UPDATE BEHANDLER_ARBEIDSTAKER SET updated_at=? WHERE 
-        arbeidstaker_personident=? AND behandler_id=? AND type=?
+        UPDATE BEHANDLER_ARBEIDSTAKER SET mottatt=?, updated_at=? WHERE 
+        arbeidstaker_personident=? AND behandler_id=? AND type=? AND mottatt<?
     """
 
 fun DatabaseInterface.updateBehandlerArbeidstakerRelasjon(
@@ -54,15 +56,14 @@ fun DatabaseInterface.updateBehandlerArbeidstakerRelasjon(
     behandlerId: Int,
 ) {
     this.connection.use { connection ->
-        val rowCount = connection.prepareStatement(queryUpdateBehandlerArbeidstakerRelasjon).use {
-            it.setObject(1, OffsetDateTime.now())
-            it.setString(2, behandlerArbeidstakerRelasjon.arbeidstakerPersonident.value)
-            it.setInt(3, behandlerId)
-            it.setString(4, behandlerArbeidstakerRelasjon.type.name)
+        connection.prepareStatement(queryUpdateBehandlerArbeidstakerRelasjon).use {
+            it.setObject(1, behandlerArbeidstakerRelasjon.mottatt)
+            it.setObject(2, OffsetDateTime.now())
+            it.setString(3, behandlerArbeidstakerRelasjon.arbeidstakerPersonident.value)
+            it.setInt(4, behandlerId)
+            it.setString(5, behandlerArbeidstakerRelasjon.type.name)
+            it.setObject(6, behandlerArbeidstakerRelasjon.mottatt)
             it.executeUpdate()
-        }
-        if (rowCount != 1) {
-            throw RuntimeException("Expected update to single behandlerArbeidstakerRelasjon")
         }
         connection.commit()
     }
@@ -100,4 +101,5 @@ fun ResultSet.toPBehandlerArbeidstaker(): PBehandlerArbeidstaker =
         arbeidstakerPersonident = getString("arbeidstaker_personident"),
         createdAt = getObject("created_at", OffsetDateTime::class.java),
         updatedAt = getObject("updated_at", OffsetDateTime::class.java),
+        mottatt = getObject("mottatt", OffsetDateTime::class.java),
     )

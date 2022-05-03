@@ -10,6 +10,7 @@ data class PBehandlerArbeidstaker(
     val arbeidstakerPersonident: String,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
+    val mottatt: OffsetDateTime,
 )
 
 fun PBehandlerArbeidstaker.toBehandlerArbeidstakerRelasjon(
@@ -22,4 +23,5 @@ fun PBehandlerArbeidstaker.toBehandlerArbeidstakerRelasjon(
     fornavn = fornavn,
     mellomnavn = mellomnavn,
     etternavn = etternavn,
+    mottatt = mottatt,
 )

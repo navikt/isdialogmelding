@@ -4,6 +4,7 @@ import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.domain.*
+import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.kafka.kafkaSykmeldingConsumerConfig
 import no.nav.syfo.domain.*
 import org.apache.kafka.clients.consumer.*
@@ -125,16 +126,21 @@ private fun createAndStoreBehandlerFromSykmelding(
             orgnummer = receivedSykmeldingDTO.legekontorOrgNr?.let { Virksomhetsnummer(it) },
             dialogmeldingEnabled = false,
             system = receivedSykmeldingDTO.sykmelding.avsenderSystem.navn,
+            mottatt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
         ),
         kategori = behandlerKategori,
+        mottatt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
     )
 
     val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
         type = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
         arbeidstakerPersonident = arbeidstakerPersonident,
+        mottatt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
     )
     behandlerService.createOrGetBehandler(
         behandler = sykmelder,
         behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
     )
 }
+
+private fun LocalDateTime.toOffsetDateTime() = ZonedDateTime.of(this, ZoneId.of("Europe/Oslo")).toOffsetDateTime()

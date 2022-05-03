@@ -17,6 +17,7 @@ import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.time.Duration
+import java.time.OffsetDateTime
 import java.util.*
 
 class KafkaDialogmeldingFromBehandlerSpek : Spek({
@@ -104,7 +105,8 @@ fun addBehandlerAndKontorToDatabase(behandlerService: BehandlerService) {
 
     val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
         type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+        mottatt = OffsetDateTime.now(),
     )
 
     behandlerService.createOrGetBehandler(behandler, behandlerArbeidstakerRelasjon)

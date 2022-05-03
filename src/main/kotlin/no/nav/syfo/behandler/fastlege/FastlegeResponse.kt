@@ -3,6 +3,7 @@ package no.nav.syfo.behandler.fastlege
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.*
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.util.*
 
 data class FastlegeResponse(
@@ -60,6 +61,7 @@ fun FastlegeResponse.toBehandler(
         orgnummer = this.fastlegekontor.orgnummer?.let { Virksomhetsnummer(it) },
         dialogmeldingEnabled = dialogmeldingEnabled,
         system = null,
+        mottatt = OffsetDateTime.now(),
     ),
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
@@ -69,4 +71,5 @@ fun FastlegeResponse.toBehandler(
     personident = this.fnr?.let { PersonIdentNumber(it) },
     telefon = this.fastlegekontor.telefon,
     kategori = BehandlerKategori.LEGE,
+    mottatt = OffsetDateTime.now(),
 )

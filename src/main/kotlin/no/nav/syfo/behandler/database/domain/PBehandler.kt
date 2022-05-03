@@ -19,6 +19,7 @@ data class PBehandler(
     val kategori: String,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
+    val mottatt: OffsetDateTime,
 )
 
 fun PBehandler.toBehandler(
@@ -34,4 +35,5 @@ fun PBehandler.toBehandler(
     hprId = this.hprId?.toInt(),
     telefon = this.telefon,
     kategori = BehandlerKategori.valueOf(this.kategori),
+    mottatt = this.mottatt,
 )

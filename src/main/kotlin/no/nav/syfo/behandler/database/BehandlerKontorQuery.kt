@@ -22,8 +22,9 @@ const val queryCreateBehandlerKontor =
             dialogmelding_enabled,
             system,
             created_at,
-            updated_at
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            updated_at,
+            mottatt
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             RETURNING ID;
     """
 
@@ -47,6 +48,7 @@ fun Connection.createBehandlerKontor(
         it.setString(9, kontor.system)
         it.setObject(10, now)
         it.setObject(11, now)
+        it.setObject(12, kontor.mottatt)
         it.executeQuery().toList { getInt("id") }
     }
 
@@ -78,15 +80,16 @@ fun DatabaseInterface.updateBehandlerKontorDialogmeldingEnabled(partnerId: Partn
 
 const val queryUpdateBehandlerKontorSystem =
     """
-        UPDATE BEHANDLER_KONTOR SET system=?,updated_at=? WHERE partner_id=?
+        UPDATE BEHANDLER_KONTOR SET system=?,updated_at=?,mottatt=? WHERE partner_id=?
     """
 
-fun Connection.updateBehandlerKontorSystem(partnerId: PartnerId, system: String) {
+fun Connection.updateBehandlerKontorSystem(partnerId: PartnerId, kontor: BehandlerKontor) {
     val rowCount = prepareStatement(queryUpdateBehandlerKontorSystem)
         .use {
-            it.setString(1, system)
+            it.setString(1, kontor.system)
             it.setObject(2, OffsetDateTime.now())
-            it.setString(3, partnerId.toString())
+            it.setObject(3, kontor.mottatt)
+            it.setString(4, partnerId.toString())
             it.executeUpdate()
         }
     if (rowCount != 1) {
@@ -96,7 +99,7 @@ fun Connection.updateBehandlerKontorSystem(partnerId: PartnerId, system: String)
 
 const val queryUpdateBehandlerKontorAddress =
     """
-        UPDATE BEHANDLER_KONTOR SET adresse=?,postnummer=?,poststed=?,updated_at=? WHERE partner_id=?
+        UPDATE BEHANDLER_KONTOR SET adresse=?,postnummer=?,poststed=?,updated_at=?,mottatt=? WHERE partner_id=?
     """
 
 fun Connection.updateBehandlerKontorAddress(partnerId: PartnerId, kontor: BehandlerKontor) {
@@ -106,7 +109,8 @@ fun Connection.updateBehandlerKontorAddress(partnerId: PartnerId, kontor: Behand
             it.setString(2, kontor.postnummer)
             it.setString(3, kontor.poststed)
             it.setObject(4, OffsetDateTime.now())
-            it.setString(5, partnerId.toString())
+            it.setObject(5, kontor.mottatt)
+            it.setString(6, partnerId.toString())
             it.executeUpdate()
         }
     if (rowCount != 1) {
@@ -158,4 +162,5 @@ fun ResultSet.toPBehandlerKontor(): PBehandlerKontor =
         system = getString("system"),
         createdAt = getObject("created_at", OffsetDateTime::class.java),
         updatedAt = getObject("updated_at", OffsetDateTime::class.java),
+        mottatt = getObject("mottatt", OffsetDateTime::class.java),
     )
