@@ -29,7 +29,6 @@ fun launchKafkaTaskSykmelding(
 ) {
     launchBackgroundTask(
         applicationState = applicationState,
-        finallyNotReady = false,
     ) {
         blockingApplicationLogicSykmelding(
             applicationState = applicationState,

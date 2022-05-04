@@ -32,11 +32,15 @@ fun blockingApplicationLogicSykmelding(
         listOf(SYKMELDING_TOPIC)
     )
     var processed = 0
-    while (applicationState.ready && processed < 1000) {
+    while (applicationState.ready) {
         processed += pollAndProcessSykmelding(
             kafkaConsumerSykmelding = kafkaConsumerSykmelding,
             behandlerService = behandlerService,
         )
+        if (processed >= 1000) {
+            log.info("Done processing $processed sykmeldinger")
+            processed = 0
+        }
     }
 }
 
@@ -45,18 +49,14 @@ fun pollAndProcessSykmelding(
     behandlerService: BehandlerService,
 ): Int {
     val records = kafkaConsumerSykmelding.poll(Duration.ofMillis(1000))
-    var processed = 0
-    if (records.count() > 0) {
-        processed = processSykmelding(
+    return if (records.count() > 0) {
+        val processed = processSykmelding(
             behandlerService = behandlerService,
             consumerRecords = records,
         )
         kafkaConsumerSykmelding.commitSync()
-        if (processed > 0) {
-            log.info("Done processing $processed sykmeldinger")
-        }
-    }
-    return processed
+        processed
+    } else 0
 }
 
 fun processSykmelding(
@@ -69,8 +69,6 @@ fun processSykmelding(
             if (receivedSykmeldingDTO.mottattDato.isAfter(PROCESS_SYKMELDING_INCOMING_AFTER)) {
                 COUNT_MOTTATT_SYKMELDING.increment()
                 if (validateReceivedSykmelding(it)) {
-                    log.info("Received sykmelding record from ${receivedSykmeldingDTO.mottattDato} with key ${it.key()} and partnerId ${receivedSykmeldingDTO.partnerreferanse}")
-
                     createAndStoreBehandlerFromSykmelding(
                         receivedSykmeldingDTO = receivedSykmeldingDTO,
                         behandlerService = behandlerService,
