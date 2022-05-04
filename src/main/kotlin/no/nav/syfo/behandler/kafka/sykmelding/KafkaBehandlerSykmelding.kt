@@ -31,8 +31,9 @@ fun blockingApplicationLogicSykmelding(
     kafkaConsumerSykmelding.subscribe(
         listOf(SYKMELDING_TOPIC)
     )
-    while (applicationState.ready) {
-        pollAndProcessSykmelding(
+    var processed = 0
+    while (applicationState.ready && processed < 1000) {
+        processed += pollAndProcessSykmelding(
             kafkaConsumerSykmelding = kafkaConsumerSykmelding,
             behandlerService = behandlerService,
         )
@@ -42,26 +43,31 @@ fun blockingApplicationLogicSykmelding(
 fun pollAndProcessSykmelding(
     kafkaConsumerSykmelding: KafkaConsumer<String, ReceivedSykmeldingDTO>,
     behandlerService: BehandlerService,
-) {
+): Int {
     val records = kafkaConsumerSykmelding.poll(Duration.ofMillis(1000))
+    var processed = 0
     if (records.count() > 0) {
-        processSykmelding(
+        processed = processSykmelding(
             behandlerService = behandlerService,
             consumerRecords = records,
         )
         kafkaConsumerSykmelding.commitSync()
+        if (processed > 0) {
+            log.info("Done processing $processed sykmeldinger")
+        }
     }
+    return processed
 }
 
 fun processSykmelding(
     behandlerService: BehandlerService,
     consumerRecords: ConsumerRecords<String, ReceivedSykmeldingDTO>,
-) {
+): Int {
+    var processed = 0
     consumerRecords.forEach {
         it.value()?.let { receivedSykmeldingDTO ->
             if (receivedSykmeldingDTO.mottattDato.isAfter(PROCESS_SYKMELDING_INCOMING_AFTER)) {
                 COUNT_MOTTATT_SYKMELDING.increment()
-
                 if (validateReceivedSykmelding(it)) {
                     log.info("Received sykmelding record from ${receivedSykmeldingDTO.mottattDato} with key ${it.key()} and partnerId ${receivedSykmeldingDTO.partnerreferanse}")
 
@@ -71,9 +77,11 @@ fun processSykmelding(
                     )
                     COUNT_MOTTATT_SYKMELDING_SUCCESS.increment()
                 }
+                processed++
             }
         }
     }
+    return processed
 }
 
 private fun validateReceivedSykmelding(

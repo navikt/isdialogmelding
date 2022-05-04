@@ -8,14 +8,19 @@ private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.application")
 
 fun launchBackgroundTask(
     applicationState: ApplicationState,
-    action: suspend CoroutineScope.() -> Unit
+    finallyNotReady: Boolean = true,
+    action: suspend CoroutineScope.() -> Unit,
 ): Job = GlobalScope.launch {
     try {
         action()
     } catch (ex: Exception) {
         log.error("Exception received while launching background task. Terminating application.", ex)
     } finally {
-        applicationState.alive = false
-        applicationState.ready = false
+        if (finallyNotReady) {
+            applicationState.alive = false
+            applicationState.ready = false
+        } else {
+            log.info("Background task exited normally")
+        }
     }
 }

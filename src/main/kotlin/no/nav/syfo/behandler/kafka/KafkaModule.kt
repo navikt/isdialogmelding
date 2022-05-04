@@ -27,7 +27,10 @@ fun launchKafkaTaskSykmelding(
     applicationEnvironmentKafka: ApplicationEnvironmentKafka,
     behandlerService: BehandlerService,
 ) {
-    launchBackgroundTask(applicationState = applicationState) {
+    launchBackgroundTask(
+        applicationState = applicationState,
+        finallyNotReady = false,
+    ) {
         blockingApplicationLogicSykmelding(
             applicationState = applicationState,
             applicationEnvironmentKafka = applicationEnvironmentKafka,

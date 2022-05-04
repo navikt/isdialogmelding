@@ -77,7 +77,7 @@ spec:
     - name: KTOR_ENV
       value: "production"
     - name: TOGGLE_KAFKA_PROCESSING_SYKMELDING_ENABLED
-      value: "false"
+      value: "true"
     - name: TOGGLE_KAFKA_PROCESSING_DIALOGMELDING_ENABLED
       value: "false"
     - name: MQGATEWAY_NAME
