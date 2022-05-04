@@ -126,7 +126,7 @@ class BehandlerService(
             val kontorId = if (pBehandlerKontor != null) {
                 connection.updateBehandlerKontor(
                     behandler = behandler,
-                    pBehandlerKontor = pBehandlerKontor,
+                    existingBehandlerKontor = pBehandlerKontor,
                 )
                 pBehandlerKontor.id
             } else {
@@ -152,10 +152,10 @@ class BehandlerService(
         behandler: Behandler,
     ) {
         database.connection.use { connection ->
-            val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)!!
+            val existingBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)!!
             connection.updateBehandlerKontor(
                 behandler = behandler,
-                pBehandlerKontor = pBehandlerKontor,
+                existingBehandlerKontor = existingBehandlerKontor,
             )
             connection.commit()
         }
@@ -163,15 +163,30 @@ class BehandlerService(
 
     private fun Connection.updateBehandlerKontor(
         behandler: Behandler,
-        pBehandlerKontor: PBehandlerKontor,
+        existingBehandlerKontor: PBehandlerKontor,
     ) {
-        if (!behandler.kontor.system.isNullOrBlank() && pBehandlerKontor.system != behandler.kontor.system) {
-            updateBehandlerKontorSystem(behandler.kontor.partnerId, behandler.kontor.system)
+        if (shouldUpdateKontorSystem(behandler.kontor, existingBehandlerKontor)) {
+            updateBehandlerKontorSystem(behandler.kontor.partnerId, behandler.kontor)
         }
-        if (behandler.kontor.harKomplettAdresse()) {
+        if (shouldUpdateKontorAdresse(behandler.kontor, existingBehandlerKontor)) {
             updateBehandlerKontorAddress(behandler.kontor.partnerId, behandler.kontor)
         }
     }
+
+    private fun shouldUpdateKontorSystem(
+        behandlerKontor: BehandlerKontor,
+        existingBehandlerKontor: PBehandlerKontor,
+    ): Boolean =
+        !behandlerKontor.system.isNullOrBlank() && (
+            existingBehandlerKontor.system.isNullOrBlank() ||
+                behandlerKontor.mottatt.isAfter(existingBehandlerKontor.mottatt)
+            )
+
+    private fun shouldUpdateKontorAdresse(
+        behandlerKontor: BehandlerKontor,
+        existingBehandlerKontor: PBehandlerKontor,
+    ): Boolean =
+        behandlerKontor.harKomplettAdresse() && behandlerKontor.mottatt.isAfter(existingBehandlerKontor.mottatt)
 
     private fun addBehandlerToArbeidstaker(
         behandlerArbeidstakerRelasjon: BehandlerArbeidstakerRelasjon,

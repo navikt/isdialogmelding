@@ -29,6 +29,7 @@ fun Connection.createBehandler(
         it.setString(10, behandler.telefon)
         it.setObject(11, now)
         it.setObject(12, now)
+        it.setObject(13, behandler.mottatt)
         it.executeQuery().toList { toPBehandler() }
     }
 
@@ -54,8 +55,9 @@ const val queryCreateBehandler =
             hpr_id,
             telefon,
             created_at,
-            updated_at
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            updated_at,
+            mottatt
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             RETURNING
             id,
             behandler_ref,
@@ -69,7 +71,8 @@ const val queryCreateBehandler =
             hpr_id,
             telefon,
             created_at,
-            updated_at
+            updated_at,
+            mottatt
     """
 
 const val queryGetBehandlerByBehandlerPersonIdentAndPartnerId =
@@ -191,4 +194,5 @@ fun ResultSet.toPBehandler(): PBehandler =
         telefon = getString("telefon"),
         createdAt = getObject("created_at", OffsetDateTime::class.java),
         updatedAt = getObject("updated_at", OffsetDateTime::class.java),
+        mottatt = getObject("mottatt", OffsetDateTime::class.java),
     )

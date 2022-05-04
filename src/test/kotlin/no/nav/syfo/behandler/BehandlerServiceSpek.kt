@@ -4,8 +4,7 @@ import io.ktor.server.testing.*
 import io.mockk.mockk
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.toBehandler
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.testhelper.ExternalMockEnvironment
 import no.nav.syfo.testhelper.UserConstants
@@ -16,6 +15,7 @@ import org.amshove.kluent.*
 import org.junit.Assert.assertThrows
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import java.time.OffsetDateTime
 
 class BehandlerServiceSpek : Spek({
     describe("BehandlerService") {
@@ -41,7 +41,8 @@ class BehandlerServiceSpek : Spek({
                             generateFastlegeResponse().toBehandler(UserConstants.PARTNERID),
                             BehandlerArbeidstakerRelasjon(
                                 type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                                mottatt = OffsetDateTime.now(),
                             )
                         )
 
@@ -62,7 +63,8 @@ class BehandlerServiceSpek : Spek({
                             ),
                             BehandlerArbeidstakerRelasjon(
                                 type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                                mottatt = OffsetDateTime.now(),
                             )
                         )
 
@@ -90,7 +92,8 @@ class BehandlerServiceSpek : Spek({
                             ),
                             BehandlerArbeidstakerRelasjon(
                                 type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                                mottatt = OffsetDateTime.now(),
                             )
                         )
 
@@ -104,7 +107,21 @@ class BehandlerServiceSpek : Spek({
                     behandlerFromDB.kontor.system shouldBe null
 
                     database.connection.use {
-                        it.updateBehandlerKontorSystem(behandlerFromDB.kontor.partnerId, "EPJ-systemet")
+                        it.updateBehandlerKontorSystem(
+                            partnerId = behandlerFromDB.kontor.partnerId,
+                            kontor = BehandlerKontor(
+                                partnerId = behandlerFromDB.kontor.partnerId,
+                                herId = behandlerFromDB.kontor.herId,
+                                navn = behandlerFromDB.kontor.navn,
+                                adresse = behandlerFromDB.kontor.adresse,
+                                postnummer = behandlerFromDB.kontor.postnummer,
+                                poststed = behandlerFromDB.kontor.poststed,
+                                orgnummer = behandlerFromDB.kontor.orgnummer,
+                                dialogmeldingEnabled = behandlerFromDB.kontor.dialogmeldingEnabled,
+                                system = "EPJ-systemet",
+                                mottatt = OffsetDateTime.now(),
+                            ),
+                        )
                         it.commit()
                     }
 
@@ -118,14 +135,16 @@ class BehandlerServiceSpek : Spek({
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         )
                     )
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         )
                     )
                     val pBehandlerList = database.getBehandlerByArbeidstaker(
@@ -139,14 +158,16 @@ class BehandlerServiceSpek : Spek({
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ANNEN_ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ANNEN_ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
                     behandlerService.createOrGetBehandler(
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
 
@@ -167,7 +188,8 @@ class BehandlerServiceSpek : Spek({
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
 
@@ -186,7 +208,8 @@ class BehandlerServiceSpek : Spek({
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
 
@@ -205,7 +228,8 @@ class BehandlerServiceSpek : Spek({
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
 
@@ -222,7 +246,8 @@ class BehandlerServiceSpek : Spek({
                             behandler,
                             BehandlerArbeidstakerRelasjon(
                                 type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                                mottatt = OffsetDateTime.now(),
                             ),
                         )
                     }
@@ -242,7 +267,8 @@ class BehandlerServiceSpek : Spek({
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
 
@@ -263,7 +289,8 @@ class BehandlerServiceSpek : Spek({
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
 
@@ -286,7 +313,8 @@ class BehandlerServiceSpek : Spek({
                         behandler = annenBehandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
 
@@ -313,7 +341,8 @@ class BehandlerServiceSpek : Spek({
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
 
@@ -337,7 +366,8 @@ class BehandlerServiceSpek : Spek({
                         behandler,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
 
@@ -361,7 +391,8 @@ class BehandlerServiceSpek : Spek({
                         behandler = sammeBehandlerAnnenPartnerId,
                         BehandlerArbeidstakerRelasjon(
                             type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
                         ),
                     )
 

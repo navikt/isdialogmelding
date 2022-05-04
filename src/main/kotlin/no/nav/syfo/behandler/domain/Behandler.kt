@@ -3,6 +3,7 @@ package no.nav.syfo.behandler.domain
 import no.nav.syfo.behandler.api.BehandlerDTO
 import no.nav.syfo.behandler.api.person.PersonBehandlerDTO
 import no.nav.syfo.domain.PersonIdentNumber
+import java.time.OffsetDateTime
 import java.util.*
 
 data class Behandler(
@@ -16,6 +17,7 @@ data class Behandler(
     val telefon: String?,
     val kontor: BehandlerKontor,
     val kategori: BehandlerKategori,
+    val mottatt: OffsetDateTime,
 )
 
 fun Behandler.toBehandlerDTO(
