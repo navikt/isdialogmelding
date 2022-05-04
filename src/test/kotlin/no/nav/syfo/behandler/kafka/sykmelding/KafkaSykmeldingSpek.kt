@@ -83,9 +83,9 @@ class KafkaSykmeldingSpek : Spek({
                             consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
                         val kontorBefore = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
-                        val behandlerBefore = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandlereBefore = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         kontorBefore shouldBe null
-                        behandlerBefore.size shouldBeEqualTo 0
+                        behandlereBefore.size shouldBeEqualTo 0
 
                         runBlocking {
                             pollAndProcessSykmelding(
@@ -98,21 +98,61 @@ class KafkaSykmeldingSpek : Spek({
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfter.herId shouldBeEqualTo sykmelding.legekontorHerId
 
-                        val behandlerAfter = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
-                        behandlerAfter.size shouldBeEqualTo 1
-                        behandlerAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
-                        behandlerAfter[0].kategori shouldBeEqualTo BehandlerKategori.LEGE.name
-                        behandlerAfter[0].herId shouldBeEqualTo sykmelding.sykmelding.behandler.her
-                        behandlerAfter[0].fornavn shouldBeEqualTo sykmelding.sykmelding.behandler.fornavn
-                        behandlerAfter[0].etternavn shouldBeEqualTo sykmelding.sykmelding.behandler.etternavn
-                        behandlerAfter[0].telefon shouldBeEqualTo sykmelding.sykmelding.behandler.tlf
+                        val behandlereAfter = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        behandlereAfter.size shouldBeEqualTo 1
+                        behandlereAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
+                        behandlereAfter[0].kategori shouldBeEqualTo BehandlerKategori.LEGE.name
+                        behandlereAfter[0].herId shouldBeEqualTo sykmelding.sykmelding.behandler.her
+                        behandlereAfter[0].fornavn shouldBeEqualTo sykmelding.sykmelding.behandler.fornavn
+                        behandlereAfter[0].etternavn shouldBeEqualTo sykmelding.sykmelding.behandler.etternavn
+                        behandlereAfter[0].telefon shouldBeEqualTo sykmelding.sykmelding.behandler.tlf
 
-                        val behandlerRelasjonAfter = database.getBehandlerArbeidstakerRelasjon(
+                        val behandlerRelasjonerAfter = database.getBehandlerArbeidstakerRelasjon(
                             personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
-                            behandlerRef = behandlerAfter[0].behandlerRef,
+                            behandlerRef = behandlereAfter[0].behandlerRef,
                         )
-                        behandlerRelasjonAfter.size shouldBeEqualTo 1
-                        behandlerRelasjonAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.SYKMELDER.name
+                        behandlerRelasjonerAfter.size shouldBeEqualTo 1
+                        behandlerRelasjonerAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.SYKMELDER.name
+                    }
+                    it("should persist behandler from incoming sykmelding even if herid is blank") {
+                        val sykmelding = generateSykmeldingDTO(
+                            uuid = UUID.randomUUID(),
+                            herId = " ",
+                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
+                        val kontorBefore = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
+                        val behandlereBefore = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        kontorBefore shouldBe null
+                        behandlereBefore.size shouldBeEqualTo 0
+
+                        runBlocking {
+                            pollAndProcessSykmelding(
+                                kafkaConsumerSykmelding = mockConsumer,
+                                behandlerService = behandlerService,
+                            )
+                        }
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+                        val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
+                        kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
+                        kontorAfter.herId shouldBeEqualTo sykmelding.legekontorHerId
+
+                        val behandlereAfter = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        behandlereAfter.size shouldBeEqualTo 1
+                        behandlereAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
+                        behandlereAfter[0].kategori shouldBeEqualTo BehandlerKategori.LEGE.name
+                        behandlereAfter[0].herId shouldBe null
+                        behandlereAfter[0].fornavn shouldBeEqualTo sykmelding.sykmelding.behandler.fornavn
+                        behandlereAfter[0].etternavn shouldBeEqualTo sykmelding.sykmelding.behandler.etternavn
+                        behandlereAfter[0].telefon shouldBeEqualTo sykmelding.sykmelding.behandler.tlf
+
+                        val behandlerRelasjonerAfter = database.getBehandlerArbeidstakerRelasjon(
+                            personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
+                            behandlerRef = behandlereAfter[0].behandlerRef,
+                        )
+                        behandlerRelasjonerAfter.size shouldBeEqualTo 1
+                        behandlerRelasjonerAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.SYKMELDER.name
                     }
                     it("should remove telephone-prefix") {
                         val sykmelding = generateSykmeldingDTO(
@@ -574,6 +614,25 @@ class KafkaSykmeldingSpek : Spek({
                         val sykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
                             partnerreferanse = "",
+                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
+                        runBlocking {
+                            pollAndProcessSykmelding(
+                                kafkaConsumerSykmelding = mockConsumer,
+                                behandlerService = behandlerService,
+                            )
+                        }
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+                        val behandler =
+                            database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        behandler.size shouldBeEqualTo 0
+                    }
+                    it("should ignore when partnerId is not numeric") {
+                        val sykmelding = generateSykmeldingDTO(
+                            uuid = UUID.randomUUID(),
+                            partnerreferanse = "x",
                         )
                         every { mockConsumer.poll(any<Duration>()) } returns
                             consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
