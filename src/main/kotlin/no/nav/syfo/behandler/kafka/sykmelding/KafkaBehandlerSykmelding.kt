@@ -92,13 +92,13 @@ private fun validateReceivedSykmelding(
         COUNT_MOTTATT_SYKMELDING_IGNORED_MISMATCHED.increment()
         return false
     }
-    if (receivedSykmeldingDTO.partnerreferanse.isNullOrBlank()) {
+    if (receivedSykmeldingDTO.partnerreferanse?.toIntOrNull() == null) {
         log.info("Ignoring Received sykmelding record from $sykmeldingMottattDato with key ${consumerRecord.key()} since no partnerId")
         COUNT_MOTTATT_SYKMELDING_IGNORED_PARTNERID.increment()
         return false
     }
     if (BehandlerKategori.fromKategoriKode(receivedSykmeldingDTO.legeHelsepersonellkategori) == null) {
-        log.info("Ignoring Received sykmelding record from $sykmeldingMottattDato with key ${consumerRecord.key()} since missing or invalid helsepersonellkategori")
+        log.info("Ignoring Received sykmelding record from $sykmeldingMottattDato with key ${consumerRecord.key()} since missing or invalid helsepersonellkategori: ${receivedSykmeldingDTO.legeHelsepersonellkategori}")
         COUNT_MOTTATT_SYKMELDING_IGNORED_BEHANDLERKATEGORI.increment()
         return false
     }
@@ -119,12 +119,12 @@ private fun createAndStoreBehandlerFromSykmelding(
         fornavn = sykmeldingBehandler.fornavn,
         mellomnavn = sykmeldingBehandler.mellomnavn,
         etternavn = sykmeldingBehandler.etternavn,
-        herId = sykmeldingBehandler.her?.toInt(),
-        hprId = sykmeldingBehandler.hpr?.toInt(),
-        telefon = sykmeldingBehandler.tlf?.removePrefix("tel:"),
+        herId = sykmeldingBehandler.her?.toIntOrNull(),
+        hprId = sykmeldingBehandler.hpr?.toIntOrNull(),
+        telefon = sykmeldingBehandler.tlf?.removePrefix("tel:")?.removePrefix("Tel:"),
         kontor = BehandlerKontor(
             partnerId = PartnerId(partnerId.toInt()),
-            herId = receivedSykmeldingDTO.legekontorHerId?.toInt(),
+            herId = receivedSykmeldingDTO.legekontorHerId?.toIntOrNull(),
             navn = receivedSykmeldingDTO.legekontorOrgName,
             adresse = sykmeldingBehandler.adresse.gate,
             postnummer = sykmeldingBehandler.adresse.postnummer?.toString(),

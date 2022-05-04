@@ -21,6 +21,7 @@ fun kafkaSykmeldingConsumerConfig(
     applicationEnvironmentKafka: ApplicationEnvironmentKafka,
 ): Properties {
     return kafkaConsumerConfig(applicationEnvironmentKafka).apply {
+        this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "500"
         this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] =
             JacksonKafkaDeserializerSykmelding::class.java.canonicalName
     }
