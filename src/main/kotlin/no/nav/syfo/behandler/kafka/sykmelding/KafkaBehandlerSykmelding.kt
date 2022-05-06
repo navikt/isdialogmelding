@@ -50,12 +50,12 @@ fun pollAndProcessSykmelding(
 ): Int {
     val records = kafkaConsumerSykmelding.poll(Duration.ofMillis(1000))
     return if (records.count() > 0) {
-        val processed = processSykmelding(
+        processSykmelding(
             behandlerService = behandlerService,
             consumerRecords = records,
-        )
-        kafkaConsumerSykmelding.commitSync()
-        processed
+        ).also {
+            kafkaConsumerSykmelding.commitSync()
+        }
     } else 0
 }
 
