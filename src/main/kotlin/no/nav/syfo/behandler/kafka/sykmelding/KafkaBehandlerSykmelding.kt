@@ -31,39 +31,32 @@ fun blockingApplicationLogicSykmelding(
     kafkaConsumerSykmelding.subscribe(
         listOf(SYKMELDING_TOPIC)
     )
-    var processed = 0
     while (applicationState.ready) {
-        processed += pollAndProcessSykmelding(
+        pollAndProcessSykmelding(
             kafkaConsumerSykmelding = kafkaConsumerSykmelding,
             behandlerService = behandlerService,
         )
-        if (processed >= 1000) {
-            log.info("Done processing $processed sykmeldinger")
-            processed = 0
-        }
     }
 }
 
 fun pollAndProcessSykmelding(
     kafkaConsumerSykmelding: KafkaConsumer<String, ReceivedSykmeldingDTO>,
     behandlerService: BehandlerService,
-): Int {
+) {
     val records = kafkaConsumerSykmelding.poll(Duration.ofMillis(1000))
-    return if (records.count() > 0) {
+    if (records.count() > 0) {
         processSykmelding(
             behandlerService = behandlerService,
             consumerRecords = records,
-        ).also {
-            kafkaConsumerSykmelding.commitSync()
-        }
-    } else 0
+        )
+        kafkaConsumerSykmelding.commitSync()
+    }
 }
 
 fun processSykmelding(
     behandlerService: BehandlerService,
     consumerRecords: ConsumerRecords<String, ReceivedSykmeldingDTO>,
-): Int {
-    var processed = 0
+) {
     consumerRecords.forEach {
         it.value()?.let { receivedSykmeldingDTO ->
             if (receivedSykmeldingDTO.mottattDato.isAfter(PROCESS_SYKMELDING_INCOMING_AFTER)) {
@@ -75,30 +68,24 @@ fun processSykmelding(
                     )
                     COUNT_MOTTATT_SYKMELDING_SUCCESS.increment()
                 }
-                processed++
             }
         }
     }
-    return processed
 }
 
 private fun validateReceivedSykmelding(
     consumerRecord: ConsumerRecord<String, ReceivedSykmeldingDTO>,
 ): Boolean {
     val receivedSykmeldingDTO = consumerRecord.value()
-    val sykmeldingMottattDato = receivedSykmeldingDTO.mottattDato
     if (receivedSykmeldingDTO.sykmelding.behandler.fnr != receivedSykmeldingDTO.personNrLege) {
-        log.info("Ignoring Received sykmelding record from $sykmeldingMottattDato with key ${consumerRecord.key()} since mismatched behandler fnr")
         COUNT_MOTTATT_SYKMELDING_IGNORED_MISMATCHED.increment()
         return false
     }
     if (receivedSykmeldingDTO.partnerreferanse?.toIntOrNull() == null) {
-        log.info("Ignoring Received sykmelding record from $sykmeldingMottattDato with key ${consumerRecord.key()} since no partnerId")
         COUNT_MOTTATT_SYKMELDING_IGNORED_PARTNERID.increment()
         return false
     }
     if (BehandlerKategori.fromKategoriKode(receivedSykmeldingDTO.legeHelsepersonellkategori) == null) {
-        log.info("Ignoring Received sykmelding record from $sykmeldingMottattDato with key ${consumerRecord.key()} since missing or invalid helsepersonellkategori: ${receivedSykmeldingDTO.legeHelsepersonellkategori}")
         COUNT_MOTTATT_SYKMELDING_IGNORED_BEHANDLERKATEGORI.increment()
         return false
     }
