@@ -108,7 +108,7 @@ fun Connection.getBestillinger(uuid: UUID): PDialogmeldingToBehandlerBestilling?
 
 const val queryGetBestillingerNotSent =
     """
-        SELECT * FROM BEHANDLER_DIALOGMELDING_BESTILLING WHERE sendt is NULL LIMIT 50
+        SELECT * FROM BEHANDLER_DIALOGMELDING_BESTILLING WHERE sendt is NULL ORDER BY id LIMIT 50
     """
 
 fun DatabaseInterface.getDialogmeldingToBehandlerBestillingNotSendt(): List<PDialogmeldingToBehandlerBestilling> {
