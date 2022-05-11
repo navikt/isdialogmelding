@@ -1,6 +1,7 @@
 package no.nav.syfo.application
 
 import kotlinx.coroutines.*
+import no.nav.syfo.util.Unbounded
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -9,7 +10,7 @@ private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.application")
 fun launchBackgroundTask(
     applicationState: ApplicationState,
     action: suspend CoroutineScope.() -> Unit,
-): Job = GlobalScope.launch {
+): Job = GlobalScope.launch(Dispatchers.Unbounded) {
     try {
         action()
     } catch (ex: Exception) {
