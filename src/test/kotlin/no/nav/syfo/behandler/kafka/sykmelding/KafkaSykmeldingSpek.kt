@@ -53,6 +53,7 @@ class KafkaSykmeldingSpek : Spek({
                 syfoPartnerinfoUrl = externalMockEnvironment.environment.syfoPartnerinfoUrl,
             ),
             database = database,
+            toggleSykmeldingbehandlere = externalMockEnvironment.environment.toggleSykmeldingbehandlere,
         )
 
         val mockConsumer = mockk<KafkaConsumer<String, ReceivedSykmeldingDTO>>()
@@ -438,6 +439,7 @@ class KafkaSykmeldingSpek : Spek({
                         val behandlerAfterAnotherGet = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
                         behandlerAfterAnotherGet.size shouldBeEqualTo 2
                     }
+
                     it("should update system for kontor") {
                         val sykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),

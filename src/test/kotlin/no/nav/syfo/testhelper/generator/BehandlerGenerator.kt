@@ -5,7 +5,14 @@ import no.nav.syfo.domain.*
 import java.time.OffsetDateTime
 import java.util.UUID
 
-fun generateBehandler(behandlerRef: UUID, partnerId: PartnerId) = Behandler(
+fun generateBehandler(
+    behandlerRef: UUID,
+    partnerId: PartnerId,
+    dialogmeldingEnabled: Boolean = true,
+    personident: PersonIdentNumber = PersonIdentNumber("12125678911"),
+    herId: Int = 77,
+    hprId: Int = 9,
+) = Behandler(
     behandlerRef = behandlerRef,
     kontor = BehandlerKontor(
         partnerId = partnerId,
@@ -15,16 +22,16 @@ fun generateBehandler(behandlerRef: UUID, partnerId: PartnerId) = Behandler(
         postnummer = "1234",
         poststed = "poststed",
         orgnummer = Virksomhetsnummer("123456789"),
-        dialogmeldingEnabled = true,
+        dialogmeldingEnabled = dialogmeldingEnabled,
         system = null,
         mottatt = OffsetDateTime.now(),
     ),
-    personident = PersonIdentNumber("12125678911"),
+    personident = personident,
     fornavn = "Dana",
     mellomnavn = "Katherine",
     etternavn = "Scully",
-    herId = 77,
-    hprId = 9,
+    herId = herId,
+    hprId = hprId,
     telefon = null,
     kategori = BehandlerKategori.LEGE,
     mottatt = OffsetDateTime.now(),

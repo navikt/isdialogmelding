@@ -20,6 +20,7 @@ data class Behandler(
     val mottatt: OffsetDateTime,
 )
 
+// TODO: Få med behandlerkategori
 fun Behandler.toBehandlerDTO(
     behandlerType: BehandlerArbeidstakerRelasjonstype,
 ) = BehandlerDTO(
@@ -56,3 +57,12 @@ fun Behandler.toPersonBehandlerDTO(
 )
 
 fun Behandler.hasAnId(): Boolean = personident != null || herId != null || hprId != null
+
+fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.removeDuplicates() = this.sortFastlegerFirst().distinctBy { it.first.behandlerRef }
+
+fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.sortFastlegerFirst(): List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>> {
+    val (fastleger, otherBehandlere) = this.partition { it.second == BehandlerArbeidstakerRelasjonstype.FASTLEGE }
+    return fastleger + otherBehandlere
+}
+
+fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.toBehandlerDTOList() = this.map { it.first.toBehandlerDTO(it.second) }

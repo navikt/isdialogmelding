@@ -23,6 +23,7 @@ object UserConstants {
     const val HERID = 404
     const val HPRID = 1337
     const val OTHER_HERID = 604
+    const val OTHER_HPRID = 804
     const val HERID_UTEN_PARTNERINFO = 504
     const val HERID_MED_FLERE_PARTNERINFO = 704
 

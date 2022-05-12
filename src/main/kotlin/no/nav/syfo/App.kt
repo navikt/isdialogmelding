@@ -68,6 +68,7 @@ fun main() {
                 fastlegeClient = fastlegeClient,
                 partnerinfoClient = partnerinfoClient,
                 database = applicationDatabase,
+                environment.toggleSykmeldingbehandlere,
             )
 
             apiModule(
