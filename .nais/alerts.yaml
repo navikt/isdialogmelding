@@ -1,0 +1,25 @@
+apiVersion: "nais.io/v1"
+kind: "Alert"
+metadata:
+  name: isdialogmelding-alerts
+  namespace: teamsykefravr
+  labels:
+    team: teamsykefravr
+spec:
+  receivers:
+    slack:
+      channel: '#syfo-alarm'
+      prependText: '<!here> | '
+  alerts:
+    - alert: ISDIALOGMELDING IS DOWN
+      expr: sum(up{app="isdialogmelding", job="kubernetes-pods"}) == 0
+      for: 5m
+      description: "Det er ingen pods for app kjørende i namespace og dermed er appen nede"
+      action: "Undersøk hvorfor pods er nede og få den kjørende igjen!"
+      severity: danger
+    - alert: FAILURES IN CRONJOB FOR SENDING DIALOGMELDING
+      expr: sum(increase(isdialogmelding_cronjob_dialogmelding_fail_count_total{app="isdialogmelding"} [1h])) > 0
+      for: 5m
+      description: "{{ $labels.app }} klarer ikke å sende dialogmeldinger."
+      action: "Undersøk hvorfor det feiler i logger og om det er en midlertidig feil eller ikke."
+      severity: danger
