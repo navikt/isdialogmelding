@@ -81,7 +81,7 @@ spec:
     - name: TOGGLE_KAFKA_PROCESSING_DIALOGMELDING_ENABLED
       value: "true"
     - name: TOGGLE_SYKMELDINGBEHANDLERE
-      value: "false"
+      value: "true"
     - name: MQGATEWAY_NAME
       value: "MPLS02"
     - name: MQGATEWAY_HOSTNAME
