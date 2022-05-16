@@ -26,25 +26,14 @@ class BehandlerService(
         token: String,
         callId: String,
     ): List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>> {
+        val behandlere = mutableListOf<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>()
 
-        val fastlege = getAktivFastlegeBehandler(
+        val fastlegeBehandler = getFastlegeBehandler(
             personIdentNumber = personIdentNumber,
             token = token,
             callId = callId,
         )
-        val behandlere = mutableListOf<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>()
-        if (fastlege != null && fastlege.hasAnId()) {
-            val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
-                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                arbeidstakerPersonident = personIdentNumber,
-                mottatt = OffsetDateTime.now(),
-            )
-            val behandler = createOrGetBehandler(
-                behandler = fastlege,
-                behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
-            )
-            behandlere.add(Pair(behandler, BehandlerArbeidstakerRelasjonstype.FASTLEGE))
-        }
+        fastlegeBehandler?.let { behandlere.add(Pair(it, BehandlerArbeidstakerRelasjonstype.FASTLEGE)) }
 
         if (toggleSykmeldingbehandlere) {
             database.getSykmeldereExtended(personIdentNumber)
@@ -58,6 +47,30 @@ class BehandlerService(
                 }
         }
         return behandlere.removeDuplicates()
+    }
+
+    private suspend fun getFastlegeBehandler(
+        personIdentNumber: PersonIdentNumber,
+        token: String,
+        callId: String,
+    ): Behandler? {
+        val fastlege = getAktivFastlegeBehandler(
+            personIdentNumber = personIdentNumber,
+            token = token,
+            callId = callId,
+        )
+        if (fastlege != null && fastlege.hasAnId()) {
+            val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
+                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                arbeidstakerPersonident = personIdentNumber,
+                mottatt = OffsetDateTime.now(),
+            )
+            return createOrGetBehandler(
+                behandler = fastlege,
+                behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
+            )
+        }
+        return null
     }
 
     suspend fun getAktivFastlegeBehandler(
