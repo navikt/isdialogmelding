@@ -2,16 +2,16 @@ package no.nav.syfo.testhelper.generator
 
 import no.nav.syfo.behandler.domain.DialogmeldingKode
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.DialogmeldingToBehandlerBestillingDTO
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import java.util.UUID
 
 fun generateDialogmeldingToBehandlerBestillingDTO(
     behandlerRef: UUID,
     uuid: UUID,
-    arbeidstakerPersonIdent: PersonIdentNumber = PersonIdentNumber("01010112345"),
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
 ) = DialogmeldingToBehandlerBestillingDTO(
     behandlerRef = behandlerRef.toString(),
-    personIdent = arbeidstakerPersonIdent.value,
+    personIdent = arbeidstakerPersonident.value,
     dialogmeldingUuid = uuid.toString(),
     dialogmeldingRefParent = null,
     dialogmeldingRefConversation = uuid.toString(),
@@ -23,10 +23,10 @@ fun generateDialogmeldingToBehandlerBestillingDTO(
 fun generateDialogmeldingToBehandlerBestillingEndreTidStedDTO(
     behandlerRef: UUID,
     uuid: UUID,
-    arbeidstakerPersonIdent: PersonIdentNumber = PersonIdentNumber("01010112345"),
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
 ) = DialogmeldingToBehandlerBestillingDTO(
     behandlerRef = behandlerRef.toString(),
-    personIdent = arbeidstakerPersonIdent.value,
+    personIdent = arbeidstakerPersonident.value,
     dialogmeldingUuid = uuid.toString(),
     dialogmeldingRefParent = uuid.toString(),
     dialogmeldingRefConversation = uuid.toString(),
@@ -39,10 +39,10 @@ fun generateDialogmeldingToBehandlerBestillingEndreTidStedDTO(
 fun generateDialogmeldingToBehandlerBestillingAvlysningDTO(
     behandlerRef: UUID,
     uuid: UUID,
-    arbeidstakerPersonIdent: PersonIdentNumber = PersonIdentNumber("01010112345"),
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
 ) = DialogmeldingToBehandlerBestillingDTO(
     behandlerRef = behandlerRef.toString(),
-    personIdent = arbeidstakerPersonIdent.value,
+    personIdent = arbeidstakerPersonident.value,
     dialogmeldingUuid = uuid.toString(),
     dialogmeldingRefParent = uuid.toString(),
     dialogmeldingRefConversation = uuid.toString(),
@@ -55,10 +55,10 @@ fun generateDialogmeldingToBehandlerBestillingAvlysningDTO(
 fun generateDialogmeldingToBehandlerBestillingReferatDTO(
     behandlerRef: UUID,
     uuid: UUID,
-    arbeidstakerPersonIdent: PersonIdentNumber = PersonIdentNumber("01010112345"),
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
 ) = DialogmeldingToBehandlerBestillingDTO(
     behandlerRef = behandlerRef.toString(),
-    personIdent = arbeidstakerPersonIdent.value,
+    personIdent = arbeidstakerPersonident.value,
     dialogmeldingUuid = uuid.toString(),
     dialogmeldingRefParent = uuid.toString(),
     dialogmeldingRefConversation = uuid.toString(),

@@ -15,7 +15,7 @@ import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.domain.PartnerId
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
 import no.nav.syfo.util.*
@@ -84,7 +84,7 @@ class KafkaSykmeldingSpek : Spek({
                             consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
                         val kontorBefore = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
-                        val behandlereBefore = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandlereBefore = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         kontorBefore shouldBe null
                         behandlereBefore.size shouldBeEqualTo 0
 
@@ -99,7 +99,7 @@ class KafkaSykmeldingSpek : Spek({
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfter.herId shouldBeEqualTo sykmelding.legekontorHerId
 
-                        val behandlereAfter = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandlereAfter = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandlereAfter.size shouldBeEqualTo 1
                         behandlereAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
                         behandlereAfter[0].kategori shouldBeEqualTo BehandlerKategori.LEGE.name
@@ -109,7 +109,7 @@ class KafkaSykmeldingSpek : Spek({
                         behandlereAfter[0].telefon shouldBeEqualTo sykmelding.sykmelding.behandler.tlf
 
                         val behandlerRelasjonerAfter = database.getBehandlerArbeidstakerRelasjon(
-                            personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
+                            personident = Personident(sykmelding.personNrPasient),
                             behandlerRef = behandlereAfter[0].behandlerRef,
                         )
                         behandlerRelasjonerAfter.size shouldBeEqualTo 1
@@ -124,7 +124,7 @@ class KafkaSykmeldingSpek : Spek({
                             consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
                         val kontorBefore = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
-                        val behandlereBefore = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandlereBefore = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         kontorBefore shouldBe null
                         behandlereBefore.size shouldBeEqualTo 0
 
@@ -139,7 +139,7 @@ class KafkaSykmeldingSpek : Spek({
                         kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
                         kontorAfter.herId shouldBeEqualTo sykmelding.legekontorHerId
 
-                        val behandlereAfter = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandlereAfter = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandlereAfter.size shouldBeEqualTo 1
                         behandlereAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
                         behandlereAfter[0].kategori shouldBeEqualTo BehandlerKategori.LEGE.name
@@ -149,7 +149,7 @@ class KafkaSykmeldingSpek : Spek({
                         behandlereAfter[0].telefon shouldBeEqualTo sykmelding.sykmelding.behandler.tlf
 
                         val behandlerRelasjonerAfter = database.getBehandlerArbeidstakerRelasjon(
-                            personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
+                            personident = Personident(sykmelding.personNrPasient),
                             behandlerRef = behandlereAfter[0].behandlerRef,
                         )
                         behandlerRelasjonerAfter.size shouldBeEqualTo 1
@@ -172,7 +172,7 @@ class KafkaSykmeldingSpek : Spek({
                             )
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val behandlerList = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandlerList = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandlerList.size shouldBeEqualTo 1
                         behandlerList[0].personident shouldBeEqualTo sykmelding.personNrLege
                         behandlerList[0].fornavn shouldBeEqualTo sykmelding.sykmelding.behandler.fornavn
@@ -196,7 +196,7 @@ class KafkaSykmeldingSpek : Spek({
                         val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontor!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
 
-                        val behandler = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandler.size shouldBeEqualTo 1
 
                         val newSykmelding = generateSykmeldingDTO(
@@ -217,7 +217,7 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 2) { mockConsumer.commitSync() }
 
-                        val behandlerAfterSecondSykmelding = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandlerAfterSecondSykmelding = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandlerAfterSecondSykmelding.size shouldBeEqualTo 2
                     }
                     it("sykmelding from existing fastlege should add new sykmelder-relation") {
@@ -272,7 +272,7 @@ class KafkaSykmeldingSpek : Spek({
                         pBehandlerListAfter[1].second shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.FASTLEGE
 
                         val behandlerRelasjonAfter = database.getBehandlerArbeidstakerRelasjon(
-                            personIdentNumber = UserConstants.ARBEIDSTAKER_FNR,
+                            personident = UserConstants.ARBEIDSTAKER_FNR,
                             behandlerRef = behandler.behandlerRef,
                         )
                         behandlerRelasjonAfter.size shouldBeEqualTo 2
@@ -296,11 +296,11 @@ class KafkaSykmeldingSpek : Spek({
                         val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontor!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
 
-                        val behandler = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandler.size shouldBeEqualTo 1
 
                         val behandlerRelasjon = database.getBehandlerArbeidstakerRelasjon(
-                            personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
+                            personident = Personident(sykmelding.personNrPasient),
                             behandlerRef = behandler[0].behandlerRef,
                         )
                         behandlerRelasjon.size shouldBeEqualTo 1
@@ -319,11 +319,11 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 2) { mockConsumer.commitSync() }
 
-                        val behandlerAfterSecondSykmelding = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandlerAfterSecondSykmelding = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandlerAfterSecondSykmelding.size shouldBeEqualTo 1
 
                         val behandlerRelasjonAfterSecondSykmelding = database.getBehandlerArbeidstakerRelasjon(
-                            personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
+                            personident = Personident(sykmelding.personNrPasient),
                             behandlerRef = behandler[0].behandlerRef,
                         )
                         behandlerRelasjonAfterSecondSykmelding.size shouldBeEqualTo 1
@@ -349,11 +349,11 @@ class KafkaSykmeldingSpek : Spek({
                         val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontor!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
 
-                        val behandler = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandler.size shouldBeEqualTo 1
 
                         val behandlerRelasjon = database.getBehandlerArbeidstakerRelasjon(
-                            personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
+                            personident = Personident(sykmelding.personNrPasient),
                             behandlerRef = behandler[0].behandlerRef,
                         )
                         behandlerRelasjon.size shouldBeEqualTo 1
@@ -374,11 +374,11 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 2) { mockConsumer.commitSync() }
 
-                        val behandlerAfterSecondSykmelding = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandlerAfterSecondSykmelding = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandlerAfterSecondSykmelding.size shouldBeEqualTo 1
 
                         val behandlerRelasjonAfterSecondSykmelding = database.getBehandlerArbeidstakerRelasjon(
-                            personIdentNumber = PersonIdentNumber(sykmelding.personNrPasient),
+                            personident = Personident(sykmelding.personNrPasient),
                             behandlerRef = behandler[0].behandlerRef,
                         )
                         behandlerRelasjonAfterSecondSykmelding.size shouldBeEqualTo 1
@@ -420,7 +420,7 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
 
-                        val behandler = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandler.size shouldBeEqualTo 2
                         val fastlegeBehandlerRef = behandler[1].behandlerRef
 
@@ -436,7 +436,7 @@ class KafkaSykmeldingSpek : Spek({
                             behandlerList[0].behandlerRef shouldBeEqualTo fastlegeBehandlerRef.toString()
                         }
 
-                        val behandlerAfterAnotherGet = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandlerAfterAnotherGet = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandlerAfterAnotherGet.size shouldBeEqualTo 2
                     }
 
@@ -457,7 +457,7 @@ class KafkaSykmeldingSpek : Spek({
                         val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontor!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
 
-                        val behandler = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandler.size shouldBeEqualTo 1
 
                         val newSykmelding = generateSykmeldingDTO(
@@ -497,7 +497,7 @@ class KafkaSykmeldingSpek : Spek({
                         val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontor!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
 
-                        val behandler = database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandler.size shouldBeEqualTo 1
 
                         val newSykmelding = generateSykmeldingDTO(
@@ -586,7 +586,7 @@ class KafkaSykmeldingSpek : Spek({
                         val kontor =
                             database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         val behandler =
-                            database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                            database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         kontor shouldBe null
                         behandler.size shouldBeEqualTo 0
                     }
@@ -608,7 +608,7 @@ class KafkaSykmeldingSpek : Spek({
                         val kontor =
                             database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         val behandler =
-                            database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                            database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         kontor shouldBe null
                         behandler.size shouldBeEqualTo 0
                     }
@@ -628,7 +628,7 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
                         val behandler =
-                            database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                            database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandler.size shouldBeEqualTo 0
                     }
                     it("should ignore when partnerId is not numeric") {
@@ -647,7 +647,7 @@ class KafkaSykmeldingSpek : Spek({
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
                         val behandler =
-                            database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                            database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         behandler.size shouldBeEqualTo 0
                     }
                     it("should ignore when mottatt before cutoff") {
@@ -668,7 +668,7 @@ class KafkaSykmeldingSpek : Spek({
                         val kontor =
                             database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         val behandler =
-                            database.getBehandlerByArbeidstaker(PersonIdentNumber(sykmelding.personNrPasient))
+                            database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
                         kontor shouldBe null
                         behandler.size shouldBeEqualTo 0
                     }

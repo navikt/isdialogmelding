@@ -8,7 +8,7 @@ import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.domain.PartnerId
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.time.OffsetDateTime
@@ -22,21 +22,21 @@ class BehandlerService(
     private val toggleSykmeldingbehandlere: Boolean,
 ) {
     suspend fun getBehandlere(
-        personIdentNumber: PersonIdentNumber,
+        personident: Personident,
         token: String,
         callId: String,
     ): List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>> {
         val behandlere = mutableListOf<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>()
 
         val fastlegeBehandler = getFastlegeBehandler(
-            personIdentNumber = personIdentNumber,
+            personident = personident,
             token = token,
             callId = callId,
         )
         fastlegeBehandler?.let { behandlere.add(Pair(it, BehandlerArbeidstakerRelasjonstype.FASTLEGE)) }
 
         if (toggleSykmeldingbehandlere) {
-            database.getSykmeldereExtended(personIdentNumber)
+            database.getSykmeldereExtended(personident)
                 .forEach { (pBehandler, pBehandlerKontor) ->
                     behandlere.add(
                         Pair(
@@ -50,19 +50,19 @@ class BehandlerService(
     }
 
     private suspend fun getFastlegeBehandler(
-        personIdentNumber: PersonIdentNumber,
+        personident: Personident,
         token: String,
         callId: String,
     ): Behandler? {
         val fastlege = getAktivFastlegeBehandler(
-            personIdentNumber = personIdentNumber,
+            personident = personident,
             token = token,
             callId = callId,
         )
         if (fastlege != null && fastlege.hasAnId()) {
             val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
                 type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                arbeidstakerPersonident = personIdentNumber,
+                arbeidstakerPersonident = personident,
                 mottatt = OffsetDateTime.now(),
             )
             return createOrGetBehandler(
@@ -74,13 +74,13 @@ class BehandlerService(
     }
 
     suspend fun getAktivFastlegeBehandler(
-        personIdentNumber: PersonIdentNumber,
+        personident: Personident,
         token: String,
         callId: String,
         systemRequest: Boolean = false,
     ): Behandler? {
         val fastlegeResponse = fastlegeClient.fastlege(
-            personIdentNumber = personIdentNumber,
+            personident = personident,
             systemRequest = systemRequest,
             token = token,
             callId = callId,
@@ -154,8 +154,8 @@ class BehandlerService(
 
     private fun getBehandler(behandler: Behandler): PBehandler? {
         return when {
-            behandler.personident != null -> database.getBehandlerByBehandlerPersonIdentAndPartnerId(
-                behandlerPersonIdent = behandler.personident,
+            behandler.personident != null -> database.getBehandlerByBehandlerPersonidentAndPartnerId(
+                behandlerPersonident = behandler.personident,
                 partnerId = behandler.kontor.partnerId,
             )
             behandler.hprId != null -> database.getBehandlerByHprIdAndPartnerId(

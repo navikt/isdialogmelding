@@ -68,7 +68,7 @@ fun FastlegeResponse.toBehandler(
     etternavn = this.etternavn,
     herId = this.herId,
     hprId = this.helsepersonellregisterId,
-    personident = this.fnr?.let { PersonIdentNumber(it) },
+    personident = this.fnr?.let { Personident(it) },
     telefon = this.fastlegekontor.telefon,
     kategori = BehandlerKategori.LEGE,
     mottatt = OffsetDateTime.now(),

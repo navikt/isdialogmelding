@@ -13,10 +13,10 @@ import no.nav.syfo.behandler.fastlege.FastlegeClient.Companion.FASTLEGE_SYSTEM_P
 import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
 import no.nav.syfo.testhelper.getRandomPort
-import no.nav.syfo.util.getPersonIdentHeader
+import no.nav.syfo.util.getPersonidentHeader
 
 private suspend fun PipelineContext<out Unit, ApplicationCall>.fastlegerestResponse() {
-    when (getPersonIdentHeader()) {
+    when (getPersonidentHeader()) {
         UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR.value -> call.respond(
             HttpStatusCode.NotFound,
         )

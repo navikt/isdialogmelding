@@ -4,7 +4,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.PBehandler
 import no.nav.syfo.behandler.database.domain.PBehandlerKontor
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import java.sql.ResultSet
 import java.time.OffsetDateTime
 import java.util.*
@@ -21,7 +21,7 @@ const val querySykmelderAndKontor =
     """
 
 fun DatabaseInterface.getSykmeldereExtended(
-    arbeidstakerIdent: PersonIdentNumber,
+    arbeidstakerIdent: Personident,
     dialogmeldingEnabledStatus: Boolean = true,
 ): List<Pair<PBehandler, PBehandlerKontor>> {
 

@@ -4,7 +4,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.PBehandlerArbeidstaker
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import java.sql.*
 import java.time.*
 import java.util.UUID
@@ -80,13 +80,13 @@ const val queryGetBehandlerArbeidstakerRelasjon =
     """
 
 fun DatabaseInterface.getBehandlerArbeidstakerRelasjon(
-    personIdentNumber: PersonIdentNumber,
+    personident: Personident,
     behandlerRef: UUID,
 ): List<PBehandlerArbeidstaker> {
     val pBehandlerArbeidstakerListe = this.connection.use { connection ->
         connection.prepareStatement(queryGetBehandlerArbeidstakerRelasjon)
             .use {
-                it.setString(1, personIdentNumber.value)
+                it.setString(1, personident.value)
                 it.setString(2, behandlerRef.toString())
                 it.executeQuery().toList { toPBehandlerArbeidstaker() }
             }

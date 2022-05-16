@@ -8,7 +8,7 @@ import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.toDialogme
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.domain.PartnerId
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
 import org.junit.Assert.assertTrue
@@ -41,7 +41,7 @@ object DialogmeldingServiceSpek : Spek({
         dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
     )
 
-    val arbeidstakerPersonIdent = PersonIdentNumber("01010112345")
+    val arbeidstakerPersonident = Personident("01010112345")
     val uuid = UUID.randomUUID()
     val behandlerRef = UUID.randomUUID()
     val behandler = generateBehandler(behandlerRef, PartnerId(1))
@@ -50,7 +50,7 @@ object DialogmeldingServiceSpek : Spek({
         database.dropData()
         database.createBehandlerForArbeidstaker(
             behandler = behandler,
-            arbeidstakerPersonIdent = arbeidstakerPersonIdent,
+            arbeidstakerPersonident = arbeidstakerPersonident,
         )
     }
     afterEachTest {
@@ -64,7 +64,7 @@ object DialogmeldingServiceSpek : Spek({
             val melding = generateDialogmeldingToBehandlerBestillingDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
-                arbeidstakerPersonIdent = arbeidstakerPersonIdent,
+                arbeidstakerPersonident = arbeidstakerPersonident,
             ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
@@ -92,7 +92,7 @@ object DialogmeldingServiceSpek : Spek({
             val melding = generateDialogmeldingToBehandlerBestillingEndreTidStedDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
-                arbeidstakerPersonIdent = arbeidstakerPersonIdent,
+                arbeidstakerPersonident = arbeidstakerPersonident,
             ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
@@ -120,7 +120,7 @@ object DialogmeldingServiceSpek : Spek({
             val melding = generateDialogmeldingToBehandlerBestillingReferatDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
-                arbeidstakerPersonIdent = arbeidstakerPersonIdent,
+                arbeidstakerPersonident = arbeidstakerPersonident,
             ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,
@@ -148,7 +148,7 @@ object DialogmeldingServiceSpek : Spek({
             val melding = generateDialogmeldingToBehandlerBestillingAvlysningDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
-                arbeidstakerPersonIdent = arbeidstakerPersonIdent,
+                arbeidstakerPersonident = arbeidstakerPersonident,
             ).toDialogmeldingToBehandlerBestilling(
                 behandler = generateBehandler(
                     behandlerRef = behandlerRef,

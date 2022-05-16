@@ -1,7 +1,7 @@
 package no.nav.syfo.behandler.database.domain
 
 import no.nav.syfo.behandler.domain.*
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import java.time.OffsetDateTime
 
 data class PBehandlerArbeidstaker(
@@ -19,7 +19,7 @@ fun PBehandlerArbeidstaker.toBehandlerArbeidstakerRelasjon(
     etternavn: String,
 ) = BehandlerArbeidstakerRelasjon(
     type = BehandlerArbeidstakerRelasjonstype.valueOf(this.type),
-    arbeidstakerPersonident = PersonIdentNumber(this.arbeidstakerPersonident),
+    arbeidstakerPersonident = Personident(this.arbeidstakerPersonident),
     fornavn = fornavn,
     mellomnavn = mellomnavn,
     etternavn = etternavn,

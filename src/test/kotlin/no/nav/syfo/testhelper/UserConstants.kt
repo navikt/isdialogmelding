@@ -1,18 +1,18 @@
 package no.nav.syfo.testhelper
 
 import no.nav.syfo.domain.PartnerId
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 
 object UserConstants {
-    val ARBEIDSTAKER_FNR = PersonIdentNumber("12345678912")
-    val ANNEN_ARBEIDSTAKER_FNR = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "8"))
-    val ARBEIDSTAKER_VEILEDER_NO_ACCESS = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "1"))
+    val ARBEIDSTAKER_FNR = Personident("12345678912")
+    val ANNEN_ARBEIDSTAKER_FNR = Personident(ARBEIDSTAKER_FNR.value.replace("2", "8"))
+    val ARBEIDSTAKER_VEILEDER_NO_ACCESS = Personident(ARBEIDSTAKER_FNR.value.replace("2", "1"))
 
-    val ARBEIDSTAKER_UTEN_FASTLEGE_FNR = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "4"))
-    val ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "3"))
-    val ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "6"))
-    val ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "8"))
-    val ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("5", "1"))
+    val ARBEIDSTAKER_UTEN_FASTLEGE_FNR = Personident(ARBEIDSTAKER_FNR.value.replace("2", "4"))
+    val ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET = Personident(ARBEIDSTAKER_FNR.value.replace("2", "3"))
+    val ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO = Personident(ARBEIDSTAKER_FNR.value.replace("2", "6"))
+    val ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO = Personident(ARBEIDSTAKER_FNR.value.replace("2", "8"))
+    val ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID = Personident(ARBEIDSTAKER_FNR.value.replace("5", "1"))
     val PARTNERID = PartnerId(321)
     val OTHER_PARTNERID = PartnerId(456)
 
@@ -29,6 +29,6 @@ object UserConstants {
 
     const val VEILEDER_IDENT = "Z999999"
 
-    val FASTLEGE_FNR = PersonIdentNumber("12125678911")
-    val FASTLEGE_ANNEN_FNR = PersonIdentNumber(FASTLEGE_FNR.value.replace("2", "4"))
+    val FASTLEGE_FNR = Personident("12125678911")
+    val FASTLEGE_ANNEN_FNR = Personident(FASTLEGE_FNR.value.replace("2", "4"))
 }

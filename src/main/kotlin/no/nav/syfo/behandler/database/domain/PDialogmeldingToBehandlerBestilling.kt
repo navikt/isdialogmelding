@@ -1,7 +1,7 @@
 package no.nav.syfo.behandler.database.domain
 
 import no.nav.syfo.behandler.domain.*
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import java.sql.Timestamp
 import java.util.UUID
 
@@ -9,7 +9,7 @@ data class PDialogmeldingToBehandlerBestilling(
     val id: Int,
     val uuid: UUID,
     val behandlerId: Int,
-    val arbeidstakerPersonIdent: String,
+    val arbeidstakerPersonident: String,
     val parentRef: String?,
     val conversationUuid: UUID,
     val type: String,
@@ -25,7 +25,7 @@ fun PDialogmeldingToBehandlerBestilling.toDialogmeldingToBehandlerBestilling(
 ) = DialogmeldingToBehandlerBestilling(
     uuid = this.uuid,
     behandler = behandler,
-    arbeidstakerPersonIdent = PersonIdentNumber(this.arbeidstakerPersonIdent),
+    arbeidstakerPersonident = Personident(this.arbeidstakerPersonident),
     parentRef = this.parentRef,
     conversationUuid = this.conversationUuid,
     type = DialogmeldingType.valueOf(this.type),

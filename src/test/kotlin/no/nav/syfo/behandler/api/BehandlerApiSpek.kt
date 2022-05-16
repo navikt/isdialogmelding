@@ -33,7 +33,7 @@ class BehandlerApiSpek : Spek({
         }
 
         describe(BehandlerApiSpek::class.java.simpleName) {
-            describe("Get list of Behandler for PersonIdent") {
+            describe("Get list of Behandler for Personident") {
                 val url = "$behandlerPath$behandlerPersonident"
                 val validToken = generateJWT(
                     externalMockEnvironment.environment.aadAppClient,
@@ -210,7 +210,7 @@ class BehandlerApiSpek : Spek({
                         }
                     }
 
-                    it("should return status BadRequest if $NAV_PERSONIDENT_HEADER with invalid PersonIdent is supplied") {
+                    it("should return status BadRequest if $NAV_PERSONIDENT_HEADER with invalid Personident is supplied") {
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))

@@ -8,7 +8,7 @@ import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 
@@ -23,7 +23,7 @@ class FastlegeClient(
 
     suspend fun fastlege(
         callId: String,
-        personIdentNumber: PersonIdentNumber,
+        personident: Personident,
         systemRequest: Boolean = false,
         token: String,
     ): FastlegeResponse? {
@@ -46,7 +46,7 @@ class FastlegeClient(
 
         return fastlege(
             callId = callId,
-            personIdentNumber = personIdentNumber,
+            personident = personident,
             token = newToken,
             url = url,
         )
@@ -55,14 +55,14 @@ class FastlegeClient(
     private suspend fun fastlege(
         callId: String,
         token: String,
-        personIdentNumber: PersonIdentNumber,
+        personident: Personident,
         url: String,
     ): FastlegeResponse? {
         try {
             val response = httpClient.get(url) {
                 header(HttpHeaders.Authorization, bearerHeader(token))
                 header(NAV_CALL_ID_HEADER, callId)
-                header(NAV_PERSONIDENT_HEADER, personIdentNumber.value)
+                header(NAV_PERSONIDENT_HEADER, personident.value)
                 accept(ContentType.Application.Json)
             }
             COUNT_CALL_FASTLEGEREST_FASTLEGE_SUCCESS.increment()
