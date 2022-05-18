@@ -8,7 +8,7 @@ import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import no.nav.syfo.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
@@ -25,7 +25,7 @@ class VeilederTilgangskontrollClient(
 
     suspend fun hasAccess(
         callId: String,
-        personIdentNumber: PersonIdentNumber,
+        personident: Personident,
         token: String,
     ): Boolean {
         val onBehalfOfToken = azureAdClient.getOnBehalfOfToken(
@@ -36,7 +36,7 @@ class VeilederTilgangskontrollClient(
         return try {
             val response = httpClient.get(tilgangskontrollPersonUrl) {
                 header(HttpHeaders.Authorization, bearerHeader(onBehalfOfToken))
-                header(NAV_PERSONIDENT_HEADER, personIdentNumber.value)
+                header(NAV_PERSONIDENT_HEADER, personident.value)
                 header(NAV_CALL_ID_HEADER, callId)
                 accept(ContentType.Application.Json)
             }

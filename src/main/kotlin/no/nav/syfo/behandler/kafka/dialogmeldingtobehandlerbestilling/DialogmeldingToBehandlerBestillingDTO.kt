@@ -2,7 +2,7 @@ package no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling
 
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import java.util.UUID
 
 data class DialogmeldingToBehandlerBestillingDTO(
@@ -22,7 +22,7 @@ fun DialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(
 ) = DialogmeldingToBehandlerBestilling(
     uuid = UUID.fromString(this.dialogmeldingUuid),
     behandler = behandler,
-    arbeidstakerPersonIdent = PersonIdentNumber(this.personIdent),
+    arbeidstakerPersonident = Personident(this.personIdent),
     parentRef = this.dialogmeldingRefParent,
     conversationUuid = UUID.fromString(this.dialogmeldingRefConversation),
     type = DialogmeldingType.valueOf(dialogmeldingType),

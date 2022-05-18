@@ -32,7 +32,7 @@ class PersonBehandlerApiSpek : Spek({
         }
 
         describe(PersonBehandlerApiSpek::class.java.simpleName) {
-            describe("Get list of Behandler for PersonIdent") {
+            describe("Get list of Behandler for Personident") {
                 val dtoClassName = PersonBehandlerDTO::class.java.simpleName
 
                 val url = "$personApiBehandlerPath$personBehandlerSelfPath"
@@ -211,7 +211,7 @@ class PersonBehandlerApiSpek : Spek({
                         }
                     }
 
-                    it("should return status BadRequest if invalid PersonIdent in PID is supplied") {
+                    it("should return status BadRequest if invalid Personident in PID is supplied") {
                         val tokenInvalidPid = generateJWTIdporten(
                             audience = externalMockEnvironment.environment.idportenTokenXClientId,
                             clientId = externalMockEnvironment.environment.aapSoknadApiClientId,

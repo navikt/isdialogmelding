@@ -75,7 +75,7 @@ class DialogmeldingCronjobSpek : Spek({
                     val behandler = generateBehandler(behandlerRef, partnerId)
                     database.createBehandlerForArbeidstaker(
                         behandler = behandler,
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
+                        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                     )
 
                     val dialogmeldingBestillingUuid = UUID.randomUUID()
@@ -83,7 +83,7 @@ class DialogmeldingCronjobSpek : Spek({
                     val dialogmeldingBestillingDTO = generateDialogmeldingToBehandlerBestillingDTO(
                         uuid = dialogmeldingBestillingUuid,
                         behandlerRef = behandlerRef,
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
+                        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                     )
                     dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
 

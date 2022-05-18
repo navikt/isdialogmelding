@@ -7,7 +7,7 @@ import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.domain.PartnerId
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
 import org.amshove.kluent.shouldBeEqualTo
@@ -53,8 +53,8 @@ class GetBehandlereSpek : Spek({
                         behandlerRef = behandlerRef,
                         partnerId = UserConstants.OTHER_PARTNERID,
                     ),
-                    arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
-                    otherArbeidstakerPersonIdent = UserConstants.ANNEN_ARBEIDSTAKER_FNR,
+                    arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                    otherArbeidstakerPersonident = UserConstants.ANNEN_ARBEIDSTAKER_FNR,
                     relasjonstype = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
                     otherRelasjonstype = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
                 )
@@ -77,7 +77,7 @@ class GetBehandlereSpek : Spek({
                 coEvery {
                     fastlegeClientMock.fastlege(
                         callId = callId,
-                        personIdentNumber = UserConstants.ARBEIDSTAKER_FNR,
+                        personident = UserConstants.ARBEIDSTAKER_FNR,
                         token = token,
                     )
                 } returns null
@@ -87,7 +87,7 @@ class GetBehandlereSpek : Spek({
                         partnerId = PartnerId(1),
                         dialogmeldingEnabled = false,
                     ),
-                    arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
+                    arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                     relasjonstype = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
                 )
 
@@ -107,7 +107,7 @@ class GetBehandlereSpek : Spek({
                 )
                 database.createBehandlerForArbeidstaker(
                     behandler = behandler,
-                    arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
+                    arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                     relasjonstype = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
                 )
 
@@ -139,7 +139,7 @@ class GetBehandlereSpek : Spek({
                 )
                 database.createBehandlerForArbeidstaker(
                     behandler = fastlege,
-                    arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
+                    arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                     relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                 )
 
@@ -168,8 +168,8 @@ class GetBehandlereSpek : Spek({
                 )
                 database.createBehandlerAndTwoArbeidstakerRelasjoner(
                     behandler = fastlegeAndSykmelder,
-                    arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
-                    otherArbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR,
+                    arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                    otherArbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                     relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     otherRelasjonstype = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
                 )
@@ -196,7 +196,7 @@ class GetBehandlereSpek : Spek({
 })
 
 fun mockFastlege(
-    personident: PersonIdentNumber,
+    personident: Personident,
     partnerId: PartnerId,
     fastlegeClientMock: FastlegeClient,
     partnerinfoClientMock: PartnerinfoClient,
@@ -207,7 +207,7 @@ fun mockFastlege(
     coEvery {
         fastlegeClientMock.fastlege(
             callId = callId,
-            personIdentNumber = UserConstants.ARBEIDSTAKER_FNR,
+            personident = UserConstants.ARBEIDSTAKER_FNR,
             token = token,
         )
     } returns generateFastlegeResponse(

@@ -2,13 +2,13 @@ package no.nav.syfo.behandler.domain
 
 import no.nav.syfo.behandler.api.BehandlerDTO
 import no.nav.syfo.behandler.api.person.PersonBehandlerDTO
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import java.time.OffsetDateTime
 import java.util.*
 
 data class Behandler(
     val behandlerRef: UUID,
-    val personident: PersonIdentNumber?,
+    val personident: Personident?,
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,

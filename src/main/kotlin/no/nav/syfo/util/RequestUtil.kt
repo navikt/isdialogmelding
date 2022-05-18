@@ -21,7 +21,7 @@ fun PipelineContext<out Unit, ApplicationCall>.getBearerHeader(): String? {
     return this.call.request.headers[HttpHeaders.Authorization]?.removePrefix("Bearer ")
 }
 
-fun PipelineContext<out Unit, ApplicationCall>.getPersonIdentHeader(): String? {
+fun PipelineContext<out Unit, ApplicationCall>.getPersonidentHeader(): String? {
     return this.call.request.headers[NAV_PERSONIDENT_HEADER]
 }
 

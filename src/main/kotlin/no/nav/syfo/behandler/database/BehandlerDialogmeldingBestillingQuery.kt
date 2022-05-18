@@ -36,7 +36,7 @@ fun Connection.createBehandlerDialogmeldingBestilling(
     val idList = this.prepareStatement(queryCreateBehandlerDialogmeldingBestilling).use {
         it.setString(1, dialogmeldingToBehandlerBestilling.uuid.toString())
         it.setInt(2, behandlerId)
-        it.setString(3, dialogmeldingToBehandlerBestilling.arbeidstakerPersonIdent.value)
+        it.setString(3, dialogmeldingToBehandlerBestilling.arbeidstakerPersonident.value)
         it.setString(4, dialogmeldingToBehandlerBestilling.parentRef)
         it.setString(5, dialogmeldingToBehandlerBestilling.conversationUuid.toString())
         it.setString(6, dialogmeldingToBehandlerBestilling.type.name)
@@ -125,7 +125,7 @@ fun ResultSet.toPBehandlerDialogmeldingBestilling(): PDialogmeldingToBehandlerBe
         id = getInt("id"),
         uuid = UUID.fromString(getString("uuid")),
         behandlerId = getInt("behandler_id"),
-        arbeidstakerPersonIdent = getString("arbeidstaker_personident"),
+        arbeidstakerPersonident = getString("arbeidstaker_personident"),
         parentRef = getString("parent"),
         conversationUuid = UUID.fromString(getString("conversation")),
         type = getString("type"),

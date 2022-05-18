@@ -2,7 +2,7 @@ package no.nav.syfo.behandler.database.domain
 
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerKategori
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -28,7 +28,7 @@ fun PBehandler.toBehandler(
 ) = Behandler(
     behandlerRef = this.behandlerRef,
     kontor = kontor.toBehandlerKontor(),
-    personident = this.personident?.let { PersonIdentNumber(it) },
+    personident = this.personident?.let { Personident(it) },
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
     etternavn = this.etternavn,

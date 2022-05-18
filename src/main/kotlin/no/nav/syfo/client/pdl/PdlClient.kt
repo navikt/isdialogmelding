@@ -6,7 +6,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.syfo.client.azuread.*
 import no.nav.syfo.client.httpClientDefault
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 
@@ -21,11 +21,11 @@ class PdlClient(
     private val httpClient = httpClientDefault()
 
     suspend fun person(
-        personIdent: PersonIdentNumber,
+        personident: Personident,
     ): PdlHentPerson? {
         val query = getPdlQuery("/pdl/hentPerson.graphql")
 
-        val request = PdlRequest(query, Variables(personIdent.value))
+        val request = PdlRequest(query, Variables(personident.value))
         val token = azureAdClient.getSystemToken(pdlClientId)?.accessToken
             ?: throw RuntimeException("PDL-call failed: Could not get system token from AzureAD")
 

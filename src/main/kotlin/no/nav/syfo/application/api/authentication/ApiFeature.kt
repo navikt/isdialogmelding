@@ -16,7 +16,7 @@ import io.micrometer.core.instrument.distribution.DistributionStatisticConfig
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.api.access.ForbiddenAccessVeilederException
 import no.nav.syfo.behandler.api.person.access.ForbiddenPersonAPIConsumer
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import no.nav.syfo.metric.METRICS_REGISTRY
 import no.nav.syfo.util.configure
 import no.nav.syfo.util.getCallId
@@ -68,10 +68,10 @@ fun hasExpectedAudience(credentials: JWTCredential, expectedAudience: List<Strin
     return expectedAudience.any { credentials.payload.audience.contains(it) }
 }
 
-fun ApplicationCall.personIdent(): PersonIdentNumber? {
+fun ApplicationCall.personident(): Personident? {
     val token = this.request.headers[HttpHeaders.Authorization]?.removePrefix("Bearer ")
     val decodedJWT = JWT.decode(token)
-    return decodedJWT.claims["pid"]?.asString()?.let { PersonIdentNumber(it) }
+    return decodedJWT.claims["pid"]?.asString()?.let { Personident(it) }
 }
 
 fun Application.installMetrics() {

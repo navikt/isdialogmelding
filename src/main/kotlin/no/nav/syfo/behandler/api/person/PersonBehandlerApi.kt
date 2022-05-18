@@ -4,7 +4,7 @@ import io.ktor.server.application.*
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.nav.syfo.application.api.authentication.personIdent
+import no.nav.syfo.application.api.authentication.personident
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.person.access.PersonAPIConsumerAccessService
 import no.nav.syfo.behandler.domain.*
@@ -29,8 +29,8 @@ fun Route.registerPersonBehandlerApi(
             try {
                 val token = getBearerHeader()
                     ?: throw IllegalArgumentException("No Authorization header supplied")
-                val requestPersonIdent = call.personIdent()
-                    ?: throw IllegalArgumentException("No PersonIdent found in token")
+                val requestPersonident = call.personident()
+                    ?: throw IllegalArgumentException("No Personident found in token")
 
                 personAPIConsumerAccessService.validateConsumerApplicationClientId(
                     token = token,
@@ -38,7 +38,7 @@ fun Route.registerPersonBehandlerApi(
 
                 val personBehandlerDTOList = mutableListOf<PersonBehandlerDTO>()
                 val fastlege = behandlerService.getAktivFastlegeBehandler(
-                    personIdentNumber = requestPersonIdent,
+                    personident = requestPersonident,
                     systemRequest = true,
                     token = token,
                     callId = callId,
@@ -46,7 +46,7 @@ fun Route.registerPersonBehandlerApi(
                 if (fastlege != null && fastlege.hasAnId()) {
                     val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
                         type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                        arbeidstakerPersonident = requestPersonIdent,
+                        arbeidstakerPersonident = requestPersonident,
                         mottatt = OffsetDateTime.now(),
                     )
                     val behandler = behandlerService.createOrGetBehandler(
@@ -61,7 +61,7 @@ fun Route.registerPersonBehandlerApi(
                 }
                 call.respond(personBehandlerDTOList)
             } catch (e: IllegalArgumentException) {
-                val illegalArgumentMessage = "Could not retrieve list of Behandler for PersonIdent"
+                val illegalArgumentMessage = "Could not retrieve list of Behandler for Personident"
                 log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)
                 call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
             }

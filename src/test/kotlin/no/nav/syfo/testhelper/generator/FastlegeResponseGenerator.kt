@@ -1,7 +1,7 @@
 package no.nav.syfo.testhelper.generator
 
 import no.nav.syfo.behandler.fastlege.FastlegeResponse
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.UserConstants
 import java.time.LocalDate
 
@@ -33,7 +33,7 @@ fun generateFastlegeResponse() = FastlegeResponse(
     )
 )
 
-fun generateFastlegeResponse(personident: PersonIdentNumber) = FastlegeResponse(
+fun generateFastlegeResponse(personident: Personident) = FastlegeResponse(
     fornavn = "Dana",
     mellomnavn = "Katherine",
     etternavn = "Scully",
@@ -89,7 +89,7 @@ fun generateFastlegeResponse(foreldreEnhetHerId: Int?) = FastlegeResponse(
     )
 )
 
-fun generateFastlegeResponse(personident: PersonIdentNumber?, herId: Int?, hprId: Int?) = FastlegeResponse(
+fun generateFastlegeResponse(personident: Personident?, herId: Int?, hprId: Int?) = FastlegeResponse(
     fornavn = "Dana",
     mellomnavn = "Katherine",
     etternavn = "Scully",

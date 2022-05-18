@@ -6,7 +6,7 @@ import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.domain.PartnerId
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import java.sql.*
 import java.time.OffsetDateTime
 import java.util.*
@@ -75,17 +75,17 @@ const val queryCreateBehandler =
             mottatt
     """
 
-const val queryGetBehandlerByBehandlerPersonIdentAndPartnerId =
+const val queryGetBehandlerByBehandlerPersonidentAndPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
         WHERE B.personident = ? and K.partner_id = ?
     """
 
-fun DatabaseInterface.getBehandlerByBehandlerPersonIdentAndPartnerId(behandlerPersonIdent: PersonIdentNumber, partnerId: PartnerId): PBehandler? {
+fun DatabaseInterface.getBehandlerByBehandlerPersonidentAndPartnerId(behandlerPersonident: Personident, partnerId: PartnerId): PBehandler? {
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetBehandlerByBehandlerPersonIdentAndPartnerId)
+        connection.prepareStatement(queryGetBehandlerByBehandlerPersonidentAndPartnerId)
             .use {
-                it.setString(1, behandlerPersonIdent.value)
+                it.setString(1, behandlerPersonident.value)
                 it.setString(2, partnerId.toString())
                 it.executeQuery().toList { toPBehandler() }
             }
@@ -165,7 +165,7 @@ const val queryGetBehandlerAndRelasjonstype =
         ORDER BY BEHANDLER_ARBEIDSTAKER.updated_at DESC
     """
 
-fun DatabaseInterface.getBehandlerAndRelasjonstypeList(arbeidstakerIdent: PersonIdentNumber): List<Pair<PBehandler, BehandlerArbeidstakerRelasjonstype>> {
+fun DatabaseInterface.getBehandlerAndRelasjonstypeList(arbeidstakerIdent: Personident): List<Pair<PBehandler, BehandlerArbeidstakerRelasjonstype>> {
     return this.connection.use { connection ->
         connection.prepareStatement(queryGetBehandlerAndRelasjonstype)
             .use {
@@ -175,8 +175,8 @@ fun DatabaseInterface.getBehandlerAndRelasjonstypeList(arbeidstakerIdent: Person
     }
 }
 
-fun DatabaseInterface.getBehandlerByArbeidstaker(personIdentNumber: PersonIdentNumber): List<PBehandler> {
-    return getBehandlerAndRelasjonstypeList(personIdentNumber).map { it.first }
+fun DatabaseInterface.getBehandlerByArbeidstaker(personident: Personident): List<PBehandler> {
+    return getBehandlerAndRelasjonstypeList(personident).map { it.first }
 }
 
 fun ResultSet.toPBehandler(): PBehandler =

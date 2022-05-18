@@ -3,13 +3,13 @@ package no.nav.syfo.behandler.api.access
 import io.ktor.server.application.*
 import io.ktor.util.pipeline.*
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
 
 suspend fun PipelineContext<out Unit, ApplicationCall>.validateVeilederAccess(
     action: String,
-    personIdentToAccess: PersonIdentNumber,
+    personidentToAccess: Personident,
     veilederTilgangskontrollClient: VeilederTilgangskontrollClient,
     requestBlock: suspend () -> Unit,
 ) {
@@ -20,7 +20,7 @@ suspend fun PipelineContext<out Unit, ApplicationCall>.validateVeilederAccess(
 
     val hasVeilederAccess = veilederTilgangskontrollClient.hasAccess(
         callId = callId,
-        personIdentNumber = personIdentToAccess,
+        personident = personidentToAccess,
         token = token,
     )
     if (hasVeilederAccess) {
@@ -34,5 +34,5 @@ suspend fun PipelineContext<out Unit, ApplicationCall>.validateVeilederAccess(
 
 class ForbiddenAccessVeilederException(
     action: String,
-    message: String = "Denied NAVIdent access to personIdent: $action",
+    message: String = "Denied NAVIdent access to personident: $action",
 ) : RuntimeException(message)

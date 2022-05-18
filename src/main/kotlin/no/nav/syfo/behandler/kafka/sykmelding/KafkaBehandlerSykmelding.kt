@@ -98,11 +98,11 @@ private fun createAndStoreBehandlerFromSykmelding(
 ) {
     val partnerId = receivedSykmeldingDTO.partnerreferanse!!
     val behandlerKategori = BehandlerKategori.fromKategoriKode(receivedSykmeldingDTO.legeHelsepersonellkategori)!!
-    val arbeidstakerPersonident = PersonIdentNumber(receivedSykmeldingDTO.personNrPasient)
+    val arbeidstakerPersonident = Personident(receivedSykmeldingDTO.personNrPasient)
     val sykmeldingBehandler = receivedSykmeldingDTO.sykmelding.behandler
     val sykmelder = Behandler(
         behandlerRef = UUID.randomUUID(),
-        personident = PersonIdentNumber(sykmeldingBehandler.fnr),
+        personident = Personident(sykmeldingBehandler.fnr),
         fornavn = sykmeldingBehandler.fornavn,
         mellomnavn = sykmeldingBehandler.mellomnavn,
         etternavn = sykmeldingBehandler.etternavn,

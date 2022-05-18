@@ -6,7 +6,7 @@ import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.PBehandlerArbeidstaker
 import no.nav.syfo.behandler.domain.*
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import org.flywaydb.core.Flyway
 import java.sql.Connection
 import java.time.OffsetDateTime
@@ -48,7 +48,7 @@ class TestDatabaseNotResponding : DatabaseInterface {
 
 fun DatabaseInterface.createBehandlerForArbeidstaker(
     behandler: Behandler,
-    arbeidstakerPersonIdent: PersonIdentNumber,
+    arbeidstakerPersonident: Personident,
     relasjonstype: BehandlerArbeidstakerRelasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
 ): UUID {
     this.connection.use { connection ->
@@ -63,7 +63,7 @@ fun DatabaseInterface.createBehandlerForArbeidstaker(
         connection.createBehandlerArbeidstakerRelasjon(
             BehandlerArbeidstakerRelasjon(
                 type = relasjonstype,
-                arbeidstakerPersonident = arbeidstakerPersonIdent,
+                arbeidstakerPersonident = arbeidstakerPersonident,
                 mottatt = OffsetDateTime.now(),
             ),
             createdBehandler.id
@@ -76,8 +76,8 @@ fun DatabaseInterface.createBehandlerForArbeidstaker(
 
 fun DatabaseInterface.createBehandlerAndTwoArbeidstakerRelasjoner(
     behandler: Behandler,
-    arbeidstakerPersonIdent: PersonIdentNumber,
-    otherArbeidstakerPersonIdent: PersonIdentNumber,
+    arbeidstakerPersonident: Personident,
+    otherArbeidstakerPersonident: Personident,
     relasjonstype: BehandlerArbeidstakerRelasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
     otherRelasjonstype: BehandlerArbeidstakerRelasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
 ): UUID {
@@ -89,7 +89,7 @@ fun DatabaseInterface.createBehandlerAndTwoArbeidstakerRelasjoner(
         connection.createBehandlerArbeidstakerRelasjon(
             BehandlerArbeidstakerRelasjon(
                 type = relasjonstype,
-                arbeidstakerPersonident = arbeidstakerPersonIdent,
+                arbeidstakerPersonident = arbeidstakerPersonident,
                 mottatt = OffsetDateTime.now(),
             ),
             createdBehandler.id
@@ -97,7 +97,7 @@ fun DatabaseInterface.createBehandlerAndTwoArbeidstakerRelasjoner(
         connection.createBehandlerArbeidstakerRelasjon(
             BehandlerArbeidstakerRelasjon(
                 type = otherRelasjonstype,
-                arbeidstakerPersonident = otherArbeidstakerPersonIdent,
+                arbeidstakerPersonident = otherArbeidstakerPersonident,
                 mottatt = OffsetDateTime.now(),
             ),
             createdBehandler.id
@@ -117,12 +117,12 @@ const val queryGetBehandlerArbeidstakerRelasjoner =
     """
 
 fun DatabaseInterface.getBehandlerArbeidstakerRelasjoner(
-    personIdentNumber: PersonIdentNumber,
+    personident: Personident,
 ): List<PBehandlerArbeidstaker> {
     val pBehandlerArbeidstakerListe = this.connection.use { connection ->
         connection.prepareStatement(queryGetBehandlerArbeidstakerRelasjoner)
             .use {
-                it.setString(1, personIdentNumber.value)
+                it.setString(1, personident.value)
                 it.executeQuery().toList { toPBehandlerArbeidstaker() }
             }
     }

@@ -19,7 +19,7 @@ class DialogmeldingService(
         log.info("Sending dialogmelding to lege with partnerId: ${melding.behandler.kontor.partnerId}")
         val arbeidstaker = dialogmeldingToBehandlerService.getBehandlerArbeidstakerRelasjon(
             melding.behandler.behandlerRef,
-            melding.arbeidstakerPersonIdent,
+            melding.arbeidstakerPersonident,
         )
 
         val fellesformat: Fellesformat = opprettDialogmelding(melding, arbeidstaker)

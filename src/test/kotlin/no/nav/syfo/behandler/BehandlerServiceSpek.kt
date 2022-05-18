@@ -269,7 +269,7 @@ class BehandlerServiceSpek : Spek({
                     val existingBehandlerRef =
                         database.createBehandlerForArbeidstaker(
                             behandler = behandler,
-                            arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         )
 
                     behandlerService.createOrGetBehandler(
@@ -292,7 +292,7 @@ class BehandlerServiceSpek : Spek({
                     val existingBehandlerRef =
                         database.createBehandlerForArbeidstaker(
                             behandler = behandler,
-                            arbeidstakerPersonIdent = UserConstants.ANNEN_ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ANNEN_ARBEIDSTAKER_FNR
                         )
                     behandlerService.createOrGetBehandler(
                         behandler,
@@ -316,7 +316,7 @@ class BehandlerServiceSpek : Spek({
                     val existingBehandlerRef =
                         database.createBehandlerForArbeidstaker(
                             behandler = behandler,
-                            arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         )
                     behandlerService.createOrGetBehandler(
                         behandler = annenBehandler,
@@ -340,11 +340,11 @@ class BehandlerServiceSpek : Spek({
                         generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR).toBehandler(UserConstants.PARTNERID)
                     database.createBehandlerForArbeidstaker(
                         behandler = behandler,
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                     )
                     database.createBehandlerForArbeidstaker(
                         behandler = annenBehandler,
-                        arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                     )
                     behandlerService.createOrGetBehandler(
                         behandler,
@@ -369,7 +369,7 @@ class BehandlerServiceSpek : Spek({
                         generateFastlegeResponse(UserConstants.FASTLEGE_ANNEN_FNR).toBehandler(UserConstants.PARTNERID)
                     database.createBehandlerForArbeidstaker(
                         behandler = annenBehandler,
-                        arbeidstakerPersonIdent = UserConstants.ANNEN_ARBEIDSTAKER_FNR
+                        arbeidstakerPersonident = UserConstants.ANNEN_ARBEIDSTAKER_FNR
                     )
                     behandlerService.createOrGetBehandler(
                         behandler,
@@ -393,7 +393,7 @@ class BehandlerServiceSpek : Spek({
                     val existingBehandlerRef =
                         database.createBehandlerForArbeidstaker(
                             behandler = behandler,
-                            arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_FNR
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR
                         )
 
                     behandlerService.createOrGetBehandler(

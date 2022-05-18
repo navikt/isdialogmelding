@@ -1,12 +1,12 @@
 package no.nav.syfo.behandler.domain
 
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import java.util.UUID
 
 data class DialogmeldingToBehandlerBestilling(
     val uuid: UUID,
     val behandler: Behandler,
-    val arbeidstakerPersonIdent: PersonIdentNumber,
+    val arbeidstakerPersonident: Personident,
     val parentRef: String?,
     val conversationUuid: UUID,
     val type: DialogmeldingType,

@@ -10,7 +10,7 @@ import no.nav.syfo.client.veiledertilgang.Tilgang
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient.Companion.TILGANGSKONTROLL_PERSON_PATH
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import no.nav.syfo.testhelper.getRandomPort
-import no.nav.syfo.util.getPersonIdentHeader
+import no.nav.syfo.util.getPersonidentHeader
 
 class SyfoTilgangskontrollMock {
     private val port = getRandomPort()
@@ -24,7 +24,7 @@ class SyfoTilgangskontrollMock {
         installContentNegotiation()
         routing {
             get(TILGANGSKONTROLL_PERSON_PATH) {
-                when (getPersonIdentHeader()) {
+                when (getPersonidentHeader()) {
                     ARBEIDSTAKER_VEILEDER_NO_ACCESS.value -> call.respond(
                         Tilgang(harTilgang = false)
                     )

@@ -7,7 +7,7 @@ import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
 import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.*
 import no.nav.syfo.client.pdl.PdlClient
-import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Personident
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.UUID
@@ -40,13 +40,13 @@ class DialogmeldingToBehandlerService(
 
     suspend fun getBehandlerArbeidstakerRelasjon(
         behandlerRef: UUID,
-        personIdent: PersonIdentNumber,
+        personident: Personident,
     ): BehandlerArbeidstakerRelasjon {
         val pBehandlerArbeidstaker = database.getBehandlerArbeidstakerRelasjon(
-            personIdentNumber = personIdent,
+            personident = personident,
             behandlerRef = behandlerRef,
         ).first()
-        val pdlNavn = pdlClient.person(personIdent)?.hentPerson?.navn?.first()
+        val pdlNavn = pdlClient.person(personident)?.hentPerson?.navn?.first()
             ?: throw RuntimeException("PDL returned empty response")
         return pBehandlerArbeidstaker.toBehandlerArbeidstakerRelasjon(
             fornavn = pdlNavn.fornavn,
