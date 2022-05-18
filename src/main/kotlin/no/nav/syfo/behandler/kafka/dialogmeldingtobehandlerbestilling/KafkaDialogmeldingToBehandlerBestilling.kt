@@ -3,7 +3,7 @@ package no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling
 import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
-import no.nav.syfo.behandler.kafka.kafkaBehandlerDialogmeldingBestillingConsumerConfig
+import no.nav.syfo.behandler.kafka.*
 import org.apache.kafka.clients.consumer.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -53,6 +53,9 @@ fun createAndStoreDialogmeldingBestillingFromRecords(
 ) {
     consumerRecords.forEach {
         log.info("Received consumer record with key: ${it.key()}")
-        dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(it.value())
+        it.value()?.let { dialogmeldingToBehandlerBestillingDTO ->
+            dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingToBehandlerBestillingDTO)
+            COUNT_KAFKA_CONSUMER_DIALOGMELDING_BESTILLING_READ.increment()
+        } ?: COUNT_KAFKA_CONSUMER_DIALOGMELDING_BESTILLING_TOMBSTONE.increment()
     }
 }

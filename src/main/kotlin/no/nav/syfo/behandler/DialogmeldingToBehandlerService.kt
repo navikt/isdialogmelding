@@ -80,6 +80,7 @@ class DialogmeldingToBehandlerService(
                     )
                 } else {
                     log.warn("Ignoring duplicate behandler dialogmelding bestilling with uuid: ${dialogmeldingToBehandlerBestilling.uuid}.")
+                    COUNT_KAFKA_CONSUMER_DIALOGMELDING_BESTILLING_DUPLICATE.increment()
                 }
                 connection.commit()
             }

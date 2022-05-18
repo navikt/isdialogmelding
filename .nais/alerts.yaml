@@ -18,8 +18,14 @@ spec:
       action: "Undersøk hvorfor pods er nede og få den kjørende igjen!"
       severity: danger
     - alert: FAILURES IN CRONJOB FOR SENDING DIALOGMELDING
-      expr: sum(increase(isdialogmelding_cronjob_dialogmelding_fail_count_total{app="isdialogmelding"} [1h])) > 0
+      expr: sum(increase(isdialogmelding_cronjob_dialogmelding_fail_count_total{app="isdialogmelding"} [1h])) > 1
       for: 5m
       description: "{{ $labels.app }} klarer ikke å sende dialogmeldinger."
+      action: "Undersøk hvorfor det feiler i logger og om det er en midlertidig feil eller ikke."
+      severity: danger
+    - alert: CRONJOB FOR SENDING DIALOGMELDING INACTIVE
+      expr: sum(increase(isdialogmelding_kafka_consumer_dialogmelding_bestilling_read_total{app="isdialogmelding"} [24h])) - sum(increase(isdialogmelding_cronjob_dialogmelding_send_count_total{app="isdialogmelding"} [24h])) > 100
+      for: 5m
+      description: "{{ $labels.app }} sender få dialogmeldinger sammenliknet med innkomne bestillinger."
       action: "Undersøk hvorfor det feiler i logger og om det er en midlertidig feil eller ikke."
       severity: danger
