@@ -48,11 +48,11 @@ class BehandlerServiceSpek : Spek({
                     val behandler =
                         behandlerService.createOrGetBehandler(
                             generateFastlegeResponse().toBehandler(UserConstants.PARTNERID),
-                            BehandlerArbeidstakerRelasjon(
-                                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                            Arbeidstaker(
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                                 mottatt = OffsetDateTime.now(),
-                            )
+                            ),
+                            relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                         )
 
                     val pBehandlerList = database.getBehandlerByArbeidstaker(
@@ -70,11 +70,11 @@ class BehandlerServiceSpek : Spek({
                                 partnerId = UserConstants.PARTNERID,
                                 dialogmeldingEnabled = false,
                             ),
-                            BehandlerArbeidstakerRelasjon(
-                                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                            Arbeidstaker(
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                                 mottatt = OffsetDateTime.now(),
-                            )
+                            ),
+                            relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                         )
 
                     val pBehandlerList = database.getBehandlerByArbeidstaker(
@@ -99,11 +99,11 @@ class BehandlerServiceSpek : Spek({
                                 partnerId = UserConstants.PARTNERID,
                                 dialogmeldingEnabled = false,
                             ),
-                            BehandlerArbeidstakerRelasjon(
-                                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                            Arbeidstaker(
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                                 mottatt = OffsetDateTime.now(),
-                            )
+                            ),
+                            relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                         )
 
                     val pBehandlerList = database.getBehandlerByArbeidstaker(
@@ -142,19 +142,19 @@ class BehandlerServiceSpek : Spek({
                     val behandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
-                        )
+                        ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
-                        )
+                        ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
                     val pBehandlerList = database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
@@ -165,19 +165,19 @@ class BehandlerServiceSpek : Spek({
                     val behandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ANNEN_ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
@@ -195,11 +195,11 @@ class BehandlerServiceSpek : Spek({
                         generateFastlegeResponse(null, UserConstants.HERID, UserConstants.HPRID).toBehandler(UserConstants.PARTNERID)
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
 
                     database.getBehandlerByArbeidstaker(
@@ -215,11 +215,11 @@ class BehandlerServiceSpek : Spek({
                         ).toBehandler(UserConstants.PARTNERID)
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
 
                     database.getBehandlerByArbeidstaker(
@@ -235,11 +235,11 @@ class BehandlerServiceSpek : Spek({
                         ).toBehandler(UserConstants.PARTNERID)
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
 
                     database.getBehandlerByArbeidstaker(
@@ -253,11 +253,11 @@ class BehandlerServiceSpek : Spek({
                     assertThrows(IllegalArgumentException::class.java) {
                         behandlerService.createOrGetBehandler(
                             behandler,
-                            BehandlerArbeidstakerRelasjon(
-                                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                            Arbeidstaker(
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                                 mottatt = OffsetDateTime.now(),
                             ),
+                            relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                         )
                     }
                     database.getBehandlerByArbeidstaker(
@@ -274,11 +274,11 @@ class BehandlerServiceSpek : Spek({
 
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
@@ -296,11 +296,11 @@ class BehandlerServiceSpek : Spek({
                         )
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
@@ -320,11 +320,11 @@ class BehandlerServiceSpek : Spek({
                         )
                     behandlerService.createOrGetBehandler(
                         behandler = annenBehandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
@@ -348,11 +348,11 @@ class BehandlerServiceSpek : Spek({
                     )
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
@@ -373,11 +373,11 @@ class BehandlerServiceSpek : Spek({
                     )
                     behandlerService.createOrGetBehandler(
                         behandler,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(
@@ -398,11 +398,11 @@ class BehandlerServiceSpek : Spek({
 
                     behandlerService.createOrGetBehandler(
                         behandler = sammeBehandlerAnnenPartnerId,
-                        BehandlerArbeidstakerRelasjon(
-                            type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        Arbeidstaker(
                             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                             mottatt = OffsetDateTime.now(),
                         ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
 
                     val pBehandlerForArbeidstakerList = database.getBehandlerByArbeidstaker(

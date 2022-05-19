@@ -3,8 +3,7 @@ package no.nav.syfo.behandler.domain
 import no.nav.syfo.domain.Personident
 import java.time.OffsetDateTime
 
-data class BehandlerArbeidstakerRelasjon(
-    val type: BehandlerArbeidstakerRelasjonstype,
+data class Arbeidstaker(
     val arbeidstakerPersonident: Personident,
     val fornavn: String = "",
     val mellomnavn: String? = null,

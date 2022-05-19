@@ -2,8 +2,7 @@ package no.nav.syfo.dialogmelding
 
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
-import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.fellesformat.Fellesformat
 import no.nav.syfo.dialogmelding.converter.createFellesformat
 import no.nav.syfo.util.JAXB
@@ -17,7 +16,7 @@ class DialogmeldingService(
 ) {
     suspend fun sendMelding(melding: DialogmeldingToBehandlerBestilling) {
         log.info("Sending dialogmelding to lege with partnerId: ${melding.behandler.kontor.partnerId}")
-        val arbeidstaker = dialogmeldingToBehandlerService.getBehandlerArbeidstakerRelasjon(
+        val arbeidstaker = dialogmeldingToBehandlerService.getArbeidstakerIfRelasjonToBehandler(
             melding.behandler.behandlerRef,
             melding.arbeidstakerPersonident,
         )
@@ -29,7 +28,7 @@ class DialogmeldingService(
 
     private fun opprettDialogmelding(
         melding: DialogmeldingToBehandlerBestilling,
-        arbeidstaker: BehandlerArbeidstakerRelasjon,
+        arbeidstaker: Arbeidstaker,
     ): Fellesformat {
         val xmleiFellesformat = createFellesformat(
             melding = melding,

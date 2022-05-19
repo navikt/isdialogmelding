@@ -125,14 +125,14 @@ private fun createAndStoreBehandlerFromSykmelding(
         mottatt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
     )
 
-    val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
-        type = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
+    val arbeidstaker = Arbeidstaker(
         arbeidstakerPersonident = arbeidstakerPersonident,
         mottatt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
     )
     behandlerService.createOrGetBehandler(
         behandler = sykmelder,
-        behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
+        arbeidstaker = arbeidstaker,
+        relasjonstype = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
     )
 }
 

@@ -61,11 +61,11 @@ fun DatabaseInterface.createBehandlerForArbeidstaker(
         val createdBehandler =
             connection.createBehandler(behandler, kontorId)
         connection.createBehandlerArbeidstakerRelasjon(
-            BehandlerArbeidstakerRelasjon(
-                type = relasjonstype,
+            Arbeidstaker(
                 arbeidstakerPersonident = arbeidstakerPersonident,
                 mottatt = OffsetDateTime.now(),
             ),
+            relasjonstype = relasjonstype,
             createdBehandler.id
         )
         connection.commit()
@@ -87,19 +87,19 @@ fun DatabaseInterface.createBehandlerAndTwoArbeidstakerRelasjoner(
         val createdBehandler =
             connection.createBehandler(behandler, kontorId)
         connection.createBehandlerArbeidstakerRelasjon(
-            BehandlerArbeidstakerRelasjon(
-                type = relasjonstype,
+            Arbeidstaker(
                 arbeidstakerPersonident = arbeidstakerPersonident,
                 mottatt = OffsetDateTime.now(),
             ),
+            relasjonstype = relasjonstype,
             createdBehandler.id
         )
         connection.createBehandlerArbeidstakerRelasjon(
-            BehandlerArbeidstakerRelasjon(
-                type = otherRelasjonstype,
+            Arbeidstaker(
                 arbeidstakerPersonident = otherArbeidstakerPersonident,
                 mottatt = OffsetDateTime.now(),
             ),
+            relasjonstype = otherRelasjonstype,
             createdBehandler.id
         )
         connection.commit()

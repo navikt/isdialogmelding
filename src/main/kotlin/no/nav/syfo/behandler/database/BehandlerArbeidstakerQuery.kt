@@ -3,7 +3,7 @@ package no.nav.syfo.behandler.database
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.PBehandlerArbeidstaker
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.Personident
 import java.sql.*
 import java.time.*
@@ -24,19 +24,20 @@ const val queryCreateBehandlerArbeidstakerRelasjon =
     """
 
 fun Connection.createBehandlerArbeidstakerRelasjon(
-    behandlerArbeidstakerRelasjon: BehandlerArbeidstakerRelasjon,
+    arbeidstaker: Arbeidstaker,
+    relasjonstype: BehandlerArbeidstakerRelasjonstype,
     behandlerId: Int,
 ) {
     val uuid = UUID.randomUUID()
     val now = OffsetDateTime.now()
     val idList = this.prepareStatement(queryCreateBehandlerArbeidstakerRelasjon).use {
         it.setString(1, uuid.toString())
-        it.setString(2, behandlerArbeidstakerRelasjon.type.name)
-        it.setString(3, behandlerArbeidstakerRelasjon.arbeidstakerPersonident.value)
+        it.setString(2, relasjonstype.name)
+        it.setString(3, arbeidstaker.arbeidstakerPersonident.value)
         it.setObject(4, now)
         it.setObject(5, now)
         it.setInt(6, behandlerId)
-        it.setObject(7, behandlerArbeidstakerRelasjon.mottatt)
+        it.setObject(7, arbeidstaker.mottatt)
         it.executeQuery().toList { getInt("id") }
     }
 
@@ -52,17 +53,18 @@ const val queryUpdateBehandlerArbeidstakerRelasjon =
     """
 
 fun DatabaseInterface.updateBehandlerArbeidstakerRelasjon(
-    behandlerArbeidstakerRelasjon: BehandlerArbeidstakerRelasjon,
+    arbeidstaker: Arbeidstaker,
+    relasjonstype: BehandlerArbeidstakerRelasjonstype,
     behandlerId: Int,
 ) {
     this.connection.use { connection ->
         connection.prepareStatement(queryUpdateBehandlerArbeidstakerRelasjon).use {
-            it.setObject(1, behandlerArbeidstakerRelasjon.mottatt)
+            it.setObject(1, arbeidstaker.mottatt)
             it.setObject(2, OffsetDateTime.now())
-            it.setString(3, behandlerArbeidstakerRelasjon.arbeidstakerPersonident.value)
+            it.setString(3, arbeidstaker.arbeidstakerPersonident.value)
             it.setInt(4, behandlerId)
-            it.setString(5, behandlerArbeidstakerRelasjon.type.name)
-            it.setObject(6, behandlerArbeidstakerRelasjon.mottatt)
+            it.setString(5, relasjonstype.name)
+            it.setObject(6, arbeidstaker.mottatt)
             it.executeUpdate()
         }
         connection.commit()
