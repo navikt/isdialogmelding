@@ -56,6 +56,10 @@ fun defaultFellesformatDialogmeldingReferatXmlRegex(): Regex {
             "                            <ns2:Id>9</ns2:Id>\n" +
             "                            <ns2:TypeId V=\"HPR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"HPR-nummer\"/>\n" +
             "                        </ns2:Ident>\n" +
+            "                        <ns2:Ident>\n" +
+            "                            <ns2:Id>77</ns2:Id>\n" +
+            "                            <ns2:TypeId V=\"HER\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"Identifikator fra Helsetjenesteenhetsregisteret\"/>\n" +
+            "                        </ns2:Ident>\n" +
             "                    </ns2:HealthcareProfessional>\n" +
             "                </ns2:Organisation>\n" +
             "            </ns2:Receiver>\n" +
