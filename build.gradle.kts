@@ -10,7 +10,7 @@ object Versions {
     const val jackson = "2.13.1"
     const val jaxb = "2.3.1"
     const val kafka = "3.1.0"
-    const val kafkaEmbedded = "3.1.0"
+    const val kafkaEmbedded = "3.1.4"
     const val kluent = "1.68"
     const val ktor = "2.0.1"
     const val logback = "1.2.11"
