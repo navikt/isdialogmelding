@@ -5,7 +5,7 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.getBehandlerKontor
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
+import no.nav.syfo.behandler.domain.Arbeidstaker
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.testhelper.*
@@ -104,13 +104,16 @@ fun addBehandlerAndKontorToDatabase(behandlerService: BehandlerService) {
         dialogmeldingEnabled = false,
     )
 
-    val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
-        type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+    val arbeidstaker = Arbeidstaker(
         arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
         mottatt = OffsetDateTime.now(),
     )
 
-    behandlerService.createOrGetBehandler(behandler, behandlerArbeidstakerRelasjon)
+    behandlerService.createOrGetBehandler(
+        behandler,
+        arbeidstaker,
+        BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+    )
 }
 
 fun mockKafkaConsumerWithDialogmelding(dialogmelding: KafkaDialogmeldingFromBehandlerDTO): KafkaConsumer<String, KafkaDialogmeldingFromBehandlerDTO> {

@@ -2,10 +2,10 @@ package no.nav.syfo.dialogmelding.converter
 
 import no.kith.xmlstds.msghead._2006_05_24.ObjectFactory
 import no.kith.xmlstds.msghead._2006_05_24.XMLPatient
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjon
+import no.nav.syfo.behandler.domain.Arbeidstaker
 
 fun createPasient(
-    arbeidstaker: BehandlerArbeidstakerRelasjon,
+    arbeidstaker: Arbeidstaker,
 ): XMLPatient {
     val factory = ObjectFactory()
     return factory.createXMLPatient()

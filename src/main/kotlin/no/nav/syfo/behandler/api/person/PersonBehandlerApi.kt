@@ -44,14 +44,14 @@ fun Route.registerPersonBehandlerApi(
                     callId = callId,
                 )
                 if (fastlege != null && fastlege.hasAnId()) {
-                    val behandlerArbeidstakerRelasjon = BehandlerArbeidstakerRelasjon(
-                        type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                    val arbeidstaker = Arbeidstaker(
                         arbeidstakerPersonident = requestPersonident,
                         mottatt = OffsetDateTime.now(),
                     )
                     val behandler = behandlerService.createOrGetBehandler(
                         behandler = fastlege,
-                        behandlerArbeidstakerRelasjon = behandlerArbeidstakerRelasjon,
+                        arbeidstaker = arbeidstaker,
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     )
                     personBehandlerDTOList.add(
                         behandler.toPersonBehandlerDTO(

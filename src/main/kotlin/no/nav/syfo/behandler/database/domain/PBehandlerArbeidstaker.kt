@@ -13,12 +13,11 @@ data class PBehandlerArbeidstaker(
     val mottatt: OffsetDateTime,
 )
 
-fun PBehandlerArbeidstaker.toBehandlerArbeidstakerRelasjon(
+fun PBehandlerArbeidstaker.toArbeidstaker(
     fornavn: String,
     mellomnavn: String?,
     etternavn: String,
-) = BehandlerArbeidstakerRelasjon(
-    type = BehandlerArbeidstakerRelasjonstype.valueOf(this.type),
+) = Arbeidstaker(
     arbeidstakerPersonident = Personident(this.arbeidstakerPersonident),
     fornavn = fornavn,
     mellomnavn = mellomnavn,

@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 fun createMsgInfo(
     melding: DialogmeldingToBehandlerBestilling,
-    arbeidstaker: BehandlerArbeidstakerRelasjon,
+    arbeidstaker: Arbeidstaker,
 ): XMLMsgInfo {
     val factory = ObjectFactory()
     return factory.createXMLMsgInfo()

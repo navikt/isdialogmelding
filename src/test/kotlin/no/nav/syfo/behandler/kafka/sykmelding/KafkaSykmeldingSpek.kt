@@ -17,7 +17,8 @@ import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.*
-import no.nav.syfo.testhelper.generator.*
+import no.nav.syfo.testhelper.generator.generateFastlegeResponse
+import no.nav.syfo.testhelper.generator.generateSykmeldingDTO
 import no.nav.syfo.util.*
 import org.amshove.kluent.*
 import org.apache.kafka.clients.consumer.*
@@ -25,7 +26,7 @@ import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.time.*
-import java.util.UUID
+import java.util.*
 
 class KafkaSykmeldingSpek : Spek({
 
@@ -224,11 +225,11 @@ class KafkaSykmeldingSpek : Spek({
                         val behandler =
                             behandlerService.createOrGetBehandler(
                                 generateFastlegeResponse().toBehandler(UserConstants.PARTNERID),
-                                BehandlerArbeidstakerRelasjon(
-                                    type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                                Arbeidstaker(
                                     arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                                     mottatt = OffsetDateTime.now(),
-                                )
+                                ),
+                                relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                             )
 
                         val pBehandlerList = database.getBehandlerByArbeidstaker(
@@ -552,11 +553,11 @@ class KafkaSykmeldingSpek : Spek({
 
                         behandlerService.createOrGetBehandler(
                             fastlegeBehandler,
-                            BehandlerArbeidstakerRelasjon(
-                                type = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                            Arbeidstaker(
                                 arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                                 mottatt = OffsetDateTime.now(),
-                            )
+                            ),
+                            relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                         )
 
                         val kontorAfterFastlegeOppslag = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
