@@ -10,7 +10,7 @@ fun generateBehandler(
     partnerId: PartnerId,
     dialogmeldingEnabled: Boolean = true,
     personident: Personident = Personident("12125678911"),
-    herId: Int = 77,
+    herId: Int? = 77,
     hprId: Int = 9,
 ) = Behandler(
     behandlerRef = behandlerRef,

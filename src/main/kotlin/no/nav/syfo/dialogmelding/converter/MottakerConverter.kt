@@ -44,11 +44,11 @@ fun createReceiver(
                         .withCity(melding.behandler.kontor.poststed)
                 )
                 .withHealthcareProfessional(
-                    factory.createXMLHealthcareProfessional()
-                        .withFamilyName(melding.behandler.etternavn)
-                        .withMiddleName(melding.behandler.mellomnavn)
-                        .withGivenName(melding.behandler.fornavn)
-                        .withIdent(
+                    factory.createXMLHealthcareProfessional().apply {
+                        withFamilyName(melding.behandler.etternavn)
+                        withMiddleName(melding.behandler.mellomnavn)
+                        withGivenName(melding.behandler.fornavn)
+                        withIdent(
                             factory.createXMLIdent()
                                 .withId(melding.behandler.personident!!.value)
                                 .withTypeId(
@@ -58,16 +58,32 @@ fun createReceiver(
                                         .withV("FNR")
                                 )
                         )
-                        .withIdent(
-                            factory.createXMLIdent()
-                                .withId(melding.behandler.hprId.toString())
-                                .withTypeId(
-                                    factory.createXMLCV()
-                                        .withDN("HPR-nummer")
-                                        .withS("2.16.578.1.12.4.1.1.8116")
-                                        .withV("HPR")
-                                )
-                        )
+                        if (melding.behandler.hprId != null) {
+                            withIdent(
+                                factory.createXMLIdent()
+                                    .withId(melding.behandler.hprId.toString())
+                                    .withTypeId(
+                                        factory.createXMLCV()
+                                            .withDN("HPR-nummer")
+                                            .withS("2.16.578.1.12.4.1.1.8116")
+                                            .withV("HPR")
+                                    )
+                            )
+                        }
+                        if (melding.behandler.herId != null) {
+                            withIdent(
+                                factory.createXMLIdent()
+                                    .withId(melding.behandler.herId.toString())
+                                    .withTypeId(
+                                        factory.createXMLCV()
+                                            .withDN("Identifikator fra Helsetjenesteenhetsregisteret")
+                                            .withS("2.16.578.1.12.4.1.1.8116")
+                                            .withV("HER")
+                                    )
+
+                            )
+                        }
+                    }
                 )
         )
 }

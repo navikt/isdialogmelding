@@ -14,7 +14,7 @@ import no.nav.syfo.testhelper.generator.*
 import org.junit.Assert.assertTrue
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import java.util.UUID
+import java.util.*
 
 object DialogmeldingServiceSpek : Spek({
 
