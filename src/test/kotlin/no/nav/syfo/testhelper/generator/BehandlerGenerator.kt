@@ -2,6 +2,7 @@ package no.nav.syfo.testhelper.generator
 
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.*
+import no.nav.syfo.testhelper.UserConstants
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -9,7 +10,7 @@ fun generateBehandler(
     behandlerRef: UUID,
     partnerId: PartnerId,
     dialogmeldingEnabled: Boolean = true,
-    personident: Personident = Personident("12125678911"),
+    personident: Personident = UserConstants.FASTLEGE_FNR,
     herId: Int? = 77,
     hprId: Int = 9,
 ) = Behandler(
