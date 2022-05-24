@@ -1,15 +1,14 @@
 package no.nav.syfo.behandler
 
-import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
+import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.domain.PartnerId
-import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.*
-import no.nav.syfo.testhelper.generator.*
+import no.nav.syfo.testhelper.generator.generateBehandler
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -19,35 +18,37 @@ class GetBehandlereSpek : Spek({
 
     val externalMockEnvironment = ExternalMockEnvironment.instance
     val database = externalMockEnvironment.database
-    val fastlegeClientMock = mockk<FastlegeClient>()
-    val partnerinfoClientMock = mockk<PartnerinfoClient>()
+    val azureAdClient = AzureAdClient(
+        azureAppClientId = externalMockEnvironment.environment.aadAppClient,
+        azureAppClientSecret = externalMockEnvironment.environment.azureAppClientSecret,
+        azureOpenidConfigTokenEndpoint = externalMockEnvironment.environment.azureOpenidConfigTokenEndpoint,
+    )
+    val fastlegeClient = FastlegeClient(
+        azureAdClient = azureAdClient,
+        fastlegeRestClientId = externalMockEnvironment.environment.fastlegeRestClientId,
+        fastlegeRestUrl = externalMockEnvironment.environment.fastlegeRestUrl,
+    )
+    val partnerinfoClient = PartnerinfoClient(
+        azureAdClient = azureAdClient,
+        syfoPartnerinfoClientId = externalMockEnvironment.environment.fastlegeRestClientId,
+        syfoPartnerinfoUrl = externalMockEnvironment.environment.syfoPartnerinfoUrl,
+    )
+
     val behandlerService = BehandlerService(
-        fastlegeClient = fastlegeClientMock,
-        partnerinfoClient = partnerinfoClientMock,
+        fastlegeClient = fastlegeClient,
+        partnerinfoClient = partnerinfoClient,
         database = database,
         externalMockEnvironment.environment.toggleSykmeldingbehandlere,
     )
-    val callId = "callId"
-    val token = "token"
     val behandlerRef = UUID.randomUUID()
 
     afterEachTest {
         database.dropData()
-        clearMocks(
-            fastlegeClientMock,
-            partnerinfoClientMock,
-        )
     }
 
     describe("BehandlerService") {
         describe("get fastlege and behandlere who have sykmeldt arbeidstaker") {
             it("find fastlege and sykmeldingbehandler for arbeidstaker") {
-                mockFastlege(
-                    personident = UserConstants.FASTLEGE_FNR,
-                    partnerId = UserConstants.PARTNERID,
-                    fastlegeClientMock = fastlegeClientMock,
-                    partnerinfoClientMock = partnerinfoClientMock,
-                )
                 database.createBehandlerAndTwoArbeidstakerRelasjoner(
                     behandler = generateBehandler(
                         behandlerRef = behandlerRef,
@@ -74,26 +75,19 @@ class GetBehandlereSpek : Spek({
             }
 
             it("exclude behandlere without electronic communication enabled") {
-                coEvery {
-                    fastlegeClientMock.fastlege(
-                        callId = callId,
-                        personident = UserConstants.ARBEIDSTAKER_FNR,
-                        token = token,
-                    )
-                } returns null
                 database.createBehandlerForArbeidstaker(
                     behandler = generateBehandler(
                         behandlerRef = behandlerRef,
                         partnerId = PartnerId(1),
                         dialogmeldingEnabled = false,
                     ),
-                    arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                    arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR,
                     relasjonstype = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
                 )
 
                 var behandlere: List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>
                 runBlocking {
-                    behandlere = behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, "token", "callId")
+                    behandlere = behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR, "token", "callId")
                 }
 
                 behandlere.size shouldBeEqualTo 0
@@ -102,20 +96,13 @@ class GetBehandlereSpek : Spek({
             it("return behandler as fastlege if behandler is also registered as sykmelder for innbygger") {
                 val behandler = generateBehandler(
                     behandlerRef = behandlerRef,
-                    partnerId = PartnerId(1),
+                    partnerId = UserConstants.PARTNERID,
                     dialogmeldingEnabled = true,
                 )
                 database.createBehandlerForArbeidstaker(
                     behandler = behandler,
                     arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                     relasjonstype = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
-                )
-
-                mockFastlege(
-                    personident = behandler.personident!!,
-                    partnerId = behandler.kontor.partnerId,
-                    fastlegeClientMock = fastlegeClientMock,
-                    partnerinfoClientMock = partnerinfoClientMock,
                 )
 
                 var behandlere: List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>
@@ -133,21 +120,15 @@ class GetBehandlereSpek : Spek({
 
             it("return newest fastlege if more than one") {
                 val fastlege = generateBehandler(
+                    personident = UserConstants.FASTLEGE_ANNEN_FNR,
                     behandlerRef = behandlerRef,
-                    partnerId = PartnerId(1),
+                    partnerId = UserConstants.PARTNERID,
                     dialogmeldingEnabled = true,
                 )
                 database.createBehandlerForArbeidstaker(
                     behandler = fastlege,
                     arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                     relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                )
-
-                mockFastlege(
-                    personident = UserConstants.FASTLEGE_ANNEN_FNR,
-                    partnerId = PartnerId(1),
-                    fastlegeClientMock = fastlegeClientMock,
-                    partnerinfoClientMock = partnerinfoClientMock,
                 )
 
                 var behandlere: List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>
@@ -157,13 +138,14 @@ class GetBehandlereSpek : Spek({
 
                 behandlere.size shouldBeEqualTo 1
                 behandlere[0].second shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.FASTLEGE
-                behandlere[0].first.personident shouldBeEqualTo UserConstants.FASTLEGE_ANNEN_FNR
+                behandlere[0].first.personident shouldBeEqualTo UserConstants.FASTLEGE_FNR
             }
 
             it("return old fastlege as sykmelder") {
                 val fastlegeAndSykmelder = generateBehandler(
+                    personident = UserConstants.FASTLEGE_ANNEN_FNR,
                     behandlerRef = behandlerRef,
-                    partnerId = PartnerId(1),
+                    partnerId = UserConstants.PARTNERID,
                     dialogmeldingEnabled = true,
                 )
                 database.createBehandlerAndTwoArbeidstakerRelasjoner(
@@ -173,12 +155,6 @@ class GetBehandlereSpek : Spek({
                     relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
                     otherRelasjonstype = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
                 )
-                mockFastlege(
-                    personident = UserConstants.FASTLEGE_ANNEN_FNR,
-                    partnerId = PartnerId(1),
-                    fastlegeClientMock = fastlegeClientMock,
-                    partnerinfoClientMock = partnerinfoClientMock,
-                )
 
                 var behandlere: List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>
                 runBlocking {
@@ -187,31 +163,10 @@ class GetBehandlereSpek : Spek({
 
                 behandlere.size shouldBeEqualTo 2
                 val fastlege = behandlere.firstOrNull { it.second == BehandlerArbeidstakerRelasjonstype.FASTLEGE }
-                fastlege!!.first.personident shouldBeEqualTo UserConstants.FASTLEGE_ANNEN_FNR
+                fastlege!!.first.personident shouldBeEqualTo UserConstants.FASTLEGE_FNR
                 val sykmelder = behandlere.firstOrNull { it.second == BehandlerArbeidstakerRelasjonstype.SYKMELDER }
-                sykmelder!!.first.personident shouldBeEqualTo UserConstants.FASTLEGE_FNR
+                sykmelder!!.first.personident shouldBeEqualTo UserConstants.FASTLEGE_ANNEN_FNR
             }
         }
     }
 })
-
-fun mockFastlege(
-    personident: Personident,
-    partnerId: PartnerId,
-    fastlegeClientMock: FastlegeClient,
-    partnerinfoClientMock: PartnerinfoClient,
-) {
-    val callId = "callId"
-    val token = "token"
-
-    coEvery {
-        fastlegeClientMock.fastlege(
-            callId = callId,
-            personident = UserConstants.ARBEIDSTAKER_FNR,
-            token = token,
-        )
-    } returns generateFastlegeResponse(
-        personident = personident,
-    )
-    coEvery { partnerinfoClientMock.partnerinfo(any(), token, callId) } returns generatePartnerinfoResponse(partnerId.value)
-}
