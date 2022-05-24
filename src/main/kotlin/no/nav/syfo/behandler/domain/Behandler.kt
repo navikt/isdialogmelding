@@ -56,6 +56,12 @@ fun Behandler.toPersonBehandlerDTO(
     telefon = this.telefon,
 )
 
+enum class BehandleridentType {
+    FNR,
+    HPR,
+    HER,
+}
+
 fun Behandler.hasAnId(): Boolean = personident != null || herId != null || hprId != null
 
 fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.removeDuplicates() = this.sortFastlegerFirst().distinctBy { it.first.behandlerRef }
