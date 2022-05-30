@@ -143,11 +143,13 @@ private fun updateIdenterForBehandler(
     database: DatabaseInterface,
 ) {
     val behandlerFnr = identer[BehandleridentType.FNR]
+    log.info("Update behandler idents for behandler connected to partnerId: $partnerId")
 
     behandlerFnr?.let {
         val behandlerToUpdate = database.getBehandlerByBehandlerPersonidentAndPartnerId(Personident(behandlerFnr), partnerId)
 
         behandlerToUpdate?.let {
+            log.info("Behandler found with behandlerRef ${behandlerToUpdate.behandlerRef}")
             database.updateBehandlerIdenter(behandlerToUpdate.behandlerRef, identer)
         }
     }
