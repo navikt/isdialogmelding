@@ -3,8 +3,7 @@ package no.nav.syfo.behandler.database
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.*
-import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.Personident
 import java.sql.*
@@ -177,6 +176,29 @@ fun DatabaseInterface.getBehandlerAndRelasjonstypeList(arbeidstakerIdent: Person
 
 fun DatabaseInterface.getBehandlerByArbeidstaker(personident: Personident): List<PBehandler> {
     return getBehandlerAndRelasjonstypeList(personident).map { it.first }
+}
+
+const val queryUpdateBehandlerIdenter =
+    """
+        UPDATE BEHANDLER
+        SET hpr_id = COALESCE(hpr_id, ?),
+        her_id = COALESCE(her_id, ?),
+        updated_at = ?
+        WHERE behandler_ref=?
+    """
+
+fun DatabaseInterface.updateBehandlerIdenter(behandlerRef: UUID, identer: Map<BehandleridentType, String>) {
+    this.connection.use { connection ->
+        connection.prepareStatement(queryUpdateBehandlerIdenter)
+            .use {
+                it.setString(1, identer[BehandleridentType.HPR])
+                it.setString(2, identer[BehandleridentType.HER])
+                it.setObject(3, OffsetDateTime.now())
+                it.setString(4, behandlerRef.toString())
+                it.executeUpdate()
+            }
+        connection.commit()
+    }
 }
 
 fun ResultSet.toPBehandler(): PBehandler =
