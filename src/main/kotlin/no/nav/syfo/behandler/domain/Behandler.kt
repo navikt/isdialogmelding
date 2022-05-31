@@ -60,6 +60,7 @@ enum class BehandleridentType {
     FNR,
     HPR,
     HER,
+    DNR,
 }
 
 fun Behandler.hasAnId(): Boolean = personident != null || herId != null || hprId != null
