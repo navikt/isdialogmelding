@@ -25,11 +25,13 @@ class BehandlerService(
         personident: Personident,
         token: String,
         callId: String,
+        systemRequest: Boolean = false,
     ): List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>> {
         val behandlere = mutableListOf<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>()
 
         val fastlegeBehandler = getFastlegeBehandler(
             personident = personident,
+            systemRequest = systemRequest,
             token = token,
             callId = callId,
         )
@@ -53,11 +55,13 @@ class BehandlerService(
         personident: Personident,
         token: String,
         callId: String,
+        systemRequest: Boolean = false,
     ): Behandler? {
         val fastlege = getAktivFastlegeBehandler(
             personident = personident,
             token = token,
             callId = callId,
+            systemRequest = systemRequest,
         )
         if (fastlege != null && fastlege.hasAnId()) {
             val arbeidstaker = Arbeidstaker(

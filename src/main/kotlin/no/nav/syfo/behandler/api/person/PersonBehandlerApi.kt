@@ -1,18 +1,17 @@
 package no.nav.syfo.behandler.api.person
 
-import io.ktor.server.application.*
 import io.ktor.http.*
+import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.nav.syfo.application.api.authentication.personident
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.person.access.PersonAPIConsumerAccessService
-import no.nav.syfo.behandler.domain.*
+import no.nav.syfo.behandler.domain.toPersonBehandlerDTOList
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.time.OffsetDateTime
 
 private val log: Logger = LoggerFactory.getLogger("no.nav.syfo")
 
@@ -36,30 +35,16 @@ fun Route.registerPersonBehandlerApi(
                     token = token,
                 )
 
-                val personBehandlerDTOList = mutableListOf<PersonBehandlerDTO>()
-                val fastlege = behandlerService.getAktivFastlegeBehandler(
+                val behandlere = behandlerService.getBehandlere(
                     personident = requestPersonident,
-                    systemRequest = true,
                     token = token,
                     callId = callId,
+                    systemRequest = true,
                 )
-                if (fastlege != null && fastlege.hasAnId()) {
-                    val arbeidstaker = Arbeidstaker(
-                        arbeidstakerPersonident = requestPersonident,
-                        mottatt = OffsetDateTime.now(),
-                    )
-                    val behandler = behandlerService.createOrGetBehandler(
-                        behandler = fastlege,
-                        arbeidstaker = arbeidstaker,
-                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                    )
-                    personBehandlerDTOList.add(
-                        behandler.toPersonBehandlerDTO(
-                            behandlerType = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                        )
-                    )
-                }
-                call.respond(personBehandlerDTOList)
+
+                val behandlerDTOList = behandlere.toPersonBehandlerDTOList()
+
+                call.respond(behandlerDTOList)
             } catch (e: IllegalArgumentException) {
                 val illegalArgumentMessage = "Could not retrieve list of Behandler for Personident"
                 log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)
