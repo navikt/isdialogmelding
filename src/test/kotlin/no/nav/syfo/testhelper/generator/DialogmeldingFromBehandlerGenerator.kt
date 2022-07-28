@@ -39,6 +39,26 @@ val fellesformatXMLHealthcareProfessional = """<?xml version="1.0" ?>
         <MottakenhetBlokk partnerReferanse="${UserConstants.PARTNERID}" />
     </EI_fellesformat>"""
 
+val fellesformatXMLHealthcareProfessionalMedIdenttypeAnnen = """<?xml version="1.0" ?>
+    <EI_fellesformat xmlns="http://www.nav.no/xml/eiff/2/" >
+    <MsgHead xmlns="http://www.kith.no/xmlstds/msghead/2006-05-24">
+        <HealthcareProfessional>
+            <Ident>
+                <Id>${UserConstants.FASTLEGE_FNR.value}</Id>
+                <TypeId V="${BehandleridentType.FNR}" S="2.16.578.1.12.4.1.1.8116" DN="Fødselsnummer Norsk fødselsnummer"/>
+            </Ident>
+            <Ident>
+                <Id>${UserConstants.OTHER_HPRID}</Id>
+                <TypeId V="${BehandleridentType.HPR}" S="2.16.578.1.12.4.1.1.8116" DN="HPR-nummer"/>
+            </Ident>
+            <Ident>
+                <Id>xyz</Id>
+                <TypeId V="${BehandleridentType.XXX}" S="2.16.578.1.12.4.1.1.8116" DN="Identifikator fra Helsetjenesteenhetsregisteret"/>
+            </Ident>
+        </HealthcareProfessional>
+        </MsgHead>
+        <MottakenhetBlokk partnerReferanse="${UserConstants.PARTNERID}" />
+    </EI_fellesformat>"""
 val fellesformatXmlWithIdenterWithoutPartnerId = """<?xml version="1.0" ?>
     <EI_fellesformat xmlns="http://www.nav.no/xml/eiff/2/" >
     <HealthcareProfessional>

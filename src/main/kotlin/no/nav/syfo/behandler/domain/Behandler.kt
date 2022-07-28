@@ -56,11 +56,19 @@ fun Behandler.toPersonBehandlerDTO(
     telefon = this.telefon,
 )
 
+// Kodeverk 2.16.578.1.12.4.1.1.8116
 enum class BehandleridentType {
     FNR,
     HPR,
     HER,
     DNR,
+    HNR,
+    PNR,
+    SEF,
+    DKF,
+    SSN,
+    FPN,
+    XXX,
 }
 
 fun Behandler.hasAnId(): Boolean = personident != null || herId != null || hprId != null

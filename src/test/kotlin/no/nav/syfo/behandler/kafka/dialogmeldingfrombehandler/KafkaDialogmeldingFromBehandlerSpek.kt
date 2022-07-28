@@ -55,7 +55,6 @@ class KafkaDialogmeldingFromBehandlerSpek : Spek({
                         val kontor = database.connection.getBehandlerKontor(UserConstants.PARTNERID)
                         kontor?.dialogmeldingEnabled shouldNotBe null
                     }
-
                     it("update identer for behandler if stored idents are null") {
                         val behandlerRef = database.createBehandlerForArbeidstaker(
                             behandler = generateBehandler(
@@ -82,6 +81,33 @@ class KafkaDialogmeldingFromBehandlerSpek : Spek({
                         behandler shouldNotBe null
                         behandler!!.hprId shouldBeEqualTo UserConstants.HPRID.toString()
                         behandler.herId shouldBeEqualTo UserConstants.OTHER_HERID.toString()
+                    }
+                    it("do not update identer when received ident of type XXX") {
+                        val behandlerRef = database.createBehandlerForArbeidstaker(
+                            behandler = generateBehandler(
+                                behandlerRef = UUID.randomUUID(),
+                                partnerId = UserConstants.PARTNERID,
+                                herId = null,
+                                hprId = UserConstants.HPRID,
+                            ),
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        )
+                        val dialogmelding = generateDialogmeldingFromBehandlerDTO(fellesformatXMLHealthcareProfessionalMedIdenttypeAnnen)
+                        val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
+
+                        runBlocking {
+                            pollAndProcessDialogmeldingFromBehandler(
+                                kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                                database = database,
+                            )
+                        }
+
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+                        val behandler = database.getBehandlerByBehandlerRef(behandlerRef)
+                        behandler shouldNotBe null
+                        behandler!!.hprId shouldBeEqualTo UserConstants.HPRID.toString()
+                        behandler.herId shouldBeEqualTo null
                     }
                 }
 
