@@ -31,7 +31,7 @@ const val queryCreateBehandlerDialogmeldingBestilling =
 fun Connection.createBehandlerDialogmeldingBestilling(
     dialogmeldingToBehandlerBestilling: DialogmeldingToBehandlerBestilling,
     behandlerId: Int,
-) {
+): Int {
     val now = Timestamp.from(Instant.now())
     val idList = this.prepareStatement(queryCreateBehandlerDialogmeldingBestilling).use {
         it.setString(1, dialogmeldingToBehandlerBestilling.uuid.toString())
@@ -53,6 +53,7 @@ fun Connection.createBehandlerDialogmeldingBestilling(
     if (idList.size != 1) {
         throw SQLException("Creating BehandlerDialogmeldingBestilling failed, no rows affected.")
     }
+    return idList.first()
 }
 
 const val querySetBehandlerDialogmeldingBestillingSendt =

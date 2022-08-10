@@ -34,6 +34,7 @@ data class Environment(
     val mqHostname: String = getEnvVar("MQGATEWAY_HOSTNAME"),
     val mqPort: Int = getEnvVar("MQGATEWAY_PORT", "1413").toInt(),
     val mqChannelName: String = getEnvVar("MQGATEWAY_CHANNEL_NAME"),
+    val apprecQueueName: String = getEnvVar("APPREC_QUEUE"),
     val emottakQueuename: String = getEnvVar("MOTTAK_QUEUE_UTSENDING_QUEUENAME"),
     val mqApplicationName: String = "isdialogmelding",
     val fastlegeRestClientId: String = getEnvVar("FASTLEGEREST_CLIENT_ID"),
@@ -47,6 +48,7 @@ data class Environment(
     val toggleKafkaProcessingSykmeldingEnabled: Boolean = getEnvVar("TOGGLE_KAFKA_PROCESSING_SYKMELDING_ENABLED").toBoolean(),
     val toggleKafkaProcessingDialogmeldingEnabled: Boolean = getEnvVar("TOGGLE_KAFKA_PROCESSING_DIALOGMELDING_ENABLED").toBoolean(),
     val toggleSykmeldingbehandlere: Boolean = getEnvVar("TOGGLE_SYKMELDINGBEHANDLERE").toBoolean(),
+    val toggleApprecs: Boolean = getEnvVar("TOGGLE_APPREC").toBoolean(),
 ) {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$isdialogmeldingDbHost:$isdialogmeldingDbPort/$isdialogmeldingDbName"

@@ -132,6 +132,9 @@ fun DatabaseInterface.getBehandlerArbeidstakerRelasjoner(
 fun DatabaseInterface.dropData() {
     val queryList = listOf(
         """
+        DELETE FROM APPREC
+        """.trimIndent(),
+        """
         DELETE FROM BEHANDLER_DIALOGMELDING_BESTILLING
         """.trimIndent(),
         """
