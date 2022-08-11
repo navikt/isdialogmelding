@@ -5,13 +5,12 @@ import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.Environment
+import no.nav.syfo.application.*
 import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.application.api.authentication.getWellKnown
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
-import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.application.mq.*
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.fastlege.FastlegeClient
@@ -21,8 +20,10 @@ import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
+import javax.jms.Session
 
 const val applicationPort = 8080
 
@@ -125,6 +126,28 @@ fun main() {
                 applicationEnvironmentKafka = environment.kafka,
                 database = applicationDatabase,
             )
+        }
+        if (environment.toggleApprecs) {
+            launchBackgroundTask(
+                applicationState = applicationState,
+            ) {
+                val factory = connectionFactory(environment)
+
+                factory.createConnection(
+                    environment.serviceuserUsername,
+                    environment.serviceuserPassword,
+                ).use { connection ->
+                    connection.start()
+                    val session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE)
+                    val inputconsumer = session.consumerForQueue(environment.apprecQueueName)
+                    val blockingApplicationRunner = ApprecConsumer(
+                        applicationState = applicationState,
+                        database = applicationDatabase,
+                        inputconsumer = inputconsumer,
+                    )
+                    blockingApplicationRunner.run()
+                }
+            }
         }
     }
 

@@ -79,6 +79,8 @@ spec:
   env:
     - name: KTOR_ENV
       value: production
+    - name: TOGGLE_APPREC
+      value: "false"
     - name: TOGGLE_KAFKA_PROCESSING_SYKMELDING_ENABLED
       value: "true"
     - name: TOGGLE_KAFKA_PROCESSING_DIALOGMELDING_ENABLED
@@ -93,6 +95,8 @@ spec:
       value: '1413'
     - name: MQGATEWAY_CHANNEL_NAME
       value: Q1_ISDIALOGMELDING
+    - name: APPREC_QUEUE
+      value: QA.Q1_ISDIALOGMELDING.APPRECS
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
       value: QA.Q414.IU03_UTSENDING
     - name: AAP_SOKNAD_API_CLIENT_ID

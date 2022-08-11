@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EI_fellesformat xmlns="http://www.nav.no/xml/eiff/2/" xmlns:ns2="http://www.kith.no/xmlstds/apprec/2004-11-21">
+    <MottakenhetBlokk ediLoggId="FiktivTestdata0001" ebRole="Saksbehandler" ebService="ForesporselFraSaksbehandler" ebAction="Bekreftelse"/>
+    <ns2:AppRec>
+        <ns2:MsgType V="APPREC"/>
+        <ns2:MIGversion>1.0 2004-11-21</ns2:MIGversion>
+        <ns2:GenDate>2022-08-08T10:10:28.660481</ns2:GenDate>
+        <ns2:Id>FiktivTestdata0001</ns2:Id>
+        <ns2:Sender>
+            <ns2:HCP>
+                <ns2:Inst>
+                    <ns2:Name>NAV</ns2:Name>
+                    <ns2:Id>889640782</ns2:Id>
+                    <ns2:TypeId V="ENH" DN="Organisasjonsnummeret i Enhetsregister"/>
+                    <ns2:AdditionalId>
+                        <ns2:Id>79768</ns2:Id>
+                        <ns2:Type V="HER" DN="HER-id"/>
+                    </ns2:AdditionalId>
+                </ns2:Inst>
+            </ns2:HCP>
+        </ns2:Sender>
+        <ns2:Receiver>
+            <ns2:HCP>
+                <ns2:Inst>
+                    <ns2:Name>Kule helsetjenester AS</ns2:Name>
+                    <ns2:Id>223456789</ns2:Id>
+                    <ns2:TypeId V="ENH" DN="Organisasjonsnummeret i Enhetsregister"/>
+                    <ns2:AdditionalId>
+                        <ns2:Id>0123</ns2:Id>
+                        <ns2:Type V="HER" DN="HER-id"/>
+                    </ns2:AdditionalId>
+                    <ns2:HCPerson>
+                        <ns2:Name>Valda Inga Fos</ns2:Name>
+                        <ns2:Id>1234567</ns2:Id>
+                        <ns2:TypeId V="HPR" DN="HPR-nummer"/>
+                        <ns2:AdditionalId>
+                            <ns2:Id>1234</ns2:Id>
+                            <ns2:Type V="HER" DN="HER-id"/>
+                        </ns2:AdditionalId>
+                    </ns2:HCPerson>
+                </ns2:Inst>
+            </ns2:HCP>
+        </ns2:Receiver>
+        <ns2:Status V="2" DN="Avvist"/>
+        <ns2:Error V="X99" DN="Annen feil"/>
+        <ns2:OriginalMsgId>
+            <ns2:MsgType V="DIALOG_SVAR" DN="Svar på forespørsel"/>
+            <ns2:IssueDate>2020-09-30T16:00:31.476</ns2:IssueDate>
+            <ns2:Id>b62016eb-6c2d-417a-8ecc-157b3c5ee2ca</ns2:Id>
+        </ns2:OriginalMsgId>
+    </ns2:AppRec>
+</EI_fellesformat>

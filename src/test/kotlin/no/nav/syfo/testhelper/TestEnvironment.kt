@@ -12,6 +12,7 @@ fun testEnvironment(
     pdlUrl: String,
 ) = Environment(
     aadAppClient = "isdialogmelding-client-id",
+    apprecQueueName = "apprec-test-queue",
     azureAppClientSecret = "isdialogmelding-secret",
     azureAppWellKnownUrl = "wellknown",
     azureOpenidConfigTokenEndpoint = azureOpenidConfigTokenEndpoint,
@@ -47,6 +48,7 @@ fun testEnvironment(
     isdialogmeldingDbName = "isdialogmelding_dev",
     isdialogmeldingDbUsername = "username",
     isdialogmeldingDbPassword = "password",
+    toggleApprecs = true,
     toggleKafkaProcessingSykmeldingEnabled = true,
     toggleKafkaProcessingDialogmeldingEnabled = true,
     toggleSykmeldingbehandlere = true,

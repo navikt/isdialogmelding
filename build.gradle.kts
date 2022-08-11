@@ -5,12 +5,16 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 object Versions {
+    const val dialogmeldingVersion = "1.5d21db9"
+    const val fellesformat2Version = "1.0329dd1"
     const val flyway = "8.5.13"
     const val hikari = "5.0.1"
     const val jackson = "2.13.3"
     const val jaxb = "2.3.1"
     const val kafka = "3.2.0"
     const val kafkaEmbedded = "3.1.6"
+    const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
+    const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluent = "1.68"
     const val ktor = "2.0.3"
     const val logback = "1.2.11"
@@ -44,6 +48,13 @@ repositories {
             password = githubPassword
         }
     }
+    maven {
+        url = uri("https://maven.pkg.github.com/navikt/syfo-xml-codegen")
+        credentials {
+            username = githubUser
+            password = githubPassword
+        }
+    }
 }
 
 dependencies {
@@ -72,6 +83,11 @@ dependencies {
 
     // MQ
     implementation("com.ibm.mq:com.ibm.mq.allclient:${Versions.mq}")
+
+    implementation("no.nav.helse.xml:xmlfellesformat2:${Versions.fellesformat2Version}")
+    implementation("no.nav.helse.xml:kith-hodemelding:${Versions.kithHodemeldingVersion}")
+    implementation("no.nav.helse.xml:kith-apprec:${Versions.kithApprecVersion}")
+    implementation("no.nav.helse.xml:dialogmelding:${Versions.dialogmeldingVersion}")
 
     implementation("no.nav.syfotjenester:fellesformat:${Versions.syfotjenester}")
     implementation("no.nav.syfotjenester:kith-base64:${Versions.syfotjenester}")
