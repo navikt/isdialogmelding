@@ -12,7 +12,7 @@ object Versions {
     const val jackson = "2.13.3"
     const val jaxb = "2.3.1"
     const val kafka = "3.2.0"
-    const val kafkaEmbedded = "3.2.0"
+    const val kafkaEmbedded = "3.2.1"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluent = "1.68"
@@ -100,6 +100,14 @@ dependencies {
     }
     implementation("org.apache.kafka:kafka_2.13:${Versions.kafka}", excludeLog4j)
     testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded}", excludeLog4j)
+    constraints {
+        implementation("org.eclipse.jetty.http2:http2-server") {
+            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-2048/")
+            version {
+                require("9.4.48.v20220622")
+            }
+        }
+    }
 
     // Database
     implementation("org.flywaydb:flyway-core:${Versions.flyway}")
