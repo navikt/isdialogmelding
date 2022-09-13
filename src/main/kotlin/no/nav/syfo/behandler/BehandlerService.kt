@@ -51,6 +51,20 @@ class BehandlerService(
         return behandlere.removeDuplicates()
     }
 
+    fun searchBehandlere(
+        behandlerFornavn: String,
+        behandlerEtternavn: String,
+        kontornavn: String,
+    ): List<Behandler> {
+        return database.searchBehandlerByFornavnEtternavnKontornavn(
+            fornavn = behandlerFornavn,
+            etternavn = behandlerEtternavn,
+            kontornavn = kontornavn,
+        ).map { pair ->
+            pair.first.toBehandler(pair.second)
+        }
+    }
+
     private suspend fun getFastlegeBehandler(
         personident: Personident,
         token: String,

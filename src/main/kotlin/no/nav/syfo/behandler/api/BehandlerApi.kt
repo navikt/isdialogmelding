@@ -12,6 +12,7 @@ import no.nav.syfo.util.*
 
 const val behandlerPath = "/api/v1/behandler"
 const val behandlerPersonident = "/personident"
+const val search = "/search"
 
 fun Route.registerBehandlerApi(
     behandlerService: BehandlerService,
@@ -42,6 +43,23 @@ fun Route.registerBehandlerApi(
 
                 call.respond(behandlerDTOList)
             }
+        }
+        get(search) {
+            val callId = getCallId()
+            val token = getBearerHeader()
+                ?: throw IllegalArgumentException("No Authorization header supplied")
+            val fornavn = this.call.request.headers["fornavn"]
+                ?: throw IllegalArgumentException("No fornavn supplied")
+            val etternavn = this.call.request.headers["etternavn"]
+                ?: throw IllegalArgumentException("No etternavn supplied")
+            val kontornavn = this.call.request.headers["kontornavn"]
+                ?: throw IllegalArgumentException("No kontornavn supplied")
+            val behandlere = behandlerService.searchBehandlere(
+                behandlerFornavn = fornavn,
+                behandlerEtternavn = etternavn,
+                kontornavn = kontornavn,
+            )
+            call.respond(behandlere.toBehandlerDTOListUtenRelasjonstype())
         }
     }
 }

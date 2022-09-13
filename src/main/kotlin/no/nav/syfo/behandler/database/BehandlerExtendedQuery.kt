@@ -38,6 +38,33 @@ fun DatabaseInterface.getSykmeldereExtended(
     }
 }
 
+const val querySearchBehandlerByFornavnEtternavn =
+    """
+SELECT b.id behandlerid, b.her_id behandlerherid, b.created_at behandlercreatedat, b.updated_at behandlerupdatedat, b.mottatt behandlermottatt, b.*, 
+        k.id kontorid, k.her_id kontorherid, k.created_at kontorcreatedat, k.updated_at kontorupdatedat, k.mottatt kontormottatt, k.*
+        FROM BEHANDLER AS b
+        INNER JOIN BEHANDLER_KONTOR AS k ON (k.id = b.kontor_id)
+        WHERE k.dialogmelding_enabled IS NOT NULL 
+        AND b.fornavn like ? AND b.etternavn like ? and k.navn like ?
+    """
+
+fun DatabaseInterface.searchBehandlerByFornavnEtternavnKontornavn(
+    fornavn: String,
+    etternavn: String,
+    kontornavn: String,
+): List<Pair<PBehandler, PBehandlerKontor>> {
+    return this.connection.use { connection ->
+        connection.prepareStatement(querySearchBehandlerByFornavnEtternavn)
+            .use {
+                it.setString(1, fornavn + "%")
+                it.setString(2, etternavn + "%")
+                it.setString(3, kontornavn + "%")
+                it.executeQuery().toList { toPBehandlerAndPBehandlerKontor() }
+            }
+    }
+}
+
+
 fun ResultSet.toPBehandlerAndPBehandlerKontor(): Pair<PBehandler, PBehandlerKontor> {
 
     val pBehandler = PBehandler(
