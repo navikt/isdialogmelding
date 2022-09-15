@@ -83,4 +83,4 @@ fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.sortFastlegerFirst
 fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.toBehandlerDTOList() = this.map { it.first.toBehandlerDTO(it.second) }
 fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.toPersonBehandlerDTOList() = this.map { it.first.toPersonBehandlerDTO(it.second) }
 
-fun List<Behandler>.toBehandlerDTOListUtenRelasjonstype() = this.map { it.toBehandlerDTO(null)}
+fun List<Behandler>.toBehandlerDTOListUtenRelasjonstype() = this.map { it.toBehandlerDTO(null) }

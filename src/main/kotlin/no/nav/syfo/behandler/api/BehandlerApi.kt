@@ -45,19 +45,12 @@ fun Route.registerBehandlerApi(
             }
         }
         get(search) {
-            val callId = getCallId()
             val token = getBearerHeader()
                 ?: throw IllegalArgumentException("No Authorization header supplied")
-            val fornavn = this.call.request.headers["fornavn"]
-                ?: throw IllegalArgumentException("No fornavn supplied")
-            val etternavn = this.call.request.headers["etternavn"]
-                ?: throw IllegalArgumentException("No etternavn supplied")
-            val kontornavn = this.call.request.headers["kontornavn"]
-                ?: throw IllegalArgumentException("No kontornavn supplied")
+            val search = this.call.request.headers["searchstring"]
+                ?: throw IllegalArgumentException("No searchstring supplied")
             val behandlere = behandlerService.searchBehandlere(
-                behandlerFornavn = fornavn,
-                behandlerEtternavn = etternavn,
-                kontornavn = kontornavn,
+                searchStrings = search,
             )
             call.respond(behandlere.toBehandlerDTOListUtenRelasjonstype())
         }

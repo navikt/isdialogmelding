@@ -52,14 +52,15 @@ class BehandlerService(
     }
 
     fun searchBehandlere(
-        behandlerFornavn: String,
-        behandlerEtternavn: String,
-        kontornavn: String,
+        searchStrings: String,
     ): List<Behandler> {
-        return database.searchBehandlerByFornavnEtternavnKontornavn(
-            fornavn = behandlerFornavn,
-            etternavn = behandlerEtternavn,
-            kontornavn = kontornavn,
+        val tokens = searchStrings.split(" ")
+            .filter { s -> !s.isBlank() }
+            .map { s -> s.replace(",", "") }
+            .map { s -> s.replace(".", "") }
+            .map { s -> s.trim() }
+        return database.searchBehandler(
+            searchStrings = tokens,
         ).map { pair ->
             pair.first.toBehandler(pair.second)
         }
