@@ -35,6 +35,7 @@ class BehandlerApiSpek : Spek({
         describe(BehandlerApiSpek::class.java.simpleName) {
             describe("Get list of Behandler for Personident") {
                 val url = "$behandlerPath$behandlerPersonident"
+                val searchUrl = "$behandlerPath$search"
                 val validToken = generateJWT(
                     externalMockEnvironment.environment.aadAppClient,
                     externalMockEnvironment.wellKnownInternalAzureAD.issuer,
@@ -73,6 +74,58 @@ class BehandlerApiSpek : Spek({
                             behandlerDTO.type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.FASTLEGE.name
                             behandlerDTO.behandlerRef shouldBeEqualTo behandlerForPersonList.first().behandlerRef.toString()
                             behandlerDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
+                        }
+                    }
+                    it("search should return list of Behandler") {
+                        generateFastlegeResponse()
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                        }
+                        with(
+                            handleRequest(HttpMethod.Get, searchUrl) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader("searchstring", "Scully")
+                            }
+                        ) {
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
+
+                            val behandlerForPersonList = database.getBehandlerByArbeidstaker(
+                                UserConstants.ARBEIDSTAKER_FNR,
+                            )
+                            behandlerForPersonList.size shouldBeEqualTo 1
+                        }
+                    }
+                    it("search with multiple strings should return list of Behandler") {
+                        generateFastlegeResponse()
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                        }
+                        with(
+                            handleRequest(HttpMethod.Get, searchUrl) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader("searchstring", "Dan Scully Fastlegens")
+                            }
+                        ) {
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
+
+                            val behandlerForPersonList = database.getBehandlerByArbeidstaker(
+                                UserConstants.ARBEIDSTAKER_FNR,
+                            )
+                            behandlerForPersonList.size shouldBeEqualTo 1
                         }
                     }
                     it("should return empty list of Behandler for arbeidstaker uten fastlege") {
