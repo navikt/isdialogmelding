@@ -95,11 +95,6 @@ class BehandlerApiSpek : Spek({
                             val behandlerList =
                                 objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
                             behandlerList.size shouldBeEqualTo 1
-
-                            val behandlerForPersonList = database.getBehandlerByArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_FNR,
-                            )
-                            behandlerForPersonList.size shouldBeEqualTo 1
                         }
                     }
                     it("search with multiple strings should return list of Behandler") {
@@ -121,11 +116,27 @@ class BehandlerApiSpek : Spek({
                             val behandlerList =
                                 objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
                             behandlerList.size shouldBeEqualTo 1
-
-                            val behandlerForPersonList = database.getBehandlerByArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_FNR,
-                            )
-                            behandlerForPersonList.size shouldBeEqualTo 1
+                       }
+                    }
+                    it("search with too short strings should return empty list of Behandler") {
+                        generateFastlegeResponse()
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                        }
+                        with(
+                            handleRequest(HttpMethod.Get, searchUrl) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader("searchstring", "Da Sc")
+                            }
+                        ) {
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 0
                         }
                     }
                     it("should return empty list of Behandler for arbeidstaker uten fastlege") {

@@ -59,6 +59,7 @@ class BehandlerService(
             .map { s -> s.replace(",", "") }
             .map { s -> s.replace(".", "") }
             .map { s -> s.trim() }
+            .filter { s -> s.length > 2 }
         return database.searchBehandler(
             searchStrings = tokens,
         ).map { pair ->
