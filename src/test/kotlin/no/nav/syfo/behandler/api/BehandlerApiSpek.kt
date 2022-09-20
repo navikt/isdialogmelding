@@ -116,7 +116,7 @@ class BehandlerApiSpek : Spek({
                             val behandlerList =
                                 objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
                             behandlerList.size shouldBeEqualTo 1
-                       }
+                        }
                     }
                     it("search with too short strings should return empty list of Behandler") {
                         generateFastlegeResponse()
