@@ -118,6 +118,27 @@ class BehandlerApiSpek : Spek({
                             behandlerList.size shouldBeEqualTo 1
                         }
                     }
+                    it("search with lower case kontor navn should return list of Behandler") {
+                        generateFastlegeResponse()
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                        }
+                        with(
+                            handleRequest(HttpMethod.Get, searchUrl) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader("searchstring", "fastlegen")
+                            }
+                        ) {
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
+                        }
+                    }
                     it("search with too short strings should return empty list of Behandler") {
                         generateFastlegeResponse()
                         with(
