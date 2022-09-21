@@ -1,7 +1,7 @@
 package no.nav.syfo.behandler.api
 
 data class BehandlerDTO(
-    val type: String,
+    val type: String?,
     val behandlerRef: String,
     val fnr: String?,
     val fornavn: String,

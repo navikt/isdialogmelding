@@ -51,6 +51,22 @@ class BehandlerService(
         return behandlere.removeDuplicates()
     }
 
+    fun searchBehandlere(
+        searchStrings: String,
+    ): List<Behandler> {
+        val tokens = searchStrings.split(" ")
+            .filter { s -> !s.isBlank() }
+            .map { s -> s.replace(",", "") }
+            .map { s -> s.replace(".", "") }
+            .map { s -> s.trim() }
+            .filter { s -> s.length > 2 }
+        return database.searchBehandler(
+            searchStrings = tokens,
+        ).map { pair ->
+            pair.first.toBehandler(pair.second)
+        }
+    }
+
     private suspend fun getFastlegeBehandler(
         personident: Personident,
         token: String,

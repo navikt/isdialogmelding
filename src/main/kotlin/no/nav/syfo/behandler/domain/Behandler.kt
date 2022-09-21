@@ -22,9 +22,9 @@ data class Behandler(
 
 // TODO: Få med behandlerkategori
 fun Behandler.toBehandlerDTO(
-    behandlerType: BehandlerArbeidstakerRelasjonstype,
+    behandlerType: BehandlerArbeidstakerRelasjonstype?,
 ) = BehandlerDTO(
-    type = behandlerType.name,
+    type = behandlerType?.name,
     behandlerRef = this.behandlerRef.toString(),
     fnr = this.personident?.value,
     fornavn = this.fornavn,
@@ -82,3 +82,5 @@ fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.sortFastlegerFirst
 
 fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.toBehandlerDTOList() = this.map { it.first.toBehandlerDTO(it.second) }
 fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.toPersonBehandlerDTOList() = this.map { it.first.toPersonBehandlerDTO(it.second) }
+
+fun List<Behandler>.toBehandlerDTOListUtenRelasjonstype() = this.map { it.toBehandlerDTO(null) }

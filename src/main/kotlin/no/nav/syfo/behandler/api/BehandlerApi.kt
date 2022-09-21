@@ -12,6 +12,7 @@ import no.nav.syfo.util.*
 
 const val behandlerPath = "/api/v1/behandler"
 const val behandlerPersonident = "/personident"
+const val search = "/search"
 
 fun Route.registerBehandlerApi(
     behandlerService: BehandlerService,
@@ -42,6 +43,16 @@ fun Route.registerBehandlerApi(
 
                 call.respond(behandlerDTOList)
             }
+        }
+        get(search) {
+            val token = getBearerHeader()
+                ?: throw IllegalArgumentException("No Authorization header supplied")
+            val search = this.call.request.headers["searchstring"]
+                ?: throw IllegalArgumentException("No searchstring supplied")
+            val behandlere = behandlerService.searchBehandlere(
+                searchStrings = search,
+            )
+            call.respond(behandlere.toBehandlerDTOListUtenRelasjonstype())
         }
     }
 }

@@ -38,6 +38,38 @@ fun DatabaseInterface.getSykmeldereExtended(
     }
 }
 
+const val querySearchBehandler =
+    """
+SELECT b.id behandlerid, b.her_id behandlerherid, b.created_at behandlercreatedat, b.updated_at behandlerupdatedat, b.mottatt behandlermottatt, b.*, 
+        k.id kontorid, k.her_id kontorherid, k.created_at kontorcreatedat, k.updated_at kontorupdatedat, k.mottatt kontormottatt, k.*
+        FROM BEHANDLER AS b
+        INNER JOIN BEHANDLER_KONTOR AS k ON (k.id = b.kontor_id)
+        WHERE k.dialogmelding_enabled IS NOT NULL 
+        AND (b.fornavn ilike ? OR b.etternavn ilike ? 
+            OR position(? IN k.navn)>0 OR position(UPPER(?) IN k.navn)>0 
+            OR k.orgnummer = ?)
+    """
+
+fun DatabaseInterface.searchBehandler(
+    searchStrings: List<String>,
+): List<Pair<PBehandler, PBehandlerKontor>> {
+    var results: List<Pair<PBehandler, PBehandlerKontor>> = emptyList()
+    this.connection.use { connection ->
+        connection.prepareStatement(querySearchBehandler).use {
+            searchStrings.forEach { searchString ->
+                it.setString(1, searchString + "%")
+                it.setString(2, searchString + "%")
+                it.setString(3, searchString)
+                it.setString(4, searchString)
+                it.setString(5, searchString)
+                val matches = it.executeQuery().toList { toPBehandlerAndPBehandlerKontor() }
+                results = if (results.isEmpty()) matches else (results.intersect(matches).toList())
+            }
+        }
+    }
+    return results
+}
+
 fun ResultSet.toPBehandlerAndPBehandlerKontor(): Pair<PBehandler, PBehandlerKontor> {
 
     val pBehandler = PBehandler(
