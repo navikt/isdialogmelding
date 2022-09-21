@@ -46,7 +46,7 @@ SELECT b.id behandlerid, b.her_id behandlerherid, b.created_at behandlercreateda
         INNER JOIN BEHANDLER_KONTOR AS k ON (k.id = b.kontor_id)
         WHERE k.dialogmelding_enabled IS NOT NULL 
         AND (b.fornavn ilike ? OR b.etternavn ilike ? 
-            OR position(? IN k.navn)>0 OR position(UPPER(?) IN k.navn)>0 
+            OR position(? IN k.navn)>0 OR position(UPPER(?) IN k.navn)>0 OR position(INITCAP(?) IN k.navn)>0 
             OR k.orgnummer = ?)
     """
 
@@ -62,6 +62,7 @@ fun DatabaseInterface.searchBehandler(
                 it.setString(3, searchString)
                 it.setString(4, searchString)
                 it.setString(5, searchString)
+                it.setString(6, searchString)
                 val matches = it.executeQuery().toList { toPBehandlerAndPBehandlerKontor() }
                 results = if (results.isEmpty()) matches else (results.intersect(matches).toList())
             }
