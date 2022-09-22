@@ -48,6 +48,9 @@ spec:
         - application: syfomodiaperson
           namespace: teamsykefravr
           cluster: prod-fss
+        - application: syfooppfolgingsplanservice
+          namespace: team-esyfo
+          cluster: prod-fss
     outbound:
       external:
         - host: "syfopartnerinfo.prod-fss-pub.nais.io"
@@ -98,6 +101,8 @@ spec:
       value: QA.P414.IU03_UTSENDING
     - name: AAP_SOKNAD_API_CLIENT_ID
       value: "prod-gcp:aap:soknad-api"
+    - name: SYFOOPPFOLGINGSPLANSERVICE_CLIENT_ID
+      value: "prod-fss:team-esyfo:syfooppfolgingsplanservice"
     - name: FASTLEGEREST_CLIENT_ID
       value: "prod-gcp.teamsykefravr.fastlegerest"
     - name: FASTLEGEREST_URL

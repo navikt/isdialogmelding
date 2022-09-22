@@ -51,6 +51,9 @@ spec:
         - application: soknad-api
           namespace: aap
           cluster: dev-gcp
+        - application: syfooppfolgingsplanservice
+          namespace: team-esyfo
+          cluster: dev-fss
     outbound:
       external:
         - host: "syfopartnerinfo.dev-fss-pub.nais.io"
@@ -101,6 +104,8 @@ spec:
       value: QA.Q414.IU03_UTSENDING
     - name: AAP_SOKNAD_API_CLIENT_ID
       value: "dev-gcp:aap:soknad-api"
+    - name: SYFOOPPFOLGINGSPLANSERVICE_CLIENT_ID
+      value: "dev-fss:team-esyfo:syfooppfolgingsplanservice"
     - name: FASTLEGEREST_CLIENT_ID
       value: "dev-gcp.teamsykefravr.fastlegerest"
     - name: FASTLEGEREST_URL

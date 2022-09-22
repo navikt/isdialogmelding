@@ -52,7 +52,13 @@ fun main() {
         syfoPartnerinfoClientId = environment.syfoPartnerinfoClientId,
         syfoPartnerinfoUrl = environment.syfoPartnerinfoUrl,
     )
+    val pdlClient = PdlClient(
+        azureAdClient = azureAdClient,
+        pdlClientId = environment.pdlClientId,
+        pdlUrl = environment.pdlUrl,
+    )
     lateinit var behandlerService: BehandlerService
+    lateinit var dialogmeldingToBehandlerService: DialogmeldingToBehandlerService
 
     val applicationEngineEnvironment = applicationEngineEnvironment {
         log = logger
@@ -71,6 +77,10 @@ fun main() {
                 database = applicationDatabase,
                 environment.toggleSykmeldingbehandlere,
             )
+            dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
+                database = applicationDatabase,
+                pdlClient = pdlClient,
+            )
 
             apiModule(
                 applicationState = applicationState,
@@ -81,6 +91,7 @@ fun main() {
                 wellKnownInternalIdportenTokenX = wellKnownInternalIdportenTokenX,
                 azureAdClient = azureAdClient,
                 behandlerService = behandlerService,
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
             )
         }
     }
@@ -88,15 +99,6 @@ fun main() {
     applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) {
         applicationState.ready = true
         logger.info("Application is ready, running Java VM ${Runtime.version()}")
-        val pdlClient = PdlClient(
-            azureAdClient = azureAdClient,
-            pdlClientId = environment.pdlClientId,
-            pdlUrl = environment.pdlUrl,
-        )
-        val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
-            database = applicationDatabase,
-            pdlClient = pdlClient,
-        )
         launchKafkaTaskDialogmeldingBestilling(
             applicationState = applicationState,
             applicationEnvironmentKafka = environment.kafka,
