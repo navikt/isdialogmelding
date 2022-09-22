@@ -2,6 +2,8 @@ package no.nav.syfo.oppfolgingsplan
 
 import io.mockk.*
 import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.behandler.BehandlerService
+import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.testhelper.generator.defaultFellesformatMessageXmlRegex
 import no.nav.syfo.testhelper.generator.generateRSHodemelding
 import org.junit.Assert.assertTrue
@@ -16,7 +18,11 @@ object OppfolgingsplanServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val oppfolgingsplanService = OppfolgingsplanService(mqSender)
+            val oppfolgingsplanService = OppfolgingsplanService(
+                mqSender = mqSender,
+                behandlerService = mockk<BehandlerService>(),
+                dialogmeldingToBehandlerService = mockk<DialogmeldingToBehandlerService>(),
+            )
             val rsHodemelding = generateRSHodemelding()
 
             oppfolgingsplanService.sendMelding(rsHodemelding)

@@ -4,14 +4,13 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import no.nav.syfo.api.registerDialogmeldingApi
-import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.Environment
+import no.nav.syfo.api.registerOppfolgingsplanApi
+import no.nav.syfo.application.*
 import no.nav.syfo.application.api.authentication.*
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
-import no.nav.syfo.behandler.api.person.access.PersonAPIConsumerAccessService
 import no.nav.syfo.behandler.api.person.registerPersonBehandlerApi
 import no.nav.syfo.behandler.api.person.registerPersonOppfolgingsplanApi
 import no.nav.syfo.behandler.api.registerBehandlerApi
@@ -55,13 +54,15 @@ fun Application.apiModule(
     )
 
     val oppfolgingsplanService = OppfolgingsplanService(
-        mqSender = mqSender
+        mqSender = mqSender,
+        behandlerService = behandlerService,
+        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
     )
 
-    val personAPIConsumerAccessService = PersonAPIConsumerAccessService(
+    val personAPIConsumerAccessService = APIConsumerAccessService(
         authorizedConsumerApplicationClientIdList = environment.personAPIAuthorizedConsumerClientIdList,
     )
-    val oppfolgingsplanAPIConsumerAccessService = PersonAPIConsumerAccessService(
+    val oppfolgingsplanAPIConsumerAccessService = APIConsumerAccessService(
         authorizedConsumerApplicationClientIdList = environment.oppfolgingsplanAPIAuthorizedConsumerClientIdList,
     )
 
@@ -76,6 +77,10 @@ fun Application.apiModule(
             registerDialogmeldingApi(
                 oppfolgingsplanService = oppfolgingsplanService,
             )
+            registerOppfolgingsplanApi(
+                oppfolgingsplanService = oppfolgingsplanService,
+                apiConsumerAccessService = oppfolgingsplanAPIConsumerAccessService,
+            )
             registerBehandlerApi(
                 behandlerService = behandlerService,
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
@@ -84,13 +89,11 @@ fun Application.apiModule(
         authenticate(JwtIssuerType.IDPORTEN_TOKENX.name) {
             registerPersonBehandlerApi(
                 behandlerService = behandlerService,
-                personAPIConsumerAccessService = personAPIConsumerAccessService,
+                apiConsumerAccessService = personAPIConsumerAccessService,
             )
             registerPersonOppfolgingsplanApi(
-                behandlerService = behandlerService,
-                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                 oppfolgingsplanService = oppfolgingsplanService,
-                oppfolgingsplanAPIConsumerAccessService = oppfolgingsplanAPIConsumerAccessService,
+                apiConsumerAccessService = oppfolgingsplanAPIConsumerAccessService,
             )
         }
     }

@@ -4,9 +4,9 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import no.nav.syfo.application.api.APIConsumerAccessService
 import no.nav.syfo.application.api.authentication.personident
 import no.nav.syfo.behandler.BehandlerService
-import no.nav.syfo.behandler.api.person.access.PersonAPIConsumerAccessService
 import no.nav.syfo.behandler.domain.toPersonBehandlerDTOList
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
@@ -20,7 +20,7 @@ const val personBehandlerSelfPath = "/self"
 
 fun Route.registerPersonBehandlerApi(
     behandlerService: BehandlerService,
-    personAPIConsumerAccessService: PersonAPIConsumerAccessService,
+    apiConsumerAccessService: APIConsumerAccessService,
 ) {
     route(personApiBehandlerPath) {
         get(personBehandlerSelfPath) {
@@ -31,7 +31,7 @@ fun Route.registerPersonBehandlerApi(
                 val requestPersonident = call.personident()
                     ?: throw IllegalArgumentException("No Personident found in token")
 
-                personAPIConsumerAccessService.validateConsumerApplicationClientId(
+                apiConsumerAccessService.validateConsumerApplicationClientId(
                     token = token,
                 )
 

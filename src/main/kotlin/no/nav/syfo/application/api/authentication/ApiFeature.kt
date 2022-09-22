@@ -15,7 +15,7 @@ import io.ktor.server.response.*
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.api.access.ForbiddenAccessVeilederException
-import no.nav.syfo.behandler.api.person.access.ForbiddenPersonAPIConsumer
+import no.nav.syfo.application.api.ForbiddenAPIConsumer
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.metric.METRICS_REGISTRY
 import no.nav.syfo.util.configure
@@ -103,7 +103,7 @@ fun Application.installStatusPages() {
                 is ForbiddenAccessVeilederException -> {
                     log.warn(logExceptionMessage, cause)
                 }
-                is ForbiddenPersonAPIConsumer -> {
+                is ForbiddenAPIConsumer -> {
                     log.warn(logExceptionMessage, cause)
                 }
                 else -> {
@@ -123,7 +123,7 @@ fun Application.installStatusPages() {
                 is ForbiddenAccessVeilederException -> {
                     HttpStatusCode.Forbidden
                 }
-                is ForbiddenPersonAPIConsumer -> {
+                is ForbiddenAPIConsumer -> {
                     HttpStatusCode.Forbidden
                 }
                 else -> {
