@@ -55,10 +55,14 @@ class BehandlerService(
         searchStrings: String,
     ): List<Behandler> {
         val tokens = searchStrings.split(" ")
-            .filter { s -> !s.isBlank() }
-            .map { s -> s.replace(",", "") }
-            .map { s -> s.replace(".", "") }
-            .map { s -> s.trim() }
+            .filter { s -> s.isNotBlank() }
+            .map { s ->
+                s
+                    .replace(",", "")
+                    .replace(".", "")
+                    .replace(":", "")
+                    .trim()
+            }
             .filter { s -> s.length > 2 }
         return database.searchBehandler(
             searchStrings = tokens,
