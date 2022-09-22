@@ -20,6 +20,8 @@ fun testEnvironment(
     idportenTokenXWellKnownUrl = "wellknown-idporten-tokenx",
     aapSoknadApiClientId = testAapSoknadApiClientId,
     personAPIAuthorizedConsumerClientIdList = listOf(testAapSoknadApiClientId),
+    syfooppfolgingsplanserviceClientId = testSyfooppfolgingsplanserviceClientId,
+    oppfolgingsplanAPIAuthorizedConsumerClientIdList = listOf(testAapSoknadApiClientId),
     electorPath = "/tmp",
     kafka = ApplicationEnvironmentKafka(
         aivenBootstrapServers = kafkaBootstrapServers,
@@ -55,6 +57,7 @@ fun testEnvironment(
 )
 
 const val testAapSoknadApiClientId = "soknad-api-client-id"
+const val testSyfooppfolgingsplanserviceClientId = "syfooppfolgingsplanservice-client-id"
 
 fun testAppState() = ApplicationState(
     alive = true,

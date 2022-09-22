@@ -10,8 +10,10 @@ import no.nav.syfo.application.api.authentication.*
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerService
+import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.api.person.access.PersonAPIConsumerAccessService
 import no.nav.syfo.behandler.api.person.registerPersonBehandlerApi
+import no.nav.syfo.behandler.api.person.registerPersonOppfolgingsplanApi
 import no.nav.syfo.behandler.api.registerBehandlerApi
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
@@ -26,6 +28,7 @@ fun Application.apiModule(
     wellKnownInternalIdportenTokenX: WellKnown,
     azureAdClient: AzureAdClient,
     behandlerService: BehandlerService,
+    dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
 ) {
     installMetrics()
     installContentNegotiation()
@@ -58,6 +61,9 @@ fun Application.apiModule(
     val personAPIConsumerAccessService = PersonAPIConsumerAccessService(
         authorizedConsumerApplicationClientIdList = environment.personAPIAuthorizedConsumerClientIdList,
     )
+    val oppfolgingsplanAPIConsumerAccessService = PersonAPIConsumerAccessService(
+        authorizedConsumerApplicationClientIdList = environment.oppfolgingsplanAPIAuthorizedConsumerClientIdList,
+    )
 
     routing {
         registerPodApi(
@@ -79,6 +85,12 @@ fun Application.apiModule(
             registerPersonBehandlerApi(
                 behandlerService = behandlerService,
                 personAPIConsumerAccessService = personAPIConsumerAccessService,
+            )
+            registerPersonOppfolgingsplanApi(
+                behandlerService = behandlerService,
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                oppfolgingsplanService = oppfolgingsplanService,
+                oppfolgingsplanAPIConsumerAccessService = oppfolgingsplanAPIConsumerAccessService,
             )
         }
     }

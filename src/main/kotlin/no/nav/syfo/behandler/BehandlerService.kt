@@ -67,7 +67,7 @@ class BehandlerService(
         }
     }
 
-    private suspend fun getFastlegeBehandler(
+    suspend fun getFastlegeBehandler(
         personident: Personident,
         token: String,
         callId: String,
@@ -79,18 +79,17 @@ class BehandlerService(
             callId = callId,
             systemRequest = systemRequest,
         )
-        if (fastlege != null && fastlege.hasAnId()) {
+        return if (fastlege != null && fastlege.hasAnId()) {
             val arbeidstaker = Arbeidstaker(
                 arbeidstakerPersonident = personident,
                 mottatt = OffsetDateTime.now(),
             )
-            return createOrGetBehandler(
+            createOrGetBehandler(
                 behandler = fastlege,
                 arbeidstaker = arbeidstaker,
                 relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
             )
-        }
-        return null
+        } else null
     }
 
     suspend fun getAktivFastlegeBehandler(

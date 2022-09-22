@@ -14,6 +14,10 @@ data class Environment(
     val personAPIAuthorizedConsumerClientIdList: List<String> = listOf(
         aapSoknadApiClientId,
     ),
+    val syfooppfolgingsplanserviceClientId: String = getEnvVar("SYFOOPPFOLGINGSPLANSERVICE_CLIENT_ID"),
+    val oppfolgingsplanAPIAuthorizedConsumerClientIdList: List<String> = listOf(
+        syfooppfolgingsplanserviceClientId,
+    ),
 
     val electorPath: String = getEnvVar("ELECTOR_PATH"),
     val serviceuserUsername: String = getEnvVar("SERVICEUSER_USERNAME"),
