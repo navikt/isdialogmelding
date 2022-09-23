@@ -10,9 +10,9 @@ fun createReceiver(
     val factory = ObjectFactory()
     return factory.createXMLReceiver()
         .withOrganisation(
-            factory.createXMLOrganisation()
-                .withOrganisationName(melding.behandler.kontor.navn)
-                .withIdent(
+            factory.createXMLOrganisation().apply {
+                withOrganisationName(melding.behandler.kontor.navn)
+                withIdent(
                     factory.createXMLIdent()
                         .withId(melding.behandler.kontor.herId.toString())
                         .withTypeId(
@@ -22,17 +22,19 @@ fun createReceiver(
                                 .withV("HER")
                         )
                 )
-                .withIdent(
-                    factory.createXMLIdent()
-                        .withId(melding.behandler.kontor.orgnummer!!.value)
-                        .withTypeId(
-                            factory.createXMLCV()
-                                .withDN("Organisasjonsnummeret i Enhetsregisteret")
-                                .withS("2.16.578.1.12.4.1.1.9051")
-                                .withV("ENH")
-                        )
-                )
-                .withAddress(
+                if (melding.behandler.kontor.orgnummer != null) {
+                    withIdent(
+                        factory.createXMLIdent()
+                            .withId(melding.behandler.kontor.orgnummer.value)
+                            .withTypeId(
+                                factory.createXMLCV()
+                                    .withDN("Organisasjonsnummeret i Enhetsregisteret")
+                                    .withS("2.16.578.1.12.4.1.1.9051")
+                                    .withV("ENH")
+                            )
+                    )
+                }
+                withAddress(
                     factory.createXMLAddress()
                         .withType(
                             factory.createXMLCS()
@@ -43,7 +45,7 @@ fun createReceiver(
                         .withPostalCode(melding.behandler.kontor.postnummer)
                         .withCity(melding.behandler.kontor.poststed)
                 )
-                .withHealthcareProfessional(
+                withHealthcareProfessional(
                     factory.createXMLHealthcareProfessional().apply {
                         withFamilyName(melding.behandler.etternavn)
                         withMiddleName(melding.behandler.mellomnavn)
@@ -85,5 +87,6 @@ fun createReceiver(
                         }
                     }
                 )
+            }
         )
 }
