@@ -101,7 +101,7 @@ class OppfolgingsplanSystemApiSpek : Spek({
                         }
                     }
 
-                    it("should return status Forbiddden if unauthorized ClientId is supplied") {
+                    it("should return status Forbidden if unauthorized ClientId is supplied") {
                         val tokenUnauthorizedClientId = generateJWTIdporten(
                             audience = externalMockEnvironment.environment.aadAppClient,
                             clientId = "app",
