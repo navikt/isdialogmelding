@@ -45,11 +45,17 @@ object DialogmeldingServiceSpek : Spek({
     val uuid = UUID.randomUUID()
     val behandlerRef = UUID.randomUUID()
     val behandler = generateBehandler(behandlerRef, PartnerId(1))
+    val behandlerRefWithoutOrgnr = UUID.randomUUID()
+    val behandlerWithoutOrgnr = generateBehandler(behandlerRefWithoutOrgnr, PartnerId(2), orgnummer = null)
 
     beforeEachTest {
         database.dropData()
         database.createBehandlerForArbeidstaker(
             behandler = behandler,
+            arbeidstakerPersonident = arbeidstakerPersonident,
+        )
+        database.createBehandlerForArbeidstaker(
+            behandler = behandlerWithoutOrgnr,
             arbeidstakerPersonident = arbeidstakerPersonident,
         )
     }
@@ -66,10 +72,7 @@ object DialogmeldingServiceSpek : Spek({
                 uuid = uuid,
                 arbeidstakerPersonident = arbeidstakerPersonident,
             ).toDialogmeldingToBehandlerBestilling(
-                behandler = generateBehandler(
-                    behandlerRef = behandlerRef,
-                    partnerId = PartnerId(1),
-                ),
+                behandler = behandler,
             )
 
             runBlocking {
@@ -84,6 +87,24 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
+        it("Sends correct message on MQ when foresporsel dialogmote-innkalling to behandler without orgnr") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val melding = generateDialogmeldingToBehandlerBestillingDTO(
+                behandlerRef = behandlerRefWithoutOrgnr,
+                uuid = uuid,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+            ).toDialogmeldingToBehandlerBestilling(
+                behandler = behandlerWithoutOrgnr,
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+        }
         it("Sends correct message on MQ when foresporsel endre tid-sted") {
             clearAllMocks()
             val messageSlot = slot<String>()
@@ -94,10 +115,7 @@ object DialogmeldingServiceSpek : Spek({
                 uuid = uuid,
                 arbeidstakerPersonident = arbeidstakerPersonident,
             ).toDialogmeldingToBehandlerBestilling(
-                behandler = generateBehandler(
-                    behandlerRef = behandlerRef,
-                    partnerId = PartnerId(1),
-                ),
+                behandler = behandler,
             )
 
             runBlocking {
@@ -122,10 +140,7 @@ object DialogmeldingServiceSpek : Spek({
                 uuid = uuid,
                 arbeidstakerPersonident = arbeidstakerPersonident,
             ).toDialogmeldingToBehandlerBestilling(
-                behandler = generateBehandler(
-                    behandlerRef = behandlerRef,
-                    partnerId = PartnerId(1),
-                ),
+                behandler = behandler,
             )
 
             runBlocking {
@@ -150,10 +165,7 @@ object DialogmeldingServiceSpek : Spek({
                 uuid = uuid,
                 arbeidstakerPersonident = arbeidstakerPersonident,
             ).toDialogmeldingToBehandlerBestilling(
-                behandler = generateBehandler(
-                    behandlerRef = behandlerRef,
-                    partnerId = PartnerId(1),
-                ),
+                behandler = behandler,
             )
 
             runBlocking {

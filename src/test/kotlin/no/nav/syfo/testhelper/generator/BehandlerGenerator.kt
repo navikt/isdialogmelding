@@ -13,6 +13,7 @@ fun generateBehandler(
     personident: Personident = UserConstants.FASTLEGE_FNR,
     herId: Int? = 77,
     hprId: Int = 9,
+    orgnummer: String? = "123456789",
 ) = Behandler(
     behandlerRef = behandlerRef,
     kontor = BehandlerKontor(
@@ -22,7 +23,7 @@ fun generateBehandler(
         adresse = "adresse",
         postnummer = "1234",
         poststed = "poststed",
-        orgnummer = Virksomhetsnummer("123456789"),
+        orgnummer = orgnummer?.let { Virksomhetsnummer(it) },
         dialogmeldingEnabled = dialogmeldingEnabled,
         system = null,
         mottatt = OffsetDateTime.now(),
