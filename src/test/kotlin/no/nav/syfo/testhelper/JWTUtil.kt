@@ -4,8 +4,8 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
+import no.nav.syfo.application.api.JWT_CLAIM_CLIENT_ID
 import no.nav.syfo.application.api.authentication.JWT_CLAIM_NAVIDENT
-import no.nav.syfo.behandler.api.person.access.JWT_CLAIM_CLIENT_ID
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files

@@ -1,4 +1,4 @@
-package no.nav.syfo.behandler.api.person.access
+package no.nav.syfo.application.api
 
 import com.auth0.jwt.JWT
 
@@ -9,7 +9,7 @@ fun getConsumerClientId(token: String): String? {
     return decodedJWT.claims[JWT_CLAIM_CLIENT_ID]?.asString()
 }
 
-class PersonAPIConsumerAccessService(
+class APIConsumerAccessService(
     private val authorizedConsumerApplicationClientIdList: List<String>,
 ) {
     fun validateConsumerApplicationClientId(
@@ -19,7 +19,7 @@ class PersonAPIConsumerAccessService(
             ?: throw IllegalArgumentException("Claim $JWT_CLAIM_CLIENT_ID was not found in token")
 
         if (!authorizedConsumerApplicationClientIdList.contains(consumerClientId)) {
-            throw ForbiddenPersonAPIConsumer(
+            throw ForbiddenAPIConsumer(
                 consumerClientId = consumerClientId,
             )
         }
