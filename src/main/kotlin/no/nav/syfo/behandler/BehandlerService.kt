@@ -19,7 +19,6 @@ class BehandlerService(
     private val fastlegeClient: FastlegeClient,
     private val partnerinfoClient: PartnerinfoClient,
     private val database: DatabaseInterface,
-    private val toggleSykmeldingbehandlere: Boolean,
 ) {
     suspend fun getBehandlere(
         personident: Personident,
@@ -37,17 +36,15 @@ class BehandlerService(
         )
         fastlegeBehandler?.let { behandlere.add(Pair(it, BehandlerArbeidstakerRelasjonstype.FASTLEGE)) }
 
-        if (toggleSykmeldingbehandlere) {
-            database.getSykmeldereExtended(personident)
-                .forEach { (pBehandler, pBehandlerKontor) ->
-                    behandlere.add(
-                        Pair(
-                            pBehandler.toBehandler(pBehandlerKontor),
-                            BehandlerArbeidstakerRelasjonstype.SYKMELDER,
-                        )
+        database.getSykmeldereExtended(personident)
+            .forEach { (pBehandler, pBehandlerKontor) ->
+                behandlere.add(
+                    Pair(
+                        pBehandler.toBehandler(pBehandlerKontor),
+                        BehandlerArbeidstakerRelasjonstype.SYKMELDER,
                     )
-                }
-        }
+                )
+            }
         return behandlere.removeDuplicates()
     }
 

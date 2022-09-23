@@ -28,7 +28,6 @@ class KafkaDialogmeldingFromBehandlerSpek : Spek({
             fastlegeClient = mockk(),
             partnerinfoClient = mockk(),
             database = database,
-            ExternalMockEnvironment.instance.environment.toggleSykmeldingbehandlere,
         )
 
         afterEachTest {

@@ -40,7 +40,6 @@ fun Application.testApiModule(
                 syfoPartnerinfoUrl = externalMockEnvironment.environment.syfoPartnerinfoUrl,
             ),
             database = externalMockEnvironment.database,
-            toggleSykmeldingbehandlere = externalMockEnvironment.environment.toggleSykmeldingbehandlere
         ),
         dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
             database = externalMockEnvironment.database,

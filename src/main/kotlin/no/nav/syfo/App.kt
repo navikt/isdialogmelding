@@ -75,7 +75,6 @@ fun main() {
                 fastlegeClient = fastlegeClient,
                 partnerinfoClient = partnerinfoClient,
                 database = applicationDatabase,
-                environment.toggleSykmeldingbehandlere,
             )
             dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
                 database = applicationDatabase,
@@ -115,20 +114,16 @@ fun main() {
             dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
             dialogmeldingService = dialogmeldingService,
         )
-        if (environment.toggleKafkaProcessingSykmeldingEnabled) {
-            launchKafkaTaskSykmelding(
-                applicationState = applicationState,
-                applicationEnvironmentKafka = environment.kafka,
-                behandlerService = behandlerService,
-            )
-        }
-        if (environment.toggleKafkaProcessingDialogmeldingEnabled) {
-            launchKafkaTaskDialogmeldingFromBehandler(
-                applicationState = applicationState,
-                applicationEnvironmentKafka = environment.kafka,
-                database = applicationDatabase,
-            )
-        }
+        launchKafkaTaskSykmelding(
+            applicationState = applicationState,
+            applicationEnvironmentKafka = environment.kafka,
+            behandlerService = behandlerService,
+        )
+        launchKafkaTaskDialogmeldingFromBehandler(
+            applicationState = applicationState,
+            applicationEnvironmentKafka = environment.kafka,
+            database = applicationDatabase,
+        )
         if (environment.toggleApprecs) {
             launchBackgroundTask(
                 applicationState = applicationState,

@@ -32,7 +32,6 @@ class BehandlerServiceSpek : Spek({
                 fastlegeClient = fastlegeClientMock,
                 partnerinfoClient = partnerinfoClientMock,
                 database = database,
-                externalMockEnvironment.environment.toggleSykmeldingbehandlere,
             )
 
             afterEachTest {
