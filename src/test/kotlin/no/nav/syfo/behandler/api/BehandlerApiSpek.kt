@@ -97,6 +97,27 @@ class BehandlerApiSpek : Spek({
                             behandlerList.size shouldBeEqualTo 1
                         }
                     }
+                    it("search should remove special characters") {
+                        generateFastlegeResponse()
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                        }
+                        with(
+                            handleRequest(HttpMethod.Get, searchUrl) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader("searchstring", "Scu:lly, Dana: Fas,tle.gen kont:or")
+                            }
+                        ) {
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
+                        }
+                    }
                     it("search with multiple strings should return list of Behandler") {
                         generateFastlegeResponse()
                         with(
