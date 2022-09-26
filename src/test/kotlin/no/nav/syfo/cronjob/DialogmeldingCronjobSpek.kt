@@ -39,7 +39,6 @@ class DialogmeldingCronjobSpek : Spek({
                 pdlUrl = environment.pdlUrl,
             )
             val mqSenderMock = mockk<MQSender>()
-            justRun { mqSenderMock.sendMessageToEmottak(any()) }
 
             application.testApiModule(
                 externalMockEnvironment = externalMockEnvironment,
@@ -51,7 +50,7 @@ class DialogmeldingCronjobSpek : Spek({
             )
 
             val dialogmeldingService = DialogmeldingService(
-                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                pdlClient = pdlClient,
                 mqSender = mqSenderMock,
             )
 
@@ -63,9 +62,8 @@ class DialogmeldingCronjobSpek : Spek({
 
             beforeEachTest {
                 database.dropData()
-            }
-            afterEachTest {
-                database.dropData()
+                clearAllMocks()
+                justRun { mqSenderMock.sendMessageToEmottak(any()) }
             }
 
             describe("Cronjob sender bestilte dialogmeldinger") {
@@ -118,6 +116,48 @@ class DialogmeldingCronjobSpek : Spek({
                         result.updated shouldBeEqualTo 0
                     }
                     verify(exactly = 0) { mqSenderMock.sendMessageToEmottak(any()) }
+                }
+                it("Sender bestilt dialogmelding uten relasjon mellom arbeidstaker og behandler") {
+                    val behandlerRef = UUID.randomUUID()
+                    val partnerId = PartnerId(random.nextInt())
+                    val behandler = generateBehandler(behandlerRef, partnerId)
+                    database.createBehandlerForArbeidstaker(
+                        behandler = behandler,
+                        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                    )
+
+                    val dialogmeldingBestillingUuid = UUID.randomUUID()
+
+                    val dialogmeldingBestillingDTO = generateDialogmeldingToBehandlerBestillingDTO(
+                        uuid = dialogmeldingBestillingUuid,
+                        behandlerRef = behandlerRef,
+                        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR,
+                    )
+                    dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
+
+                    val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
+                        connection.getBestillinger(
+                            uuid = dialogmeldingBestillingUuid,
+                        )
+                    }
+                    pBehandlerDialogmeldingBestillingBefore shouldNotBeEqualTo null
+                    pBehandlerDialogmeldingBestillingBefore!!.sendt shouldBeEqualTo null
+                    pBehandlerDialogmeldingBestillingBefore.sendtTries shouldBeEqualTo 0
+
+                    runBlocking {
+                        val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
+                        result.failed shouldBeEqualTo 0
+                        result.updated shouldBeEqualTo 1
+                    }
+                    verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
+
+                    val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
+                        connection.getBestillinger(
+                            uuid = dialogmeldingBestillingUuid,
+                        )
+                    }
+                    pBehandlerDialogmeldingBestillingAfter!!.sendt shouldNotBeEqualTo null
+                    pBehandlerDialogmeldingBestillingAfter.sendtTries shouldBeEqualTo 1
                 }
             }
         }

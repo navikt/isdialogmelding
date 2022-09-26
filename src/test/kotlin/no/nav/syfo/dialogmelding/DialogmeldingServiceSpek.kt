@@ -37,8 +37,8 @@ object DialogmeldingServiceSpek : Spek({
     val mqSender = mockk<MQSender>()
 
     val dialogmeldingService = DialogmeldingService(
+        pdlClient = pdlClient,
         mqSender = mqSender,
-        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
     )
 
     val arbeidstakerPersonident = Personident("01010112345")
