@@ -104,7 +104,7 @@ fun main() {
             dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
         )
         val dialogmeldingService = DialogmeldingService(
-            dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+            pdlClient = pdlClient,
             mqSender = mqSender,
         )
         cronjobModule(
