@@ -38,7 +38,6 @@ class GetBehandlereSpek : Spek({
         fastlegeClient = fastlegeClient,
         partnerinfoClient = partnerinfoClient,
         database = database,
-        externalMockEnvironment.environment.toggleSykmeldingbehandlere,
     )
     val behandlerRef = UUID.randomUUID()
 

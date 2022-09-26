@@ -54,7 +54,6 @@ class KafkaSykmeldingSpek : Spek({
                 syfoPartnerinfoUrl = externalMockEnvironment.environment.syfoPartnerinfoUrl,
             ),
             database = database,
-            toggleSykmeldingbehandlere = externalMockEnvironment.environment.toggleSykmeldingbehandlere,
         )
 
         val mockConsumer = mockk<KafkaConsumer<String, ReceivedSykmeldingDTO>>()

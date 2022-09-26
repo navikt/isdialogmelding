@@ -51,9 +51,6 @@ fun testEnvironment(
     isdialogmeldingDbUsername = "username",
     isdialogmeldingDbPassword = "password",
     toggleApprecs = true,
-    toggleKafkaProcessingSykmeldingEnabled = true,
-    toggleKafkaProcessingDialogmeldingEnabled = true,
-    toggleSykmeldingbehandlere = true,
 )
 
 const val testAapSoknadApiClientId = "soknad-api-client-id"
