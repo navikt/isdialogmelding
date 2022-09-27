@@ -11,7 +11,7 @@ object Versions {
     const val hikari = "5.0.1"
     const val jackson = "2.13.3"
     const val jaxb = "2.3.1"
-    const val kafka = "3.2.0"
+    const val kafka = "3.2.3"
     const val kafkaEmbedded = "3.2.1"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
