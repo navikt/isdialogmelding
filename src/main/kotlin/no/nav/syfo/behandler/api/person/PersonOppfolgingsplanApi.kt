@@ -34,9 +34,6 @@ fun Route.registerPersonOppfolgingsplanApi(
                     token = token,
                 )
                 val oppfolgingsplan = call.receive<RSOppfolgingsplan>()
-                if (requestPersonident.value != oppfolgingsplan.sykmeldtFnr) {
-                    throw IllegalArgumentException("Feil ved sending av oppfølgingsplan, ugyldig fnr")
-                }
 
                 oppfolgingsplanService.sendOppfolgingsplan(
                     callId = callId,

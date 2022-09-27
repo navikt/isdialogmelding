@@ -57,27 +57,27 @@ class PersonOppfolgingsplanApiSpek : Spek({
                             verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
                         }
                     }
-                }
-                describe("Unhappy paths") {
-                    it("Should not send oppfolgingsplan for other arbeidstaker") {
+                    it("Should send oppfolgingsplan for narmeste leder") {
                         val validToken = generateJWTIdporten(
                             audience = externalMockEnvironment.environment.idportenTokenXClientId,
                             clientId = externalMockEnvironment.environment.aapSoknadApiClientId,
                             issuer = externalMockEnvironment.wellKnownInternalIdportenTokenX.issuer,
-                            pid = UserConstants.ARBEIDSTAKER_FNR.value,
+                            pid = UserConstants.NARMESTELEDER_FNR.value,
                         )
 
                         with(
                             handleRequest(HttpMethod.Post, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                                setBody(objectMapper.writeValueAsString(generateRSOppfolgingsplan(UserConstants.ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO)))
+                                setBody(objectMapper.writeValueAsString(generateRSOppfolgingsplan()))
                             }
                         ) {
-                            response.status() shouldBeEqualTo HttpStatusCode.BadRequest
-                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
                         }
                     }
+                }
+                describe("Unhappy paths") {
                     it("should return error for arbeidstaker with no fastlege") {
                         val validToken = generateJWTIdporten(
                             audience = externalMockEnvironment.environment.idportenTokenXClientId,
