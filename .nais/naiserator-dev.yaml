@@ -83,7 +83,7 @@ spec:
     - name: KTOR_ENV
       value: production
     - name: TOGGLE_APPREC
-      value: "false"
+      value: "true"
     - name: MQGATEWAY_NAME
       value: "MQLS02"
     - name: MQGATEWAY_HOSTNAME
@@ -93,7 +93,7 @@ spec:
     - name: MQGATEWAY_CHANNEL_NAME
       value: Q1_ISDIALOGMELDING
     - name: APPREC_QUEUE
-      value: QA.Q1_ISDIALOGMELDING.APPRECS
+      value: QA.Q1_ISDIALOGMELDING.IU03_UTSENDING_REPLY
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
       value: QA.Q414.IU03_UTSENDING
     - name: AAP_SOKNAD_API_CLIENT_ID

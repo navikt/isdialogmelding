@@ -12,11 +12,13 @@ import no.nav.syfo.dialogmelding.apprec.database.getApprec
 import no.nav.syfo.dialogmelding.apprec.domain.Apprec
 import no.nav.syfo.dialogmelding.apprec.domain.ApprecStatus
 import no.nav.syfo.metric.RECEIVED_APPREC_COUNTER
+import no.nav.syfo.metric.RECEIVED_APPREC_MESSAGE_COUNTER
 import no.nav.syfo.util.*
 import no.nav.xml.eiff._2.XMLEIFellesformat
 import java.io.StringReader
 import java.util.UUID
 import javax.jms.*
+import javax.xml.bind.JAXBException
 
 class ApprecConsumer(
     val applicationState: ApplicationState,
@@ -42,6 +44,7 @@ class ApprecConsumer(
     }
 
     fun processApprecMessage(message: Message) {
+        RECEIVED_APPREC_MESSAGE_COUNTER.increment()
         val inputMessageText = when (message) {
             is TextMessage -> message.text
             else -> {
@@ -59,9 +62,17 @@ class ApprecConsumer(
     private fun storeApprec(
         inputMessageText: String
     ): String? {
-        val fellesformat = apprecUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
-        val xmlApprec: XMLAppRec = fellesformat.get()
-
+        var xmlApprec: XMLAppRec? = null
+        try {
+            val fellesformat = apprecUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
+            xmlApprec = fellesformat.get()
+        } catch (exc: JAXBException) {
+            log.warn("ApprecConsumer received message that could not be parsed", exc)
+        }
+        if (xmlApprec == null) {
+            log.warn("ApprecConsumer received message that was not an apprec")
+            return null
+        }
         val bestillingId = xmlApprec.originalMsgId.id
 
         val pBestilling = database.connection.use {

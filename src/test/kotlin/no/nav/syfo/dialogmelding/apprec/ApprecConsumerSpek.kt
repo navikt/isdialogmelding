@@ -125,6 +125,14 @@ class ApprecConsumerSpek : Spek({
                     pApprec.feilKode shouldBeEqualTo "X99"
                     pApprec.feilTekst shouldBeEqualTo "Annen feil"
                 }
+                it("Prosesserer innkommet feilformattert melding") {
+                    val apprecXml = "Ikke noen apprec"
+                    every { incomingMessage.text } returns(apprecXml)
+                    runBlocking {
+                        apprecConsumer.processApprecMessage(incomingMessage)
+                    }
+                    // should not get an exception
+                }
             }
         }
     }
