@@ -39,7 +39,7 @@ class ApprecConsumer(
         } catch (exc: Exception) {
             log.error("ApprecConsumer failed, restarting application", exc)
         } finally {
-            //applicationState.alive = false
+            // applicationState.alive = false
         }
     }
 
