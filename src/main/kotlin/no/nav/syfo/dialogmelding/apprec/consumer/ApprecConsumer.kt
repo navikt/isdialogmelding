@@ -28,7 +28,7 @@ class ApprecConsumer(
 
     suspend fun run() {
         try {
-            while (applicationState.ready) {
+            while (applicationState.ready && RECEIVED_APPREC_MESSAGE_COUNTER.count() < 1000) {
                 val message = inputconsumer.receiveNoWait()
                 if (message == null) {
                     delay(100)
@@ -39,7 +39,7 @@ class ApprecConsumer(
         } catch (exc: Exception) {
             log.error("ApprecConsumer failed, restarting application", exc)
         } finally {
-            applicationState.alive = false
+            //applicationState.alive = false
         }
     }
 
