@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 fun createMsgInfo(
+    msgId: String,
     rsMeldingInfo: RSMeldingInfo?,
 ): XMLMsgInfo {
     val factory = ObjectFactory()
@@ -18,7 +19,7 @@ fun createMsgInfo(
         )
         .withMIGversion("v1.2 2006-05-24")
         .withGenDate(LocalDateTime.now())
-        .withMsgId(UUID.randomUUID().toString())
+        .withMsgId(msgId)
         .withAck(
             factory.createXMLCS()
                 .withDN("Ja")
