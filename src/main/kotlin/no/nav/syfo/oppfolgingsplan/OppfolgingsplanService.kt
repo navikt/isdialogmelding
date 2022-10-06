@@ -14,6 +14,7 @@ import no.nav.syfo.oppfolgingsplan.domain.createRSHodemelding
 import no.nav.syfo.util.JAXB
 import no.nav.xml.eiff._2.XMLEIFellesformat
 import org.slf4j.LoggerFactory
+import java.util.UUID
 
 private val log = LoggerFactory.getLogger("no.nav.syfo.oppfolgingsplan")
 
@@ -55,15 +56,16 @@ class OppfolgingsplanService(
     }
 
     fun sendMelding(melding: RSHodemelding) {
-        log.info("Sending oppfølgingsplan to lege with partnerId: ${melding.meldingInfo?.mottaker?.partnerId}")
+        val msgId = UUID.randomUUID().toString()
+        log.info("Sending oppfølgingsplan $msgId to lege with partnerId: ${melding.meldingInfo?.mottaker?.partnerId}")
 
-        val fellesformat: Fellesformat = opprettDialogmelding(melding)
+        val fellesformat: Fellesformat = opprettDialogmelding(msgId, melding)
 
         mqSender.sendMessageToEmottak(fellesformat.message!!)
     }
 
-    private fun opprettDialogmelding(hodemelding: RSHodemelding): Fellesformat {
-        val xmleiFellesformat: XMLEIFellesformat = createFellesformat(hodemelding)
+    private fun opprettDialogmelding(msgId: String, hodemelding: RSHodemelding): Fellesformat {
+        val xmleiFellesformat: XMLEIFellesformat = createFellesformat(msgId, hodemelding)
         return Fellesformat(xmleiFellesformat, JAXB::marshallDialogmelding1_0)
     }
 }
