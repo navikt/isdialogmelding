@@ -5,7 +5,7 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.nav.syfo.application.api.APIConsumerAccessService
+import no.nav.syfo.application.api.APISystemConsumerAccessService
 import no.nav.syfo.behandler.api.person.RSOppfolgingsplan
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 import no.nav.syfo.util.getBearerHeader
@@ -19,7 +19,8 @@ const val sendOppfolgingsplanPath = "/api/v2/send/oppfolgingsplan"
 
 fun Route.registerOppfolgingsplanApi(
     oppfolgingsplanService: OppfolgingsplanService,
-    apiConsumerAccessService: APIConsumerAccessService,
+    apiConsumerAccessService: APISystemConsumerAccessService,
+    authorizedApplicationNameList: List<String>,
 ) {
     route(sendOppfolgingsplanPath) {
         post() {
@@ -27,7 +28,8 @@ fun Route.registerOppfolgingsplanApi(
                 val callId = getCallId()
                 val token = getBearerHeader()
                     ?: throw IllegalArgumentException("No Authorization header supplied")
-                apiConsumerAccessService.validateConsumerApplicationClientId(
+                apiConsumerAccessService.validateSystemConsumerApplicationClientId(
+                    authorizedApplicationNameList = authorizedApplicationNameList,
                     token = token,
                 )
                 val oppfolgingsplan = call.receive<RSOppfolgingsplan>()

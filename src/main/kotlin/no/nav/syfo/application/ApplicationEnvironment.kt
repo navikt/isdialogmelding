@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 data class Environment(
     val aadAppClient: String = getEnvVar("AZURE_APP_CLIENT_ID"),
     val azureAppClientSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
+    val azureAppPreAuthorizedApps: String = getEnvVar("AZURE_APP_PRE_AUTHORIZED_APPS"),
     val azureOpenidConfigTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
     val azureAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),
 
@@ -17,6 +18,10 @@ data class Environment(
     val syfooppfolgingsplanserviceClientId: String = getEnvVar("SYFOOPPFOLGINGSPLANSERVICE_CLIENT_ID"),
     val oppfolgingsplanAPIAuthorizedConsumerClientIdList: List<String> = listOf(
         syfooppfolgingsplanserviceClientId,
+    ),
+    private val syfooppfolgingsplanserviceApplicationName: String = "syfooppfolgingsplanservice",
+    val oppfolgingsplanSystemAPIAuthorizedConsumerApplicationNameList: List<String> = listOf(
+        syfooppfolgingsplanserviceApplicationName,
     ),
 
     val electorPath: String = getEnvVar("ELECTOR_PATH"),

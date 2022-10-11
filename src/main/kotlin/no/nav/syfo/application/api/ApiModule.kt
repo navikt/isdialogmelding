@@ -65,6 +65,9 @@ fun Application.apiModule(
     val oppfolgingsplanAPIConsumerAccessService = APIConsumerAccessService(
         authorizedConsumerApplicationClientIdList = environment.oppfolgingsplanAPIAuthorizedConsumerClientIdList,
     )
+    val systemAPIConsumerAccessService = APISystemConsumerAccessService(
+        azureAppPreAuthorizedApps = environment.azureAppPreAuthorizedApps,
+    )
 
     routing {
         registerPodApi(
@@ -79,7 +82,8 @@ fun Application.apiModule(
             )
             registerOppfolgingsplanApi(
                 oppfolgingsplanService = oppfolgingsplanService,
-                apiConsumerAccessService = oppfolgingsplanAPIConsumerAccessService,
+                apiConsumerAccessService = systemAPIConsumerAccessService,
+                authorizedApplicationNameList = environment.oppfolgingsplanSystemAPIAuthorizedConsumerApplicationNameList,
             )
             registerBehandlerApi(
                 behandlerService = behandlerService,

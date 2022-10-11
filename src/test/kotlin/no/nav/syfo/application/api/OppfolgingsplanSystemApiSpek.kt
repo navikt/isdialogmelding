@@ -24,9 +24,9 @@ class OppfolgingsplanSystemApiSpek : Spek({
 
         val externalMockEnvironment = ExternalMockEnvironment.instance
         val database = externalMockEnvironment.database
-        val validToken = generateJWTIdporten(
+        val validToken = generateJWTSystem(
             audience = externalMockEnvironment.environment.aadAppClient,
-            clientId = externalMockEnvironment.environment.aapSoknadApiClientId,
+            azp = externalMockEnvironment.environment.syfooppfolgingsplanserviceClientId,
             issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
         )
         application.testApiModule(
@@ -102,9 +102,9 @@ class OppfolgingsplanSystemApiSpek : Spek({
                     }
 
                     it("should return status Forbidden if unauthorized ClientId is supplied") {
-                        val tokenUnauthorizedClientId = generateJWTIdporten(
+                        val tokenUnauthorizedClientId = generateJWTSystem(
                             audience = externalMockEnvironment.environment.aadAppClient,
-                            clientId = "app",
+                            azp = "app",
                             issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
                         )
 
