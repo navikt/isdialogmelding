@@ -1,6 +1,8 @@
 package no.nav.syfo.testhelper
 
 import no.nav.syfo.application.*
+import no.nav.syfo.behandler.api.person.access.PreAuthorizedClient
+import no.nav.syfo.util.configuredJacksonMapper
 import java.net.ServerSocket
 
 fun testEnvironment(
@@ -15,6 +17,7 @@ fun testEnvironment(
     apprecQueueName = "apprec-test-queue",
     azureAppClientSecret = "isdialogmelding-secret",
     azureAppWellKnownUrl = "wellknown",
+    azureAppPreAuthorizedApps = configuredJacksonMapper().writeValueAsString(testAzureAppPreAuthorizedApps),
     azureOpenidConfigTokenEndpoint = azureOpenidConfigTokenEndpoint,
     idportenTokenXClientId = "dev-gcp.teamsykefravr.isdialogmelding",
     idportenTokenXWellKnownUrl = "wellknown-idporten-tokenx",
@@ -59,6 +62,13 @@ const val testSyfooppfolgingsplanserviceClientId = "syfooppfolgingsplanservice-c
 fun testAppState() = ApplicationState(
     alive = true,
     ready = true,
+)
+
+val testAzureAppPreAuthorizedApps = listOf(
+    PreAuthorizedClient(
+        name = "dev-fss:team-esyfo:syfooppfolgingsplanservice",
+        clientId = testSyfooppfolgingsplanserviceClientId,
+    ),
 )
 
 fun getRandomPort() = ServerSocket(0).use {
