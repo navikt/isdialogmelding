@@ -42,15 +42,12 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: soknad-api
-          namespace: aap
-          cluster: prod-gcp
-        - application: fastlegerest
-          namespace: teamsykefravr
-          cluster: prod-gcp
         - application: syfomodiaperson
           namespace: teamsykefravr
           cluster: prod-fss
+        - application: soknad-api
+          namespace: aap
+          cluster: prod-gcp
         - application: syfooppfolgingsplanservice
           namespace: team-esyfo
           cluster: prod-fss

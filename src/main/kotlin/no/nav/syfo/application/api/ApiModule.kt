@@ -3,7 +3,6 @@ package no.nav.syfo.application.api
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
-import no.nav.syfo.api.registerDialogmeldingApi
 import no.nav.syfo.api.registerOppfolgingsplanApi
 import no.nav.syfo.application.*
 import no.nav.syfo.application.api.authentication.*
@@ -77,9 +76,6 @@ fun Application.apiModule(
         registerPrometheusApi()
 
         authenticate(JwtIssuerType.AZUREAD_V2.name) {
-            registerDialogmeldingApi(
-                oppfolgingsplanService = oppfolgingsplanService,
-            )
             registerOppfolgingsplanApi(
                 oppfolgingsplanService = oppfolgingsplanService,
                 apiConsumerAccessService = systemAPIConsumerAccessService,
