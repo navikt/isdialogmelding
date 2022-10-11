@@ -6,11 +6,11 @@ import no.nav.syfo.behandler.api.person.access.PreAuthorizedClient
 import no.nav.syfo.behandler.api.person.access.toNamespaceAndApplicationName
 import no.nav.syfo.util.configuredJacksonMapper
 
-const val JWT_CLAIM_CLIENT_ID_SYSTEM_TOKEN = "azp"
+const val JWT_CLAIM_AZP = "azp"
 
 fun getSystemConsumerClientId(token: String): String? {
     val decodedJWT = JWT.decode(token)
-    return decodedJWT.claims[JWT_CLAIM_CLIENT_ID_SYSTEM_TOKEN]?.asString()
+    return decodedJWT.claims[JWT_CLAIM_AZP]?.asString()
 }
 
 class APISystemConsumerAccessService(
@@ -24,7 +24,7 @@ class APISystemConsumerAccessService(
         token: String,
     ) {
         val consumerClientIdAzp = getSystemConsumerClientId(token = token)
-            ?: throw IllegalArgumentException("Claim $JWT_CLAIM_CLIENT_ID_SYSTEM_TOKEN was not found in token")
+            ?: throw IllegalArgumentException("Claim $JWT_CLAIM_AZP was not found in token")
 
         val clientIdList = preAuthorizedClientList
             .filter {
