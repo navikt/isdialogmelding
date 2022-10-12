@@ -11,6 +11,7 @@ import no.nav.syfo.metric.COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS
 import no.nav.syfo.oppfolgingsplan.converter.createFellesformat
 import no.nav.syfo.oppfolgingsplan.domain.RSHodemelding
 import no.nav.syfo.oppfolgingsplan.domain.createRSHodemelding
+import no.nav.syfo.oppfolgingsplan.exception.FastlegeNotFoundException
 import no.nav.syfo.util.JAXB
 import no.nav.xml.eiff._2.XMLEIFellesformat
 import org.slf4j.LoggerFactory
@@ -35,7 +36,7 @@ class OppfolgingsplanService(
                 token = token,
                 callId = callId,
                 systemRequest = true,
-            ) ?: throw IllegalArgumentException("Feil ved sending av oppfølgingsplan, FastlegeIkkeFunnet")
+            ) ?: throw FastlegeNotFoundException("Feil ved sending av oppfølgingsplan, FastlegeIkkeFunnet")
 
             val arbeidstaker = dialogmeldingToBehandlerService.getArbeidstakerIfRelasjonToBehandler(
                 behandlerRef = fastlegeBehandler.behandlerRef,

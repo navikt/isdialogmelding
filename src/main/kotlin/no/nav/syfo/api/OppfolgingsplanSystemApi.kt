@@ -8,6 +8,7 @@ import io.ktor.server.routing.*
 import no.nav.syfo.application.api.APISystemConsumerAccessService
 import no.nav.syfo.behandler.api.person.RSOppfolgingsplan
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
+import no.nav.syfo.oppfolgingsplan.exception.FastlegeNotFoundException
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
 import org.slf4j.Logger
@@ -39,6 +40,8 @@ fun Route.registerOppfolgingsplanApi(
                     oppfolgingsplan = oppfolgingsplan,
                 )
                 call.respond(HttpStatusCode.OK, "Vellykket deling av oppfolgingsplan med lege!")
+            } catch (e: FastlegeNotFoundException) {
+                call.respond(HttpStatusCode.NotFound, e.message!!)
             } catch (e: IllegalArgumentException) {
                 val errorMessage = "Feil ved sending av OP til lege!"
                 log.error(errorMessage, e)

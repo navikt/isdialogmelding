@@ -67,7 +67,7 @@ class OppfolgingsplanSystemApiSpek : Spek({
                                 setBody(objectMapper.writeValueAsString(generateRSOppfolgingsplan(UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR)))
                             }
                         ) {
-                            response.status() shouldBeEqualTo HttpStatusCode.BadRequest
+                            response.status() shouldBeEqualTo HttpStatusCode.NotFound
                             verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
                         }
                     }
