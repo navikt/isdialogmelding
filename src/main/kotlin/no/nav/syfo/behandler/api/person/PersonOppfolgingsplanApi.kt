@@ -8,6 +8,7 @@ import io.ktor.server.routing.*
 import no.nav.syfo.application.api.APIConsumerAccessService
 import no.nav.syfo.application.api.authentication.personident
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
+import no.nav.syfo.oppfolgingsplan.exception.FastlegeNotFoundException
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
 import org.slf4j.Logger
@@ -41,6 +42,8 @@ fun Route.registerPersonOppfolgingsplanApi(
                     oppfolgingsplan = oppfolgingsplan,
                 )
                 call.respond(HttpStatusCode.OK)
+            } catch (e: FastlegeNotFoundException) {
+                call.respond(HttpStatusCode.NotFound, e.message!!)
             } catch (e: IllegalArgumentException) {
                 val illegalArgumentMessage = "Could not send oppfolgingsplan to behandler"
                 log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)
