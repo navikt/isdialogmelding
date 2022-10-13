@@ -23,7 +23,7 @@ object Versions {
     const val mockk = "1.12.4"
     const val mq = "9.2.5.0"
     const val nimbusjosejwt = "9.23"
-    const val postgres = "42.4.1"
+    const val postgres = "42.5.0"
     const val postgresEmbedded = "0.13.4"
     const val scala = "2.13.9"
     const val spek = "2.0.18"
