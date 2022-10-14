@@ -68,12 +68,22 @@ class FastlegeClient(
             COUNT_CALL_FASTLEGEREST_FASTLEGE_SUCCESS.increment()
             return response.body()
         } catch (e: ClientRequestException) {
-            handleUnexpectedResponseException(e.response, e.message, callId)
+            handleUnexpectedClientRequestException(e.response, e.message, callId)
         } catch (e: ServerResponseException) {
             handleUnexpectedResponseException(e.response, e.message, callId)
         }
 
         return null
+    }
+
+    private fun handleUnexpectedClientRequestException(response: HttpResponse, message: String?, callId: String) {
+        log.warn(
+            "Error while requesting Response from fastlegerest {}, {}, {}",
+            StructuredArguments.keyValue("statusCode", response.status.value.toString()),
+            StructuredArguments.keyValue("message", message),
+            StructuredArguments.keyValue("callId", callId),
+        )
+        COUNT_CALL_FASTLEGEREST_FASTLEGE_FAIL.increment()
     }
 
     private fun handleUnexpectedResponseException(response: HttpResponse, message: String?, callId: String) {
