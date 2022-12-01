@@ -145,6 +145,22 @@ class KafkaDialogmeldingFromBehandlerSpek : Spek({
                         kontor!!.dialogmeldingEnabled `should be` null
                     }
 
+                    it("do not update identer for behandler with invalid fnr") {
+                        val dialogmelding = generateDialogmeldingFromBehandlerDTO(
+                            fellesformatXml = fellesformatXMLHealthcareProfessionalInvalidFNR,
+                        )
+                        val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
+
+                        runBlocking {
+                            pollAndProcessDialogmeldingFromBehandler(
+                                kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                                database = database,
+                            )
+                        }
+
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+                    }
+
                     it("don't update behandleridenter if we can't find partnerId in xml") {
                         val dialogmeldingWithoutValidPartnerIdWithHealthcareProfessional = generateDialogmeldingFromBehandlerDTO(fellesformatXmlWithIdenterWithoutPartnerId)
                         val behandlerRef = addExistingBehandlerToDatabase(database)

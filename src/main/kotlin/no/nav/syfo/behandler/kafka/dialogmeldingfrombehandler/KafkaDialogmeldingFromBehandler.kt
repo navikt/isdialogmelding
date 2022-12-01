@@ -7,8 +7,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.BehandleridentType
 import no.nav.syfo.behandler.kafka.kafkaDialogmeldingFromBehandlerConsumerConfig
-import no.nav.syfo.domain.PartnerId
-import no.nav.syfo.domain.Personident
+import no.nav.syfo.domain.*
 import no.nav.syfo.util.getObjectFromXmlString
 import no.nav.xml.eiff._2.XMLMottakenhetBlokk
 import org.apache.kafka.clients.consumer.ConsumerRecords
@@ -143,14 +142,20 @@ private fun updateIdenterForBehandler(
     database: DatabaseInterface,
 ) {
     val behandlerFnr = identer[BehandleridentType.FNR]
-    log.info("Update behandler idents for behandler connected to partnerId: $partnerId")
 
     behandlerFnr?.let {
-        val behandlerToUpdate = database.getBehandlerByBehandlerPersonidentAndPartnerId(Personident(behandlerFnr), partnerId)
+        if (elevenDigits.matches(behandlerFnr)) {
+            log.info("Update behandler idents for behandler connected to partnerId: $partnerId")
 
-        behandlerToUpdate?.let {
-            log.info("Behandler found with behandlerRef ${behandlerToUpdate.behandlerRef}")
-            database.updateBehandlerIdenter(behandlerToUpdate.behandlerRef, identer)
+            val behandlerToUpdate =
+                database.getBehandlerByBehandlerPersonidentAndPartnerId(Personident(behandlerFnr), partnerId)
+
+            behandlerToUpdate?.let {
+                log.info("Behandler found with behandlerRef ${behandlerToUpdate.behandlerRef}")
+                database.updateBehandlerIdenter(behandlerToUpdate.behandlerRef, identer)
+            }
+        } else {
+            log.warn("Ignoring invalid behandler fnr, skip update behandler idents")
         }
     }
 }
