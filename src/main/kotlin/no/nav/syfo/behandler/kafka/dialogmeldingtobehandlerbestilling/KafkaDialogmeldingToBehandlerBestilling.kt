@@ -1,7 +1,7 @@
 package no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling
 
-import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.kafka.ApplicationEnvironmentKafka
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.kafka.*
 import org.apache.kafka.clients.consumer.*

@@ -3,6 +3,7 @@ package no.nav.syfo.behandler.kafka
 import no.nav.syfo.application.*
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.application.kafka.ApplicationEnvironmentKafka
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.blockingApplicationLogicDialogmeldingBestilling
 import no.nav.syfo.behandler.kafka.dialogmeldingfrombehandler.blockingApplicationLogicDialogmeldingFromBehandler

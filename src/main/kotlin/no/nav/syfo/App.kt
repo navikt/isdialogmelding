@@ -21,6 +21,8 @@ import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
+import no.nav.syfo.identhendelse.kafka.IdenthendelseConsumerService
+import no.nav.syfo.identhendelse.kafka.launchKafkaTaskIdenthendelse
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import javax.jms.Session
@@ -145,6 +147,14 @@ fun main() {
                     blockingApplicationRunner.run()
                 }
             }
+        }
+        if (environment.toggleKafkaConsumerIdenthendelseEnabled) {
+            val identhendelseConsumerService = IdenthendelseConsumerService()
+            launchKafkaTaskIdenthendelse(
+                applicationState = applicationState,
+                applicationEnvironmentKafka = environment.kafka,
+                kafkaIdenthendelseConsumerService = identhendelseConsumerService,
+            )
         }
     }
 

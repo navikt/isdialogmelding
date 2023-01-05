@@ -1,6 +1,7 @@
 package no.nav.syfo.application
 
 import io.ktor.server.application.*
+import no.nav.syfo.application.kafka.ApplicationEnvironmentKafka
 
 data class Environment(
     val aadAppClient: String = getEnvVar("AZURE_APP_CLIENT_ID"),
@@ -38,6 +39,9 @@ data class Environment(
         aivenKeystoreLocation = getEnvVar("KAFKA_KEYSTORE_PATH"),
         aivenSecurityProtocol = "SSL",
         aivenTruststoreLocation = getEnvVar("KAFKA_TRUSTSTORE_PATH"),
+        aivenSchemaRegistryUrl = getEnvVar("KAFKA_SCHEMA_REGISTRY"),
+        aivenRegistryUser = getEnvVar("KAFKA_SCHEMA_REGISTRY_USER"),
+        aivenRegistryPassword = getEnvVar("KAFKA_SCHEMA_REGISTRY_PASSWORD"),
     ),
     val mqQueueManager: String = getEnvVar("MQGATEWAY_NAME"),
     val mqHostname: String = getEnvVar("MQGATEWAY_HOSTNAME"),
@@ -55,19 +59,12 @@ data class Environment(
     val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),
     val syfotilgangskontrollUrl: String = getEnvVar("SYFOTILGANGSKONTROLL_URL"),
     val toggleApprecs: Boolean = getEnvVar("TOGGLE_APPREC").toBoolean(),
+    val toggleKafkaConsumerIdenthendelseEnabled: Boolean = getEnvVar("TOGGLE_KAFKA_IDENTHENDELSE_CONSUMER_ENABLED").toBoolean(),
 ) {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$isdialogmeldingDbHost:$isdialogmeldingDbPort/$isdialogmeldingDbName"
     }
 }
-
-data class ApplicationEnvironmentKafka(
-    val aivenBootstrapServers: String,
-    val aivenCredstorePassword: String,
-    val aivenKeystoreLocation: String,
-    val aivenSecurityProtocol: String,
-    val aivenTruststoreLocation: String,
-)
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =
     System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable \"$varName\"")
