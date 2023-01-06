@@ -1,9 +1,9 @@
 package no.nav.syfo.behandler.kafka.dialogmeldingfrombehandler
 
 import no.kith.xmlstds.msghead._2006_05_24.XMLHealthcareProfessional
-import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.application.kafka.ApplicationEnvironmentKafka
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.BehandleridentType
 import no.nav.syfo.behandler.kafka.kafkaDialogmeldingFromBehandlerConsumerConfig

@@ -1,6 +1,7 @@
 package no.nav.syfo.testhelper
 
 import no.nav.syfo.application.*
+import no.nav.syfo.application.kafka.ApplicationEnvironmentKafka
 import no.nav.syfo.behandler.api.person.access.PreAuthorizedClient
 import no.nav.syfo.util.configuredJacksonMapper
 import java.net.ServerSocket
@@ -32,6 +33,9 @@ fun testEnvironment(
         aivenKeystoreLocation = "keystore",
         aivenSecurityProtocol = "SSL",
         aivenTruststoreLocation = "truststore",
+        aivenSchemaRegistryUrl = "http://kafka-schema-registry.tpa.svc.nais.local:8081",
+        aivenRegistryUser = "registryuser",
+        aivenRegistryPassword = "registrypassword",
     ),
     serviceuserUsername = "user",
     serviceuserPassword = "password",
@@ -54,6 +58,7 @@ fun testEnvironment(
     isdialogmeldingDbUsername = "username",
     isdialogmeldingDbPassword = "password",
     toggleApprecs = true,
+    toggleKafkaConsumerIdenthendelseEnabled = true,
 )
 
 const val testAapSoknadApiClientId = "soknad-api-client-id"

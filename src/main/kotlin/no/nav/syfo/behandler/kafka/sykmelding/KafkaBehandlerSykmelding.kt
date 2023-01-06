@@ -1,23 +1,19 @@
 package no.nav.syfo.behandler.kafka.sykmelding
 
-import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.kafka.ApplicationEnvironmentKafka
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.kafka.kafkaSykmeldingConsumerConfig
 import no.nav.syfo.domain.*
 import org.apache.kafka.clients.consumer.*
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.*
 import java.util.UUID
 
 const val SYKMELDING_TOPIC = "teamsykmelding.ok-sykmelding"
 
 val PROCESS_SYKMELDING_INCOMING_AFTER = LocalDateTime.of(LocalDate.of(2021, Month.OCTOBER, 1), LocalTime.of(0, 0))
-
-private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.behandler.kafka")
 
 fun blockingApplicationLogicSykmelding(
     applicationState: ApplicationState,
