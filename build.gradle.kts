@@ -1,6 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.apache.tools.ant.taskdefs.condition.Os
-import org.apache.tools.ant.taskdefs.condition.Os.isFamily
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "no.nav.syfo"
@@ -27,7 +26,7 @@ object Versions {
     const val mq = "9.2.5.0"
     const val nimbusjosejwt = "9.23"
     const val postgres = "42.5.0"
-    val postgresEmbedded = if (isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
+    val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
     const val scala = "2.13.9"
     const val spek = "2.0.18"
     const val syfotjenester = "1.2021.06.09-13.09-b3d30de9996e"

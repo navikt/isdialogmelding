@@ -1,6 +1,9 @@
 package no.nav.syfo.testhelper.generator
 
-import no.nav.syfo.client.pdl.*
+import no.nav.syfo.client.pdl.domain.PdlHentPerson
+import no.nav.syfo.client.pdl.domain.PdlPerson
+import no.nav.syfo.client.pdl.domain.PdlPersonNavn
+import no.nav.syfo.client.pdl.domain.PdlPersonResponse
 import no.nav.syfo.testhelper.UserConstants
 
 fun generatePdlPersonResponse() = PdlPersonResponse(
