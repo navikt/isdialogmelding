@@ -9,31 +9,31 @@ object Versions {
     const val confluent = "7.3.1"
     const val dialogmeldingVersion = "1.5d21db9"
     const val fellesformat2Version = "1.0329dd1"
-    const val flyway = "8.5.13"
+    const val flyway = "9.7.0"
     const val hikari = "5.0.1"
-    const val jackson = "2.13.4"
+    const val jackson = "2.14.0"
     const val jaxb = "2.3.1"
-    const val kafka = "3.2.3"
+    const val kafka = "3.3.1"
     const val kafkaEmbedded = "3.2.1"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
-    const val kluent = "1.68"
-    const val ktor = "2.1.1"
-    const val logback = "1.2.11"
+    const val kluent = "1.72"
+    const val ktor = "2.2.2"
+    const val logback = "1.4.4"
     const val logstashEncoder = "7.2"
-    const val micrometerRegistry = "1.9.4"
-    const val mockk = "1.12.4"
+    const val micrometerRegistry = "1.10.0"
+    const val mockk = "1.13.2"
     const val mq = "9.2.5.0"
-    const val nimbusjosejwt = "9.23"
-    const val postgres = "42.5.0"
+    const val nimbusjosejwt = "9.25.6"
+    const val postgres = "42.5.1"
     val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
     const val scala = "2.13.9"
-    const val spek = "2.0.18"
+    const val spek = "2.0.19"
     const val syfotjenester = "1.2021.06.09-13.09-b3d30de9996e"
 }
 
 plugins {
-    kotlin("jvm") version "1.7.0"
+    kotlin("jvm") version "1.7.20"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
@@ -119,7 +119,13 @@ dependencies {
         implementation("org.yaml:snakeyaml") {
             because("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-25857/")
             version {
-                require("1.31")
+                require("1.33")
+            }
+        }
+        implementation("com.google.protobuf:protobuf-java") {
+            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded} -> https://cwe.mitre.org/data/definitions/400.html")
+            version {
+                require("3.21.7")
             }
         }
     }
