@@ -6,26 +6,6 @@ import no.nav.syfo.domain.Personident
 import java.sql.Connection
 import java.sql.PreparedStatement
 
-const val queryUpdateBehandler =
-    """
-        UPDATE BEHANDLER
-        SET personident = ?
-        WHERE personident = ?
-    """
-
-fun Connection.updateBehandler(
-    nyPersonident: Personident,
-    inactiveIdenter: List<Personident>,
-    commit: Boolean = false,
-): Int {
-    return this.updateIdent(
-        query = queryUpdateBehandler,
-        nyPersonident = nyPersonident,
-        inactiveIdenter = inactiveIdenter,
-        commit = commit,
-    )
-}
-
 const val queryBehandlerArbeidstaker =
     """
         UPDATE BEHANDLER_ARBEIDSTAKER
@@ -90,8 +70,6 @@ const val queryGetIdentCount =
     """
         SELECT COUNT(*)
         FROM (
-            SELECT personident FROM BEHANDLER
-            UNION ALL
             SELECT arbeidstaker_personident as personident FROM BEHANDLER_ARBEIDSTAKER
             UNION ALL
             SELECT arbeidstaker_personident as personident FROM BEHANDLER_DIALOGMELDING_BESTILLING

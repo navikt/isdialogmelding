@@ -68,7 +68,7 @@ object IdenthendelseServiceSpek : Spek({
                     }
 
                     val newIdentOccurrences = database.getIdentCount(listOf(newIdent))
-                    newIdentOccurrences shouldBeEqualTo 3
+                    newIdentOccurrences shouldBeEqualTo 2
                 }
 
                 it("Skal oppdatere gamle identer når person har fått ny ident, men kun tabeller som har en forekomst av gamle identer") {
@@ -87,7 +87,7 @@ object IdenthendelseServiceSpek : Spek({
                     }
 
                     val newIdentOccurrences = database.getIdentCount(listOf(newIdent))
-                    newIdentOccurrences shouldBeEqualTo 2
+                    newIdentOccurrences shouldBeEqualTo 1
                 }
             }
 

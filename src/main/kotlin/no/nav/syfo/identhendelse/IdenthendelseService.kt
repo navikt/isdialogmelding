@@ -40,7 +40,6 @@ class IdenthendelseService(
         if (inactiveIdenterCount > 0) {
             checkThatPdlIsUpdated(activeIdent)
             database.connection.use { connection ->
-                numberOfUpdatedIdenter += connection.updateBehandler(activeIdent, inactiveIdenter)
                 numberOfUpdatedIdenter += connection.updateBehandlerArbeidstaker(activeIdent, inactiveIdenter)
                 numberOfUpdatedIdenter += connection.updateBehandlerDialogmeldingBestilling(activeIdent, inactiveIdenter)
                 connection.commit()
