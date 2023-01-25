@@ -109,8 +109,6 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlDNRRegex()
             val actualFellesformatMessage = messageSlot.captured
-            println(expectedFellesformatMessageAsRegex)
-            println(actualFellesformatMessage)
 
             assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
