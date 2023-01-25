@@ -1,12 +1,12 @@
 package no.nav.syfo.testhelper.generator
 
-fun defaultFellesformatDialogmeldingAvlysningXmlRegex(): Regex {
+fun defaultFellesformatDialogmeldingXmlDNRRegex(): Regex {
     return Regex(
         "<\\?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"\\?>\n" +
             "<EI_fellesformat xmlns=\"http://www.nav.no/xml/eiff/2/\" xmlns:ns6=\"http://www.kith.no/xmlstds/base64container\" xmlns:ns5=\"http://www.kith.no/xmlstds/felleskomponent1\" xmlns:ns2=\"http://www.kith.no/xmlstds/msghead/2006-05-24\" xmlns:ns4=\"http://www.kith.no/xmlstds/dialog/2006-10-11\" xmlns:ns3=\"http://www.w3.org/2000/09/xmldsig#\">\n" +
             "    <ns2:MsgHead>\n" +
             "        <ns2:MsgInfo>\n" +
-            "            <ns2:Type V=\"DIALOG_NOTAT\" DN=\"Notat\"/>\n" +
+            "            <ns2:Type V=\"DIALOG_FORESPORSEL\" DN=\"Forespørsel\"/>\n" +
             "            <ns2:MIGversion>v1.2 2006-05-24</ns2:MIGversion>\n" +
             "            <ns2:GenDate>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{0,9}</ns2:GenDate>\n" +
             "            <ns2:MsgId>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns2:MsgId>\n" +
@@ -49,8 +49,8 @@ fun defaultFellesformatDialogmeldingAvlysningXmlRegex(): Regex {
             "                        <ns2:MiddleName>Katherine</ns2:MiddleName>\n" +
             "                        <ns2:GivenName>Dana</ns2:GivenName>\n" +
             "                        <ns2:Ident>\n" +
-            "                            <ns2:Id>12125678911</ns2:Id>\n" +
-            "                            <ns2:TypeId V=\"FNR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"Fødselsnummer\"/>\n" +
+            "                            <ns2:Id>52125678911</ns2:Id>\n" +
+            "                            <ns2:TypeId V=\"DNR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"D-nummer\"/>\n" +
             "                        </ns2:Ident>\n" +
             "                        <ns2:Ident>\n" +
             "                            <ns2:Id>9</ns2:Id>\n" +
@@ -68,8 +68,8 @@ fun defaultFellesformatDialogmeldingAvlysningXmlRegex(): Regex {
             "                <ns2:MiddleName>Mellomnavn</ns2:MiddleName>\n" +
             "                <ns2:GivenName>Fornavn</ns2:GivenName>\n" +
             "                <ns2:Ident>\n" +
-            "                    <ns2:Id>01010112345</ns2:Id>\n" +
-            "                    <ns2:TypeId V=\"FNR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"Fødselsnummer\"/>\n" +
+            "                    <ns2:Id>41010112345</ns2:Id>\n" +
+            "                    <ns2:TypeId V=\"DNR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"D-nummer\"/>\n" +
             "                </ns2:Ident>\n" +
             "            </ns2:Patient>\n" +
             "        </ns2:MsgInfo>\n" +
@@ -81,11 +81,11 @@ fun defaultFellesformatDialogmeldingAvlysningXmlRegex(): Regex {
             "                <ns2:MimeType>text/xml</ns2:MimeType>\n" +
             "                <ns2:Content>\n" +
             "                    <ns4:Dialogmelding>\n" +
-            "                        <ns4:Notat>\n" +
-            "                            <ns4:TemaKodet V=\"4\" S=\"2.16.578.1.12.4.1.1.8127\" DN=\"Avlysning dialogmøte\"/>\n" +
-            "                            <ns4:TekstNotatInnhold xsi:type=\"xs:string\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">Møtet er avlyst</ns4:TekstNotatInnhold>\n" +
-            "                            <ns4:DokIdNotat>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns4:DokIdNotat>\n" +
-            "                        </ns4:Notat>\n" +
+            "                        <ns4:Foresporsel>\n" +
+            "                            <ns4:TypeForesp V=\"1\" S=\"2.16.578.1.12.4.1.1.8125\" DN=\"Innkalling dialogmøte 2\"/>\n" +
+            "                            <ns4:Sporsmal>En tekst</ns4:Sporsmal>\n" +
+            "                            <ns4:DokIdForesp>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns4:DokIdForesp>\n" +
+            "                        </ns4:Foresporsel>\n" +
             "                    </ns4:Dialogmelding>\n" +
             "                </ns2:Content>\n" +
             "            </ns2:RefDoc>\n" +
@@ -102,7 +102,7 @@ fun defaultFellesformatDialogmeldingAvlysningXmlRegex(): Regex {
             "            </ns2:RefDoc>\n" +
             "        </ns2:Document>\n" +
             "    </ns2:MsgHead>\n" +
-            "    <MottakenhetBlokk partnerReferanse=\"1\" ebRole=\"Saksbehandler\" ebService=\"HenvendelseFraSaksbehandler\" ebAction=\"Henvendelse\"/>\n" +
+            "    <MottakenhetBlokk partnerReferanse=\"1\" ebRole=\"Saksbehandler\" ebService=\"DialogmoteInnkalling\" ebAction=\"MoteInnkalling\"/>\n" +
             "</EI_fellesformat>\n"
     )
 }

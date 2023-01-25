@@ -2,6 +2,8 @@ package no.nav.syfo.oppfolgingsplan.converter
 
 import no.kith.xmlstds.msghead._2006_05_24.ObjectFactory
 import no.kith.xmlstds.msghead._2006_05_24.XMLPatient
+import no.nav.syfo.domain.Personident
+import no.nav.syfo.util.createXMLIdentForPersonident
 import no.nav.syfo.oppfolgingsplan.domain.RSPasient
 
 fun createPasient(
@@ -13,13 +15,8 @@ fun createPasient(
         .withMiddleName(rsPasient.mellomnavn)
         .withGivenName(rsPasient.fornavn)
         .withIdent(
-            factory.createXMLIdent()
-                .withId(rsPasient.fnr)
-                .withTypeId(
-                    factory.createXMLCV()
-                        .withDN("Fødselsnummer")
-                        .withS("2.16.578.1.12.4.1.1.8116")
-                        .withV("FNR")
-                )
+            rsPasient.fnr?.let {
+                factory.createXMLIdentForPersonident(Personident(it))
+            }
         )
 }
