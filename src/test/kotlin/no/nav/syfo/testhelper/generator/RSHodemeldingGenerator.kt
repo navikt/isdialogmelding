@@ -14,7 +14,7 @@ fun generateRSHodemelding(): RSHodemelding {
                 postnummer = "postnummer",
                 poststed = "poststed",
                 behandler = RSBehandler(
-                    fnr = "fnr",
+                    fnr = "10101012345",
                     hprId = 1,
                     fornavn = "Dana",
                     mellomnavn = "Katherine",
@@ -22,7 +22,7 @@ fun generateRSHodemelding(): RSHodemelding {
                 )
             ),
             pasient = RSPasient(
-                fnr = "innbyggerFnr",
+                fnr = "01010112345",
                 fornavn = "Idun",
                 mellomnavn = "mellomnavn",
                 etternavn = "Innbygger",

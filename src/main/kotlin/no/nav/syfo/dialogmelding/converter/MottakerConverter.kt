@@ -3,6 +3,7 @@ package no.nav.syfo.dialogmelding.converter
 import no.kith.xmlstds.msghead._2006_05_24.ObjectFactory
 import no.kith.xmlstds.msghead._2006_05_24.XMLReceiver
 import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
+import no.nav.syfo.util.createXMLIdentForPersonident
 
 fun createReceiver(
     melding: DialogmeldingToBehandlerBestilling,
@@ -51,14 +52,9 @@ fun createReceiver(
                         withMiddleName(melding.behandler.mellomnavn)
                         withGivenName(melding.behandler.fornavn)
                         withIdent(
-                            factory.createXMLIdent()
-                                .withId(melding.behandler.personident!!.value)
-                                .withTypeId(
-                                    factory.createXMLCV()
-                                        .withDN("Fødselsnummer Norsk fødselsnummer")
-                                        .withS("2.16.578.1.12.4.1.1.8116")
-                                        .withV("FNR")
-                                )
+                            melding.behandler.personident?.let {
+                                factory.createXMLIdentForPersonident(it)
+                            }
                         )
                         if (melding.behandler.hprId != null) {
                             withIdent(

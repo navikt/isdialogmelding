@@ -3,7 +3,6 @@ package no.nav.syfo.dialogmelding
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.mq.MQSender
-import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.toDialogmeldingToBehandlerBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
@@ -30,10 +29,6 @@ object DialogmeldingServiceSpek : Spek({
         pdlClientId = environment.pdlClientId,
         pdlUrl = environment.pdlUrl,
     )
-    val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
-        database = database,
-        pdlClient = pdlClient,
-    )
     val mqSender = mockk<MQSender>()
 
     val dialogmeldingService = DialogmeldingService(
@@ -42,17 +37,24 @@ object DialogmeldingServiceSpek : Spek({
     )
 
     val arbeidstakerPersonident = Personident("01010112345")
+    val arbeidstakerPersonidentDNR = Personident("41010112345")
     val uuid = UUID.randomUUID()
     val behandlerRef = UUID.randomUUID()
     val behandler = generateBehandler(behandlerRef, PartnerId(1))
     val behandlerRefWithoutOrgnr = UUID.randomUUID()
     val behandlerWithoutOrgnr = generateBehandler(behandlerRefWithoutOrgnr, PartnerId(2), orgnummer = null)
+    val behandlerRefWithDNR = UUID.randomUUID()
+    val behandlerWithDNR = generateBehandler(behandlerRefWithDNR, PartnerId(1), personident = UserConstants.FASTLEGE_DNR)
 
     beforeEachTest {
         database.dropData()
         database.createBehandlerForArbeidstaker(
             behandler = behandler,
             arbeidstakerPersonident = arbeidstakerPersonident,
+        )
+        database.createBehandlerForArbeidstaker(
+            behandler = behandlerWithDNR,
+            arbeidstakerPersonident = arbeidstakerPersonidentDNR,
         )
         database.createBehandlerForArbeidstaker(
             behandler = behandlerWithoutOrgnr,
@@ -81,6 +83,31 @@ object DialogmeldingServiceSpek : Spek({
             verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+        }
+        it("Sends correct message on MQ when foresporsel dialogmote-innkalling for behandler and arbeidstaker with dnr") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val melding = generateDialogmeldingToBehandlerBestillingDTO(
+                behandlerRef = behandlerRefWithDNR,
+                uuid = uuid,
+                arbeidstakerPersonident = arbeidstakerPersonidentDNR,
+            ).toDialogmeldingToBehandlerBestilling(
+                behandler = behandlerWithDNR,
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlDNRRegex()
             val actualFellesformatMessage = messageSlot.captured
 
             assertTrue(

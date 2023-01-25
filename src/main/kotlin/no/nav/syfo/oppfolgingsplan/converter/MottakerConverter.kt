@@ -2,6 +2,8 @@ package no.nav.syfo.oppfolgingsplan.converter
 
 import no.kith.xmlstds.msghead._2006_05_24.ObjectFactory
 import no.kith.xmlstds.msghead._2006_05_24.XMLReceiver
+import no.nav.syfo.domain.Personident
+import no.nav.syfo.util.createXMLIdentForPersonident
 import no.nav.syfo.oppfolgingsplan.domain.RSMottaker
 
 fun createReceiver(
@@ -55,14 +57,9 @@ fun createReceiver(
                         .withMiddleName(rsMottaker.behandler.mellomnavn)
                         .withGivenName(rsMottaker.behandler.fornavn)
                         .withIdent(
-                            factory.createXMLIdent()
-                                .withId(rsMottaker.behandler.fnr)
-                                .withTypeId(
-                                    factory.createXMLCV()
-                                        .withDN("Fødselsnummer Norsk fødselsnummer")
-                                        .withS("2.16.578.1.12.4.1.1.8116")
-                                        .withV("FNR")
-                                )
+                            rsMottaker.behandler.fnr?.let {
+                                factory.createXMLIdentForPersonident(Personident(it))
+                            }
                         )
                         .withIdent(
                             factory.createXMLIdent()

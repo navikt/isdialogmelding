@@ -50,7 +50,7 @@ fun defaultFellesformatDialogmeldingReferatXmlRegex(): Regex {
             "                        <ns2:GivenName>Dana</ns2:GivenName>\n" +
             "                        <ns2:Ident>\n" +
             "                            <ns2:Id>12125678911</ns2:Id>\n" +
-            "                            <ns2:TypeId V=\"FNR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"Fødselsnummer Norsk fødselsnummer\"/>\n" +
+            "                            <ns2:TypeId V=\"FNR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"Fødselsnummer\"/>\n" +
             "                        </ns2:Ident>\n" +
             "                        <ns2:Ident>\n" +
             "                            <ns2:Id>9</ns2:Id>\n" +

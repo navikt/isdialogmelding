@@ -9,3 +9,5 @@ data class Personident(val value: String) {
 }
 
 val elevenDigits = Regex("^\\d{11}\$")
+
+fun Personident.isDNR() = this.value[0].digitToInt() > 3
