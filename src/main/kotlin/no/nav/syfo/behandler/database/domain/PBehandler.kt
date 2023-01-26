@@ -21,6 +21,7 @@ data class PBehandler(
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
     val mottatt: OffsetDateTime,
+    val invalidated: OffsetDateTime? = null,
 )
 
 fun PBehandler.toBehandler(
@@ -37,4 +38,5 @@ fun PBehandler.toBehandler(
     telefon = this.telefon,
     kategori = BehandlerKategori.valueOf(this.kategori),
     mottatt = this.mottatt,
+    invalidated = this.invalidated,
 )

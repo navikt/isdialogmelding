@@ -18,6 +18,7 @@ data class Behandler(
     val kontor: BehandlerKontor,
     val kategori: BehandlerKategori,
     val mottatt: OffsetDateTime,
+    val invalidated: OffsetDateTime? = null,
 )
 
 // TODO: Få med behandlerkategori

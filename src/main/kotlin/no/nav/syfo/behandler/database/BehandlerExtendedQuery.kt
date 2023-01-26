@@ -45,6 +45,7 @@ SELECT b.id behandlerid, b.her_id behandlerherid, b.created_at behandlercreateda
         FROM BEHANDLER AS b
         INNER JOIN BEHANDLER_KONTOR AS k ON (k.id = b.kontor_id)
         WHERE k.dialogmelding_enabled IS NOT NULL 
+        AND b.invalidated IS NULL
         AND (b.fornavn ilike ? OR b.etternavn ilike ? 
             OR position(? IN k.navn)>0 OR position(UPPER(?) IN k.navn)>0 OR position(INITCAP(?) IN k.navn)>0 
             OR k.orgnummer = ?)
