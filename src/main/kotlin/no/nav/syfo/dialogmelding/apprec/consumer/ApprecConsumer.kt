@@ -39,7 +39,7 @@ class ApprecConsumer(
         } catch (exc: Exception) {
             log.error("ApprecConsumer failed, restarting application", exc)
         } finally {
-            // applicationState.alive = false
+            applicationState.alive = false
         }
     }
 
@@ -99,12 +99,15 @@ class ApprecConsumer(
                     feilKode = xmlApprec.error.firstOrNull()?.v,
                     feilTekst = xmlApprec.error.firstOrNull()?.dn,
                 )
-                database.connection.use {
-                    it.createApprec(
+                database.connection.use { connection ->
+                    connection.createApprec(
                         apprec = apprec,
                         bestillingId = pBestilling.id,
                     )
-                    it.commit()
+                    if (apprec.statusKode == ApprecStatus.avvist && apprec.feilKode == "E21") {
+                        connection.invalidateBehandler(pBehandler.behandlerRef)
+                    }
+                    connection.commit()
                 }
             } else {
                 log.info("Received but skipped apprec with id ${xmlApprec.id} because unknown status ${xmlApprec.status.v} or unknown dialogmelding $bestillingId")

@@ -4,6 +4,7 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.database.*
+import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.toDialogmeldingToBehandlerBestilling
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
 import no.nav.syfo.dialogmelding.apprec.database.getApprec
@@ -42,7 +43,8 @@ class ApprecConsumerSpek : Spek({
                 it("Prosesserer innkommet melding (melding ok)") {
                     val apprecId = UUID.randomUUID()
                     val dialogmeldingBestillingUuid = UUID.randomUUID()
-                    val bestillingId = lagDialogmeldingBestilling(dialogmeldingBestillingUuid)
+                    val behandler = lagBehandler()
+                    val bestillingId = lagDialogmeldingBestilling(dialogmeldingBestillingUuid, behandler)
                     val apprecXml =
                         getFileAsString("src/test/resources/apprecOK.xml")
                             .replace("FiktivTestdata0001", apprecId.toString())
@@ -65,7 +67,7 @@ class ApprecConsumerSpek : Spek({
                 it("Prosesserer innkommet melding (melding ok, med duplikat)") {
                     val apprecId = UUID.randomUUID()
                     val dialogmeldingBestillingUuid = UUID.randomUUID()
-                    lagDialogmeldingBestilling(dialogmeldingBestillingUuid)
+                    lagDialogmeldingBestillingOgBehandler(dialogmeldingBestillingUuid)
                     val apprecXml =
                         getFileAsString("src/test/resources/apprecOK.xml")
                             .replace("FiktivTestdata0001", apprecId.toString())
@@ -87,7 +89,7 @@ class ApprecConsumerSpek : Spek({
                 it("Prosesserer innkommet melding (melding ok, men ikke knyttet til kjent dialogmelding)") {
                     val apprecId = UUID.randomUUID()
                     val dialogmeldingBestillingUuid = UUID.randomUUID()
-                    lagDialogmeldingBestilling(dialogmeldingBestillingUuid)
+                    lagDialogmeldingBestillingOgBehandler(dialogmeldingBestillingUuid)
                     val ukjentDialogmeldingBestillingUuid = UUID.randomUUID()
                     val apprecXml =
                         getFileAsString("src/test/resources/apprecOK.xml")
@@ -105,7 +107,8 @@ class ApprecConsumerSpek : Spek({
                 it("Prosesserer innkommet melding (melding avvist)") {
                     val apprecId = UUID.randomUUID()
                     val dialogmeldingBestillingUuid = UUID.randomUUID()
-                    val bestillingId = lagDialogmeldingBestilling(dialogmeldingBestillingUuid)
+                    val behandler = lagBehandler()
+                    val bestillingId = lagDialogmeldingBestilling(dialogmeldingBestillingUuid, behandler)
                     val apprecXml =
                         getFileAsString("src/test/resources/apprecError.xml")
                             .replace("FiktivTestdata0001", apprecId.toString())
@@ -124,6 +127,36 @@ class ApprecConsumerSpek : Spek({
                     pApprec.statusTekst shouldBeEqualTo "Avvist"
                     pApprec.feilKode shouldBeEqualTo "X99"
                     pApprec.feilTekst shouldBeEqualTo "Annen feil"
+
+                    val oppdatertBehandler = database.getBehandlerByBehandlerRef(behandler.behandlerRef)!!
+                    oppdatertBehandler.invalidated shouldBe null
+                }
+                it("Prosesserer innkommet melding (melding avvist, ukjent mottaker)") {
+                    val apprecId = UUID.randomUUID()
+                    val dialogmeldingBestillingUuid = UUID.randomUUID()
+                    val behandler = lagBehandler()
+                    val bestillingId = lagDialogmeldingBestilling(dialogmeldingBestillingUuid, behandler)
+                    val apprecXml =
+                        getFileAsString("src/test/resources/apprecErrorUkjentMottaker.xml")
+                            .replace("FiktivTestdata0001", apprecId.toString())
+                            .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
+                    every { incomingMessage.text } returns(apprecXml)
+                    runBlocking {
+                        apprecConsumer.processApprecMessage(incomingMessage)
+                    }
+
+                    val pApprec = database.getApprec(apprecId)
+
+                    pApprec shouldNotBe null
+                    pApprec!!.uuid shouldBeEqualTo apprecId
+                    pApprec.bestillingId shouldBeEqualTo bestillingId
+                    pApprec.statusKode shouldBeEqualTo "2"
+                    pApprec.statusTekst shouldBeEqualTo "Avvist"
+                    pApprec.feilKode shouldBeEqualTo "E21"
+                    pApprec.feilTekst shouldBeEqualTo "Mottaker finnes ikke"
+
+                    val oppdatertBehandler = database.getBehandlerByBehandlerRef(behandler.behandlerRef)!!
+                    oppdatertBehandler.invalidated shouldNotBe null
                 }
                 it("Prosesserer innkommet feilformattert melding") {
                     val apprecXml = "Ikke noen apprec"
@@ -138,24 +171,32 @@ class ApprecConsumerSpek : Spek({
     }
 })
 
-fun lagDialogmeldingBestilling(dialogmeldingBestillingUuid: UUID): Int {
+fun lagDialogmeldingBestillingOgBehandler(dialogmeldingBestillingUuid: UUID): Int {
+    val behandler = lagBehandler()
+    return lagDialogmeldingBestilling(dialogmeldingBestillingUuid, behandler)
+}
+
+fun lagBehandler(): Behandler {
     val random = Random()
     val behandlerRef = UUID.randomUUID()
     val partnerId = PartnerId(random.nextInt())
-    val behandler = generateBehandler(behandlerRef, partnerId)
-    val behandlerId = database.connection.use { connection ->
-        val kontorId = connection.createBehandlerKontor(behandler.kontor)
-        connection.createBehandler(behandler, kontorId).id.also {
-            connection.commit()
+    return generateBehandler(behandlerRef, partnerId).also { behandler ->
+        database.connection.use { connection ->
+            val kontorId = connection.createBehandlerKontor(behandler.kontor)
+            connection.createBehandler(behandler, kontorId).id.also {
+                connection.commit()
+            }
         }
     }
+}
 
+fun lagDialogmeldingBestilling(dialogmeldingBestillingUuid: UUID, behandler: Behandler): Int {
     val dialogmeldingToBehandlerBestillingDTO = generateDialogmeldingToBehandlerBestillingDTO(
         uuid = dialogmeldingBestillingUuid,
-        behandlerRef = behandlerRef,
+        behandlerRef = behandler.behandlerRef,
     )
     val dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(behandler)
-
+    val behandlerId = database.getBehandlerByBehandlerRef(behandler.behandlerRef)!!.id
     val bestillingId = database.connection.use { connection ->
         connection.createBehandlerDialogmeldingBestilling(
             dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestilling,
