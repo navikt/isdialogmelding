@@ -213,17 +213,21 @@ const val queryInvalidateBehandler =
     """
 
 fun DatabaseInterface.invalidateBehandler(behandlerRef: UUID) {
-    val now = OffsetDateTime.now()
     this.connection.use { connection ->
-        connection.prepareStatement(queryInvalidateBehandler)
-            .use {
-                it.setObject(1, now)
-                it.setObject(2, now)
-                it.setString(3, behandlerRef.toString())
-                it.executeUpdate()
-            }
+        connection.invalidateBehandler(behandlerRef)
         connection.commit()
     }
+}
+
+fun Connection.invalidateBehandler(behandlerRef: UUID) {
+    val now = OffsetDateTime.now()
+    this.prepareStatement(queryInvalidateBehandler)
+        .use {
+            it.setObject(1, now)
+            it.setObject(2, now)
+            it.setString(3, behandlerRef.toString())
+            it.executeUpdate()
+        }
 }
 
 fun ResultSet.toPBehandler(): PBehandler =
