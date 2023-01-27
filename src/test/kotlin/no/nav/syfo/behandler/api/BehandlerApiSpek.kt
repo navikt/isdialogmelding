@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import no.nav.syfo.behandler.database.getBehandlerByArbeidstaker
-import no.nav.syfo.behandler.database.getBehandlerKontorById
+import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
@@ -17,6 +16,7 @@ import no.nav.syfo.util.configuredJacksonMapper
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import java.util.UUID
 
 class BehandlerApiSpek : Spek({
     val objectMapper: ObjectMapper = configuredJacksonMapper()
@@ -95,6 +95,31 @@ class BehandlerApiSpek : Spek({
                             val behandlerList =
                                 objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
                             behandlerList.size shouldBeEqualTo 1
+                        }
+                    }
+                    it("search should exclude invalidated Behandler") {
+                        generateFastlegeResponse()
+                        val behandlerRef = with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                            val behandlerList = objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
+                            UUID.fromString(behandlerList[0].behandlerRef)
+                        }
+                        database.invalidateBehandler(behandlerRef)
+                        with(
+                            handleRequest(HttpMethod.Get, searchUrl) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader("searchstring", "Scully")
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                            val behandlerList = objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 0
                         }
                     }
                     it("search should remove special characters") {

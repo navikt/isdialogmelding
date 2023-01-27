@@ -29,6 +29,7 @@ fun Connection.createBehandler(
         it.setObject(11, now)
         it.setObject(12, now)
         it.setObject(13, behandler.mottatt)
+        it.setNull(14, Types.TIMESTAMP_WITH_TIMEZONE)
         it.executeQuery().toList { toPBehandler() }
     }
 
@@ -55,8 +56,9 @@ const val queryCreateBehandler =
             telefon,
             created_at,
             updated_at,
-            mottatt
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            mottatt,
+            invalidated
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             RETURNING
             id,
             behandler_ref,
@@ -71,7 +73,8 @@ const val queryCreateBehandler =
             telefon,
             created_at,
             updated_at,
-            mottatt
+            mottatt,
+            invalidated
     """
 
 const val queryGetBehandlerByBehandlerPersonidentAndPartnerId =
@@ -201,6 +204,28 @@ fun DatabaseInterface.updateBehandlerIdenter(behandlerRef: UUID, identer: Map<Be
     }
 }
 
+const val queryInvalidateBehandler =
+    """
+        UPDATE BEHANDLER
+        SET invalidated=?,
+        updated_at=?
+        WHERE behandler_ref=?
+    """
+
+fun DatabaseInterface.invalidateBehandler(behandlerRef: UUID) {
+    val now = OffsetDateTime.now()
+    this.connection.use { connection ->
+        connection.prepareStatement(queryInvalidateBehandler)
+            .use {
+                it.setObject(1, now)
+                it.setObject(2, now)
+                it.setString(3, behandlerRef.toString())
+                it.executeUpdate()
+            }
+        connection.commit()
+    }
+}
+
 fun ResultSet.toPBehandler(): PBehandler =
     PBehandler(
         id = getInt("id"),
@@ -217,4 +242,5 @@ fun ResultSet.toPBehandler(): PBehandler =
         createdAt = getObject("created_at", OffsetDateTime::class.java),
         updatedAt = getObject("updated_at", OffsetDateTime::class.java),
         mottatt = getObject("mottatt", OffsetDateTime::class.java),
+        invalidated = getObject("invalidated", OffsetDateTime::class.java),
     )
