@@ -1,26 +1,18 @@
 package no.nav.syfo.oppfolgingsplan
 
-import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.api.person.RSOppfolgingsplan
+import no.nav.syfo.behandler.domain.DialogmeldingKode
+import no.nav.syfo.behandler.domain.DialogmeldingType
+import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.DialogmeldingToBehandlerBestillingDTO
 import no.nav.syfo.domain.Personident
-import no.nav.syfo.fellesformat.Fellesformat
 import no.nav.syfo.metric.COUNT_SEND_OPPFOLGINGSPLAN_FAILED
 import no.nav.syfo.metric.COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS
-import no.nav.syfo.oppfolgingsplan.converter.createFellesformat
-import no.nav.syfo.oppfolgingsplan.domain.RSHodemelding
-import no.nav.syfo.oppfolgingsplan.domain.createRSHodemelding
 import no.nav.syfo.oppfolgingsplan.exception.FastlegeNotFoundException
-import no.nav.syfo.util.JAXB
-import no.nav.xml.eiff._2.XMLEIFellesformat
-import org.slf4j.LoggerFactory
 import java.util.UUID
 
-private val log = LoggerFactory.getLogger("no.nav.syfo.oppfolgingsplan")
-
 class OppfolgingsplanService(
-    val mqSender: MQSender,
     val behandlerService: BehandlerService,
     val dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
 ) {
@@ -42,13 +34,11 @@ class OppfolgingsplanService(
                 behandlerRef = fastlegeBehandler.behandlerRef,
                 personident = arbeidstakerIdent,
             )
-
-            val melding = createRSHodemelding(
-                behandler = fastlegeBehandler,
-                arbeidstaker = arbeidstaker,
+            lagreDialogmeldingBestilling(
                 oppfolgingsplan = oppfolgingsplan,
+                behandlerRef = fastlegeBehandler.behandlerRef,
+                arbeidstakerPersonIdent = arbeidstaker.arbeidstakerPersonident,
             )
-            sendMelding(melding)
             COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS.increment()
         } catch (exc: Exception) {
             COUNT_SEND_OPPFOLGINGSPLAN_FAILED.increment()
@@ -56,17 +46,24 @@ class OppfolgingsplanService(
         }
     }
 
-    fun sendMelding(melding: RSHodemelding) {
-        val msgId = UUID.randomUUID().toString()
-        log.info("Sending oppfølgingsplan $msgId to lege with partnerId: ${melding.meldingInfo?.mottaker?.partnerId}")
-
-        val fellesformat: Fellesformat = opprettDialogmelding(msgId, melding)
-
-        mqSender.sendMessageToEmottak(fellesformat.message!!)
-    }
-
-    private fun opprettDialogmelding(msgId: String, hodemelding: RSHodemelding): Fellesformat {
-        val xmleiFellesformat: XMLEIFellesformat = createFellesformat(msgId, hodemelding)
-        return Fellesformat(xmleiFellesformat, JAXB::marshallDialogmelding1_0)
+    fun lagreDialogmeldingBestilling(
+        oppfolgingsplan: RSOppfolgingsplan,
+        behandlerRef: UUID,
+        arbeidstakerPersonIdent: Personident,
+    ) {
+        val dialogmeldingToBehandlerBestillingDTO = DialogmeldingToBehandlerBestillingDTO(
+            behandlerRef = behandlerRef.toString(),
+            personIdent = arbeidstakerPersonIdent.value,
+            dialogmeldingUuid = UUID.randomUUID().toString(),
+            dialogmeldingRefParent = null, // brukes ikke for oppfølgingsplan
+            dialogmeldingRefConversation = UUID.randomUUID().toString(), // brukes ikke for oppfølgingsplan
+            dialogmeldingType = DialogmeldingType.OPPFOLGINGSPLAN.name,
+            dialogmeldingKode = DialogmeldingKode.INNKALLING.value, // brukes ikke for oppfølgingsplan
+            dialogmeldingTekst = null, // brukes ikke for oppfølgingsplan
+            dialogmeldingVedlegg = oppfolgingsplan.oppfolgingsplanPdf,
+        )
+        dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(
+            dialogmeldingToBehandlerBestillingDTO
+        )
     }
 }

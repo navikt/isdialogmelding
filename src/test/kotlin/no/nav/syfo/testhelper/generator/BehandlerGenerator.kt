@@ -10,6 +10,7 @@ fun generateBehandler(
     behandlerRef: UUID,
     partnerId: PartnerId,
     dialogmeldingEnabled: Boolean = true,
+    kontornavn: String? = null,
     personident: Personident = UserConstants.FASTLEGE_FNR,
     herId: Int? = 77,
     hprId: Int = 9,
@@ -19,7 +20,7 @@ fun generateBehandler(
     kontor = BehandlerKontor(
         partnerId = partnerId,
         herId = 99,
-        navn = null,
+        navn = kontornavn,
         adresse = "adresse",
         postnummer = "1234",
         poststed = "poststed",

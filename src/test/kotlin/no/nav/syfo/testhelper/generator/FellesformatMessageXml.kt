@@ -28,17 +28,17 @@ fun defaultFellesformatMessageXmlRegex(): Regex {
             "                <ns2:Organisation>\n" +
             "                    <ns2:OrganisationName>navn</ns2:OrganisationName>\n" +
             "                    <ns2:Ident>\n" +
-            "                        <ns2:Id>partnerId</ns2:Id>\n" +
+            "                        <ns2:Id>99</ns2:Id>\n" +
             "                        <ns2:TypeId V=\"HER\" S=\"2.16.578.1.12.4.1.1.9051\" DN=\"Identifikator fra Helsetjenesteenhetsregisteret \\(HER-id\\)\"/>\n" +
             "                    </ns2:Ident>\n" +
             "                    <ns2:Ident>\n" +
-            "                        <ns2:Id>orgnummer</ns2:Id>\n" +
+            "                        <ns2:Id>123456789</ns2:Id>\n" +
             "                        <ns2:TypeId V=\"ENH\" S=\"2.16.578.1.12.4.1.1.9051\" DN=\"Organisasjonsnummeret i Enhetsregisteret\"/>\n" +
             "                    </ns2:Ident>\n" +
             "                    <ns2:Address>\n" +
             "                        <ns2:Type V=\"RES\" DN=\"Besøksadresse\"/>\n" +
             "                        <ns2:StreetAdr>adresse</ns2:StreetAdr>\n" +
-            "                        <ns2:PostalCode>postnummer</ns2:PostalCode>\n" +
+            "                        <ns2:PostalCode>1234</ns2:PostalCode>\n" +
             "                        <ns2:City>poststed</ns2:City>\n" +
             "                    </ns2:Address>\n" +
             "                    <ns2:HealthcareProfessional>\n" +
@@ -47,20 +47,24 @@ fun defaultFellesformatMessageXmlRegex(): Regex {
             "                        <ns2:MiddleName>Katherine</ns2:MiddleName>\n" +
             "                        <ns2:GivenName>Dana</ns2:GivenName>\n" +
             "                        <ns2:Ident>\n" +
-            "                            <ns2:Id>10101012345</ns2:Id>\n" +
+            "                            <ns2:Id>12125678911</ns2:Id>\n" +
             "                            <ns2:TypeId V=\"FNR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"Fødselsnummer\"/>\n" +
             "                        </ns2:Ident>\n" +
             "                        <ns2:Ident>\n" +
-            "                            <ns2:Id>1</ns2:Id>\n" +
+            "                            <ns2:Id>9</ns2:Id>\n" +
             "                            <ns2:TypeId V=\"HPR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"HPR-nummer\"/>\n" +
+            "                        </ns2:Ident>\n" +
+            "                        <ns2:Ident>\n" +
+            "                            <ns2:Id>77</ns2:Id>\n" +
+            "                            <ns2:TypeId V=\"HER\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"Identifikator fra Helsetjenesteenhetsregisteret\"/>\n" +
             "                        </ns2:Ident>\n" +
             "                    </ns2:HealthcareProfessional>\n" +
             "                </ns2:Organisation>\n" +
             "            </ns2:Receiver>\n" +
             "            <ns2:Patient>\n" +
-            "                <ns2:FamilyName>Innbygger</ns2:FamilyName>\n" +
-            "                <ns2:MiddleName>mellomnavn</ns2:MiddleName>\n" +
-            "                <ns2:GivenName>Idun</ns2:GivenName>\n" +
+            "                <ns2:FamilyName>Etternavn</ns2:FamilyName>\n" +
+            "                <ns2:MiddleName>Mellomnavn</ns2:MiddleName>\n" +
+            "                <ns2:GivenName>Fornavn</ns2:GivenName>\n" +
             "                <ns2:Ident>\n" +
             "                    <ns2:Id>01010112345</ns2:Id>\n" +
             "                    <ns2:TypeId V=\"FNR\" S=\"2.16.578.1.12.4.1.1.8116\" DN=\"Fødselsnummer\"/>\n" +
@@ -100,7 +104,7 @@ fun defaultFellesformatMessageXmlRegex(): Regex {
             "            </ns2:RefDoc>\n" +
             "        </ns2:Document>\n" +
             "    </ns2:MsgHead>\n" +
-            "    <MottakenhetBlokk partnerReferanse=\"herId\" ebRole=\"Saksbehandler\" ebService=\"Oppfolgingsplan\" ebAction=\"Plan\"/>\n" +
+            "    <MottakenhetBlokk partnerReferanse=\"1\" ebRole=\"Saksbehandler\" ebService=\"Oppfolgingsplan\" ebAction=\"Plan\"/>\n" +
             "</EI_fellesformat>\n"
     )
 }

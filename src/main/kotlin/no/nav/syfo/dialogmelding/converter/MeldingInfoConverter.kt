@@ -13,8 +13,18 @@ fun createMsgInfo(
     return factory.createXMLMsgInfo()
         .withType(
             factory.createXMLCS()
-                .withDN(if (melding.type == DialogmeldingType.DIALOG_NOTAT) "Notat" else "Forespørsel")
-                .withV(melding.type.name)
+                .withDN(
+                    if (
+                        melding.type == DialogmeldingType.DIALOG_NOTAT ||
+                        melding.type == DialogmeldingType.OPPFOLGINGSPLAN
+                    ) "Notat" else "Forespørsel"
+                )
+                .withV(
+                    if (
+                        melding.type == DialogmeldingType.DIALOG_NOTAT ||
+                        melding.type == DialogmeldingType.OPPFOLGINGSPLAN
+                    ) DialogmeldingType.DIALOG_NOTAT.name else DialogmeldingType.DIALOG_FORESPORSEL.name
+                )
         )
         .withMIGversion("v1.2 2006-05-24")
         .withGenDate(LocalDateTime.now())
@@ -23,12 +33,15 @@ fun createMsgInfo(
             factory.createXMLCS()
                 .withDN("Ja")
                 .withV("J")
-        )
-        .withConversationRef(
-            factory.createXMLConversationRef()
-                .withRefToConversation(melding.conversationUuid.toString())
-                .withRefToParent(melding.parentRef ?: melding.conversationUuid.toString())
-        )
+        ).also {
+            if (melding.type != DialogmeldingType.OPPFOLGINGSPLAN) {
+                it.withConversationRef(
+                    factory.createXMLConversationRef()
+                        .withRefToConversation(melding.conversationUuid.toString())
+                        .withRefToParent(melding.parentRef ?: melding.conversationUuid.toString())
+                )
+            }
+        }
         .withSender(createSender())
         .withReceiver(createReceiver(melding))
         .withPatient(createPasient(arbeidstaker))

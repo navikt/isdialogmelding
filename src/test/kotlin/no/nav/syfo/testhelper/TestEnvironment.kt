@@ -25,7 +25,7 @@ fun testEnvironment(
     aapSoknadApiClientId = testAapSoknadApiClientId,
     personAPIAuthorizedConsumerClientIdList = listOf(testAapSoknadApiClientId),
     syfooppfolgingsplanserviceClientId = testSyfooppfolgingsplanserviceClientId,
-    oppfolgingsplanAPIAuthorizedConsumerClientIdList = listOf(testAapSoknadApiClientId),
+    oppfolgingsplanAPIAuthorizedConsumerClientIdList = listOf(testSyfooppfolgingsplanserviceClientId),
     electorPath = "/tmp",
     kafka = ApplicationEnvironmentKafka(
         aivenBootstrapServers = kafkaBootstrapServers,

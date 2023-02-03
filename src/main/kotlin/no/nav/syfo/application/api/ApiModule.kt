@@ -7,7 +7,6 @@ import no.nav.syfo.api.registerOppfolgingsplanApi
 import no.nav.syfo.application.*
 import no.nav.syfo.application.api.authentication.*
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.api.person.registerPersonBehandlerApi
@@ -21,7 +20,6 @@ fun Application.apiModule(
     applicationState: ApplicationState,
     database: DatabaseInterface,
     environment: Environment,
-    mqSender: MQSender,
     wellKnownInternalAzureAD: WellKnown,
     wellKnownInternalIdportenTokenX: WellKnown,
     azureAdClient: AzureAdClient,
@@ -53,7 +51,6 @@ fun Application.apiModule(
     )
 
     val oppfolgingsplanService = OppfolgingsplanService(
-        mqSender = mqSender,
         behandlerService = behandlerService,
         dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
     )

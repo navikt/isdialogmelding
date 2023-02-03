@@ -6,18 +6,19 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import no.nav.syfo.api.sendOppfolgingsplanPath
 import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.behandler.database.getDialogmeldingToBehandlerBestillingNotSendt
+import no.nav.syfo.behandler.domain.DialogmeldingType
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.configuredJacksonMapper
-import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
 class OppfolgingsplanSystemApiSpek : Spek({
     val objectMapper: ObjectMapper = configuredJacksonMapper()
-    val mqSender = mockk<MQSender>()
-    justRun { mqSender.sendMessageToEmottak(any()) }
+    val mqSender = mockk<MQSender>(relaxed = true)
 
     with(TestApplicationEngine()) {
         start()
@@ -31,30 +32,32 @@ class OppfolgingsplanSystemApiSpek : Spek({
         )
         application.testApiModule(
             externalMockEnvironment = externalMockEnvironment,
-            mqSender = mqSender,
         )
 
         afterEachTest {
             database.dropData()
-            clearMocks(mqSender)
-            justRun { mqSender.sendMessageToEmottak(any()) }
         }
 
         describe(OppfolgingsplanSystemApiSpek::class.java.simpleName) {
             describe("Send oppfolgingsplan for person") {
                 val url = sendOppfolgingsplanPath
                 describe("Happy path") {
-                    it("Should send oppfolgingsplan") {
-
+                    it("Skal lagre bestilling for oppfølgingsplan (men ikke sende)") {
+                        database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
+                        val rsOppfolgingsplan = generateRSOppfolgingsplan()
                         with(
                             handleRequest(HttpMethod.Post, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                                setBody(objectMapper.writeValueAsString(generateRSOppfolgingsplan()))
+                                setBody(objectMapper.writeValueAsString(rsOppfolgingsplan))
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
-                            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            val storedBestilling = database.getDialogmeldingToBehandlerBestillingNotSendt().first()
+                            storedBestilling.type shouldBeEqualTo DialogmeldingType.OPPFOLGINGSPLAN.name
+                            storedBestilling.arbeidstakerPersonident shouldBeEqualTo rsOppfolgingsplan.sykmeldtFnr
+                            storedBestilling.sendt shouldBe null
                         }
                     }
                 }
@@ -68,7 +71,7 @@ class OppfolgingsplanSystemApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.NotFound
-                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
                         }
                     }
 
@@ -80,7 +83,7 @@ class OppfolgingsplanSystemApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.Unauthorized
-                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
                         }
                     }
                     it("should return status BadRequest if  no ClientId is supplied") {
@@ -97,7 +100,7 @@ class OppfolgingsplanSystemApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.BadRequest
-                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
                         }
                     }
 
@@ -116,7 +119,7 @@ class OppfolgingsplanSystemApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.Forbidden
-                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
                         }
                     }
                 }

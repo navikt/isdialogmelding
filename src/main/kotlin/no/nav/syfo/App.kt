@@ -88,7 +88,6 @@ fun main() {
                 applicationState = applicationState,
                 database = applicationDatabase,
                 environment = environment,
-                mqSender = mqSender,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
                 wellKnownInternalIdportenTokenX = wellKnownInternalIdportenTokenX,
                 azureAdClient = azureAdClient,
@@ -113,7 +112,6 @@ fun main() {
         cronjobModule(
             applicationState = applicationState,
             environment = environment,
-            mqSender = mqSender,
             dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
             dialogmeldingService = dialogmeldingService,
         )
