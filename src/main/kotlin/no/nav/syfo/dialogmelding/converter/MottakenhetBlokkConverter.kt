@@ -12,6 +12,18 @@ fun createMottakenhetBlokk(
     return factory.createXMLMottakenhetBlokk()
         .withPartnerReferanse(melding.behandler.kontor.partnerId.toString())
         .withEbRole("Saksbehandler")
-        .withEbService(if (melding.type == DialogmeldingType.DIALOG_NOTAT) "HenvendelseFraSaksbehandler" else "DialogmoteInnkalling")
-        .withEbAction(if (melding.type == DialogmeldingType.DIALOG_NOTAT) "Henvendelse" else "MoteInnkalling")
+        .withEbService(
+            when (melding.type) {
+                DialogmeldingType.DIALOG_NOTAT -> "HenvendelseFraSaksbehandler"
+                DialogmeldingType.OPPFOLGINGSPLAN -> "Oppfolgingsplan"
+                else -> "DialogmoteInnkalling"
+            }
+        )
+        .withEbAction(
+            when (melding.type) {
+                DialogmeldingType.DIALOG_NOTAT -> "Henvendelse"
+                DialogmeldingType.OPPFOLGINGSPLAN -> "Plan"
+                else -> "MoteInnkalling"
+            }
+        )
 }

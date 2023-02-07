@@ -1,9 +1,7 @@
 package no.nav.syfo.testhelper
 
 import io.ktor.server.application.*
-import io.mockk.mockk
 import no.nav.syfo.application.api.apiModule
-import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.fastlege.FastlegeClient
@@ -13,7 +11,6 @@ import no.nav.syfo.client.pdl.PdlClient
 
 fun Application.testApiModule(
     externalMockEnvironment: ExternalMockEnvironment,
-    mqSender: MQSender = mockk(relaxed = true)
 ) {
     val azureAdClient = AzureAdClient(
         azureAppClientId = externalMockEnvironment.environment.aadAppClient,
@@ -24,7 +21,6 @@ fun Application.testApiModule(
         applicationState = externalMockEnvironment.applicationState,
         database = externalMockEnvironment.database,
         environment = externalMockEnvironment.environment,
-        mqSender = mqSender,
         wellKnownInternalAzureAD = externalMockEnvironment.wellKnownInternalAzureAD,
         wellKnownInternalIdportenTokenX = externalMockEnvironment.wellKnownInternalIdportenTokenX,
         azureAdClient = azureAdClient,

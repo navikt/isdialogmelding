@@ -17,7 +17,7 @@ class DialogmeldingService(
     val mqSender: MQSender,
 ) {
     suspend fun sendMelding(melding: DialogmeldingToBehandlerBestilling) {
-        log.info("Sending dialogmelding to lege with partnerId: ${melding.behandler.kontor.partnerId}")
+        log.info("Sending dialogmelding med type ${melding.type} to behandler with partnerId: ${melding.behandler.kontor.partnerId}")
         val arbeidstaker = getArbeidstaker(melding.arbeidstakerPersonident)
         val fellesformat: Fellesformat = opprettDialogmelding(melding, arbeidstaker)
         mqSender.sendMessageToEmottak(fellesformat.message!!)

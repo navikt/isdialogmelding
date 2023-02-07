@@ -5,18 +5,20 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.*
 import no.nav.syfo.application.mq.MQSender
+import no.nav.syfo.behandler.database.getDialogmeldingToBehandlerBestillingNotSendt
+import no.nav.syfo.behandler.domain.DialogmeldingType
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.configuredJacksonMapper
+import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
 class PersonOppfolgingsplanApiSpek : Spek({
     val objectMapper: ObjectMapper = configuredJacksonMapper()
-    val mqSender = mockk<MQSender>()
-    justRun { mqSender.sendMessageToEmottak(any()) }
+    val mqSender = mockk<MQSender>(relaxed = true)
 
     with(TestApplicationEngine()) {
         start()
@@ -25,55 +27,63 @@ class PersonOppfolgingsplanApiSpek : Spek({
         val database = externalMockEnvironment.database
         application.testApiModule(
             externalMockEnvironment = externalMockEnvironment,
-            mqSender = mqSender,
         )
 
         afterEachTest {
             database.dropData()
-            clearMocks(mqSender)
-            justRun { mqSender.sendMessageToEmottak(any()) }
         }
 
         describe(PersonOppfolgingsplanApiSpek::class.java.simpleName) {
             describe("Send oppfolgingsplan for person") {
                 val url = "$personApiOppfolgingsplanPath"
                 describe("Happy path") {
-                    it("Should send oppfolgingsplan") {
+                    it("Skal lagre bestilling for oppfølgingsplan") {
                         val validToken = generateJWTIdporten(
                             audience = externalMockEnvironment.environment.idportenTokenXClientId,
-                            clientId = externalMockEnvironment.environment.aapSoknadApiClientId,
+                            clientId = externalMockEnvironment.environment.syfooppfolgingsplanserviceClientId,
                             issuer = externalMockEnvironment.wellKnownInternalIdportenTokenX.issuer,
                             pid = UserConstants.ARBEIDSTAKER_FNR.value,
                         )
-
+                        val rsOppfolgingsplan = generateRSOppfolgingsplan()
+                        database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
                         with(
                             handleRequest(HttpMethod.Post, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                                setBody(objectMapper.writeValueAsString(generateRSOppfolgingsplan()))
+                                setBody(objectMapper.writeValueAsString(rsOppfolgingsplan))
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
-                            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            val storedBestilling = database.getDialogmeldingToBehandlerBestillingNotSendt().first()
+                            storedBestilling.type shouldBeEqualTo DialogmeldingType.OPPFOLGINGSPLAN.name
+                            storedBestilling.arbeidstakerPersonident shouldBeEqualTo UserConstants.ARBEIDSTAKER_FNR.value
+                            storedBestilling.sendt shouldBe null
                         }
                     }
-                    it("Should send oppfolgingsplan for narmeste leder") {
+                    it("Skal lagre bestilling for innsendt oppfølgingsplan fra nærmeste leder") {
                         val validToken = generateJWTIdporten(
                             audience = externalMockEnvironment.environment.idportenTokenXClientId,
-                            clientId = externalMockEnvironment.environment.aapSoknadApiClientId,
+                            clientId = externalMockEnvironment.environment.syfooppfolgingsplanserviceClientId,
                             issuer = externalMockEnvironment.wellKnownInternalIdportenTokenX.issuer,
                             pid = UserConstants.NARMESTELEDER_FNR.value,
                         )
+                        val rsOppfolgingsplan = generateRSOppfolgingsplan()
+                        database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
 
                         with(
                             handleRequest(HttpMethod.Post, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                                setBody(objectMapper.writeValueAsString(generateRSOppfolgingsplan()))
+                                setBody(objectMapper.writeValueAsString(rsOppfolgingsplan))
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
-                            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            val storedBestilling = database.getDialogmeldingToBehandlerBestillingNotSendt().first()
+                            storedBestilling.type shouldBeEqualTo DialogmeldingType.OPPFOLGINGSPLAN.name
+                            storedBestilling.arbeidstakerPersonident shouldBeEqualTo rsOppfolgingsplan.sykmeldtFnr
+                            storedBestilling.sendt shouldBe null
                         }
                     }
                 }
@@ -81,7 +91,7 @@ class PersonOppfolgingsplanApiSpek : Spek({
                     it("should return error for arbeidstaker with no fastlege") {
                         val validToken = generateJWTIdporten(
                             audience = externalMockEnvironment.environment.idportenTokenXClientId,
-                            clientId = externalMockEnvironment.environment.aapSoknadApiClientId,
+                            clientId = externalMockEnvironment.environment.syfooppfolgingsplanserviceClientId,
                             issuer = externalMockEnvironment.wellKnownInternalIdportenTokenX.issuer,
                             pid = UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR.value,
                         )
@@ -93,7 +103,7 @@ class PersonOppfolgingsplanApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.NotFound
-                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
                         }
                     }
 
@@ -105,14 +115,14 @@ class PersonOppfolgingsplanApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.Unauthorized
-                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
                         }
                     }
 
                     it("should return status BadRequest if no PID is supplied") {
                         val tokenNoPid = generateJWTIdporten(
                             audience = externalMockEnvironment.environment.idportenTokenXClientId,
-                            clientId = externalMockEnvironment.environment.aapSoknadApiClientId,
+                            clientId = externalMockEnvironment.environment.syfooppfolgingsplanserviceClientId,
                             issuer = externalMockEnvironment.wellKnownInternalIdportenTokenX.issuer,
                             pid = null,
                         )
@@ -125,14 +135,14 @@ class PersonOppfolgingsplanApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.BadRequest
-                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
                         }
                     }
 
                     it("should return status BadRequest if invalid Personident in PID is supplied") {
                         val tokenInvalidPid = generateJWTIdporten(
                             audience = externalMockEnvironment.environment.idportenTokenXClientId,
-                            clientId = externalMockEnvironment.environment.aapSoknadApiClientId,
+                            clientId = externalMockEnvironment.environment.syfooppfolgingsplanserviceClientId,
                             issuer = externalMockEnvironment.wellKnownInternalIdportenTokenX.issuer,
                             pid = UserConstants.ARBEIDSTAKER_FNR.value.drop(1),
                         )
@@ -145,7 +155,7 @@ class PersonOppfolgingsplanApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.BadRequest
-                            verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
+                            database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
                         }
                     }
 

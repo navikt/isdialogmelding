@@ -11,10 +11,10 @@ import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.testhelper.*
-import no.nav.syfo.testhelper.generator.generateBehandler
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingDTO
+import no.nav.syfo.testhelper.generator.*
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeEqualTo
+import org.junit.Assert
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.util.Random
@@ -57,7 +57,6 @@ class DialogmeldingCronjobSpek : Spek({
             val dialogmeldingSendCronjob = DialogmeldingSendCronjob(
                 dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                 dialogmeldingService = dialogmeldingService,
-                mqSender = mqSenderMock,
             )
 
             beforeEachTest {
@@ -150,6 +149,61 @@ class DialogmeldingCronjobSpek : Spek({
                         result.updated shouldBeEqualTo 1
                     }
                     verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
+
+                    val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
+                        connection.getBestillinger(
+                            uuid = dialogmeldingBestillingUuid,
+                        )
+                    }
+                    pBehandlerDialogmeldingBestillingAfter!!.sendt shouldNotBeEqualTo null
+                    pBehandlerDialogmeldingBestillingAfter.sendtTries shouldBeEqualTo 1
+                }
+                it("Sender bestilt oppfølgingsplan") {
+                    clearAllMocks()
+                    val messageSlot = slot<String>()
+                    justRun { mqSenderMock.sendMessageToEmottak(capture(messageSlot)) }
+                    val behandlerRef = UUID.randomUUID()
+                    val partnerId = PartnerId(1)
+                    val behandler = generateBehandler(
+                        behandlerRef = behandlerRef,
+                        partnerId = partnerId,
+                        kontornavn = "navn",
+                    )
+                    database.createBehandlerForArbeidstaker(
+                        behandler = behandler,
+                        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR_OPPFOLGINGSPLAN,
+                    )
+
+                    val dialogmeldingBestillingUuid = UUID.randomUUID()
+
+                    val dialogmeldingBestillingDTO = generateDialogmeldingToBehandlerBestillingOppfolgingsplanDTO(
+                        uuid = dialogmeldingBestillingUuid,
+                        behandlerRef = behandlerRef,
+                        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR_OPPFOLGINGSPLAN,
+                    )
+                    dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
+
+                    val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
+                        connection.getBestillinger(
+                            uuid = dialogmeldingBestillingUuid,
+                        )
+                    }
+                    pBehandlerDialogmeldingBestillingBefore shouldNotBeEqualTo null
+                    pBehandlerDialogmeldingBestillingBefore!!.sendt shouldBeEqualTo null
+                    pBehandlerDialogmeldingBestillingBefore.sendtTries shouldBeEqualTo 0
+
+                    runBlocking {
+                        val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
+                        result.failed shouldBeEqualTo 0
+                        result.updated shouldBeEqualTo 1
+                    }
+                    verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
+                    val expectedFellesformatMessageAsRegex = defaultFellesformatMessageXmlRegex()
+                    val actualFellesformatMessage = messageSlot.captured
+
+                    Assert.assertTrue(
+                        expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+                    )
 
                     val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
                         connection.getBestillinger(

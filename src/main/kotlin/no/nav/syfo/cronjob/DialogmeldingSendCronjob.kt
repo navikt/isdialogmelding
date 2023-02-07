@@ -1,7 +1,6 @@
 package no.nav.syfo.cronjob
 
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import org.slf4j.LoggerFactory
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory
 class DialogmeldingSendCronjob(
     val dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
     val dialogmeldingService: DialogmeldingService,
-    val mqSender: MQSender,
 ) : DialogmeldingCronjob {
 
     override val initialDelayMinutes: Long = 2

@@ -24,6 +24,28 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                     .withTekstNotatInnhold(melding.tekst)
                     .withDokIdNotat(UUID.randomUUID().toString())
             )
+    } else if (melding.type == DialogmeldingType.OPPFOLGINGSPLAN) {
+        factory.createXMLDialogmelding()
+            .withNotat(
+                factory.createXMLNotat()
+                    .withTemaKodet(
+                        fellesFactory.createXMLCV()
+                            .withDN("Oppfølgingsplan")
+                            .withS("2.16.578.1.12.4.1.1.8127")
+                            .withV("1")
+                    )
+                    .withTekstNotatInnhold("Åpne PDF-vedlegg")
+                    .withDokIdNotat(UUID.randomUUID().toString())
+                    .withRollerRelatertNotat(
+                        factory.createXMLRollerRelatertNotat()
+                            .withRolleNotat(
+                                fellesFactory.createXMLCV()
+                                    .withS("2.16.578.1.12.4.1.1.9057")
+                                    .withV("1")
+                            )
+                            .withPerson(factory.createXMLPerson())
+                    )
+            )
     } else { // melding.type == DialogmeldingType.DIALOG_FORESPORSEL
         factory.createXMLDialogmelding()
             .withForesporsel(

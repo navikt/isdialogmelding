@@ -31,4 +31,5 @@ enum class DialogmeldingKode(
 enum class DialogmeldingType() {
     DIALOG_FORESPORSEL,
     DIALOG_NOTAT,
+    OPPFOLGINGSPLAN,
 }
