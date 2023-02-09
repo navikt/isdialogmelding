@@ -5,11 +5,12 @@ import no.nav.syfo.application.database.toList
 import no.nav.syfo.domain.Personident
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.time.OffsetDateTime
 
 const val queryBehandlerArbeidstaker =
     """
         UPDATE BEHANDLER_ARBEIDSTAKER
-        SET arbeidstaker_personident = ?
+        SET arbeidstaker_personident = ?, updated_at = ?
         WHERE arbeidstaker_personident = ?
     """
 
@@ -29,7 +30,7 @@ fun Connection.updateBehandlerArbeidstaker(
 const val queryUpdateBehandlerDialogmeldingBestilling =
     """
         UPDATE BEHANDLER_DIALOGMELDING_BESTILLING
-        SET arbeidstaker_personident = ?
+        SET arbeidstaker_personident = ?, updated_at = ?
         WHERE arbeidstaker_personident = ?
     """
 
@@ -53,10 +54,12 @@ private fun Connection.updateIdent(
     commit: Boolean = false,
 ): Int {
     var updatedRows = 0
+    val now = OffsetDateTime.now()
     this.prepareStatement(query).use {
         inactiveIdenter.forEach { inactiveIdent ->
             it.setString(1, nyPersonident.value)
-            it.setString(2, inactiveIdent.value)
+            it.setObject(2, now)
+            it.setString(3, inactiveIdent.value)
             updatedRows += it.executeUpdate()
         }
     }

@@ -3,10 +3,7 @@ package no.nav.syfo.identhendelse
 import io.ktor.server.testing.*
 import kotlinx.coroutines.*
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.database.createBehandler
-import no.nav.syfo.behandler.database.createBehandlerArbeidstakerRelasjon
-import no.nav.syfo.behandler.database.createBehandlerDialogmeldingBestilling
-import no.nav.syfo.behandler.database.createBehandlerKontor
+import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.Arbeidstaker
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.toDialogmeldingToBehandlerBestilling
@@ -19,8 +16,10 @@ import no.nav.syfo.testhelper.ExternalMockEnvironment
 import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.dropData
 import no.nav.syfo.testhelper.generator.*
+import no.nav.syfo.testhelper.getBehandlerArbeidstakerRelasjoner
 import org.amshove.kluent.internal.assertFailsWith
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeGreaterThan
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.time.OffsetDateTime
@@ -63,12 +62,17 @@ object IdenthendelseServiceSpek : Spek({
 
                     populateDatabase(oldIdenter.first(), database)
 
+                    val oldBehandlerArbeidstaker = database.getBehandlerArbeidstakerRelasjoner(oldIdenter.first())
+                    val oldIdentUpdatedAt = oldBehandlerArbeidstaker.first().updatedAt
+
                     runBlocking {
                         identhendelseService.handleIdenthendelse(kafkaIdenthendelseDTO)
                     }
 
                     val newIdentOccurrences = database.getIdentCount(listOf(newIdent))
                     newIdentOccurrences shouldBeEqualTo 2
+                    val newBehandlerArbeidstaker = database.getBehandlerArbeidstakerRelasjoner(newIdent)
+                    newBehandlerArbeidstaker.first().updatedAt shouldBeGreaterThan oldIdentUpdatedAt
                 }
 
                 it("Skal oppdatere gamle identer når person har fått ny ident, men kun tabeller som har en forekomst av gamle identer") {
@@ -82,12 +86,17 @@ object IdenthendelseServiceSpek : Spek({
                         updateInAllTables = false,
                     )
 
+                    val oldBehandlerArbeidstaker = database.getBehandlerArbeidstakerRelasjoner(oldIdenter.first())
+                    val oldIdentUpdatedAt = oldBehandlerArbeidstaker.first().updatedAt
+
                     runBlocking {
                         identhendelseService.handleIdenthendelse(kafkaIdenthendelseDTO)
                     }
 
                     val newIdentOccurrences = database.getIdentCount(listOf(newIdent))
                     newIdentOccurrences shouldBeEqualTo 1
+                    val newBehandlerArbeidstaker = database.getBehandlerArbeidstakerRelasjoner(newIdent)
+                    newBehandlerArbeidstaker.first().updatedAt shouldBeGreaterThan oldIdentUpdatedAt
                 }
             }
 
