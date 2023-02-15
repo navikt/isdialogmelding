@@ -59,6 +59,7 @@ spec:
         - application: fastlegerest
   azure:
     application:
+      allowAllUsers: true
       enabled: true
       tenant: nav.no
       replyURLs:
