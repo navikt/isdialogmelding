@@ -147,21 +147,20 @@ fun main() {
                 }
             }
         }
-        if (environment.toggleKafkaConsumerIdenthendelseEnabled) {
-            val identhendelseService = IdenthendelseService(
-                database = applicationDatabase,
-                pdlClient = pdlClient,
-            )
-            val identhendelseConsumerService = IdenthendelseConsumerService(
-                identhendelseService = identhendelseService,
-            )
 
-            launchKafkaTaskIdenthendelse(
-                applicationState = applicationState,
-                applicationEnvironmentKafka = environment.kafka,
-                kafkaIdenthendelseConsumerService = identhendelseConsumerService,
-            )
-        }
+        val identhendelseService = IdenthendelseService(
+            database = applicationDatabase,
+            pdlClient = pdlClient,
+        )
+        val identhendelseConsumerService = IdenthendelseConsumerService(
+            identhendelseService = identhendelseService,
+        )
+
+        launchKafkaTaskIdenthendelse(
+            applicationState = applicationState,
+            applicationEnvironmentKafka = environment.kafka,
+            kafkaIdenthendelseConsumerService = identhendelseConsumerService,
+        )
     }
 
     val server = embeddedServer(
