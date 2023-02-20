@@ -7,6 +7,7 @@ object UserConstants {
     val ARBEIDSTAKER_FNR = Personident("12345678912")
     val ANNEN_ARBEIDSTAKER_FNR = Personident(ARBEIDSTAKER_FNR.value.replace("2", "8"))
     val TREDJE_ARBEIDSTAKER_FNR = Personident("12345678913")
+    val ARBEIDSTAKER_FNR_WITH_ERROR = Personident("12345678666")
     val ARBEIDSTAKER_VEILEDER_NO_ACCESS = Personident(ARBEIDSTAKER_FNR.value.replace("2", "1"))
     val ARBEIDSTAKER_FNR_OPPFOLGINGSPLAN = Personident("01010112345")
 

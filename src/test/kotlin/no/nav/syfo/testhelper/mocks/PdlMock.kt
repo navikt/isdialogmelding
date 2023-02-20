@@ -31,10 +31,16 @@ class PdlMock {
                 val isHentIdenter = pdlRequest.contains("hentIdenter")
                 if (isHentIdenter) {
                     val request: PdlHentIdenterRequest = objectMapper.readValue(pdlRequest)
-                    if (request.variables.ident == UserConstants.TREDJE_ARBEIDSTAKER_FNR.value) {
-                        call.respond(generatePdlIdenter("enAnnenIdent"))
-                    } else {
-                        call.respond(generatePdlIdenter(request.variables.ident))
+                    when (request.variables.ident) {
+                        UserConstants.TREDJE_ARBEIDSTAKER_FNR.value -> {
+                            call.respond(generatePdlIdenter("enAnnenIdent"))
+                        }
+                        UserConstants.ARBEIDSTAKER_FNR_WITH_ERROR.value -> {
+                            call.respond(generatePdlIdenter(request.variables.ident).copy(errors = generatePdlError(code = "not_found")))
+                        }
+                        else -> {
+                            call.respond(generatePdlIdenter(request.variables.ident))
+                        }
                     }
                 } else {
                     call.respond(generatePdlPersonResponse())
@@ -64,6 +70,18 @@ fun generatePdlIdenter(
         ),
     ),
     errors = null,
+)
+
+fun generatePdlError(code: String? = null) = listOf(
+    PdlError(
+        message = "Error",
+        locations = emptyList(),
+        path = emptyList(),
+        extensions = PdlErrorExtension(
+            code = code,
+            classification = "Classification",
+        )
+    )
 )
 
 private fun String.toFakeOldIdent(): String {
