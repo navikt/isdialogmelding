@@ -1,7 +1,6 @@
 package no.nav.syfo.testhelper.generator
 
-import no.nav.syfo.behandler.domain.DialogmeldingKode
-import no.nav.syfo.behandler.domain.DialogmeldingType
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.DialogmeldingToBehandlerBestillingDTO
 import no.nav.syfo.domain.Personident
 import java.util.UUID
@@ -17,7 +16,8 @@ fun generateDialogmeldingToBehandlerBestillingDTO(
     dialogmeldingRefParent = null,
     dialogmeldingRefConversation = uuid.toString(),
     dialogmeldingType = DialogmeldingType.DIALOG_FORESPORSEL.name,
-    dialogmeldingKode = DialogmeldingKode.INNKALLING.value,
+    dialogmeldingKodeverk = DialogmeldingKodeverk.DIALOGMOTE.name,
+    dialogmeldingKode = DialogmeldingKode.KODE1.value,
     dialogmeldingTekst = "En tekst",
     dialogmeldingVedlegg = null,
 )
@@ -32,7 +32,8 @@ fun generateDialogmeldingToBehandlerBestillingEndreTidStedDTO(
     dialogmeldingRefParent = uuid.toString(),
     dialogmeldingRefConversation = uuid.toString(),
     dialogmeldingType = DialogmeldingType.DIALOG_FORESPORSEL.name,
-    dialogmeldingKode = DialogmeldingKode.TIDSTED.value,
+    dialogmeldingKodeverk = DialogmeldingKodeverk.DIALOGMOTE.name,
+    dialogmeldingKode = DialogmeldingKode.KODE2.value,
     dialogmeldingTekst = "Nytt tid og sted",
     dialogmeldingVedlegg = null,
 )
@@ -48,7 +49,8 @@ fun generateDialogmeldingToBehandlerBestillingAvlysningDTO(
     dialogmeldingRefParent = uuid.toString(),
     dialogmeldingRefConversation = uuid.toString(),
     dialogmeldingType = DialogmeldingType.DIALOG_NOTAT.name,
-    dialogmeldingKode = DialogmeldingKode.AVLYST.value,
+    dialogmeldingKodeverk = DialogmeldingKodeverk.HENVENDELSE.name,
+    dialogmeldingKode = DialogmeldingKode.KODE4.value,
     dialogmeldingTekst = "Møtet er avlyst",
     dialogmeldingVedlegg = null,
 )
@@ -64,8 +66,43 @@ fun generateDialogmeldingToBehandlerBestillingReferatDTO(
     dialogmeldingRefParent = uuid.toString(),
     dialogmeldingRefConversation = uuid.toString(),
     dialogmeldingType = DialogmeldingType.DIALOG_NOTAT.name,
-    dialogmeldingKode = DialogmeldingKode.REFERAT.value,
+    dialogmeldingKodeverk = DialogmeldingKodeverk.HENVENDELSE.name,
+    dialogmeldingKode = DialogmeldingKode.KODE9.value,
     dialogmeldingTekst = "Dette er et referat",
+    dialogmeldingVedlegg = null,
+)
+
+fun generateDialogmeldingToBehandlerBestillingForesporselDTO(
+    behandlerRef: UUID,
+    uuid: UUID,
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
+) = DialogmeldingToBehandlerBestillingDTO(
+    behandlerRef = behandlerRef.toString(),
+    personIdent = arbeidstakerPersonident.value,
+    dialogmeldingUuid = uuid.toString(),
+    dialogmeldingRefParent = uuid.toString(),
+    dialogmeldingRefConversation = uuid.toString(),
+    dialogmeldingType = DialogmeldingType.DIALOG_FORESPORSEL.name,
+    dialogmeldingKodeverk = DialogmeldingKodeverk.FORESPORSEL.name,
+    dialogmeldingKode = DialogmeldingKode.KODE1.value,
+    dialogmeldingTekst = "Dette er en forespørsel",
+    dialogmeldingVedlegg = null,
+)
+
+fun generateDialogmeldingToBehandlerBestillingForesporselPurringDTO(
+    behandlerRef: UUID,
+    uuid: UUID,
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
+) = DialogmeldingToBehandlerBestillingDTO(
+    behandlerRef = behandlerRef.toString(),
+    personIdent = arbeidstakerPersonident.value,
+    dialogmeldingUuid = uuid.toString(),
+    dialogmeldingRefParent = uuid.toString(),
+    dialogmeldingRefConversation = uuid.toString(),
+    dialogmeldingType = DialogmeldingType.DIALOG_FORESPORSEL.name,
+    dialogmeldingKodeverk = DialogmeldingKodeverk.FORESPORSEL.name,
+    dialogmeldingKode = DialogmeldingKode.KODE2.value,
+    dialogmeldingTekst = "Dette er en påminnelse om en forespørsel",
     dialogmeldingVedlegg = null,
 )
 
@@ -80,7 +117,8 @@ fun generateDialogmeldingToBehandlerBestillingOppfolgingsplanDTO(
     dialogmeldingRefParent = null,
     dialogmeldingRefConversation = uuid.toString(),
     dialogmeldingType = DialogmeldingType.OPPFOLGINGSPLAN.name,
-    dialogmeldingKode = DialogmeldingKode.INNKALLING.value,
+    dialogmeldingKodeverk = DialogmeldingKodeverk.HENVENDELSE.name,
+    dialogmeldingKode = DialogmeldingKode.KODE1.value,
     dialogmeldingTekst = null,
     dialogmeldingVedlegg = byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
 )

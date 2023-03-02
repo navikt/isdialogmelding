@@ -58,7 +58,7 @@ class OppfolgingsplanService(
             dialogmeldingRefParent = null, // brukes ikke for oppfølgingsplan
             dialogmeldingRefConversation = UUID.randomUUID().toString(), // brukes ikke for oppfølgingsplan
             dialogmeldingType = DialogmeldingType.OPPFOLGINGSPLAN.name,
-            dialogmeldingKode = DialogmeldingKode.INNKALLING.value, // brukes ikke for oppfølgingsplan
+            dialogmeldingKode = DialogmeldingKode.KODE1.value, // brukes ikke for oppfølgingsplan
             dialogmeldingTekst = null, // brukes ikke for oppfølgingsplan
             dialogmeldingVedlegg = oppfolgingsplan.oppfolgingsplanPdf,
         )

@@ -2,14 +2,15 @@ package no.nav.syfo.dialogmelding.converter
 
 import no.kith.xmlstds.dialog._2006_10_11.ObjectFactory
 import no.kith.xmlstds.dialog._2006_10_11.XMLDialogmelding
-import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
-import no.nav.syfo.behandler.domain.DialogmeldingType
+import no.nav.syfo.behandler.domain.*
+import java.lang.RuntimeException
 import java.util.*
 
 fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogmelding {
     val factory = ObjectFactory()
     val fellesFactory = no.kith.xmlstds.ObjectFactory()
 
+    val kodeverk = melding.kodeverk
     val kode = melding.kode.value
     return if (melding.type == DialogmeldingType.DIALOG_NOTAT) {
         factory.createXMLDialogmelding()
@@ -18,7 +19,7 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                     .withTemaKodet(
                         fellesFactory.createXMLCV()
                             .withDN(if (kode == 4) "Avlysning dialogmøte" else "Informasjon fra NAV")
-                            .withS("2.16.578.1.12.4.1.1.8127")
+                            .withS(kodeverk?.kodeverkId ?: "2.16.578.1.12.4.1.1.8127")
                             .withV(kode.toString())
                     )
                     .withTekstNotatInnhold(melding.tekst)
@@ -31,7 +32,7 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                     .withTemaKodet(
                         fellesFactory.createXMLCV()
                             .withDN("Oppfølgingsplan")
-                            .withS("2.16.578.1.12.4.1.1.8127")
+                            .withS(kodeverk?.kodeverkId ?: "2.16.578.1.12.4.1.1.8127")
                             .withV("1")
                     )
                     .withTekstNotatInnhold("Åpne PDF-vedlegg")
@@ -46,18 +47,32 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                             .withPerson(factory.createXMLPerson())
                     )
             )
-    } else { // melding.type == DialogmeldingType.DIALOG_FORESPORSEL
+    } else if (melding.type == DialogmeldingType.DIALOG_FORESPORSEL) {
         factory.createXMLDialogmelding()
             .withForesporsel(
                 factory.createXMLForesporsel()
                     .withTypeForesp(
                         fellesFactory.createXMLCV()
-                            .withDN(if (kode == 1) "Innkalling dialogmøte 2" else "Endring dialogmøte 2")
-                            .withS("2.16.578.1.12.4.1.1.8125")
+                            .withDN(
+                                if ((kodeverk == null ||kodeverk == DialogmeldingKodeverk.DIALOGMOTE) && kode == 1) {
+                                    "Innkalling dialogmøte 2"
+                                } else if ((kodeverk == null || kodeverk == DialogmeldingKodeverk.DIALOGMOTE) && kode == 2) {
+                                    "Endring dialogmøte 2"
+                                } else if (kodeverk == DialogmeldingKodeverk.FORESPORSEL && kode == 1) {
+                                    "Forespørsel om pasient"
+                                } else if (kodeverk == DialogmeldingKodeverk.FORESPORSEL && kode == 2) {
+                                    "Påminnelse forespørsel om pasient"
+                                } else {
+                                    throw RuntimeException("Unsupported kodeverk/kode")
+                                }
+                            )
+                            .withS(kodeverk?.kodeverkId ?: "2.16.578.1.12.4.1.1.8125")
                             .withV(kode.toString())
                     )
                     .withSporsmal(melding.tekst)
                     .withDokIdForesp(UUID.randomUUID().toString())
             )
+    } else {
+        throw RuntimeException("Unsupported type/kodeverk")
     }
 }
