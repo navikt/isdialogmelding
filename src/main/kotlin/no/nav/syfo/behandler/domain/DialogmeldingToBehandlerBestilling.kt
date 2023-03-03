@@ -10,6 +10,7 @@ data class DialogmeldingToBehandlerBestilling(
     val parentRef: String?,
     val conversationUuid: UUID,
     val type: DialogmeldingType,
+    val kodeverk: DialogmeldingKodeverk?,
     val kode: DialogmeldingKode,
     val tekst: String?,
     val vedlegg: ByteArray? = null,
@@ -18,14 +19,22 @@ data class DialogmeldingToBehandlerBestilling(
 enum class DialogmeldingKode(
     val value: Int
 ) {
-    INNKALLING(1),
-    TIDSTED(2),
-    AVLYST(4),
-    REFERAT(9);
+    KODE1(1),
+    KODE2(2),
+    KODE4(4),
+    KODE9(9);
 
     companion object {
         fun fromInt(value: Int) = values().first { it.value == value }
     }
+}
+
+enum class DialogmeldingKodeverk(
+    val kodeverkId: String,
+) {
+    DIALOGMOTE("2.16.578.1.12.4.1.1.8125"),
+    HENVENDELSE("2.16.578.1.12.4.1.1.8127"),
+    FORESPORSEL("2.16.578.1.12.4.1.1.8129"),
 }
 
 enum class DialogmeldingType() {

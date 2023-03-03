@@ -18,6 +18,7 @@ const val queryCreateBehandlerDialogmeldingBestilling =
             parent,
             conversation,
             type,
+            kodeverk,
             kode,
             tekst,
             vedlegg,
@@ -25,7 +26,7 @@ const val queryCreateBehandlerDialogmeldingBestilling =
             sendt_tries,
             created_at,
             updated_at
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
     """
 
 fun Connection.createBehandlerDialogmeldingBestilling(
@@ -40,13 +41,14 @@ fun Connection.createBehandlerDialogmeldingBestilling(
         it.setString(4, dialogmeldingToBehandlerBestilling.parentRef)
         it.setString(5, dialogmeldingToBehandlerBestilling.conversationUuid.toString())
         it.setString(6, dialogmeldingToBehandlerBestilling.type.name)
-        it.setInt(7, dialogmeldingToBehandlerBestilling.kode.value)
-        it.setString(8, dialogmeldingToBehandlerBestilling.tekst)
-        it.setBytes(9, dialogmeldingToBehandlerBestilling.vedlegg)
-        it.setTimestamp(10, null)
-        it.setInt(11, 0)
-        it.setTimestamp(12, now)
+        it.setString(7, dialogmeldingToBehandlerBestilling.kodeverk?.name)
+        it.setInt(8, dialogmeldingToBehandlerBestilling.kode.value)
+        it.setString(9, dialogmeldingToBehandlerBestilling.tekst)
+        it.setBytes(10, dialogmeldingToBehandlerBestilling.vedlegg)
+        it.setTimestamp(11, null)
+        it.setInt(12, 0)
         it.setTimestamp(13, now)
+        it.setTimestamp(14, now)
         it.executeQuery().toList { getInt("id") }
     }
 
@@ -130,6 +132,7 @@ fun ResultSet.toPBehandlerDialogmeldingBestilling(): PDialogmeldingToBehandlerBe
         parentRef = getString("parent"),
         conversationUuid = UUID.fromString(getString("conversation")),
         type = getString("type"),
+        kodeverk = getString("kodeverk"),
         kode = getInt("kode"),
         tekst = getString("tekst"),
         vedlegg = getBytes("vedlegg"),
