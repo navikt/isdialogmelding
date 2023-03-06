@@ -81,8 +81,6 @@ spec:
   env:
     - name: KTOR_ENV
       value: "production"
-    - name: TOGGLE_APPREC
-      value: "true"
     - name: MQGATEWAY_NAME
       value: "MPLS02"
     - name: MQGATEWAY_HOSTNAME

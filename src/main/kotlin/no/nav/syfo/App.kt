@@ -125,26 +125,24 @@ fun main() {
             applicationEnvironmentKafka = environment.kafka,
             database = applicationDatabase,
         )
-        if (environment.toggleApprecs) {
-            launchBackgroundTask(
-                applicationState = applicationState,
-            ) {
-                val factory = connectionFactory(environment)
+        launchBackgroundTask(
+            applicationState = applicationState,
+        ) {
+            val factory = connectionFactory(environment)
 
-                factory.createConnection(
-                    environment.serviceuserUsername,
-                    environment.serviceuserPassword,
-                ).use { connection ->
-                    connection.start()
-                    val session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE)
-                    val inputconsumer = session.consumerForQueue(environment.apprecQueueName)
-                    val blockingApplicationRunner = ApprecConsumer(
-                        applicationState = applicationState,
-                        database = applicationDatabase,
-                        inputconsumer = inputconsumer,
-                    )
-                    blockingApplicationRunner.run()
-                }
+            factory.createConnection(
+                environment.serviceuserUsername,
+                environment.serviceuserPassword,
+            ).use { connection ->
+                connection.start()
+                val session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE)
+                val inputconsumer = session.consumerForQueue(environment.apprecQueueName)
+                val blockingApplicationRunner = ApprecConsumer(
+                    applicationState = applicationState,
+                    database = applicationDatabase,
+                    inputconsumer = inputconsumer,
+                )
+                blockingApplicationRunner.run()
             }
         }
 
