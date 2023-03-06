@@ -10,7 +10,7 @@ data class DialogmeldingToBehandlerBestilling(
     val parentRef: String?,
     val conversationUuid: UUID,
     val type: DialogmeldingType,
-    val kodeverk: DialogmeldingKodeverk?,
+    val kodeverk: DialogmeldingKodeverk,
     val kode: DialogmeldingKode,
     val tekst: String?,
     val vedlegg: ByteArray? = null,
