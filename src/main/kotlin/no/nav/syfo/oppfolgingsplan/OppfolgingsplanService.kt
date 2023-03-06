@@ -3,8 +3,7 @@ package no.nav.syfo.oppfolgingsplan
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.api.person.RSOppfolgingsplan
-import no.nav.syfo.behandler.domain.DialogmeldingKode
-import no.nav.syfo.behandler.domain.DialogmeldingType
+import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.DialogmeldingToBehandlerBestillingDTO
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.metric.COUNT_SEND_OPPFOLGINGSPLAN_FAILED
@@ -58,7 +57,8 @@ class OppfolgingsplanService(
             dialogmeldingRefParent = null, // brukes ikke for oppfølgingsplan
             dialogmeldingRefConversation = UUID.randomUUID().toString(), // brukes ikke for oppfølgingsplan
             dialogmeldingType = DialogmeldingType.OPPFOLGINGSPLAN.name,
-            dialogmeldingKode = DialogmeldingKode.KODE1.value, // brukes ikke for oppfølgingsplan
+            dialogmeldingKodeverk = DialogmeldingKodeverk.HENVENDELSE.name,
+            dialogmeldingKode = DialogmeldingKode.KODE1.value,
             dialogmeldingTekst = null, // brukes ikke for oppfølgingsplan
             dialogmeldingVedlegg = oppfolgingsplan.oppfolgingsplanPdf,
         )
