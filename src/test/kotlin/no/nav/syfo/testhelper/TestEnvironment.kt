@@ -57,7 +57,6 @@ fun testEnvironment(
     isdialogmeldingDbName = "isdialogmelding_dev",
     isdialogmeldingDbUsername = "username",
     isdialogmeldingDbPassword = "password",
-    toggleApprecs = true,
 )
 
 const val testAapSoknadApiClientId = "soknad-api-client-id"

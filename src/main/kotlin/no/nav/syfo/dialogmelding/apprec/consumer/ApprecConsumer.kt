@@ -28,7 +28,7 @@ class ApprecConsumer(
 
     suspend fun run() {
         try {
-            while (applicationState.ready && RECEIVED_APPREC_MESSAGE_COUNTER.count() < 1000) {
+            while (applicationState.ready) {
                 val message = inputconsumer.receiveNoWait()
                 if (message == null) {
                     delay(100)
