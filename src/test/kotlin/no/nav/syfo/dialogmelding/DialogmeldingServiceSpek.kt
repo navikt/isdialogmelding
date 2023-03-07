@@ -206,5 +206,53 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
+        it("Sends correct message on MQ when foresporsel") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val melding = generateDialogmeldingToBehandlerBestillingForesporselDTO(
+                behandlerRef = behandlerRef,
+                uuid = uuid,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+            ).toDialogmeldingToBehandlerBestilling(
+                behandler = behandler,
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+        }
+        it("Sends correct message on MQ when purring foresporsel") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val melding = generateDialogmeldingToBehandlerBestillingForesporselPurringDTO(
+                behandlerRef = behandlerRef,
+                uuid = uuid,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+            ).toDialogmeldingToBehandlerBestilling(
+                behandler = behandler,
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselPurringXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+        }
     }
 })
