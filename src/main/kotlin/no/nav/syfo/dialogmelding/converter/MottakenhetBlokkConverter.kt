@@ -1,7 +1,6 @@
 package no.nav.syfo.dialogmelding.converter
 
-import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
-import no.nav.syfo.behandler.domain.DialogmeldingType
+import no.nav.syfo.behandler.domain.*
 import no.nav.xml.eiff._2.ObjectFactory
 import no.nav.xml.eiff._2.XMLMottakenhetBlokk
 
@@ -13,17 +12,21 @@ fun createMottakenhetBlokk(
         .withPartnerReferanse(melding.behandler.kontor.partnerId.toString())
         .withEbRole("Saksbehandler")
         .withEbService(
-            when (melding.type) {
-                DialogmeldingType.DIALOG_NOTAT -> "HenvendelseFraSaksbehandler"
-                DialogmeldingType.OPPFOLGINGSPLAN -> "Oppfolgingsplan"
-                else -> "DialogmoteInnkalling"
+            when (Pair(melding.type, melding.kodeverk)) {
+                Pair(DialogmeldingType.DIALOG_NOTAT, DialogmeldingKodeverk.HENVENDELSE) -> "HenvendelseFraSaksbehandler"
+                Pair(DialogmeldingType.OPPFOLGINGSPLAN, DialogmeldingKodeverk.HENVENDELSE) -> "Oppfolgingsplan"
+                Pair(DialogmeldingType.DIALOG_FORESPORSEL, DialogmeldingKodeverk.DIALOGMOTE) -> "DialogmoteInnkalling"
+                Pair(DialogmeldingType.DIALOG_FORESPORSEL, DialogmeldingKodeverk.FORESPORSEL) -> "ForesporselFraSaksbehandler"
+                else -> throw IllegalArgumentException("Invalid melding type/kodeverk-combination")
             }
         )
         .withEbAction(
-            when (melding.type) {
-                DialogmeldingType.DIALOG_NOTAT -> "Henvendelse"
-                DialogmeldingType.OPPFOLGINGSPLAN -> "Plan"
-                else -> "MoteInnkalling"
+            when (Pair(melding.type, melding.kodeverk)) {
+                Pair(DialogmeldingType.DIALOG_NOTAT, DialogmeldingKodeverk.HENVENDELSE) -> "Henvendelse"
+                Pair(DialogmeldingType.OPPFOLGINGSPLAN, DialogmeldingKodeverk.HENVENDELSE) -> "Plan"
+                Pair(DialogmeldingType.DIALOG_FORESPORSEL, DialogmeldingKodeverk.DIALOGMOTE) -> "MoteInnkalling"
+                Pair(DialogmeldingType.DIALOG_FORESPORSEL, DialogmeldingKodeverk.FORESPORSEL) -> "Foresporsel"
+                else -> throw IllegalArgumentException("Invalid melding type/kodeverk-combination")
             }
         )
 }

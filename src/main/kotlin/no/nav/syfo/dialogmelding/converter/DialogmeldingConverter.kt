@@ -2,14 +2,15 @@ package no.nav.syfo.dialogmelding.converter
 
 import no.kith.xmlstds.dialog._2006_10_11.ObjectFactory
 import no.kith.xmlstds.dialog._2006_10_11.XMLDialogmelding
-import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
-import no.nav.syfo.behandler.domain.DialogmeldingType
+import no.nav.syfo.behandler.domain.*
 import java.util.*
 
 fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogmelding {
     val factory = ObjectFactory()
     val fellesFactory = no.kith.xmlstds.ObjectFactory()
 
+    val kodeverk = melding.kodeverk
+        ?: throw IllegalArgumentException("Cannot send dialogmelding when kodeverk is missing")
     val kode = melding.kode.value
     return if (melding.type == DialogmeldingType.DIALOG_NOTAT) {
         factory.createXMLDialogmelding()
@@ -17,8 +18,14 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                 factory.createXMLNotat()
                     .withTemaKodet(
                         fellesFactory.createXMLCV()
-                            .withDN(if (kode == 4) "Avlysning dialogmøte" else "Informasjon fra NAV")
-                            .withS("2.16.578.1.12.4.1.1.8127")
+                            .withDN(
+                                when (kode) {
+                                    4 -> "Avlysning dialogmøte"
+                                    9 -> "Informasjon fra NAV" // referat fra dialogmøte
+                                    else -> throw IllegalArgumentException("Unsupported kode-value")
+                                }
+                            )
+                            .withS(kodeverk.kodeverkId)
                             .withV(kode.toString())
                     )
                     .withTekstNotatInnhold(melding.tekst)
@@ -31,8 +38,8 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                     .withTemaKodet(
                         fellesFactory.createXMLCV()
                             .withDN("Oppfølgingsplan")
-                            .withS("2.16.578.1.12.4.1.1.8127")
-                            .withV("1")
+                            .withS(kodeverk.kodeverkId)
+                            .withV(kode.toString())
                     )
                     .withTekstNotatInnhold("Åpne PDF-vedlegg")
                     .withDokIdNotat(UUID.randomUUID().toString())
@@ -46,18 +53,28 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                             .withPerson(factory.createXMLPerson())
                     )
             )
-    } else { // melding.type == DialogmeldingType.DIALOG_FORESPORSEL
+    } else if (melding.type == DialogmeldingType.DIALOG_FORESPORSEL) {
         factory.createXMLDialogmelding()
             .withForesporsel(
                 factory.createXMLForesporsel()
                     .withTypeForesp(
                         fellesFactory.createXMLCV()
-                            .withDN(if (kode == 1) "Innkalling dialogmøte 2" else "Endring dialogmøte 2")
-                            .withS("2.16.578.1.12.4.1.1.8125")
+                            .withDN(
+                                when (Pair(kodeverk, kode)) {
+                                    Pair(DialogmeldingKodeverk.DIALOGMOTE, 1) -> "Innkalling dialogmøte 2"
+                                    Pair(DialogmeldingKodeverk.DIALOGMOTE, 2) -> "Endring dialogmøte 2"
+                                    Pair(DialogmeldingKodeverk.FORESPORSEL, 1) -> "Forespørsel om pasient"
+                                    Pair(DialogmeldingKodeverk.FORESPORSEL, 2) -> "Påminnelse forespørsel om pasient"
+                                    else -> throw IllegalArgumentException("Unsupported kodeverk/kode-values")
+                                }
+                            )
+                            .withS(kodeverk.kodeverkId)
                             .withV(kode.toString())
                     )
                     .withSporsmal(melding.tekst)
                     .withDokIdForesp(UUID.randomUUID().toString())
             )
+    } else {
+        throw IllegalArgumentException("Cannot send dialogmelding, unknown type: ${melding.type}")
     }
 }
