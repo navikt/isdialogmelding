@@ -37,6 +37,7 @@ spec:
       memory: 384Mi
   ingresses:
     - "https://isdialogmelding.dev.intern.nav.no"
+    - "https://isdialogmelding.intern.dev.nav.no"
   tokenx:
     enabled: true
   accessPolicy:
