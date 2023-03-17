@@ -64,7 +64,7 @@ spec:
       enabled: true
       tenant: trygdeetaten.no
       replyURLs:
-        - "https://isdialogmelding.dev.intern.nav.no/oauth2/callback"
+        - "https://isdialogmelding.intern.dev.nav.no/oauth2/callback"
       claims:
         extra:
           - "NAVident"
