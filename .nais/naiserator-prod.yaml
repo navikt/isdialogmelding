@@ -53,6 +53,7 @@ spec:
           cluster: prod-fss
     outbound:
       external:
+        - host: "pdl-api.prod-fss-pub.nais.io"
         - host: "syfopartnerinfo.prod-fss-pub.nais.io"
         - host: "syfo-tilgangskontroll.prod-fss-pub.nais.io"
       rules:
@@ -98,7 +99,7 @@ spec:
     - name: FASTLEGEREST_CLIENT_ID
       value: "prod-gcp.teamsykefravr.fastlegerest"
     - name: FASTLEGEREST_URL
-      value: "https://fastlegerest.intern.nav.no"
+      value: "http://fastlegerest"
     - name: PDL_CLIENT_ID
       value: "prod-fss.pdl.pdl-api"
     - name: PDL_URL
