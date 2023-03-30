@@ -45,6 +45,9 @@ spec:
         - application: syfomodiaperson
           namespace: teamsykefravr
           cluster: dev-fss
+        - application: syfomodiaperson
+          namespace: teamsykefravr
+          cluster: dev-gcp
         - application: soknad-api
           namespace: aap
           cluster: dev-gcp
@@ -54,6 +57,10 @@ spec:
     outbound:
       external:
         - host: "b27apvl220.preprod.local"
+          ports:
+            - name: MQ
+              port: 1413
+              protocol: TCP
         - host: "pdl-api.dev-fss-pub.nais.io"
         - host: "syfopartnerinfo.dev-fss-pub.nais.io"
         - host: "syfo-tilgangskontroll.dev-fss-pub.nais.io"

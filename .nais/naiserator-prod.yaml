@@ -45,6 +45,9 @@ spec:
         - application: syfomodiaperson
           namespace: teamsykefravr
           cluster: prod-fss
+        - application: syfomodiaperson
+          namespace: teamsykefravr
+          cluster: prod-gcp
         - application: soknad-api
           namespace: aap
           cluster: prod-gcp
@@ -54,6 +57,10 @@ spec:
     outbound:
       external:
         - host: "mpls02.adeo.no"
+          ports:
+            - name: MQ
+              port: 1414
+              protocol: TCP
         - host: "pdl-api.prod-fss-pub.nais.io"
         - host: "syfopartnerinfo.prod-fss-pub.nais.io"
         - host: "syfo-tilgangskontroll.prod-fss-pub.nais.io"
