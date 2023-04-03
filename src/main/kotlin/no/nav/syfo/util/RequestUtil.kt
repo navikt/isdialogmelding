@@ -25,4 +25,14 @@ fun PipelineContext<out Unit, ApplicationCall>.getPersonidentHeader(): String? {
     return this.call.request.headers[NAV_PERSONIDENT_HEADER]
 }
 
+suspend fun PipelineContext<out Unit, ApplicationCall>.withValidToken(
+    block: suspend PipelineContext<out Unit, ApplicationCall>.() -> Unit
+) {
+    if (getBearerHeader() != null) {
+        block()
+    } else {
+        throw IllegalArgumentException("No Authorization header supplied")
+    }
+}
+
 fun bearerHeader(token: String) = "Bearer $token"

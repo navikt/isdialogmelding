@@ -12,6 +12,7 @@ import no.nav.syfo.domain.Personident
 import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.time.OffsetDateTime
+import java.util.*
 
 private val log = LoggerFactory.getLogger("no.nav.syfo.behandler")
 
@@ -171,6 +172,15 @@ class BehandlerService(
         }
 
         return pBehandler.toBehandler(
+            kontor = database.getBehandlerKontorById(pBehandler.kontorId)
+        )
+    }
+
+    fun getBehandler(behandlerRef: UUID): Behandler? {
+        val pBehandler = database.getBehandlerByBehandlerRef(
+            behandlerRef = behandlerRef,
+        )
+        return pBehandler?.toBehandler(
             kontor = database.getBehandlerKontorById(pBehandler.kontorId)
         )
     }
