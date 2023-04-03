@@ -7,8 +7,11 @@ import io.ktor.server.testing.*
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.testhelper.*
+import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import no.nav.syfo.testhelper.UserConstants.OTHER_PARTNERID
+import no.nav.syfo.testhelper.UserConstants.PARTNERID
+import no.nav.syfo.testhelper.generator.generateBehandler
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
 import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
@@ -33,14 +36,14 @@ class BehandlerApiSpek : Spek({
         }
 
         describe(BehandlerApiSpek::class.java.simpleName) {
+            val validToken = generateJWT(
+                externalMockEnvironment.environment.aadAppClient,
+                externalMockEnvironment.wellKnownInternalAzureAD.issuer,
+                UserConstants.VEILEDER_IDENT,
+            )
             describe("Get list of Behandler for Personident") {
                 val url = "$behandlerPath$behandlerPersonident"
                 val searchUrl = "$behandlerPath$search"
-                val validToken = generateJWT(
-                    externalMockEnvironment.environment.aadAppClient,
-                    externalMockEnvironment.wellKnownInternalAzureAD.issuer,
-                    UserConstants.VEILEDER_IDENT,
-                )
                 describe("Happy path") {
                     it("should return list of Behandler and store behandler if request is successful") {
                         val fastlegeResponse = generateFastlegeResponse()
@@ -359,6 +362,62 @@ class BehandlerApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.Forbidden
+                        }
+                    }
+                }
+            }
+
+            describe("Get behandler for behandlerRef") {
+                val url = "$behandlerPath$behandlerRef"
+                val behandlerRef = UUID.randomUUID()
+                val behandler = generateBehandler(
+                    behandlerRef = behandlerRef,
+                    partnerId = PARTNERID,
+                )
+                describe("Happy path") {
+                    it("should return behandler for behandlerRef") {
+                        database.createBehandlerForArbeidstaker(
+                            behandler = behandler,
+                            arbeidstakerPersonident = ARBEIDSTAKER_FNR,
+                        )
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader("behandlerRef", behandlerRef.toString())
+                            }
+                        ) {
+                            val behandlerDTO =
+                                objectMapper.readValue<BehandlerDTO>(response.content!!)
+                            behandlerDTO.behandlerRef shouldBeEqualTo behandlerRef.toString()
+                            behandlerDTO.fornavn shouldBeEqualTo "Dana"
+                        }
+                    }
+                }
+                describe("Unhappy path") {
+                    it("should return status NotFound for non-matching behandlerRef") {
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader("behandlerRef", behandlerRef.toString())
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.NotFound
+                        }
+                    }
+                    it("should return status Unauthorized if no token is supplied") {
+                        with(
+                            handleRequest(HttpMethod.Get, url) {}
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.Unauthorized
+                        }
+                    }
+                    it("should return status BadRequest if no BehandlerRef is supplied in header") {
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.BadRequest
                         }
                     }
                 }
