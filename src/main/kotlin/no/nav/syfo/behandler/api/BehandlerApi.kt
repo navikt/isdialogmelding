@@ -14,7 +14,7 @@ import java.util.*
 
 const val behandlerPath = "/api/v1/behandler"
 const val behandlerPersonident = "/personident"
-const val behandlerRef = "/behandler-ref"
+const val behandlerRefParam = "behandlerRef"
 const val search = "/search"
 
 fun Route.registerBehandlerApi(
@@ -57,12 +57,11 @@ fun Route.registerBehandlerApi(
                 call.respond(behandlere.toBehandlerDTOListUtenRelasjonstype())
             }
         }
-        get(behandlerRef) {
+        get("/{$behandlerRefParam}") {
             withValidToken {
-                val behandlerRef: String = this.call.request.headers["behandlerRef"]
-                    ?: throw IllegalArgumentException("No behandlerRef supplied")
+                val behandlerRef = UUID.fromString(this.call.parameters[behandlerRefParam])
                 val behandler = behandlerService.getBehandler(
-                    behandlerRef = UUID.fromString(behandlerRef)
+                    behandlerRef = behandlerRef
                 )
                 if (behandler != null) {
                     call.respond(behandler.toBehandlerDTO(behandlerType = null))
