@@ -50,7 +50,7 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
@@ -60,7 +60,7 @@ class BehandlerApiSpek : Spek({
                             behandlerList.size shouldBeEqualTo 1
 
                             val behandlerForPersonList = database.getBehandlerByArbeidstaker(
-                                UserConstants.ARBEIDSTAKER_FNR,
+                                ARBEIDSTAKER_FNR,
                             )
                             behandlerForPersonList.size shouldBeEqualTo 1
 
@@ -84,7 +84,7 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
@@ -105,7 +105,7 @@ class BehandlerApiSpek : Spek({
                         val behandlerRef = with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
@@ -130,7 +130,7 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
@@ -151,7 +151,7 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
@@ -172,7 +172,7 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
@@ -193,7 +193,7 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value)
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
@@ -348,7 +348,7 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, UserConstants.ARBEIDSTAKER_FNR.value.drop(1))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value.drop(1))
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.BadRequest
@@ -368,8 +368,8 @@ class BehandlerApiSpek : Spek({
             }
 
             describe("Get behandler for behandlerRef") {
-                val url = "$behandlerPath$behandlerRef"
                 val behandlerRef = UUID.randomUUID()
+                val url = "$behandlerPath/$behandlerRef"
                 val behandler = generateBehandler(
                     behandlerRef = behandlerRef,
                     partnerId = PARTNERID,
@@ -383,7 +383,6 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader("behandlerRef", behandlerRef.toString())
                             }
                         ) {
                             val behandlerDTO =
@@ -398,7 +397,6 @@ class BehandlerApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
-                                addHeader("behandlerRef", behandlerRef.toString())
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.NotFound
@@ -411,9 +409,9 @@ class BehandlerApiSpek : Spek({
                             response.status() shouldBeEqualTo HttpStatusCode.Unauthorized
                         }
                     }
-                    it("should return status BadRequest if no BehandlerRef is supplied in header") {
+                    it("should return status BadRequest if invalid behandlerRef") {
                         with(
-                            handleRequest(HttpMethod.Get, url) {
+                            handleRequest(HttpMethod.Get, "$behandlerPath/123abc") {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
                             }
                         ) {
