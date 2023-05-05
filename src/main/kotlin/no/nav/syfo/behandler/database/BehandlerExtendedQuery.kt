@@ -24,7 +24,6 @@ fun DatabaseInterface.getSykmeldereExtended(
     arbeidstakerIdent: Personident,
     dialogmeldingEnabledStatus: Boolean = true,
 ): List<Pair<PBehandler, PBehandlerKontor>> {
-
     return this.connection.use { connection ->
         connection.prepareStatement(querySykmelderAndKontor)
             .use {
@@ -73,7 +72,6 @@ fun DatabaseInterface.searchBehandler(
 }
 
 fun ResultSet.toPBehandlerAndPBehandlerKontor(): Pair<PBehandler, PBehandlerKontor> {
-
     val pBehandler = PBehandler(
         id = getInt("behandlerid"),
         behandlerRef = UUID.fromString(getString("behandler_ref")),

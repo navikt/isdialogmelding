@@ -28,20 +28,22 @@ class SyfopartnerInfoMock {
                 when (call.parameters["herid"]) {
                     UserConstants.HERID_UTEN_PARTNERINFO.toString() -> call.respond(
                         HttpStatusCode.OK,
-                        emptyList<PartnerinfoResponse>()
+                        emptyList<PartnerinfoResponse>(),
                     )
                     UserConstants.HERID_MED_FLERE_PARTNERINFO.toString() -> call.respond(
                         HttpStatusCode.OK,
                         listOf(
                             generatePartnerinfoResponse(UserConstants.PARTNERID.value),
-                            generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID.value)
+                            generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID.value),
                         )
                     )
                     UserConstants.OTHER_HERID.toString() -> call.respond(
-                        HttpStatusCode.OK, listOf(generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID.value))
+                        HttpStatusCode.OK,
+                        listOf(generatePartnerinfoResponse(UserConstants.OTHER_PARTNERID.value)),
                     )
                     else -> call.respond(
-                        HttpStatusCode.OK, listOf(generatePartnerinfoResponse(UserConstants.PARTNERID.value))
+                        HttpStatusCode.OK,
+                        listOf(generatePartnerinfoResponse(UserConstants.PARTNERID.value)),
                     )
                 }
             }
