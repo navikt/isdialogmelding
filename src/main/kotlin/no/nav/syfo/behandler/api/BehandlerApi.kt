@@ -35,7 +35,6 @@ fun Route.registerBehandlerApi(
                 personidentToAccess = personident,
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
             ) {
-
                 val behandlere = behandlerService.getBehandlere(
                     personident = personident,
                     token = token,

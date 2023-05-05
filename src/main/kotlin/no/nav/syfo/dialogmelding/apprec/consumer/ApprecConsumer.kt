@@ -104,7 +104,7 @@ class ApprecConsumer(
                         apprec = apprec,
                         bestillingId = pBestilling.id,
                     )
-                    if (apprec.statusKode == ApprecStatus.avvist && apprec.feilKode == "E21") {
+                    if (apprec.statusKode == ApprecStatus.AVVIST && apprec.feilKode == "E21") {
                         connection.invalidateBehandler(pBehandler.behandlerRef)
                     }
                     connection.commit()

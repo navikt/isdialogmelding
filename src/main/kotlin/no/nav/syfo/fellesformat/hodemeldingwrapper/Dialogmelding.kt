@@ -3,6 +3,7 @@ package no.nav.syfo.fellesformat.hodemeldingwrapper
 import java.util.stream.Stream
 
 interface Dialogmelding {
+    @Suppress("ktlint")
     enum class Versjon {
         _1_0, _1_1
     }
