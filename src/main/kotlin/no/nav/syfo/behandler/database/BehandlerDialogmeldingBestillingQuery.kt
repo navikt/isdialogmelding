@@ -101,12 +101,18 @@ const val queryGetBestillinger =
         SELECT * FROM BEHANDLER_DIALOGMELDING_BESTILLING WHERE uuid = ?
     """
 
-fun Connection.getBestillinger(uuid: UUID): PDialogmeldingToBehandlerBestilling? {
+fun Connection.getBestilling(uuid: UUID): PDialogmeldingToBehandlerBestilling? {
     return this.prepareStatement(queryGetBestillinger)
         .use {
             it.setString(1, uuid.toString())
             it.executeQuery().toList { toPBehandlerDialogmeldingBestilling() }
         }.firstOrNull()
+}
+
+fun DatabaseInterface.getBestilling(uuid: UUID): PDialogmeldingToBehandlerBestilling? {
+    return this.connection.use { connection ->
+        connection.getBestilling(uuid)
+    }
 }
 
 const val queryGetBestillingerNotSent =

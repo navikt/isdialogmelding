@@ -5,7 +5,7 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.DialogmeldingToBehandlerService
-import no.nav.syfo.behandler.database.getBestillinger
+import no.nav.syfo.behandler.database.getBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
@@ -85,7 +85,7 @@ class DialogmeldingCronjobSpek : Spek({
                     dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
 
                     val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
-                        connection.getBestillinger(
+                        connection.getBestilling(
                             uuid = dialogmeldingBestillingUuid,
                         )
                     }
@@ -101,7 +101,7 @@ class DialogmeldingCronjobSpek : Spek({
                     verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
 
                     val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
-                        connection.getBestillinger(
+                        connection.getBestilling(
                             uuid = dialogmeldingBestillingUuid,
                         )
                     }
@@ -135,7 +135,7 @@ class DialogmeldingCronjobSpek : Spek({
                     dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
 
                     val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
-                        connection.getBestillinger(
+                        connection.getBestilling(
                             uuid = dialogmeldingBestillingUuid,
                         )
                     }
@@ -151,7 +151,7 @@ class DialogmeldingCronjobSpek : Spek({
                     verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
 
                     val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
-                        connection.getBestillinger(
+                        connection.getBestilling(
                             uuid = dialogmeldingBestillingUuid,
                         )
                     }
@@ -184,7 +184,7 @@ class DialogmeldingCronjobSpek : Spek({
                     dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
 
                     val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
-                        connection.getBestillinger(
+                        connection.getBestilling(
                             uuid = dialogmeldingBestillingUuid,
                         )
                     }
@@ -206,7 +206,7 @@ class DialogmeldingCronjobSpek : Spek({
                     )
 
                     val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
-                        connection.getBestillinger(
+                        connection.getBestilling(
                             uuid = dialogmeldingBestillingUuid,
                         )
                     }

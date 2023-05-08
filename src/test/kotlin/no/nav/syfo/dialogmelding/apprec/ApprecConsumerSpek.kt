@@ -3,6 +3,7 @@ package no.nav.syfo.dialogmelding.apprec
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
+import no.nav.syfo.behandler.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.toDialogmeldingToBehandlerBestilling
@@ -28,10 +29,15 @@ class ApprecConsumerSpek : Spek({
             start()
             val incomingMessage = mockk<TextMessage>(relaxed = true)
 
+            val apprecService = ApprecService(database)
+            val dialogmeldingToBehandlerService =
+                DialogmeldingToBehandlerService(database = database, pdlClient = mockk())
             val apprecConsumer = ApprecConsumer(
                 applicationState = externalMockEnvironment.applicationState,
                 database = database,
                 inputconsumer = mockk(),
+                apprecService = apprecService,
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService
             )
 
             describe("Prosesserer innkommet melding") {
@@ -49,7 +55,7 @@ class ApprecConsumerSpek : Spek({
                         getFileAsString("src/test/resources/apprecOK.xml")
                             .replace("FiktivTestdata0001", apprecId.toString())
                             .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
-                    every { incomingMessage.text } returns(apprecXml)
+                    every { incomingMessage.text } returns (apprecXml)
                     runBlocking {
                         apprecConsumer.processApprecMessage(incomingMessage)
                     }
@@ -72,7 +78,7 @@ class ApprecConsumerSpek : Spek({
                         getFileAsString("src/test/resources/apprecOK.xml")
                             .replace("FiktivTestdata0001", apprecId.toString())
                             .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
-                    every { incomingMessage.text } returns(apprecXml)
+                    every { incomingMessage.text } returns (apprecXml)
                     runBlocking {
                         apprecConsumer.processApprecMessage(incomingMessage)
                     }
@@ -94,8 +100,11 @@ class ApprecConsumerSpek : Spek({
                     val apprecXml =
                         getFileAsString("src/test/resources/apprecOK.xml")
                             .replace("FiktivTestdata0001", apprecId.toString())
-                            .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", ukjentDialogmeldingBestillingUuid.toString())
-                    every { incomingMessage.text } returns(apprecXml)
+                            .replace(
+                                "b62016eb-6c2d-417a-8ecc-157b3c5ee2ca",
+                                ukjentDialogmeldingBestillingUuid.toString()
+                            )
+                    every { incomingMessage.text } returns (apprecXml)
                     runBlocking {
                         apprecConsumer.processApprecMessage(incomingMessage)
                     }
@@ -113,7 +122,7 @@ class ApprecConsumerSpek : Spek({
                         getFileAsString("src/test/resources/apprecError.xml")
                             .replace("FiktivTestdata0001", apprecId.toString())
                             .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
-                    every { incomingMessage.text } returns(apprecXml)
+                    every { incomingMessage.text } returns (apprecXml)
                     runBlocking {
                         apprecConsumer.processApprecMessage(incomingMessage)
                     }
@@ -140,7 +149,7 @@ class ApprecConsumerSpek : Spek({
                         getFileAsString("src/test/resources/apprecErrorUkjentMottaker.xml")
                             .replace("FiktivTestdata0001", apprecId.toString())
                             .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
-                    every { incomingMessage.text } returns(apprecXml)
+                    every { incomingMessage.text } returns (apprecXml)
                     runBlocking {
                         apprecConsumer.processApprecMessage(incomingMessage)
                     }
@@ -160,7 +169,7 @@ class ApprecConsumerSpek : Spek({
                 }
                 it("Prosesserer innkommet feilformattert melding") {
                     val apprecXml = "Ikke noen apprec"
-                    every { incomingMessage.text } returns(apprecXml)
+                    every { incomingMessage.text } returns (apprecXml)
                     runBlocking {
                         apprecConsumer.processApprecMessage(incomingMessage)
                     }
@@ -195,7 +204,8 @@ fun lagDialogmeldingBestilling(dialogmeldingBestillingUuid: UUID, behandler: Beh
         uuid = dialogmeldingBestillingUuid,
         behandlerRef = behandler.behandlerRef,
     )
-    val dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(behandler)
+    val dialogmeldingToBehandlerBestilling =
+        dialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(behandler)
     val behandlerId = database.getBehandlerByBehandlerRef(behandler.behandlerRef)!!.id
     val bestillingId = database.connection.use { connection ->
         connection.createBehandlerDialogmeldingBestilling(
