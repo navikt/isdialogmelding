@@ -60,9 +60,9 @@ spec:
               protocol: TCP
         - host: "pdl-api.dev-fss-pub.nais.io"
         - host: "syfopartnerinfo.dev-fss-pub.nais.io"
-        - host: "syfo-tilgangskontroll.dev-fss-pub.nais.io"
       rules:
         - application: fastlegerest
+        - application: syfo-tilgangskontroll
   azure:
     application:
       allowAllUsers: true
@@ -113,6 +113,6 @@ spec:
     - name: SYFOPARTNERINFO_URL
       value: "https://syfopartnerinfo.dev-fss-pub.nais.io"
     - name: SYFOTILGANGSKONTROLL_CLIENT_ID
-      value: "dev-fss.teamsykefravr.syfo-tilgangskontroll"
+      value: "dev-gcp.teamsykefravr.syfo-tilgangskontroll"
     - name: SYFOTILGANGSKONTROLL_URL
-      value: "https://syfo-tilgangskontroll.dev-fss-pub.nais.io"
+      value: "http://syfo-tilgangskontroll"
