@@ -98,7 +98,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
                         val pBehandlerDialogmeldingBestilling =
                             database.connection.use {
-                                it.getBestillinger(
+                                it.getBestilling(
                                     uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
                                 )
                             }
@@ -159,7 +159,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
                         val pBehandlerDialogmeldingBestilling =
                             database.connection.use {
-                                it.getBestillinger(
+                                it.getBestilling(
                                     uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
                                 )
                             }
@@ -203,7 +203,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         verify(exactly = 1) { mockConsumer.commitSync() }
                         val pBehandlerDialogmeldingBestilling =
                             database.connection.use {
-                                it.getBestillinger(
+                                it.getBestilling(
                                     uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
                                 )
                             }

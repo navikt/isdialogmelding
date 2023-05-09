@@ -4,11 +4,8 @@ import kotlinx.coroutines.delay
 import no.nav.helse.apprecV1.XMLAppRec
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.database.*
-import no.nav.syfo.behandler.database.domain.toBehandler
-import no.nav.syfo.behandler.database.domain.toDialogmeldingToBehandlerBestilling
-import no.nav.syfo.dialogmelding.apprec.database.createApprec
-import no.nav.syfo.dialogmelding.apprec.database.getApprec
+import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.dialogmelding.apprec.ApprecService
 import no.nav.syfo.dialogmelding.apprec.domain.Apprec
 import no.nav.syfo.dialogmelding.apprec.domain.ApprecStatus
 import no.nav.syfo.metric.RECEIVED_APPREC_COUNTER
@@ -24,6 +21,8 @@ class ApprecConsumer(
     val applicationState: ApplicationState,
     val database: DatabaseInterface,
     val inputconsumer: MessageConsumer,
+    private val apprecService: ApprecService,
+    private val dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
 ) {
 
     suspend fun run() {
@@ -60,8 +59,8 @@ class ApprecConsumer(
     }
 
     private fun storeApprec(
-        inputMessageText: String
-    ): String? {
+        inputMessageText: String,
+    ) {
         var xmlApprec: XMLAppRec? = null
         try {
             val fellesformat = apprecUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
@@ -71,50 +70,44 @@ class ApprecConsumer(
         }
         if (xmlApprec == null) {
             log.warn("ApprecConsumer received message that was not an apprec")
-            return null
+            return
         }
-        val bestillingId = xmlApprec.originalMsgId.id
 
-        val pBestilling = database.connection.use {
-            it.getBestillinger(UUID.fromString(bestillingId))
-        }
-        val pApprec = database.getApprec(UUID.fromString(xmlApprec.id))
-        if (pApprec != null) {
-            log.warn("Ignoring duplicate apprec with status ${xmlApprec.status.v} and id ${xmlApprec.id} for dialogmelding with id $bestillingId\"")
+        val bestillingId = xmlApprec.originalMsgId.id
+        val apprecId = xmlApprec.id
+        val apprecStatusValue = xmlApprec.status.v
+        val apprecExists = apprecService.apprecExists(UUID.fromString(apprecId))
+
+        if (apprecExists) {
+            log.warn("Ignoring duplicate apprec with status $apprecStatusValue and id $apprecId for dialogmelding with id $bestillingId\"")
         } else {
-            val apprecStatus = ApprecStatus.fromV(xmlApprec.status.v)
-            if (pBestilling != null && apprecStatus != null) {
-                log.info("Received apprec with status ${xmlApprec.status.v} and id ${xmlApprec.id} for dialogmelding with id $bestillingId")
-                val pBehandler = database.getBehandlerById(pBestilling.behandlerId)
-                val pBehandlerKontor = database.getBehandlerKontorById(pBehandler!!.kontorId)
-                val apprec = Apprec(
-                    uuid = UUID.fromString(xmlApprec.id),
-                    bestilling = pBestilling.toDialogmeldingToBehandlerBestilling(
-                        pBehandler.toBehandler(
-                            pBehandlerKontor
-                        )
-                    ),
-                    statusKode = apprecStatus,
-                    statusTekst = xmlApprec.status.dn,
-                    feilKode = xmlApprec.error.firstOrNull()?.v,
-                    feilTekst = xmlApprec.error.firstOrNull()?.dn,
-                )
-                database.connection.use { connection ->
-                    connection.createApprec(
-                        apprec = apprec,
-                        bestillingId = pBestilling.id,
+            val apprecStatus = ApprecStatus.fromV(apprecStatusValue)
+            if (apprecStatus != null) {
+                log.info("Received apprec with status $apprecStatus and id $apprecId for dialogmelding with id $bestillingId")
+                val dialogmeldingToBehandlerBestillingPair =
+                    dialogmeldingToBehandlerService.getBestilling(UUID.fromString(bestillingId))
+                if (dialogmeldingToBehandlerBestillingPair != null) {
+                    val (dialogmeldingBestillingId, dialogmeldingBestilling) = dialogmeldingToBehandlerBestillingPair
+                    val apprec = Apprec(
+                        uuid = UUID.fromString(apprecId),
+                        bestilling = dialogmeldingBestilling,
+                        statusKode = apprecStatus,
+                        statusTekst = xmlApprec.status.dn,
+                        feilKode = xmlApprec.error.firstOrNull()?.v,
+                        feilTekst = xmlApprec.error.firstOrNull()?.dn,
                     )
-                    if (apprec.statusKode == ApprecStatus.AVVIST && apprec.feilKode == "E21") {
-                        connection.invalidateBehandler(pBehandler.behandlerRef)
-                    }
-                    connection.commit()
+                    apprecService.createApprec(
+                        apprec = apprec,
+                        bestillingId = dialogmeldingBestillingId,
+                    )
+                } else {
+                    log.info("Received but skipped apprec with id $apprecId because unknown dialogmelding $bestillingId")
                 }
             } else {
-                log.info("Received but skipped apprec with id ${xmlApprec.id} because unknown status ${xmlApprec.status.v} or unknown dialogmelding $bestillingId")
+                log.info("Received but skipped apprec with id $apprecId because unknown status $apprecStatusValue")
             }
         }
         RECEIVED_APPREC_COUNTER.increment()
-        return xmlApprec.id
     }
 }
 

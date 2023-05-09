@@ -11,3 +11,5 @@ data class Apprec(
     val feilKode: String?,
     val feilTekst: String?,
 )
+
+fun Apprec.isUkjentMottaker(): Boolean = this.statusKode == ApprecStatus.AVVIST && this.feilKode == "E21"

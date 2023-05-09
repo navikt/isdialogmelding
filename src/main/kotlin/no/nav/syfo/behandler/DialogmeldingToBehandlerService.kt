@@ -19,14 +19,28 @@ class DialogmeldingToBehandlerService(
 ) {
     fun getBestillinger(): List<DialogmeldingToBehandlerBestilling> {
         return database.getDialogmeldingToBehandlerBestillingNotSendt()
-            .map { pDialogmeldingToBehandlerBestilling ->
-                val pBehandler = database.getBehandlerById(pDialogmeldingToBehandlerBestilling.behandlerId)!!
-                pDialogmeldingToBehandlerBestilling.toDialogmeldingToBehandlerBestilling(
-                    pBehandler.toBehandler(
-                        kontor = database.getBehandlerKontorById(pBehandler.kontorId)
-                    )
+            .map { pDialogmeldingToBehandlerBestilling -> withBehandler(pDialogmeldingToBehandlerBestilling) }
+    }
+
+    fun getBestilling(uuid: UUID): Pair<Int, DialogmeldingToBehandlerBestilling>? {
+        return database.getBestilling(uuid = uuid)
+            ?.let { pDialogmeldingToBehandlerBestilling ->
+                Pair(
+                    pDialogmeldingToBehandlerBestilling.id,
+                    withBehandler(pDialogmeldingToBehandlerBestilling)
                 )
             }
+    }
+
+    private fun withBehandler(
+        pDialogmeldingToBehandlerBestilling: PDialogmeldingToBehandlerBestilling,
+    ): DialogmeldingToBehandlerBestilling {
+        val pBehandler = database.getBehandlerById(pDialogmeldingToBehandlerBestilling.behandlerId)!!
+        return pDialogmeldingToBehandlerBestilling.toDialogmeldingToBehandlerBestilling(
+            pBehandler.toBehandler(
+                kontor = database.getBehandlerKontorById(pBehandler.kontorId)
+            )
+        )
     }
 
     fun setDialogmeldingBestillingSendt(uuid: UUID) {
@@ -63,13 +77,14 @@ class DialogmeldingToBehandlerService(
         if (pBehandler == null) {
             log.error("Unknown behandlerRef $behandlerRef in dialogmeldingToBehandlerBestilling ${dialogmeldingToBehandlerBestillingDTO.dialogmeldingUuid}")
         } else {
-            val dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(
-                behandler = pBehandler.toBehandler(
-                    kontor = database.getBehandlerKontorById(pBehandler.kontorId)
+            val dialogmeldingToBehandlerBestilling =
+                dialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(
+                    behandler = pBehandler.toBehandler(
+                        kontor = database.getBehandlerKontorById(pBehandler.kontorId)
+                    )
                 )
-            )
             database.connection.use { connection ->
-                val pDialogmeldingToBehandlerBestilling = connection.getBestillinger(
+                val pDialogmeldingToBehandlerBestilling = connection.getBestilling(
                     uuid = dialogmeldingToBehandlerBestilling.uuid
                 )
 

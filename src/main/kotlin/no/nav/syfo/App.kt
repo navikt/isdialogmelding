@@ -20,6 +20,7 @@ import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.dialogmelding.apprec.ApprecService
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
 import no.nav.syfo.identhendelse.IdenthendelseService
 import no.nav.syfo.identhendelse.kafka.IdenthendelseConsumerService
@@ -137,10 +138,13 @@ fun main() {
                 connection.start()
                 val session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE)
                 val inputconsumer = session.consumerForQueue(environment.apprecQueueName)
+                val apprecService = ApprecService(database = applicationDatabase)
                 val blockingApplicationRunner = ApprecConsumer(
                     applicationState = applicationState,
                     database = applicationDatabase,
                     inputconsumer = inputconsumer,
+                    apprecService = apprecService,
+                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                 )
                 blockingApplicationRunner.run()
             }
