@@ -12,7 +12,7 @@ import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.application.mq.*
 import no.nav.syfo.behandler.BehandlerService
-import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.kafka.*
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient

@@ -4,8 +4,8 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.mq.MQSender
-import no.nav.syfo.behandler.DialogmeldingToBehandlerService
-import no.nav.syfo.behandler.database.getBestilling
+import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
+import no.nav.syfo.dialogmelding.bestilling.database.getBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.DialogmeldingService

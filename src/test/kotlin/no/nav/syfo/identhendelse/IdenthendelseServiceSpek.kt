@@ -6,9 +6,10 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.Arbeidstaker
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
-import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.toDialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.bestilling.kafka.toDialogmeldingToBehandlerBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.dialogmelding.bestilling.database.createBehandlerDialogmeldingBestilling
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.identhendelse.database.getIdentCount

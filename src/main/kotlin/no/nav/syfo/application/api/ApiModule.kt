@@ -8,7 +8,7 @@ import no.nav.syfo.application.*
 import no.nav.syfo.application.api.authentication.*
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.BehandlerService
-import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.api.person.registerPersonBehandlerApi
 import no.nav.syfo.behandler.api.person.registerPersonOppfolgingsplanApi
 import no.nav.syfo.behandler.api.registerBehandlerApi

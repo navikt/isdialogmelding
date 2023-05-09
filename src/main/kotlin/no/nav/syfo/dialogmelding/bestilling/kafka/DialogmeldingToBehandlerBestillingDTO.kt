@@ -1,7 +1,7 @@
-package no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling
+package no.nav.syfo.dialogmelding.bestilling.kafka
 
-import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.dialogmelding.bestilling.domain.*
 import no.nav.syfo.domain.Personident
 import java.util.UUID
 

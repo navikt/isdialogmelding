@@ -1,5 +1,6 @@
-package no.nav.syfo.behandler.domain
+package no.nav.syfo.dialogmelding.bestilling.domain
 
+import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.domain.Personident
 import java.util.UUID
 

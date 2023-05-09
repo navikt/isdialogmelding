@@ -1,7 +1,7 @@
 package no.nav.syfo.cronjob
 
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import org.slf4j.LoggerFactory
 

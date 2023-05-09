@@ -1,7 +1,7 @@
 package no.nav.syfo.testhelper.generator
 
-import no.nav.syfo.behandler.domain.*
-import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.DialogmeldingToBehandlerBestillingDTO
+import no.nav.syfo.dialogmelding.bestilling.kafka.DialogmeldingToBehandlerBestillingDTO
+import no.nav.syfo.dialogmelding.bestilling.domain.*
 import no.nav.syfo.domain.Personident
 import java.util.UUID
 

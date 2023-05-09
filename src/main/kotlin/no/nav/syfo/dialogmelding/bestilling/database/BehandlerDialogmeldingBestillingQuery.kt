@@ -1,9 +1,8 @@
-package no.nav.syfo.behandler.database
+package no.nav.syfo.dialogmelding.bestilling.database
 
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
-import no.nav.syfo.behandler.database.domain.PDialogmeldingToBehandlerBestilling
-import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
 import java.sql.*
 import java.time.Instant
 import java.util.UUID

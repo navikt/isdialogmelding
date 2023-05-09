@@ -1,6 +1,7 @@
-package no.nav.syfo.behandler.database.domain
+package no.nav.syfo.dialogmelding.bestilling.database
 
 import no.nav.syfo.behandler.domain.*
+import no.nav.syfo.dialogmelding.bestilling.domain.*
 import no.nav.syfo.domain.Personident
 import java.sql.Timestamp
 import java.util.UUID

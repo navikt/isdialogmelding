@@ -3,7 +3,7 @@ package no.nav.syfo.testhelper
 import io.ktor.server.application.*
 import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.behandler.BehandlerService
-import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient

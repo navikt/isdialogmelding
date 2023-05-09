@@ -3,6 +3,7 @@ package no.nav.syfo.dialogmelding
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
 import no.nav.syfo.fellesformat.Fellesformat
 import no.nav.syfo.dialogmelding.converter.createFellesformat
 import no.nav.syfo.domain.Personident
