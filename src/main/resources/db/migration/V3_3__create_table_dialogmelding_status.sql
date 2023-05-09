@@ -7,7 +7,7 @@ CREATE TABLE DIALOGMELDING_STATUS
     tekst         VARCHAR(100),
     created_at    timestamptz  NOT NULL,
     updated_at    timestamptz  NOT NULL,
-    published_at  timestamptz  NOT NULL
+    published_at  timestamptz
 );
 
 CREATE INDEX IX_DIALOGMELDING_STATUS_BESTILLING_ID on DIALOGMELDING_STATUS (bestilling_id);
