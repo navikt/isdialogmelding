@@ -2,7 +2,7 @@ package no.nav.syfo.dialogmelding.converter
 
 import no.kith.xmlstds.dialog._2006_10_11.ObjectFactory
 import no.kith.xmlstds.dialog._2006_10_11.XMLDialogmelding
-import no.nav.syfo.behandler.domain.*
+import no.nav.syfo.dialogmelding.bestilling.domain.*
 import java.util.*
 
 fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogmelding {

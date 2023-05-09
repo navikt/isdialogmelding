@@ -6,8 +6,8 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import no.nav.syfo.api.sendOppfolgingsplanPath
 import no.nav.syfo.application.mq.MQSender
-import no.nav.syfo.behandler.database.getDialogmeldingToBehandlerBestillingNotSendt
-import no.nav.syfo.behandler.domain.DialogmeldingType
+import no.nav.syfo.dialogmelding.bestilling.database.getDialogmeldingToBehandlerBestillingNotSendt
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingType
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
 import no.nav.syfo.util.bearerHeader

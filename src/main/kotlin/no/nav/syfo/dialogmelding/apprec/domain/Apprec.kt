@@ -1,6 +1,6 @@
 package no.nav.syfo.dialogmelding.apprec.domain
 
-import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
 import java.util.UUID
 
 data class Apprec(

@@ -3,12 +3,13 @@ package no.nav.syfo.dialogmelding.apprec
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.toDialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.bestilling.kafka.toDialogmeldingToBehandlerBestilling
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
 import no.nav.syfo.dialogmelding.apprec.database.getApprec
+import no.nav.syfo.dialogmelding.bestilling.database.createBehandlerDialogmeldingBestilling
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateBehandler

@@ -1,7 +1,7 @@
 package no.nav.syfo.dialogmelding.converter
 
-import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
-import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.toDialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.bestilling.kafka.toDialogmeldingToBehandlerBestilling
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.fellesformat.Fellesformat

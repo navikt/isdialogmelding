@@ -1,10 +1,10 @@
 package no.nav.syfo.oppfolgingsplan
 
 import no.nav.syfo.behandler.BehandlerService
-import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.api.person.RSOppfolgingsplan
-import no.nav.syfo.behandler.domain.*
-import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.DialogmeldingToBehandlerBestillingDTO
+import no.nav.syfo.dialogmelding.bestilling.kafka.DialogmeldingToBehandlerBestillingDTO
+import no.nav.syfo.dialogmelding.bestilling.domain.*
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.metric.COUNT_SEND_OPPFOLGINGSPLAN_FAILED
 import no.nav.syfo.metric.COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS

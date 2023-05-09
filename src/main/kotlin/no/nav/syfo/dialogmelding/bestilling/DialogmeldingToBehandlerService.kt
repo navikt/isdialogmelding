@@ -1,17 +1,19 @@
-package no.nav.syfo.behandler
+package no.nav.syfo.dialogmelding.bestilling
 
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.*
-import no.nav.syfo.behandler.domain.*
-import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.*
+import no.nav.syfo.behandler.domain.Arbeidstaker
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.dialogmelding.bestilling.database.*
+import no.nav.syfo.dialogmelding.bestilling.kafka.*
 import no.nav.syfo.domain.Personident
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.UUID
+import java.util.*
 
-private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.behandler")
+private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.dialogmelding.bestilling")
 
 class DialogmeldingToBehandlerService(
     private val database: DatabaseInterface,

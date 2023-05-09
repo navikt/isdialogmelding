@@ -3,10 +3,12 @@ package no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.dialogmelding.bestilling.database.getBestilling
+import no.nav.syfo.dialogmelding.bestilling.kafka.*
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateBehandler

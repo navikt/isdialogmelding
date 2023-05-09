@@ -1,18 +1,11 @@
 package no.nav.syfo.behandler.kafka
 
-import no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling.DialogmeldingToBehandlerBestillingDTO
 import no.nav.syfo.behandler.kafka.dialogmeldingfrombehandler.KafkaDialogmeldingFromBehandlerDTO
 import no.nav.syfo.behandler.kafka.sykmelding.ReceivedSykmeldingDTO
 import no.nav.syfo.util.configuredJacksonMapper
 import org.apache.kafka.common.serialization.Deserializer
 
 val mapper = configuredJacksonMapper()
-
-class JacksonKafkaDeserializerBehandlerDialogmeldingBestilling : Deserializer<DialogmeldingToBehandlerBestillingDTO> {
-    override fun deserialize(topic: String, data: ByteArray): DialogmeldingToBehandlerBestillingDTO =
-        mapper.readValue(data, DialogmeldingToBehandlerBestillingDTO::class.java)
-    override fun close() {}
-}
 
 class JacksonKafkaDeserializerSykmelding : Deserializer<ReceivedSykmeldingDTO> {
     override fun deserialize(topic: String, data: ByteArray): ReceivedSykmeldingDTO =

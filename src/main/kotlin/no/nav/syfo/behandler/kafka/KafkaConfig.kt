@@ -5,15 +5,6 @@ import no.nav.syfo.application.kafka.kafkaConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import java.util.*
 
-fun kafkaBehandlerDialogmeldingBestillingConsumerConfig(
-    applicationEnvironmentKafka: ApplicationEnvironmentKafka,
-): Properties {
-    return kafkaConsumerConfig(applicationEnvironmentKafka).apply {
-        this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] =
-            JacksonKafkaDeserializerBehandlerDialogmeldingBestilling::class.java.canonicalName
-    }
-}
-
 fun kafkaSykmeldingConsumerConfig(
     applicationEnvironmentKafka: ApplicationEnvironmentKafka,
 ): Properties {

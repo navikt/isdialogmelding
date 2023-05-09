@@ -1,6 +1,6 @@
 package no.nav.syfo.dialogmelding.converter
 
-import no.nav.syfo.behandler.domain.*
+import no.nav.syfo.dialogmelding.bestilling.domain.*
 import no.nav.xml.eiff._2.ObjectFactory
 import no.nav.xml.eiff._2.XMLMottakenhetBlokk
 

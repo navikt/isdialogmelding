@@ -2,8 +2,8 @@ package no.nav.syfo.dialogmelding.converter
 
 import no.kith.xmlstds.msghead._2006_05_24.ObjectFactory
 import no.kith.xmlstds.msghead._2006_05_24.XMLReceiver
-import no.nav.syfo.behandler.domain.DialogmeldingToBehandlerBestilling
-import no.nav.syfo.behandler.domain.DialogmeldingType
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingType
 import no.nav.syfo.util.createXMLIdentForPersonident
 
 fun createReceiver(

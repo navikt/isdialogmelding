@@ -4,7 +4,7 @@ import kotlinx.coroutines.delay
 import no.nav.helse.apprecV1.XMLAppRec
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.DialogmeldingToBehandlerService
+import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.apprec.ApprecService
 import no.nav.syfo.dialogmelding.apprec.domain.Apprec
 import no.nav.syfo.dialogmelding.apprec.domain.ApprecStatus
