@@ -22,6 +22,7 @@ import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.dialogmelding.apprec.ApprecService
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
+import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 import no.nav.syfo.identhendelse.IdenthendelseService
 import no.nav.syfo.identhendelse.kafka.IdenthendelseConsumerService
 import no.nav.syfo.identhendelse.kafka.launchKafkaTaskIdenthendelse
@@ -101,6 +102,8 @@ fun main() {
     applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) {
         applicationState.ready = true
         logger.info("Application is ready, running Java VM ${Runtime.version()}")
+
+        val dialogmeldingStatusService = DialogmeldingStatusService()
         launchKafkaTaskDialogmeldingBestilling(
             applicationState = applicationState,
             applicationEnvironmentKafka = environment.kafka,
@@ -138,7 +141,10 @@ fun main() {
                 connection.start()
                 val session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE)
                 val inputconsumer = session.consumerForQueue(environment.apprecQueueName)
-                val apprecService = ApprecService(database = applicationDatabase)
+                val apprecService = ApprecService(
+                    database = applicationDatabase,
+                    dialogmeldingStatusService = dialogmeldingStatusService
+                )
                 val blockingApplicationRunner = ApprecConsumer(
                     applicationState = applicationState,
                     database = applicationDatabase,
