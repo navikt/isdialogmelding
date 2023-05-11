@@ -8,6 +8,7 @@ import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 
 fun Application.testApiModule(
     externalMockEnvironment: ExternalMockEnvironment,
@@ -43,7 +44,10 @@ fun Application.testApiModule(
                 azureAdClient = azureAdClient,
                 pdlClientId = externalMockEnvironment.environment.pdlClientId,
                 pdlUrl = externalMockEnvironment.environment.pdlUrl,
-            )
+            ),
+            dialogmeldingStatusService = DialogmeldingStatusService(
+                database = externalMockEnvironment.database,
+            ),
         ),
     )
 }

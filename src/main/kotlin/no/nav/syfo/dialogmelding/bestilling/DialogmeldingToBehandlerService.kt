@@ -8,6 +8,8 @@ import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBesti
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.bestilling.database.*
 import no.nav.syfo.dialogmelding.bestilling.kafka.*
+import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
+import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatus
 import no.nav.syfo.domain.Personident
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -18,21 +20,22 @@ private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.dialogmelding.bes
 class DialogmeldingToBehandlerService(
     private val database: DatabaseInterface,
     private val pdlClient: PdlClient,
+    private val dialogmeldingStatusService: DialogmeldingStatusService,
 ) {
-    fun getBestillinger(): List<DialogmeldingToBehandlerBestilling> {
-        return database.getDialogmeldingToBehandlerBestillingNotSendt()
-            .map { pDialogmeldingToBehandlerBestilling -> withBehandler(pDialogmeldingToBehandlerBestilling) }
+    fun getBestillinger(): List<Pair<Int, DialogmeldingToBehandlerBestilling>> {
+        return database.getDialogmeldingToBehandlerBestillingNotSendt().map(::toDialogmeldingToBehandlerBestillingPair)
     }
 
     fun getBestilling(uuid: UUID): Pair<Int, DialogmeldingToBehandlerBestilling>? {
-        return database.getBestilling(uuid = uuid)
-            ?.let { pDialogmeldingToBehandlerBestilling ->
-                Pair(
-                    pDialogmeldingToBehandlerBestilling.id,
-                    withBehandler(pDialogmeldingToBehandlerBestilling)
-                )
-            }
+        return database.getBestilling(uuid = uuid)?.let(::toDialogmeldingToBehandlerBestillingPair)
     }
+
+    private fun toDialogmeldingToBehandlerBestillingPair(
+        pDialogmeldingToBehandlerBestilling: PDialogmeldingToBehandlerBestilling,
+    ): Pair<Int, DialogmeldingToBehandlerBestilling> = Pair(
+        pDialogmeldingToBehandlerBestilling.id,
+        withBehandler(pDialogmeldingToBehandlerBestilling)
+    )
 
     private fun withBehandler(
         pDialogmeldingToBehandlerBestilling: PDialogmeldingToBehandlerBestilling,
@@ -91,9 +94,14 @@ class DialogmeldingToBehandlerService(
                 )
 
                 if (pDialogmeldingToBehandlerBestilling == null) {
-                    connection.createBehandlerDialogmeldingBestilling(
+                    val bestillingId = connection.createBehandlerDialogmeldingBestilling(
                         dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestilling,
                         behandlerId = pBehandler.id,
+                    )
+                    dialogmeldingStatusService.createDialogmeldingStatus(
+                        DialogmeldingStatus.bestilt(bestilling = dialogmeldingToBehandlerBestilling),
+                        bestillingId = bestillingId,
+                        connection = connection,
                     )
                 } else {
                     log.warn("Ignoring duplicate behandler dialogmelding bestilling with uuid: ${dialogmeldingToBehandlerBestilling.uuid}.")

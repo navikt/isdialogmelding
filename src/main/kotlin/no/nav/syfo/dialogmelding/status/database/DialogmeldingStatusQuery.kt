@@ -21,7 +21,28 @@ const val queryCreateDialogmeldingStatus = """
     ) VALUES (DEFAULT, ?, ? ,?, ?, ?, ?) RETURNING id 
 """
 
-fun Connection.createDialogmeldingStatus(dialogmeldingStatus: DialogmeldingStatus, bestillingId: Int) {
+fun DatabaseInterface.createDialogmeldingStatus(
+    dialogmeldingStatus: DialogmeldingStatus,
+    bestillingId: Int,
+    connection: Connection?,
+) {
+    if (connection != null) {
+        connection.createDialogmeldingStatus(
+            dialogmeldingStatus = dialogmeldingStatus,
+            bestillingId = bestillingId,
+        )
+    } else {
+        this.connection.use {
+            it.createDialogmeldingStatus(
+                dialogmeldingStatus = dialogmeldingStatus,
+                bestillingId = bestillingId,
+            )
+            it.commit()
+        }
+    }
+}
+
+private fun Connection.createDialogmeldingStatus(dialogmeldingStatus: DialogmeldingStatus, bestillingId: Int) {
     val idList = this.prepareStatement(queryCreateDialogmeldingStatus).use {
         it.setString(1, dialogmeldingStatus.uuid.toString())
         it.setInt(2, bestillingId)

@@ -64,6 +64,7 @@ fun main() {
     )
     lateinit var behandlerService: BehandlerService
     lateinit var dialogmeldingToBehandlerService: DialogmeldingToBehandlerService
+    lateinit var dialogmeldingStatusService: DialogmeldingStatusService
 
     val applicationEngineEnvironment = applicationEngineEnvironment {
         log = logger
@@ -81,9 +82,13 @@ fun main() {
                 partnerinfoClient = partnerinfoClient,
                 database = applicationDatabase,
             )
+            dialogmeldingStatusService = DialogmeldingStatusService(
+                database = applicationDatabase,
+            )
             dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
                 database = applicationDatabase,
                 pdlClient = pdlClient,
+                dialogmeldingStatusService = dialogmeldingStatusService,
             )
 
             apiModule(
@@ -102,8 +107,6 @@ fun main() {
     applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) {
         applicationState.ready = true
         logger.info("Application is ready, running Java VM ${Runtime.version()}")
-
-        val dialogmeldingStatusService = DialogmeldingStatusService()
         launchKafkaTaskDialogmeldingBestilling(
             applicationState = applicationState,
             applicationEnvironmentKafka = environment.kafka,
@@ -118,6 +121,7 @@ fun main() {
             environment = environment,
             dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
             dialogmeldingService = dialogmeldingService,
+            dialogmeldingStatusService = dialogmeldingStatusService,
         )
         launchKafkaTaskSykmelding(
             applicationState = applicationState,
