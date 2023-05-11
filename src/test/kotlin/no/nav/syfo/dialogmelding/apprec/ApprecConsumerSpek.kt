@@ -10,6 +10,9 @@ import no.nav.syfo.dialogmelding.bestilling.kafka.toDialogmeldingToBehandlerBest
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
 import no.nav.syfo.dialogmelding.apprec.database.getApprec
 import no.nav.syfo.dialogmelding.bestilling.database.createBehandlerDialogmeldingBestilling
+import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
+import no.nav.syfo.dialogmelding.status.database.getDialogmeldingStatusNotPublished
+import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatusType
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateBehandler
@@ -30,7 +33,11 @@ class ApprecConsumerSpek : Spek({
             start()
             val incomingMessage = mockk<TextMessage>(relaxed = true)
 
-            val apprecService = ApprecService(database)
+            val dialogmeldingStatusService = DialogmeldingStatusService()
+            val apprecService = ApprecService(
+                database = database,
+                dialogmeldingStatusService = dialogmeldingStatusService
+            )
             val dialogmeldingToBehandlerService =
                 DialogmeldingToBehandlerService(database = database, pdlClient = mockk())
             val apprecConsumer = ApprecConsumer(
@@ -175,6 +182,52 @@ class ApprecConsumerSpek : Spek({
                         apprecConsumer.processApprecMessage(incomingMessage)
                     }
                     // should not get an exception
+                }
+                it("Prosessering av innkommet melding OK lagrer dialogmelding-status OK") {
+                    val dialogmeldingBestillingUuid = UUID.randomUUID()
+                    val bestillingId = lagDialogmeldingBestilling(dialogmeldingBestillingUuid, lagBehandler())
+                    val apprecXml =
+                        getFileAsString("src/test/resources/apprecOK.xml")
+                            .replace("FiktivTestdata0001", UUID.randomUUID().toString())
+                            .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
+                    every { incomingMessage.text } returns (apprecXml)
+                    runBlocking {
+                        apprecConsumer.processApprecMessage(incomingMessage)
+                    }
+
+                    val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
+                    dialogmeldingStatusNotPublished.size shouldBeEqualTo 1
+
+                    val pDialogmeldingStatus = dialogmeldingStatusNotPublished.first()
+                    pDialogmeldingStatus.status shouldBeEqualTo DialogmeldingStatusType.OK.name
+                    pDialogmeldingStatus.tekst?.shouldBeEmpty()
+                    pDialogmeldingStatus.bestillingId shouldBeEqualTo bestillingId
+                    pDialogmeldingStatus.createdAt.shouldNotBeNull()
+                    pDialogmeldingStatus.updatedAt.shouldNotBeNull()
+                    pDialogmeldingStatus.publishedAt.shouldBeNull()
+                }
+                it("Prosessering av innkommet melding Avvist lagrer dialogmelding-status Avvist") {
+                    val dialogmeldingBestillingUuid = UUID.randomUUID()
+                    val bestillingId = lagDialogmeldingBestilling(dialogmeldingBestillingUuid, lagBehandler())
+                    val apprecXml =
+                        getFileAsString("src/test/resources/apprecError.xml")
+                            .replace("FiktivTestdata0001", UUID.randomUUID().toString())
+                            .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
+                    every { incomingMessage.text } returns (apprecXml)
+                    runBlocking {
+                        apprecConsumer.processApprecMessage(incomingMessage)
+                    }
+
+                    val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
+                    dialogmeldingStatusNotPublished.size shouldBeEqualTo 1
+
+                    val pDialogmeldingStatus = dialogmeldingStatusNotPublished.first()
+                    pDialogmeldingStatus.status shouldBeEqualTo DialogmeldingStatusType.AVVIST.name
+                    pDialogmeldingStatus.tekst shouldBeEqualTo "Annen feil"
+                    pDialogmeldingStatus.bestillingId shouldBeEqualTo bestillingId
+                    pDialogmeldingStatus.createdAt.shouldNotBeNull()
+                    pDialogmeldingStatus.updatedAt.shouldNotBeNull()
+                    pDialogmeldingStatus.publishedAt.shouldBeNull()
                 }
             }
         }
