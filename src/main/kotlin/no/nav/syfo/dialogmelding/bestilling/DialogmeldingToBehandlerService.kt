@@ -99,7 +99,9 @@ class DialogmeldingToBehandlerService(
                         behandlerId = pBehandler.id,
                     )
                     dialogmeldingStatusService.createDialogmeldingStatus(
-                        DialogmeldingStatus.bestilt(bestilling = dialogmeldingToBehandlerBestilling),
+                        dialogmeldingStatus = DialogmeldingStatus.bestilt(
+                            bestilling = dialogmeldingToBehandlerBestilling
+                        ),
                         bestillingId = bestillingId,
                         connection = connection,
                     )
