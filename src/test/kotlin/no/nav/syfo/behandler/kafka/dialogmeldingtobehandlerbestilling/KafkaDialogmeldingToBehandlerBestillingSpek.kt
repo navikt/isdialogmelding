@@ -8,7 +8,6 @@ import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.bestilling.database.getBestilling
 import no.nav.syfo.dialogmelding.bestilling.kafka.*
-import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 import no.nav.syfo.dialogmelding.status.database.getDialogmeldingStatusNotPublished
 import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatusType
 import no.nav.syfo.testhelper.*
@@ -40,9 +39,6 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
         val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
             database = database,
             pdlClient = pdlClient,
-            dialogmeldingStatusService = DialogmeldingStatusService(
-                database = database,
-            ),
         )
 
         afterEachTest {
@@ -91,7 +87,8 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
 
-                        val pBehandlerDialogmeldingBestilling = database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
+                        val pBehandlerDialogmeldingBestilling =
+                            database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
                         pBehandlerDialogmeldingBestilling shouldNotBeEqualTo null
                         pBehandlerDialogmeldingBestilling!!.uuid shouldBeEqualTo dialogmeldingBestillingUuid
                         pBehandlerDialogmeldingBestilling.tekst!! shouldBeEqualTo dialogmeldingBestilling.dialogmeldingTekst
@@ -184,7 +181,8 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
 
-                        val pBehandlerDialogmeldingBestilling = database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
+                        val pBehandlerDialogmeldingBestilling =
+                            database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
 
                         pBehandlerDialogmeldingBestilling shouldNotBeEqualTo null
                         pBehandlerDialogmeldingBestilling!!.uuid shouldBeEqualTo dialogmeldingBestillingUuid
@@ -222,7 +220,8 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         }
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val pBehandlerDialogmeldingBestilling = database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
+                        val pBehandlerDialogmeldingBestilling =
+                            database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
                         pBehandlerDialogmeldingBestilling shouldBeEqualTo null
                     }
                 }

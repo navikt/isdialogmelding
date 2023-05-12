@@ -47,13 +47,13 @@ class DialogmeldingCronjobSpek : Spek({
                 externalMockEnvironment = externalMockEnvironment,
             )
 
-            val dialogmeldingStatusService = DialogmeldingStatusService(
-                database = database,
-            )
             val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
                 database = database,
                 pdlClient = pdlClient,
-                dialogmeldingStatusService = dialogmeldingStatusService,
+            )
+            val dialogmeldingStatusService = DialogmeldingStatusService(
+                database = database,
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
             )
             val dialogmeldingService = DialogmeldingService(
                 pdlClient = pdlClient,

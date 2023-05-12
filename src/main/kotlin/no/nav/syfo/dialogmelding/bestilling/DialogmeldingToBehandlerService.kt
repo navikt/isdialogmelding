@@ -8,7 +8,7 @@ import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBesti
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.bestilling.database.*
 import no.nav.syfo.dialogmelding.bestilling.kafka.*
-import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
+import no.nav.syfo.dialogmelding.status.database.createDialogmeldingStatus
 import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatus
 import no.nav.syfo.domain.Personident
 import org.slf4j.Logger
@@ -20,7 +20,6 @@ private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.dialogmelding.bes
 class DialogmeldingToBehandlerService(
     private val database: DatabaseInterface,
     private val pdlClient: PdlClient,
-    private val dialogmeldingStatusService: DialogmeldingStatusService,
 ) {
     fun getBestillinger(): List<Pair<Int, DialogmeldingToBehandlerBestilling>> {
         return database.getDialogmeldingToBehandlerBestillingNotSendt().map(::toDialogmeldingToBehandlerBestillingPair)
@@ -28,6 +27,14 @@ class DialogmeldingToBehandlerService(
 
     fun getBestilling(uuid: UUID): Pair<Int, DialogmeldingToBehandlerBestilling>? {
         return database.getBestilling(uuid = uuid)?.let(::toDialogmeldingToBehandlerBestillingPair)
+    }
+
+    fun getBestilling(id: Int): DialogmeldingToBehandlerBestilling? {
+        return database.getBestilling(id = id)?.let { pDialogmeldingToBehandlerBestilling ->
+            toDialogmeldingToBehandlerBestillingPair(
+                pDialogmeldingToBehandlerBestilling
+            ).second
+        }
     }
 
     private fun toDialogmeldingToBehandlerBestillingPair(
@@ -98,12 +105,11 @@ class DialogmeldingToBehandlerService(
                         dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestilling,
                         behandlerId = pBehandler.id,
                     )
-                    dialogmeldingStatusService.createDialogmeldingStatus(
+                    connection.createDialogmeldingStatus(
                         dialogmeldingStatus = DialogmeldingStatus.bestilt(
                             bestilling = dialogmeldingToBehandlerBestilling
                         ),
                         bestillingId = bestillingId,
-                        connection = connection,
                     )
                 } else {
                     log.warn("Ignoring duplicate behandler dialogmelding bestilling with uuid: ${dialogmeldingToBehandlerBestilling.uuid}.")

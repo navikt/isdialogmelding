@@ -4,6 +4,7 @@ import no.nav.syfo.application.*
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.cronjob.leaderelection.LeaderPodClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.dialogmelding.cronjob.DialogmeldingStatusCronjob
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 
 fun cronjobModule(
@@ -32,5 +33,13 @@ fun cronjobModule(
         cronjobRunner.start(
             cronjob = dialogmeldingSendCronjob
         )
+    }
+
+    if (environment.publishDialogmeldingStatusEnabled) {
+        val dialogmeldingStatusCronjob =
+            DialogmeldingStatusCronjob(dialogmeldingStatusService = dialogmeldingStatusService)
+        launchBackgroundTask(applicationState = applicationState) {
+            cronjobRunner.start(cronjob = dialogmeldingStatusCronjob)
+        }
     }
 }

@@ -24,25 +24,17 @@ const val queryCreateDialogmeldingStatus = """
 fun DatabaseInterface.createDialogmeldingStatus(
     dialogmeldingStatus: DialogmeldingStatus,
     bestillingId: Int,
-    connection: Connection?,
 ) {
-    if (connection != null) {
-        connection.createDialogmeldingStatus(
+    this.connection.use {
+        it.createDialogmeldingStatus(
             dialogmeldingStatus = dialogmeldingStatus,
             bestillingId = bestillingId,
         )
-    } else {
-        this.connection.use {
-            it.createDialogmeldingStatus(
-                dialogmeldingStatus = dialogmeldingStatus,
-                bestillingId = bestillingId,
-            )
-            it.commit()
-        }
+        it.commit()
     }
 }
 
-private fun Connection.createDialogmeldingStatus(dialogmeldingStatus: DialogmeldingStatus, bestillingId: Int) {
+fun Connection.createDialogmeldingStatus(dialogmeldingStatus: DialogmeldingStatus, bestillingId: Int) {
     val idList = this.prepareStatement(queryCreateDialogmeldingStatus).use {
         it.setString(1, dialogmeldingStatus.uuid.toString())
         it.setInt(2, bestillingId)
@@ -55,6 +47,24 @@ private fun Connection.createDialogmeldingStatus(dialogmeldingStatus: Dialogmeld
 
     if (idList.size != 1) {
         throw SQLException("Creating DIALOGMELDING_STATUS failed, no rows affected.")
+    }
+}
+
+const val queryUpdateDialomeldingStatusPublishedAt = """
+    UPDATE DIALOGMELDING_STATUS SET published_at = ? WHERE uuid = ?
+"""
+
+fun DatabaseInterface.updatePublishedAt(uuid: UUID) {
+    this.connection.use { connection ->
+        val rowCount = connection.prepareStatement(queryUpdateDialomeldingStatusPublishedAt).use {
+            it.setObject(1, OffsetDateTime.now())
+            it.setString(2, uuid.toString())
+            it.executeUpdate()
+        }
+        if (rowCount != 1) {
+            throw SQLException("Failed to update published at for DIALOGMELDING_STATUS with uuid: $uuid ")
+        }
+        connection.commit()
     }
 }
 

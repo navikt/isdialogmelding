@@ -84,11 +84,11 @@ fun main() {
             )
             dialogmeldingStatusService = DialogmeldingStatusService(
                 database = applicationDatabase,
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
             )
             dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
                 database = applicationDatabase,
                 pdlClient = pdlClient,
-                dialogmeldingStatusService = dialogmeldingStatusService,
             )
 
             apiModule(
@@ -147,7 +147,6 @@ fun main() {
                 val inputconsumer = session.consumerForQueue(environment.apprecQueueName)
                 val apprecService = ApprecService(
                     database = applicationDatabase,
-                    dialogmeldingStatusService = dialogmeldingStatusService
                 )
                 val blockingApplicationRunner = ApprecConsumer(
                     applicationState = applicationState,
