@@ -3,6 +3,7 @@ package no.nav.syfo.dialogmelding.status.domain
 import no.nav.syfo.dialogmelding.apprec.domain.Apprec
 import no.nav.syfo.dialogmelding.apprec.domain.ApprecStatus
 import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.status.database.PDialogmeldingStatus
 import no.nav.syfo.util.nowUTC
 import java.time.OffsetDateTime
 import java.util.*
@@ -44,6 +45,18 @@ data class DialogmeldingStatus private constructor(
                 )
             }
         }
+
+        fun fromPDialogmeldingStatus(
+            pDialogmeldingStatus: PDialogmeldingStatus,
+            bestilling: DialogmeldingToBehandlerBestilling,
+        ): DialogmeldingStatus = DialogmeldingStatus(
+            uuid = pDialogmeldingStatus.uuid,
+            status = DialogmeldingStatusType.valueOf(pDialogmeldingStatus.status),
+            tekst = pDialogmeldingStatus.tekst,
+            createdAt = pDialogmeldingStatus.createdAt,
+            publishedAt = pDialogmeldingStatus.publishedAt,
+            bestilling = bestilling,
+        )
 
         private fun create(
             status: DialogmeldingStatusType,

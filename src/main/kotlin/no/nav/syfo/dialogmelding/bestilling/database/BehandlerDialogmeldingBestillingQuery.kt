@@ -114,6 +114,20 @@ fun DatabaseInterface.getBestilling(uuid: UUID): PDialogmeldingToBehandlerBestil
     }
 }
 
+const val queryGetBestilling =
+    """
+        SELECT * FROM BEHANDLER_DIALOGMELDING_BESTILLING WHERE id = ?
+    """
+
+fun DatabaseInterface.getBestilling(id: Int): PDialogmeldingToBehandlerBestilling? {
+    return this.connection.use { connection ->
+        connection.prepareStatement(queryGetBestilling).use { it ->
+            it.setInt(1, id)
+            it.executeQuery().toList { toPBehandlerDialogmeldingBestilling() }
+        }.firstOrNull()
+    }
+}
+
 const val queryGetBestillingerNotSent =
     """
         SELECT * FROM BEHANDLER_DIALOGMELDING_BESTILLING WHERE sendt is NULL ORDER BY id LIMIT 50

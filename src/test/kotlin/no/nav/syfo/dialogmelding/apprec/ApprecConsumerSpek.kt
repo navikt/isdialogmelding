@@ -7,7 +7,6 @@ import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
 import no.nav.syfo.dialogmelding.apprec.database.getApprec
-import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 import no.nav.syfo.dialogmelding.status.database.getDialogmeldingStatusNotPublished
 import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatusType
 import no.nav.syfo.testhelper.*
@@ -27,16 +26,13 @@ class ApprecConsumerSpek : Spek({
             start()
             val incomingMessage = mockk<TextMessage>(relaxed = true)
 
-            val dialogmeldingStatusService = DialogmeldingStatusService(database = database)
             val apprecService = ApprecService(
                 database = database,
-                dialogmeldingStatusService = dialogmeldingStatusService
             )
             val dialogmeldingToBehandlerService =
                 DialogmeldingToBehandlerService(
                     database = database,
                     pdlClient = mockk(),
-                    dialogmeldingStatusService = dialogmeldingStatusService
                 )
             val apprecConsumer = ApprecConsumer(
                 applicationState = externalMockEnvironment.applicationState,
