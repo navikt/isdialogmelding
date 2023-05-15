@@ -4,23 +4,22 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
-import no.nav.syfo.behandler.database.*
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.bestilling.database.getBestilling
 import no.nav.syfo.dialogmelding.bestilling.kafka.*
-import no.nav.syfo.domain.PartnerId
+import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
+import no.nav.syfo.dialogmelding.status.database.getDialogmeldingStatusNotPublished
+import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatusType
 import no.nav.syfo.testhelper.*
-import no.nav.syfo.testhelper.generator.generateBehandler
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingDTO
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldNotBeEqualTo
+import no.nav.syfo.testhelper.testdata.lagreBehandler
+import org.amshove.kluent.*
 import org.apache.kafka.clients.consumer.*
 import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.time.Duration
-import java.util.Random
 import java.util.UUID
 
 class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
@@ -41,8 +40,10 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
         val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
             database = database,
             pdlClient = pdlClient,
+            dialogmeldingStatusService = DialogmeldingStatusService(
+                database = database,
+            ),
         )
-        val random = Random()
 
         afterEachTest {
             database.dropData()
@@ -58,19 +59,11 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                 )
                 describe("Happy path") {
                     it("should persist incoming bestillinger") {
-                        val behandlerRef = UUID.randomUUID()
-                        val partnerId = PartnerId(random.nextInt())
-                        val behandler = generateBehandler(behandlerRef, partnerId)
-                        database.connection.use {
-                            val kontorId = it.createBehandlerKontor(behandler.kontor)
-                            it.createBehandler(behandler, kontorId)
-                            it.commit()
-                        }
-
+                        val behandler = lagreBehandler(database)
                         val dialogmeldingBestillingUuid = UUID.randomUUID()
                         val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
                             uuid = dialogmeldingBestillingUuid,
-                            behandlerRef = behandlerRef,
+                            behandlerRef = behandler.behandlerRef,
                         )
                         val dialogmeldingBestillingRecord = ConsumerRecord(
                             DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
@@ -98,32 +91,64 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
 
-                        val pBehandlerDialogmeldingBestilling =
-                            database.connection.use {
-                                it.getBestilling(
-                                    uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
-                                )
-                            }
+                        val pBehandlerDialogmeldingBestilling = database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
                         pBehandlerDialogmeldingBestilling shouldNotBeEqualTo null
                         pBehandlerDialogmeldingBestilling!!.uuid shouldBeEqualTo dialogmeldingBestillingUuid
                         pBehandlerDialogmeldingBestilling.tekst!! shouldBeEqualTo dialogmeldingBestilling.dialogmeldingTekst
                     }
+                    it("persists dialogmelding-status BESTILT when incoming bestilling") {
+                        val behandler = lagreBehandler(database)
+                        val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
+                            uuid = UUID.randomUUID(),
+                            behandlerRef = behandler.behandlerRef,
+                        )
+                        val dialogmeldingBestillingRecord = ConsumerRecord(
+                            DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
+                            partition,
+                            1,
+                            dialogmeldingBestilling.dialogmeldingUuid,
+                            dialogmeldingBestilling,
+                        )
+                        val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
+                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                            mapOf(
+                                dialogmeldingToBehandlerBestillingTopicPartition to listOf(
+                                    dialogmeldingBestillingRecord,
+                                )
+                            )
+                        )
+                        every { mockConsumer.commitSync() } returns Unit
+
+                        runBlocking {
+                            pollAndProcessDialogmeldingBestilling(
+                                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                                kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+                            )
+                        }
+
+                        val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
+                        dialogmeldingStatusNotPublished.size shouldBeEqualTo 1
+
+                        val pDialogmeldingStatus = dialogmeldingStatusNotPublished.first()
+                        val pBehandlerDialogmeldingBestilling =
+                            database.getBestilling(
+                                uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
+                            )
+                        pDialogmeldingStatus.status shouldBeEqualTo DialogmeldingStatusType.BESTILT.name
+                        pDialogmeldingStatus.tekst.shouldBeNull()
+                        pDialogmeldingStatus.bestillingId shouldBeEqualTo pBehandlerDialogmeldingBestilling?.id
+                        pDialogmeldingStatus.createdAt.shouldNotBeNull()
+                        pDialogmeldingStatus.updatedAt.shouldNotBeNull()
+                        pDialogmeldingStatus.publishedAt.shouldBeNull()
+                    }
                 }
                 describe("Should only persist once when duplicates") {
                     it("Should only persist once when duplicates") {
-                        val behandlerRef = UUID.randomUUID()
-                        val partnerId = PartnerId(random.nextInt())
-                        val behandler = generateBehandler(behandlerRef, partnerId)
-                        database.connection.use {
-                            val kontorId = it.createBehandlerKontor(behandler.kontor)
-                            it.createBehandler(behandler, kontorId)
-                            it.commit()
-                        }
-
+                        val behandler = lagreBehandler(database)
                         val dialogmeldingBestillingUuid = UUID.randomUUID()
                         val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
                             uuid = dialogmeldingBestillingUuid,
-                            behandlerRef = behandlerRef,
+                            behandlerRef = behandler.behandlerRef,
                         )
                         val dialogmeldingBestillingRecord = ConsumerRecord(
                             DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
@@ -159,24 +184,18 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
 
-                        val pBehandlerDialogmeldingBestilling =
-                            database.connection.use {
-                                it.getBestilling(
-                                    uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
-                                )
-                            }
+                        val pBehandlerDialogmeldingBestilling = database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
+
                         pBehandlerDialogmeldingBestilling shouldNotBeEqualTo null
                         pBehandlerDialogmeldingBestilling!!.uuid shouldBeEqualTo dialogmeldingBestillingUuid
                     }
                 }
                 describe("Does not persist when behandlerRef not valid") {
                     it("should not persist incoming bestillinger when behandlerRef is invalid") {
-                        val behandlerRef = UUID.randomUUID()
-
                         val dialogmeldingBestillingUuid = UUID.randomUUID()
                         val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
                             uuid = dialogmeldingBestillingUuid,
-                            behandlerRef = behandlerRef,
+                            behandlerRef = UUID.randomUUID(),
                         )
                         val dialogmeldingBestillingRecord = ConsumerRecord(
                             DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
@@ -203,12 +222,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         }
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val pBehandlerDialogmeldingBestilling =
-                            database.connection.use {
-                                it.getBestilling(
-                                    uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
-                                )
-                            }
+                        val pBehandlerDialogmeldingBestilling = database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
                         pBehandlerDialogmeldingBestilling shouldBeEqualTo null
                     }
                 }

@@ -3,11 +3,14 @@ package no.nav.syfo.cronjob
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
+import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatus
 import org.slf4j.LoggerFactory
 
 class DialogmeldingSendCronjob(
     val dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
     val dialogmeldingService: DialogmeldingService,
+    val dialogmeldingStatusService: DialogmeldingStatusService,
 ) : DialogmeldingCronjob {
 
     override val initialDelayMinutes: Long = 2
@@ -21,10 +24,14 @@ class DialogmeldingSendCronjob(
         val sendingResult = DialogmeldingCronjobResult()
 
         val bestillinger = dialogmeldingToBehandlerService.getBestillinger()
-        bestillinger.forEach { bestilling ->
+        bestillinger.forEach { (bestillingId, bestilling) ->
             try {
                 dialogmeldingService.sendMelding(bestilling)
                 dialogmeldingToBehandlerService.setDialogmeldingBestillingSendt(bestilling.uuid)
+                dialogmeldingStatusService.createDialogmeldingStatus(
+                    dialogmeldingStatus = DialogmeldingStatus.sendt(bestilling),
+                    bestillingId = bestillingId,
+                )
                 sendingResult.updated++
                 COUNT_CRONJOB_DIALOGMELDING_SEND_COUNT.increment()
             } catch (e: Exception) {

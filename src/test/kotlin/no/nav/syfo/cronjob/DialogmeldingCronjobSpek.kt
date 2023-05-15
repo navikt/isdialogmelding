@@ -9,11 +9,14 @@ import no.nav.syfo.dialogmelding.bestilling.database.getBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
+import no.nav.syfo.dialogmelding.status.database.getDialogmeldingStatusNotPublished
+import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatusType
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldNotBeEqualTo
+import no.nav.syfo.testhelper.testdata.lagreDialogmeldingBestilling
+import org.amshove.kluent.*
 import org.junit.Assert
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -44,19 +47,22 @@ class DialogmeldingCronjobSpek : Spek({
                 externalMockEnvironment = externalMockEnvironment,
             )
 
+            val dialogmeldingStatusService = DialogmeldingStatusService(
+                database = database,
+            )
             val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
                 database = database,
                 pdlClient = pdlClient,
+                dialogmeldingStatusService = dialogmeldingStatusService,
             )
-
             val dialogmeldingService = DialogmeldingService(
                 pdlClient = pdlClient,
                 mqSender = mqSenderMock,
             )
-
             val dialogmeldingSendCronjob = DialogmeldingSendCronjob(
                 dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                 dialogmeldingService = dialogmeldingService,
+                dialogmeldingStatusService = dialogmeldingStatusService,
             )
 
             beforeEachTest {
@@ -76,19 +82,19 @@ class DialogmeldingCronjobSpek : Spek({
                     )
 
                     val dialogmeldingBestillingUuid = UUID.randomUUID()
-
                     val dialogmeldingBestillingDTO = generateDialogmeldingToBehandlerBestillingDTO(
                         uuid = dialogmeldingBestillingUuid,
                         behandlerRef = behandlerRef,
                         arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
                     )
-                    dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
+                    lagreDialogmeldingBestilling(
+                        database = database,
+                        behandler = behandler,
+                        dialogmeldingToBehandlerBestillingDTO = dialogmeldingBestillingDTO,
+                    )
 
-                    val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
-                        connection.getBestilling(
-                            uuid = dialogmeldingBestillingUuid,
-                        )
-                    }
+                    val pBehandlerDialogmeldingBestillingBefore =
+                        database.getBestilling(uuid = dialogmeldingBestillingUuid)
                     pBehandlerDialogmeldingBestillingBefore shouldNotBeEqualTo null
                     pBehandlerDialogmeldingBestillingBefore!!.sendt shouldBeEqualTo null
                     pBehandlerDialogmeldingBestillingBefore.sendtTries shouldBeEqualTo 0
@@ -100,11 +106,8 @@ class DialogmeldingCronjobSpek : Spek({
                     }
                     verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
 
-                    val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
-                        connection.getBestilling(
-                            uuid = dialogmeldingBestillingUuid,
-                        )
-                    }
+                    val pBehandlerDialogmeldingBestillingAfter =
+                        database.getBestilling(uuid = dialogmeldingBestillingUuid)
                     pBehandlerDialogmeldingBestillingAfter!!.sendt shouldNotBeEqualTo null
                     pBehandlerDialogmeldingBestillingAfter.sendtTries shouldBeEqualTo 1
 
@@ -132,13 +135,14 @@ class DialogmeldingCronjobSpek : Spek({
                         behandlerRef = behandlerRef,
                         arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR,
                     )
-                    dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
+                    lagreDialogmeldingBestilling(
+                        database = database,
+                        behandler = behandler,
+                        dialogmeldingToBehandlerBestillingDTO = dialogmeldingBestillingDTO,
+                    )
 
-                    val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
-                        connection.getBestilling(
-                            uuid = dialogmeldingBestillingUuid,
-                        )
-                    }
+                    val pBehandlerDialogmeldingBestillingBefore =
+                        database.getBestilling(uuid = dialogmeldingBestillingUuid)
                     pBehandlerDialogmeldingBestillingBefore shouldNotBeEqualTo null
                     pBehandlerDialogmeldingBestillingBefore!!.sendt shouldBeEqualTo null
                     pBehandlerDialogmeldingBestillingBefore.sendtTries shouldBeEqualTo 0
@@ -150,11 +154,8 @@ class DialogmeldingCronjobSpek : Spek({
                     }
                     verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
 
-                    val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
-                        connection.getBestilling(
-                            uuid = dialogmeldingBestillingUuid,
-                        )
-                    }
+                    val pBehandlerDialogmeldingBestillingAfter =
+                        database.getBestilling(uuid = dialogmeldingBestillingUuid)
                     pBehandlerDialogmeldingBestillingAfter!!.sendt shouldNotBeEqualTo null
                     pBehandlerDialogmeldingBestillingAfter.sendtTries shouldBeEqualTo 1
                 }
@@ -181,13 +182,14 @@ class DialogmeldingCronjobSpek : Spek({
                         behandlerRef = behandlerRef,
                         arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR_OPPFOLGINGSPLAN,
                     )
-                    dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingBestillingDTO)
+                    lagreDialogmeldingBestilling(
+                        database = database,
+                        behandler = behandler,
+                        dialogmeldingToBehandlerBestillingDTO = dialogmeldingBestillingDTO
+                    )
 
-                    val pBehandlerDialogmeldingBestillingBefore = database.connection.use { connection ->
-                        connection.getBestilling(
-                            uuid = dialogmeldingBestillingUuid,
-                        )
-                    }
+                    val pBehandlerDialogmeldingBestillingBefore =
+                        database.getBestilling(uuid = dialogmeldingBestillingUuid)
                     pBehandlerDialogmeldingBestillingBefore shouldNotBeEqualTo null
                     pBehandlerDialogmeldingBestillingBefore!!.sendt shouldBeEqualTo null
                     pBehandlerDialogmeldingBestillingBefore.sendtTries shouldBeEqualTo 0
@@ -205,13 +207,47 @@ class DialogmeldingCronjobSpek : Spek({
                         expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
                     )
 
-                    val pBehandlerDialogmeldingBestillingAfter = database.connection.use { connection ->
-                        connection.getBestilling(
-                            uuid = dialogmeldingBestillingUuid,
-                        )
-                    }
+                    val pBehandlerDialogmeldingBestillingAfter =
+                        database.getBestilling(uuid = dialogmeldingBestillingUuid)
                     pBehandlerDialogmeldingBestillingAfter!!.sendt shouldNotBeEqualTo null
                     pBehandlerDialogmeldingBestillingAfter.sendtTries shouldBeEqualTo 1
+                }
+                it("Sending av bestilt dialogmelding lagrer dialogmelding-status SENDT") {
+                    val behandlerRef = UUID.randomUUID()
+                    val partnerId = PartnerId(random.nextInt())
+                    val behandler = generateBehandler(behandlerRef, partnerId)
+                    database.createBehandlerForArbeidstaker(
+                        behandler = behandler,
+                        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                    )
+
+                    val dialogmeldingBestillingUuid = UUID.randomUUID()
+                    val dialogmeldingBestillingDTO = generateDialogmeldingToBehandlerBestillingDTO(
+                        uuid = dialogmeldingBestillingUuid,
+                        behandlerRef = behandlerRef,
+                        arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                    )
+                    lagreDialogmeldingBestilling(
+                        database = database,
+                        behandler = behandler,
+                        dialogmeldingToBehandlerBestillingDTO = dialogmeldingBestillingDTO
+                    )
+                    val pBehandlerDialogmeldingBestilling = database.getBestilling(uuid = dialogmeldingBestillingUuid)
+
+                    runBlocking {
+                        dialogmeldingSendCronjob.dialogmeldingSendJob()
+                    }
+
+                    val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
+                    dialogmeldingStatusNotPublished.size shouldBeEqualTo 1
+
+                    val pDialogmeldingStatus = dialogmeldingStatusNotPublished.first()
+                    pDialogmeldingStatus.status shouldBeEqualTo DialogmeldingStatusType.SENDT.name
+                    pDialogmeldingStatus.tekst.shouldBeNull()
+                    pDialogmeldingStatus.bestillingId shouldBeEqualTo pBehandlerDialogmeldingBestilling?.id
+                    pDialogmeldingStatus.createdAt.shouldNotBeNull()
+                    pDialogmeldingStatus.updatedAt.shouldNotBeNull()
+                    pDialogmeldingStatus.publishedAt.shouldBeNull()
                 }
             }
         }

@@ -20,6 +20,16 @@ data class DialogmeldingStatus private constructor(
     val publishedAt: OffsetDateTime? = null,
 ) {
     companion object {
+        fun bestilt(bestilling: DialogmeldingToBehandlerBestilling): DialogmeldingStatus = create(
+            status = DialogmeldingStatusType.BESTILT,
+            bestilling = bestilling,
+        )
+
+        fun sendt(bestilling: DialogmeldingToBehandlerBestilling): DialogmeldingStatus = create(
+            status = DialogmeldingStatusType.SENDT,
+            bestilling = bestilling,
+        )
+
         fun fromApprec(apprec: Apprec): DialogmeldingStatus {
             return when (apprec.statusKode) {
                 ApprecStatus.OK -> create(

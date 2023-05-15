@@ -31,7 +31,7 @@ class ApprecService(
             dialogmeldingStatusService.createDialogmeldingStatus(
                 connection = connection,
                 dialogmeldingStatus = DialogmeldingStatus.fromApprec(apprec),
-                bestillingId = bestillingId
+                bestillingId = bestillingId,
             )
             connection.commit()
         }
