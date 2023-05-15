@@ -117,4 +117,4 @@ spec:
     - name: SYFOTILGANGSKONTROLL_URL
       value: "http://syfo-tilgangskontroll"
     - name: TOGGLE_PUBLISH_DIALOGMELDING_STATUS
-      value: "false"
+      value: "true"

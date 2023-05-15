@@ -6,6 +6,8 @@ import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.PBehandlerArbeidstaker
 import no.nav.syfo.behandler.domain.*
+import no.nav.syfo.dialogmelding.status.database.PDialogmeldingStatus
+import no.nav.syfo.dialogmelding.status.database.toPDialogmeldingStatus
 import no.nav.syfo.domain.Personident
 import org.flywaydb.core.Flyway
 import java.sql.Connection
@@ -127,6 +129,19 @@ fun DatabaseInterface.getBehandlerArbeidstakerRelasjoner(
             }
     }
     return pBehandlerArbeidstakerListe
+}
+
+const val queryGetDialogmeldingStatus =
+    """
+        SELECT * FROM DIALOGMELDING_STATUS
+    """
+
+fun DatabaseInterface.getDialogmeldingStatuses(): List<PDialogmeldingStatus> = this.connection.use { connection ->
+    connection.prepareStatement(
+        queryGetDialogmeldingStatus
+    ).use {
+        it.executeQuery().toList { toPDialogmeldingStatus() }
+    }
 }
 
 fun DatabaseInterface.dropData() {

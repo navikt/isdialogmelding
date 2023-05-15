@@ -4,6 +4,7 @@ import no.nav.syfo.dialogmelding.apprec.domain.Apprec
 import no.nav.syfo.dialogmelding.apprec.domain.ApprecStatus
 import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
 import no.nav.syfo.dialogmelding.status.database.PDialogmeldingStatus
+import no.nav.syfo.dialogmelding.status.kafka.KafkaDialogmeldingStatusDTO
 import no.nav.syfo.util.nowUTC
 import java.time.OffsetDateTime
 import java.util.*
@@ -71,3 +72,11 @@ data class DialogmeldingStatus private constructor(
         )
     }
 }
+
+fun DialogmeldingStatus.toKafkaDialogmeldingStatusDTO(): KafkaDialogmeldingStatusDTO = KafkaDialogmeldingStatusDTO(
+    uuid = this.uuid.toString(),
+    createdAt = this.createdAt,
+    status = this.status.name,
+    tekst = this.tekst,
+    bestillingUuid = this.bestilling.uuid.toString(),
+)

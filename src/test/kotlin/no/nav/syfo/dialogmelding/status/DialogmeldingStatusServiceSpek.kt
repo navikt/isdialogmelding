@@ -3,9 +3,12 @@ package no.nav.syfo.dialogmelding.status
 import io.mockk.mockk
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatusType
+import no.nav.syfo.dialogmelding.status.kafka.DialogmeldingStatusProducer
+import no.nav.syfo.dialogmelding.status.kafka.KafkaDialogmeldingStatusDTO
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.testdata.*
 import org.amshove.kluent.shouldBeEqualTo
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
@@ -16,7 +19,10 @@ object DialogmeldingStatusServiceSpek : Spek({
     val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(database = database, pdlClient = mockk())
     val dialogmeldingStatusService = DialogmeldingStatusService(
         database = database,
-        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService
+        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+        dialogmeldingStatusProducer = DialogmeldingStatusProducer(
+            kafkaProducer = mockk<KafkaProducer<String, KafkaDialogmeldingStatusDTO>>()
+        )
     )
 
     beforeEachTest {

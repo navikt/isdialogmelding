@@ -1,7 +1,7 @@
 package no.nav.syfo.dialogmelding.cronjob
 
-import no.nav.syfo.cronjob.DialogmeldingCronjob
-import no.nav.syfo.cronjob.DialogmeldingCronjobResult
+import net.logstash.logback.argument.StructuredArguments
+import no.nav.syfo.cronjob.*
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 import org.slf4j.LoggerFactory
 
@@ -26,6 +26,11 @@ class DialogmeldingStatusCronjob(private val dialogmeldingStatusService: Dialogm
                 result.failed++
             }
         }
+        log.info(
+            "Completed dialogmelding-status publishing with result: {}, {}",
+            StructuredArguments.keyValue("failed", result.failed),
+            StructuredArguments.keyValue("updated", result.updated),
+        )
 
         return result
     }
