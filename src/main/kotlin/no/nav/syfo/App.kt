@@ -82,13 +82,13 @@ fun main() {
                 partnerinfoClient = partnerinfoClient,
                 database = applicationDatabase,
             )
-            dialogmeldingStatusService = DialogmeldingStatusService(
-                database = applicationDatabase,
-                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-            )
             dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
                 database = applicationDatabase,
                 pdlClient = pdlClient,
+            )
+            dialogmeldingStatusService = DialogmeldingStatusService(
+                database = applicationDatabase,
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
             )
 
             apiModule(
