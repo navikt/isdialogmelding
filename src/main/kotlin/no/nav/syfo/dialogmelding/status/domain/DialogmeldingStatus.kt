@@ -46,7 +46,7 @@ data class DialogmeldingStatus private constructor(
             }
         }
 
-        fun createFromDatabase(
+        fun fromPDialogmeldingStatus(
             pDialogmeldingStatus: PDialogmeldingStatus,
             bestilling: DialogmeldingToBehandlerBestilling,
         ): DialogmeldingStatus = DialogmeldingStatus(

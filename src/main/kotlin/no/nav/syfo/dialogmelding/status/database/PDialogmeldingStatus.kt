@@ -17,4 +17,4 @@ data class PDialogmeldingStatus(
 )
 
 fun PDialogmeldingStatus.toDialogmoteStatus(dialogmeldingToBehandlerBestilling: DialogmeldingToBehandlerBestilling): DialogmeldingStatus =
-    DialogmeldingStatus.createFromDatabase(this, dialogmeldingToBehandlerBestilling)
+    DialogmeldingStatus.fromPDialogmeldingStatus(this, dialogmeldingToBehandlerBestilling)
