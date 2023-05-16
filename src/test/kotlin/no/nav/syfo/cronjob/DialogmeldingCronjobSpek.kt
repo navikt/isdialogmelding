@@ -12,11 +12,14 @@ import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 import no.nav.syfo.dialogmelding.status.database.getDialogmeldingStatusNotPublished
 import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatusType
+import no.nav.syfo.dialogmelding.status.kafka.DialogmeldingStatusProducer
+import no.nav.syfo.dialogmelding.status.kafka.KafkaDialogmeldingStatusDTO
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.*
 import no.nav.syfo.testhelper.testdata.lagreDialogmeldingBestilling
 import org.amshove.kluent.*
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.junit.Assert
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -54,6 +57,9 @@ class DialogmeldingCronjobSpek : Spek({
             val dialogmeldingStatusService = DialogmeldingStatusService(
                 database = database,
                 dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                dialogmeldingStatusProducer = DialogmeldingStatusProducer(
+                    kafkaProducer = mockk<KafkaProducer<String, KafkaDialogmeldingStatusDTO>>()
+                )
             )
             val dialogmeldingService = DialogmeldingService(
                 pdlClient = pdlClient,

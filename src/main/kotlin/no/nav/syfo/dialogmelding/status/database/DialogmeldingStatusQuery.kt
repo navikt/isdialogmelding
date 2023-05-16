@@ -51,14 +51,16 @@ fun Connection.createDialogmeldingStatus(dialogmeldingStatus: DialogmeldingStatu
 }
 
 const val queryUpdateDialomeldingStatusPublishedAt = """
-    UPDATE DIALOGMELDING_STATUS SET published_at = ? WHERE uuid = ?
+    UPDATE DIALOGMELDING_STATUS SET published_at = ?, updated_at = ? WHERE uuid = ?
 """
 
 fun DatabaseInterface.updatePublishedAt(uuid: UUID) {
     this.connection.use { connection ->
         val rowCount = connection.prepareStatement(queryUpdateDialomeldingStatusPublishedAt).use {
-            it.setObject(1, OffsetDateTime.now())
-            it.setString(2, uuid.toString())
+            val now = OffsetDateTime.now()
+            it.setObject(1, now)
+            it.setObject(2, now)
+            it.setString(3, uuid.toString())
             it.executeUpdate()
         }
         if (rowCount != 1) {

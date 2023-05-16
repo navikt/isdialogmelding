@@ -10,6 +10,7 @@ import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.application.api.authentication.getWellKnown
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
+import no.nav.syfo.application.kafka.kafkaProducerConfig
 import no.nav.syfo.application.mq.*
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
@@ -23,9 +24,11 @@ import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.dialogmelding.apprec.ApprecService
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
+import no.nav.syfo.dialogmelding.status.kafka.*
 import no.nav.syfo.identhendelse.IdenthendelseService
 import no.nav.syfo.identhendelse.kafka.IdenthendelseConsumerService
 import no.nav.syfo.identhendelse.kafka.launchKafkaTaskIdenthendelse
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import javax.jms.Session
@@ -62,6 +65,12 @@ fun main() {
         pdlClientId = environment.pdlClientId,
         pdlUrl = environment.pdlUrl,
     )
+    val dialogmeldingStatusProducer = DialogmeldingStatusProducer(
+        kafkaProducer = KafkaProducer(
+            kafkaProducerConfig<DialogmeldingStatusSerializer>(kafkaEnvironment = environment.kafka)
+        )
+    )
+
     lateinit var behandlerService: BehandlerService
     lateinit var dialogmeldingToBehandlerService: DialogmeldingToBehandlerService
     lateinit var dialogmeldingStatusService: DialogmeldingStatusService
@@ -89,6 +98,7 @@ fun main() {
             dialogmeldingStatusService = DialogmeldingStatusService(
                 database = applicationDatabase,
                 dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                dialogmeldingStatusProducer = dialogmeldingStatusProducer,
             )
 
             apiModule(

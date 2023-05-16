@@ -4,10 +4,12 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.status.database.*
 import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatus
+import no.nav.syfo.dialogmelding.status.kafka.DialogmeldingStatusProducer
 
 class DialogmeldingStatusService(
     private val database: DatabaseInterface,
     private val dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
+    private val dialogmeldingStatusProducer: DialogmeldingStatusProducer,
 ) {
     fun createDialogmeldingStatus(
         dialogmeldingStatus: DialogmeldingStatus,
@@ -27,7 +29,7 @@ class DialogmeldingStatusService(
     }
 
     fun publishDialogmeldingStatus(dialogmeldingStatus: DialogmeldingStatus) {
-        // TODO: Publish to kafka topic
+        dialogmeldingStatusProducer.sendDialogmeldingStatus(status = dialogmeldingStatus)
         database.updatePublishedAt(uuid = dialogmeldingStatus.uuid)
     }
 }
