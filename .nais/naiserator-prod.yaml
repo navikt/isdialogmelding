@@ -117,5 +117,3 @@ spec:
       value: "prod-gcp.teamsykefravr.syfo-tilgangskontroll"
     - name: SYFOTILGANGSKONTROLL_URL
       value: "http://syfo-tilgangskontroll"
-    - name: TOGGLE_PUBLISH_DIALOGMELDING_STATUS
-      value: "false"
