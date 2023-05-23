@@ -71,7 +71,7 @@ fun DatabaseInterface.updatePublishedAt(uuid: UUID) {
 }
 
 const val queryGetDialogmeldingStatusNotPublished = """
-    SELECT * FROM DIALOGMELDING_STATUS WHERE published_at IS NULL ORDER BY created_at ASC LIMIT 100 
+    SELECT * FROM DIALOGMELDING_STATUS WHERE published_at IS NULL ORDER BY created_at ASC LIMIT 1000 
 """
 
 fun DatabaseInterface.getDialogmeldingStatusNotPublished(): List<PDialogmeldingStatus> =
