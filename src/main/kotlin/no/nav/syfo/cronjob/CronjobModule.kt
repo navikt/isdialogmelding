@@ -26,20 +26,16 @@ fun cronjobModule(
         dialogmeldingService = dialogmeldingService,
         dialogmeldingStatusService = dialogmeldingStatusService,
     )
+    val dialogmeldingStatusCronjob =
+        DialogmeldingStatusCronjob(dialogmeldingStatusService = dialogmeldingStatusService)
 
-    launchBackgroundTask(
-        applicationState = applicationState,
-    ) {
-        cronjobRunner.start(
-            cronjob = dialogmeldingSendCronjob
-        )
-    }
-
-    if (environment.publishDialogmeldingStatusEnabled) {
-        val dialogmeldingStatusCronjob =
-            DialogmeldingStatusCronjob(dialogmeldingStatusService = dialogmeldingStatusService)
-        launchBackgroundTask(applicationState = applicationState) {
-            cronjobRunner.start(cronjob = dialogmeldingStatusCronjob)
+    listOf(dialogmeldingSendCronjob, dialogmeldingStatusCronjob).forEach {
+        launchBackgroundTask(
+            applicationState = applicationState,
+        ) {
+            cronjobRunner.start(
+                cronjob = it
+            )
         }
     }
 }

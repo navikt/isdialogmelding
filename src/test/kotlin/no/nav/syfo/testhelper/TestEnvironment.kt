@@ -57,7 +57,6 @@ fun testEnvironment(
     syfoPartnerinfoUrl = syfoPartnerinfoUrl,
     syfotilgangskontrollClientId = "syfo-tilgangskontroll-client-id",
     syfotilgangskontrollUrl = syfoTilgangskontrollUrl,
-    publishDialogmeldingStatusEnabled = true,
 )
 
 const val testAapSoknadApiClientId = "soknad-api-client-id"
