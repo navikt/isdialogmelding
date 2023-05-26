@@ -60,9 +60,27 @@ class OppfolgingsplanSystemApiSpek : Spek({
                             storedBestilling.sendt shouldBe null
                         }
                     }
+                    it("Skal lagre bestilling for oppfølgingsplan når bare vikar for fastlege finnes") {
+                        database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
+                        val rsOppfolgingsplan = generateRSOppfolgingsplan(
+                            arbeidstakerPersonIdent = UserConstants.ARBEIDSTAKER_MED_VIKARFASTLEGE,
+                        )
+                        with(
+                            handleRequest(HttpMethod.Post, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                                setBody(objectMapper.writeValueAsString(rsOppfolgingsplan))
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                            val storedBestilling = database.getDialogmeldingToBehandlerBestillingNotSendt().first()
+                            storedBestilling.type shouldBeEqualTo DialogmeldingType.OPPFOLGINGSPLAN.name
+                            storedBestilling.arbeidstakerPersonident shouldBeEqualTo rsOppfolgingsplan.sykmeldtFnr
+                        }
+                    }
                 }
                 describe("Unhappy paths") {
-                    it("should return error for arbeidstaker with no fastlege") {
+                    it("should return error for arbeidstaker with no fastlege or vikar") {
                         with(
                             handleRequest(HttpMethod.Post, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))

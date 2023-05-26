@@ -75,7 +75,7 @@ class BehandlerService(
         callId: String,
         systemRequest: Boolean = false,
     ): Behandler? {
-        val fastlege = getAktivFastlegeBehandler(
+        val fastlege = getAktivFastlegeBehandlerMedKontor(
             personident = personident,
             token = token,
             callId = callId,
@@ -94,7 +94,30 @@ class BehandlerService(
         } else null
     }
 
-    suspend fun getAktivFastlegeBehandler(
+    suspend fun getFastlegevikarBehandler(
+        personident: Personident,
+        token: String,
+        callId: String,
+    ): Behandler? {
+        val vikar = getFastlegevikarBehandlerMedKontor(
+            personident = personident,
+            token = token,
+            callId = callId,
+        )
+        return if (vikar != null && vikar.hasAnId()) {
+            val arbeidstaker = Arbeidstaker(
+                arbeidstakerPersonident = personident,
+                mottatt = OffsetDateTime.now(),
+            )
+            createOrGetBehandler(
+                behandler = vikar,
+                arbeidstaker = arbeidstaker,
+                relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGEVIKAR,
+            )
+        } else null
+    }
+
+    private suspend fun getAktivFastlegeBehandlerMedKontor(
         personident: Personident,
         token: String,
         callId: String,
@@ -115,6 +138,35 @@ class BehandlerService(
         val partnerinfoResponse = partnerinfoClient.partnerinfo(
             herId = fastlegeResponse.foreldreEnhetHerId.toString(),
             systemRequest = systemRequest,
+            token = token,
+            callId = callId,
+        )
+
+        return if (partnerinfoResponse != null) {
+            fastlegeResponse.toBehandler(
+                partnerId = PartnerId(partnerinfoResponse.partnerId),
+            )
+        } else null
+    }
+
+    private suspend fun getFastlegevikarBehandlerMedKontor(
+        personident: Personident,
+        token: String,
+        callId: String,
+    ): Behandler? {
+        val fastlegeResponse = fastlegeClient.fastlegevikar(
+            personident = personident,
+            callId = callId,
+        ) ?: return null
+
+        if (fastlegeResponse.foreldreEnhetHerId == null) {
+            log.warn("Vikar missing foreldreEnhetHerId so cannot request partnerinfo")
+            return null
+        }
+
+        val partnerinfoResponse = partnerinfoClient.partnerinfo(
+            herId = fastlegeResponse.foreldreEnhetHerId.toString(),
+            systemRequest = true,
             token = token,
             callId = callId,
         )
