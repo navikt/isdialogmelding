@@ -83,11 +83,12 @@ class DialogmeldingToBehandlerService(
 
     fun handleIncomingDialogmeldingBestilling(
         dialogmeldingToBehandlerBestillingDTO: DialogmeldingToBehandlerBestillingDTO,
-    ) {
+    ): DialogmeldingToBehandlerBestilling? {
         val behandlerRef = UUID.fromString(dialogmeldingToBehandlerBestillingDTO.behandlerRef)
         val pBehandler = database.getBehandlerByBehandlerRef(behandlerRef)
-        if (pBehandler == null) {
+        return if (pBehandler == null) {
             log.error("Unknown behandlerRef $behandlerRef in dialogmeldingToBehandlerBestilling ${dialogmeldingToBehandlerBestillingDTO.dialogmeldingUuid}")
+            null
         } else {
             val dialogmeldingToBehandlerBestilling =
                 dialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(
@@ -117,6 +118,7 @@ class DialogmeldingToBehandlerService(
                 }
                 connection.commit()
             }
+            dialogmeldingToBehandlerBestilling
         }
     }
 }

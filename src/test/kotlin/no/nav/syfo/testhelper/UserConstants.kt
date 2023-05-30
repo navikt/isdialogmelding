@@ -16,6 +16,8 @@ object UserConstants {
     val ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO = Personident(ARBEIDSTAKER_FNR.value.replace("2", "6"))
     val ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO = Personident(ARBEIDSTAKER_FNR.value.replace("2", "8"))
     val ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID = Personident(ARBEIDSTAKER_FNR.value.replace("5", "1"))
+    val ARBEIDSTAKER_MED_VIKARFASTLEGE = Personident(ARBEIDSTAKER_FNR.value.replace("5", "2"))
+
     val NARMESTELEDER_FNR = Personident(ARBEIDSTAKER_FNR.value.replace("5", "9"))
 
     val PARTNERID = PartnerId(321)

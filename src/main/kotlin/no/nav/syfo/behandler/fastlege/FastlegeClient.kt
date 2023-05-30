@@ -20,6 +20,7 @@ class FastlegeClient(
     private val httpClient = httpClientDefault()
     private val finnFastlegeUrl: String = "$fastlegeRestUrl$FASTLEGE_PATH"
     private val finnFastlegeSystemUrl: String = "$fastlegeRestUrl$FASTLEGE_SYSTEM_PATH"
+    private val finnFastlegevikarSystemUrl: String = "$fastlegeRestUrl$FASTLEGEVIKAR_SYSTEM_PATH"
 
     suspend fun fastlege(
         callId: String,
@@ -49,7 +50,28 @@ class FastlegeClient(
             personident = personident,
             token = newToken,
             url = url,
-        )
+        ).also {
+            COUNT_CALL_FASTLEGEREST_FASTLEGE_SUCCESS.increment()
+        }
+    }
+
+    suspend fun fastlegevikar(
+        callId: String,
+        personident: Personident,
+    ): FastlegeResponse? {
+        val token = azureAdClient.getSystemToken(
+            scopeClientId = fastlegeRestClientId,
+        )?.accessToken
+            ?: throw RuntimeException("Failed to request vikar from fastlegerest: Failed to get System token")
+
+        return fastlege(
+            callId = callId,
+            personident = personident,
+            token = token,
+            url = finnFastlegevikarSystemUrl,
+        ).also {
+            COUNT_CALL_FASTLEGEREST_VIKAR_SUCCESS.increment()
+        }
     }
 
     private suspend fun fastlege(
@@ -65,7 +87,6 @@ class FastlegeClient(
                 header(NAV_PERSONIDENT_HEADER, personident.value)
                 accept(ContentType.Application.Json)
             }
-            COUNT_CALL_FASTLEGEREST_FASTLEGE_SUCCESS.increment()
             return response.body()
         } catch (e: ClientRequestException) {
             handleUnexpectedClientRequestException(e.response, e.message, callId)
@@ -99,6 +120,7 @@ class FastlegeClient(
     companion object {
         const val FASTLEGE_PATH = "/fastlegerest/api/v2/fastlege"
         const val FASTLEGE_SYSTEM_PATH = "/fastlegerest/api/system/v1/fastlege/aktiv/personident"
+        const val FASTLEGEVIKAR_SYSTEM_PATH = "/fastlegerest/api/system/v1/fastlege/vikar/personident"
         private val log = LoggerFactory.getLogger(FastlegeClient::class.java)
     }
 }

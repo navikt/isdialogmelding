@@ -8,6 +8,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
 import no.nav.syfo.application.api.authentication.installContentNegotiation
+import no.nav.syfo.behandler.fastlege.FastlegeClient.Companion.FASTLEGEVIKAR_SYSTEM_PATH
 import no.nav.syfo.behandler.fastlege.FastlegeClient.Companion.FASTLEGE_PATH
 import no.nav.syfo.behandler.fastlege.FastlegeClient.Companion.FASTLEGE_SYSTEM_PATH
 import no.nav.syfo.testhelper.UserConstants
@@ -18,6 +19,9 @@ import no.nav.syfo.util.getPersonidentHeader
 private suspend fun PipelineContext<out Unit, ApplicationCall>.fastlegerestResponse() {
     when (getPersonidentHeader()) {
         UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR.value -> call.respond(
+            HttpStatusCode.NotFound,
+        )
+        UserConstants.ARBEIDSTAKER_MED_VIKARFASTLEGE.value -> call.respond(
             HttpStatusCode.NotFound,
         )
         UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET.value -> call.respond(
@@ -44,6 +48,18 @@ private suspend fun PipelineContext<out Unit, ApplicationCall>.fastlegerestRespo
     }
 }
 
+private suspend fun PipelineContext<out Unit, ApplicationCall>.fastlegerestResponseVikar() {
+    when (getPersonidentHeader()) {
+        UserConstants.ARBEIDSTAKER_MED_VIKARFASTLEGE.value -> call.respond(
+            HttpStatusCode.OK,
+            generateFastlegeResponse(UserConstants.HERID),
+        )
+        else -> call.respond(
+            HttpStatusCode.NotFound,
+        )
+    }
+}
+
 class FastlegeRestMock {
     private val port = getRandomPort()
     val url = "http://localhost:$port"
@@ -60,6 +76,9 @@ class FastlegeRestMock {
             }
             get(FASTLEGE_SYSTEM_PATH) {
                 this.fastlegerestResponse()
+            }
+            get(FASTLEGEVIKAR_SYSTEM_PATH) {
+                this.fastlegerestResponseVikar()
             }
         }
     }

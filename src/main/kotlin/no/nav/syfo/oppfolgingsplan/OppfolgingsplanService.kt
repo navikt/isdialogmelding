@@ -9,12 +9,16 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.metric.COUNT_SEND_OPPFOLGINGSPLAN_FAILED
 import no.nav.syfo.metric.COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS
 import no.nav.syfo.oppfolgingsplan.exception.FastlegeNotFoundException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.util.UUID
 
 class OppfolgingsplanService(
     val behandlerService: BehandlerService,
     val dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
 ) {
+    private val log: Logger = LoggerFactory.getLogger(OppfolgingsplanService::class.java)
+
     suspend fun sendOppfolgingsplan(
         callId: String,
         token: String,
@@ -27,18 +31,34 @@ class OppfolgingsplanService(
                 token = token,
                 callId = callId,
                 systemRequest = true,
-            ) ?: throw FastlegeNotFoundException("Feil ved sending av oppfølgingsplan, FastlegeIkkeFunnet")
+            )
+            val vikarBehandler = if (fastlegeBehandler == null) {
+                behandlerService.getFastlegevikarBehandler(
+                    personident = arbeidstakerIdent,
+                    token = token,
+                    callId = callId,
+                )
+            } else null
 
+            if (fastlegeBehandler == null && vikarBehandler == null) {
+                throw FastlegeNotFoundException("Feil ved sending av oppfølgingsplan, FastlegeIkkeFunnet")
+            }
+
+            val behandlerRef = fastlegeBehandler?.behandlerRef ?: vikarBehandler!!.behandlerRef
             val arbeidstaker = dialogmeldingToBehandlerService.getArbeidstakerIfRelasjonToBehandler(
-                behandlerRef = fastlegeBehandler.behandlerRef,
+                behandlerRef = behandlerRef,
                 personident = arbeidstakerIdent,
             )
-            lagreDialogmeldingBestilling(
+            val dialogmeldingToBehandlerBestilling = lagreDialogmeldingBestilling(
                 oppfolgingsplan = oppfolgingsplan,
-                behandlerRef = fastlegeBehandler.behandlerRef,
+                behandlerRef = behandlerRef,
                 arbeidstakerPersonIdent = arbeidstaker.arbeidstakerPersonident,
             )
-            COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS.increment()
+            if (dialogmeldingToBehandlerBestilling != null) {
+                COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS.increment()
+                val vikar = (fastlegeBehandler == null && vikarBehandler != null)
+                log.info("Lagret bestilling for oppfølgingsplan til ${if (vikar) "fastlegevikar" else "fastlege"}, bestillingid: ${dialogmeldingToBehandlerBestilling.uuid}")
+            } else throw FastlegeNotFoundException("Sending av oppfølgingsplan feilet")
         } catch (exc: Exception) {
             COUNT_SEND_OPPFOLGINGSPLAN_FAILED.increment()
             throw exc
@@ -49,7 +69,7 @@ class OppfolgingsplanService(
         oppfolgingsplan: RSOppfolgingsplan,
         behandlerRef: UUID,
         arbeidstakerPersonIdent: Personident,
-    ) {
+    ): DialogmeldingToBehandlerBestilling? {
         val dialogmeldingToBehandlerBestillingDTO = DialogmeldingToBehandlerBestillingDTO(
             behandlerRef = behandlerRef.toString(),
             personIdent = arbeidstakerPersonIdent.value,
@@ -62,7 +82,7 @@ class OppfolgingsplanService(
             dialogmeldingTekst = null, // brukes ikke for oppfølgingsplan
             dialogmeldingVedlegg = oppfolgingsplan.oppfolgingsplanPdf,
         )
-        dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(
+        return dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(
             dialogmeldingToBehandlerBestillingDTO
         )
     }
