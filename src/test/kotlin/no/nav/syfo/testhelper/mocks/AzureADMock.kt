@@ -1,14 +1,9 @@
 package no.nav.syfo.testhelper.mocks
 
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.client.engine.mock.*
+import io.ktor.client.request.*
 import no.nav.syfo.application.api.authentication.WellKnown
-import no.nav.syfo.application.api.authentication.installContentNegotiation
 import no.nav.syfo.client.azuread.AzureAdTokenResponse
-import no.nav.syfo.testhelper.getRandomPort
 import java.nio.file.Paths
 
 fun wellKnownInternalAzureAD(): WellKnown {
@@ -22,32 +17,10 @@ fun wellKnownInternalAzureAD(): WellKnown {
     )
 }
 
-class AzureAdMock {
-    private val port = getRandomPort()
-    val url = "http://localhost:$port"
-
-    private val azureAdTokenResponse = AzureAdTokenResponse(
+fun MockRequestHandleScope.azureAdMockResponse(): HttpResponseData = respondOk(
+    AzureAdTokenResponse(
         access_token = "token",
         expires_in = 3600,
         token_type = "type",
     )
-
-    val name = "azuread"
-    val server = mockAzureAdServer(port = port)
-
-    private fun mockAzureAdServer(
-        port: Int
-    ): NettyApplicationEngine {
-        return embeddedServer(
-            factory = Netty,
-            port = port,
-        ) {
-            installContentNegotiation()
-            routing {
-                post {
-                    call.respond(azureAdTokenResponse)
-                }
-            }
-        }
-    }
-}
+)

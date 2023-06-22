@@ -1,5 +1,6 @@
 package no.nav.syfo.behandler.fastlege
 
+import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -15,9 +16,9 @@ import org.slf4j.LoggerFactory
 class FastlegeClient(
     private val azureAdClient: AzureAdClient,
     private val fastlegeRestClientId: String,
-    fastlegeRestUrl: String
+    fastlegeRestUrl: String,
+    private val httpClient: HttpClient = httpClientDefault()
 ) {
-    private val httpClient = httpClientDefault()
     private val finnFastlegeUrl: String = "$fastlegeRestUrl$FASTLEGE_PATH"
     private val finnFastlegeSystemUrl: String = "$fastlegeRestUrl$FASTLEGE_SYSTEM_PATH"
     private val finnFastlegevikarSystemUrl: String = "$fastlegeRestUrl$FASTLEGEVIKAR_SYSTEM_PATH"

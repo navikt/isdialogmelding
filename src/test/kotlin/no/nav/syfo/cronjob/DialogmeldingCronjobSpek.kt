@@ -40,9 +40,11 @@ class DialogmeldingCronjobSpek : Spek({
                     azureAppClientId = environment.aadAppClient,
                     azureAppClientSecret = environment.azureAppClientSecret,
                     azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+                    httpClient = externalMockEnvironment.mockHttpClient,
                 ),
                 pdlClientId = environment.pdlClientId,
                 pdlUrl = environment.pdlUrl,
+                httpClient = externalMockEnvironment.mockHttpClient,
             )
             val mqSenderMock = mockk<MQSender>()
 

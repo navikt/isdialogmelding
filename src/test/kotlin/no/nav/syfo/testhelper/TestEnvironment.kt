@@ -6,18 +6,11 @@ import no.nav.syfo.behandler.api.person.access.PreAuthorizedClient
 import no.nav.syfo.util.configuredJacksonMapper
 import java.net.ServerSocket
 
-fun testEnvironment(
-    azureOpenidConfigTokenEndpoint: String,
-    kafkaBootstrapServers: String,
-    fastlegeRestUrl: String,
-    syfoPartnerinfoUrl: String,
-    syfoTilgangskontrollUrl: String,
-    pdlUrl: String,
-) = Environment(
+fun testEnvironment() = Environment(
     aadAppClient = "isdialogmelding-client-id",
     azureAppClientSecret = "isdialogmelding-secret",
     azureAppPreAuthorizedApps = configuredJacksonMapper().writeValueAsString(testAzureAppPreAuthorizedApps),
-    azureOpenidConfigTokenEndpoint = azureOpenidConfigTokenEndpoint,
+    azureOpenidConfigTokenEndpoint = "azureOpenidConfigTokenEndpoint",
     azureAppWellKnownUrl = "wellknown",
     idportenTokenXClientId = "dev-gcp.teamsykefravr.isdialogmelding",
     idportenTokenXWellKnownUrl = "wellknown-idporten-tokenx",
@@ -34,7 +27,7 @@ fun testEnvironment(
     isdialogmeldingDbUsername = "username",
     isdialogmeldingDbPassword = "password",
     kafka = ApplicationEnvironmentKafka(
-        aivenBootstrapServers = kafkaBootstrapServers,
+        aivenBootstrapServers = "kafkaBootstrapServers",
         aivenCredstorePassword = "credstorepassord",
         aivenKeystoreLocation = "keystore",
         aivenSecurityProtocol = "SSL",
@@ -50,13 +43,13 @@ fun testEnvironment(
     apprecQueueName = "apprec-test-queue",
     emottakQueuename = "emottak-queue",
     fastlegeRestClientId = "fastlegerest-client-id",
-    fastlegeRestUrl = fastlegeRestUrl,
+    fastlegeRestUrl = "fastlegeRestUrl",
     pdlClientId = "pdlclientid",
-    pdlUrl = pdlUrl,
+    pdlUrl = "pdlUrl",
     syfoPartnerinfoClientId = "syfopartnerinfo-client-id",
-    syfoPartnerinfoUrl = syfoPartnerinfoUrl,
+    syfoPartnerinfoUrl = "syfoPartnerinfoUrl",
     syfotilgangskontrollClientId = "syfo-tilgangskontroll-client-id",
-    syfotilgangskontrollUrl = syfoTilgangskontrollUrl,
+    syfotilgangskontrollUrl = "syfoTilgangskontrollUrl",
 )
 
 const val testAapSoknadApiClientId = "soknad-api-client-id"

@@ -1,5 +1,6 @@
 package no.nav.syfo.behandler.partnerinfo
 
+import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -16,9 +17,9 @@ class PartnerinfoClient(
     private val azureAdClient: AzureAdClient,
     private val syfoPartnerinfoClientId: String,
     syfoPartnerinfoUrl: String,
+    private val httpClient: HttpClient = httpClientDefault(),
 ) {
 
-    private val httpClient = httpClientDefault()
     private val partnerinfoBehandlerUrl: String = "$syfoPartnerinfoUrl$BEHANDLER_PATH"
 
     suspend fun partnerinfo(

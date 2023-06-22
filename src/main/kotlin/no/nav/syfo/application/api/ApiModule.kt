@@ -12,7 +12,6 @@ import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.api.person.registerPersonBehandlerApi
 import no.nav.syfo.behandler.api.person.registerPersonOppfolgingsplanApi
 import no.nav.syfo.behandler.api.registerBehandlerApi
-import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 
@@ -22,9 +21,9 @@ fun Application.apiModule(
     environment: Environment,
     wellKnownInternalAzureAD: WellKnown,
     wellKnownInternalIdportenTokenX: WellKnown,
-    azureAdClient: AzureAdClient,
     behandlerService: BehandlerService,
     dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
+    veilederTilgangskontrollClient: VeilederTilgangskontrollClient,
 ) {
     installMetrics()
     installContentNegotiation()
@@ -43,13 +42,6 @@ fun Application.apiModule(
             ),
         ),
     )
-
-    val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
-        azureAdClient = azureAdClient,
-        syfotilgangskontrollClientId = environment.syfotilgangskontrollClientId,
-        tilgangskontrollBaseUrl = environment.syfotilgangskontrollUrl,
-    )
-
     val oppfolgingsplanService = OppfolgingsplanService(
         behandlerService = behandlerService,
         dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
