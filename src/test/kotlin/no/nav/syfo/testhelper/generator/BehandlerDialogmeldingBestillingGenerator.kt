@@ -106,6 +106,40 @@ fun generateDialogmeldingToBehandlerBestillingForesporselPurringDTO(
     dialogmeldingVedlegg = null,
 )
 
+fun generateDialogmeldingToBehandlerBestillingForesporselLegeerklaringDTO(
+    behandlerRef: UUID,
+    uuid: UUID,
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
+) = DialogmeldingToBehandlerBestillingDTO(
+    behandlerRef = behandlerRef.toString(),
+    personIdent = arbeidstakerPersonident.value,
+    dialogmeldingUuid = uuid.toString(),
+    dialogmeldingRefParent = uuid.toString(),
+    dialogmeldingRefConversation = uuid.toString(),
+    dialogmeldingType = DialogmeldingType.DIALOG_FORESPORSEL.name,
+    dialogmeldingKodeverk = DialogmeldingKodeverk.FORESPORSEL.name,
+    dialogmeldingKode = DialogmeldingKode.KODE1.value,
+    dialogmeldingTekst = "Dette er en forespørsel om legeerklæring",
+    dialogmeldingVedlegg = null,
+)
+
+fun generateDialogmeldingToBehandlerBestillingNotatReturLegeerklæringDTO(
+    behandlerRef: UUID,
+    uuid: UUID,
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
+) = DialogmeldingToBehandlerBestillingDTO(
+    behandlerRef = behandlerRef.toString(),
+    personIdent = arbeidstakerPersonident.value,
+    dialogmeldingUuid = uuid.toString(),
+    dialogmeldingRefParent = uuid.toString(),
+    dialogmeldingRefConversation = uuid.toString(),
+    dialogmeldingType = DialogmeldingType.DIALOG_NOTAT.name,
+    dialogmeldingKodeverk = DialogmeldingKodeverk.HENVENDELSE.name,
+    dialogmeldingKode = DialogmeldingKode.KODE3.value,
+    dialogmeldingTekst = "Dette er en henvendelse om retur av legeerklæring",
+    dialogmeldingVedlegg = null,
+)
+
 fun generateDialogmeldingToBehandlerBestillingOppfolgingsplanDTO(
     behandlerRef: UUID,
     uuid: UUID,

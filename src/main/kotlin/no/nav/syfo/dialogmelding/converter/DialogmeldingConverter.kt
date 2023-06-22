@@ -20,6 +20,7 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                         fellesFactory.createXMLCV()
                             .withDN(
                                 when (kode) {
+                                    3 -> "Retur av legeerklæring"
                                     4 -> "Avlysning dialogmøte"
                                     9 -> "Informasjon fra NAV" // referat fra dialogmøte
                                     else -> throw IllegalArgumentException("Unsupported kode-value")

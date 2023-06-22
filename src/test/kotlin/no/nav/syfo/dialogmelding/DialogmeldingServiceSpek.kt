@@ -254,5 +254,53 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
+        it("Sends correct message on MQ when foresporsel om legeerklæring") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val melding = generateDialogmeldingToBehandlerBestillingForesporselLegeerklaringDTO(
+                behandlerRef = behandlerRef,
+                uuid = uuid,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+            ).toDialogmeldingToBehandlerBestilling(
+                behandler = behandler,
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselLegeerklaringXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+        }
+        it("Sends correct message on MQ when retur av legeerklæring") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val melding = generateDialogmeldingToBehandlerBestillingNotatReturLegeerklæringDTO(
+                behandlerRef = behandlerRef,
+                uuid = uuid,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+            ).toDialogmeldingToBehandlerBestilling(
+                behandler = behandler,
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingReturLegeerklaringXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+        }
     }
 })

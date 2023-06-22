@@ -22,6 +22,7 @@ enum class DialogmeldingKode(
 ) {
     KODE1(1),
     KODE2(2),
+    KODE3(3),
     KODE4(4),
     KODE9(9);
 
