@@ -1,5 +1,6 @@
 package no.nav.syfo.client.pdl
 
+import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -18,8 +19,8 @@ class PdlClient(
     private val azureAdClient: AzureAdClient,
     private val pdlClientId: String,
     private val pdlUrl: String,
+    private val httpClient: HttpClient = httpClientDefault(),
 ) {
-    private val httpClient = httpClientDefault()
 
     suspend fun person(
         personident: Personident,
@@ -51,6 +52,7 @@ class PdlClient(
                     pdlPersonReponse.data
                 }
             }
+
             else -> {
                 COUNT_CALL_PDL_FAIL.increment()
                 logger.error("Request with url: $pdlUrl failed with reponse code ${response.status.value}")
@@ -108,6 +110,7 @@ class PdlClient(
                     pdlIdenterResponse.data
                 }
             }
+
             else -> {
                 COUNT_CALL_PDL_IDENTER_FAIL.increment()
                 logger.error("Request to get IdentList with url: $pdlClientId failed with reponse code ${response.status.value}")

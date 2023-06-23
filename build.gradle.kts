@@ -13,11 +13,10 @@ object Versions {
     const val jackson = "2.14.0"
     const val jaxb = "2.3.1"
     const val kafka = "3.3.1"
-    const val kafkaEmbedded = "3.2.1"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluent = "1.72"
-    const val ktor = "2.2.2"
+    const val ktor = "2.3.1"
     const val logback = "1.4.4"
     const val logstashEncoder = "7.2"
     const val micrometerRegistry = "1.10.0"
@@ -107,27 +106,6 @@ dependencies {
             strictly(Versions.scala)
         }
     }
-    testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded}", excludeLog4j)
-    constraints {
-        implementation("org.eclipse.jetty.http2:http2-server") {
-            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-2048/")
-            version {
-                require("9.4.48.v20220622")
-            }
-        }
-        implementation("org.yaml:snakeyaml") {
-            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-25857/")
-            version {
-                require("1.33")
-            }
-        }
-        implementation("com.google.protobuf:protobuf-java") {
-            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded} -> https://cwe.mitre.org/data/definitions/400.html")
-            version {
-                require("3.21.7")
-            }
-        }
-    }
 
     // Database
     implementation("org.flywaydb:flyway-core:${Versions.flyway}")
@@ -138,6 +116,7 @@ dependencies {
     testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusjosejwt}")
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktor}")
     testImplementation("io.mockk:mockk:${Versions.mockk}")
+    testImplementation("io.ktor:ktor-client-mock:${Versions.ktor}")
     testImplementation("org.amshove.kluent:kluent:${Versions.kluent}")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:${Versions.spek}") {
         exclude(group = "org.jetbrains.kotlin")

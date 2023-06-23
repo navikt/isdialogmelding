@@ -25,16 +25,19 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
 
     with(TestApplicationEngine()) {
         start()
-        val database = ExternalMockEnvironment.instance.database
-        val environment = ExternalMockEnvironment.instance.environment
+        val externalMockEnvironment = ExternalMockEnvironment.instance
+        val database = externalMockEnvironment.database
+        val environment = externalMockEnvironment.environment
         val pdlClient = PdlClient(
             azureAdClient = AzureAdClient(
                 azureAppClientId = environment.aadAppClient,
                 azureAppClientSecret = environment.azureAppClientSecret,
                 azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+                httpClient = externalMockEnvironment.mockHttpClient,
             ),
             pdlClientId = environment.pdlClientId,
             pdlUrl = environment.pdlUrl,
+            httpClient = externalMockEnvironment.mockHttpClient,
         )
         val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
             database = database,

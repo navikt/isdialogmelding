@@ -19,6 +19,7 @@ import no.nav.syfo.behandler.kafka.*
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.dialogmelding.apprec.ApprecService
@@ -65,6 +66,11 @@ fun main() {
         pdlClientId = environment.pdlClientId,
         pdlUrl = environment.pdlUrl,
     )
+    val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
+        azureAdClient = azureAdClient,
+        syfotilgangskontrollClientId = environment.syfotilgangskontrollClientId,
+        tilgangskontrollBaseUrl = environment.syfotilgangskontrollUrl,
+    )
     val dialogmeldingStatusProducer = DialogmeldingStatusProducer(
         kafkaProducer = KafkaProducer(
             kafkaProducerConfig<DialogmeldingStatusSerializer>(kafkaEnvironment = environment.kafka)
@@ -107,9 +113,9 @@ fun main() {
                 environment = environment,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
                 wellKnownInternalIdportenTokenX = wellKnownInternalIdportenTokenX,
-                azureAdClient = azureAdClient,
                 behandlerService = behandlerService,
                 dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                veilederTilgangskontrollClient = veilederTilgangskontrollClient,
             )
         }
     }

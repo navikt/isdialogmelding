@@ -37,21 +37,25 @@ class KafkaSykmeldingSpek : Spek({
         val externalMockEnvironment = ExternalMockEnvironment.instance
         val database = externalMockEnvironment.database
         application.testApiModule(externalMockEnvironment = externalMockEnvironment)
+        val mockHttpClient = externalMockEnvironment.mockHttpClient
         val azureAdClient = AzureAdClient(
             azureAppClientId = externalMockEnvironment.environment.aadAppClient,
             azureAppClientSecret = externalMockEnvironment.environment.azureAppClientSecret,
             azureOpenidConfigTokenEndpoint = externalMockEnvironment.environment.azureOpenidConfigTokenEndpoint,
+            httpClient = mockHttpClient,
         )
         val behandlerService = BehandlerService(
             fastlegeClient = FastlegeClient(
                 azureAdClient = azureAdClient,
                 fastlegeRestClientId = externalMockEnvironment.environment.fastlegeRestClientId,
                 fastlegeRestUrl = externalMockEnvironment.environment.fastlegeRestUrl,
+                httpClient = mockHttpClient,
             ),
             partnerinfoClient = PartnerinfoClient(
                 azureAdClient = azureAdClient,
                 syfoPartnerinfoClientId = externalMockEnvironment.environment.syfoPartnerinfoClientId,
                 syfoPartnerinfoUrl = externalMockEnvironment.environment.syfoPartnerinfoUrl,
+                httpClient = mockHttpClient,
             ),
             database = database,
         )
