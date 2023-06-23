@@ -11,6 +11,7 @@ const val SEND_OPPFOLGINGSPLAN_FAILED = "${METRICS_NS}_send_oppfolgingsplan_forb
 const val SEND_MESSAGE_EMOTTAK_MQ = "${METRICS_NS}_send_message_emottak_mq_count"
 const val RECEIVED_APPREC_SUCCESSFUL = "${METRICS_NS}_received_apprec_emottak_mq_count"
 const val RECEIVED_APPREC_MESSAGE_QUEUE = "${METRICS_NS}_received_emottak_mq_count"
+const val STORED_APPREC_MESSAGE = "${METRICS_NS}_stored_apprec_count"
 
 val METRICS_REGISTRY = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
@@ -37,4 +38,9 @@ val RECEIVED_APPREC_COUNTER: Counter = Counter
 val RECEIVED_APPREC_MESSAGE_COUNTER: Counter = Counter
     .builder(RECEIVED_APPREC_MESSAGE_QUEUE)
     .description("Counts the number of received apprecs from mq")
+    .register(METRICS_REGISTRY)
+
+val STORED_APPREC_COUNTER: Counter = Counter
+    .builder(STORED_APPREC_MESSAGE)
+    .description("Counts the number of stored apprecs")
     .register(METRICS_REGISTRY)

@@ -8,8 +8,7 @@ import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.apprec.ApprecService
 import no.nav.syfo.dialogmelding.apprec.domain.Apprec
 import no.nav.syfo.dialogmelding.apprec.domain.ApprecStatus
-import no.nav.syfo.metric.RECEIVED_APPREC_COUNTER
-import no.nav.syfo.metric.RECEIVED_APPREC_MESSAGE_COUNTER
+import no.nav.syfo.metric.*
 import no.nav.syfo.util.*
 import no.nav.xml.eiff._2.XMLEIFellesformat
 import java.io.StringReader
@@ -100,6 +99,7 @@ class ApprecConsumer(
                         apprec = apprec,
                         bestillingId = dialogmeldingBestillingId,
                     )
+                    STORED_APPREC_COUNTER.increment()
                 } else {
                     log.info("Received but skipped apprec with id $apprecId because unknown dialogmelding $bestillingId")
                 }

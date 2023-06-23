@@ -3,6 +3,8 @@ package no.nav.syfo.cronjob
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingKodeverk
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingType
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatus
 import org.slf4j.LoggerFactory
@@ -34,6 +36,17 @@ class DialogmeldingSendCronjob(
                 )
                 sendingResult.updated++
                 COUNT_CRONJOB_DIALOGMELDING_SEND_COUNT.increment()
+                when (bestilling.type) {
+                    DialogmeldingType.OPPFOLGINGSPLAN -> COUNT_CRONJOB_DIALOGMELDING_OPPFOLGINGSPLAN_SEND_COUNT.increment()
+                    DialogmeldingType.DIALOG_NOTAT -> COUNT_CRONJOB_DIALOGMELDING_NOTAT_SEND_COUNT.increment()
+                    DialogmeldingType.DIALOG_FORESPORSEL -> {
+                        when (bestilling.kodeverk) {
+                            DialogmeldingKodeverk.DIALOGMOTE -> COUNT_CRONJOB_DIALOGMELDING_DIALOGMOTE_SEND_COUNT.increment()
+                            DialogmeldingKodeverk.FORESPORSEL -> COUNT_CRONJOB_DIALOGMELDING_FORESPORSEL_SEND_COUNT.increment()
+                            else -> {}
+                        }
+                    }
+                }
             } catch (e: Exception) {
                 log.error("Exception caught while attempting sending of dialogmelding", e)
                 dialogmeldingToBehandlerService.incrementDialogmeldingBestillingSendtTries(bestilling.uuid)
