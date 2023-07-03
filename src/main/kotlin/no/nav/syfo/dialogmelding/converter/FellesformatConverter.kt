@@ -13,4 +13,5 @@ fun createFellesformat(
     return factory.createXMLEIFellesformat()
         .withAny(createMsgHead(melding, arbeidstaker))
         .withAny(createMottakenhetBlokk(melding))
+        .withAny(createSporinformasjonBlokk())
 }
