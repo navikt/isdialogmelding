@@ -105,6 +105,7 @@ fun defaultFellesformatMessageXmlRegex(): Regex {
             "        </ns2:Document>\n" +
             "    </ns2:MsgHead>\n" +
             "    <MottakenhetBlokk partnerReferanse=\"1\" ebRole=\"Saksbehandler\" ebService=\"Oppfolgingsplan\" ebAction=\"Plan\"/>\n" +
+            "    <SporinformasjonBlokk programID=\"MODIA SYFO\" programVersjonID=\"1.0\" programResultatKoder=\"0\" tidsstempel=\"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\"/>\n" +
             "</EI_fellesformat>\n"
     )
 }

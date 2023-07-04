@@ -6,13 +6,17 @@ import no.kith.xmlstds.base64container.XMLBase64Container
 import no.kith.xmlstds.dialog._2006_10_11.XMLDialogmelding
 import no.kith.xmlstds.msghead._2006_05_24.XMLMsgHead
 import no.nav.helse.apprecV1.XMLAppRec
+import no.nav.helse.eiFellesformat2.XMLSporinformasjonBlokkType
 import no.nav.xml.eiff._2.XMLEIFellesformat
 import java.io.StringWriter
 import javax.xml.bind.*
 import javax.xml.stream.XMLStreamReader
 import javax.xml.transform.stream.StreamResult
 
-val apprecJaxBContext: JAXBContext = JAXBContext.newInstance(XMLEIFellesformat::class.java, XMLAppRec::class.java)
+val apprecJaxBContext: JAXBContext = JAXBContext.newInstance(
+    XMLEIFellesformat::class.java,
+    XMLAppRec::class.java,
+)
 
 val apprecUnmarshaller: Unmarshaller = apprecJaxBContext.createUnmarshaller().apply {
     setAdapter(LocalDateTimeXmlAdapter::class.java, XMLDateTimeAdapter())
@@ -48,7 +52,8 @@ object JAXB {
                 XMLEIFellesformat::class.java,
                 XMLMsgHead::class.java,
                 XMLDialogmelding::class.java,
-                XMLBase64Container::class.java
+                XMLBase64Container::class.java,
+                XMLSporinformasjonBlokkType::class.java,
             )
         } catch (e: JAXBException) {
             throw RuntimeException(e)
