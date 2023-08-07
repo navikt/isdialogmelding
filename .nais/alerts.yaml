@@ -1,31 +1,39 @@
-apiVersion: "nais.io/v1"
-kind: "Alert"
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
   name: isdialogmelding-alerts
   namespace: teamsykefravr
   labels:
     team: teamsykefravr
 spec:
-  receivers:
-    slack:
-      channel: '#syfo-alarm'
-      prependText: '<!here> | '
-  alerts:
-    - alert: ISDIALOGMELDING IS DOWN
-      expr: sum(up{app="isdialogmelding", job="kubernetes-pods"}) == 0
-      for: 5m
-      description: "Det er ingen pods for app kjørende i namespace og dermed er appen nede"
-      action: "Undersøk hvorfor pods er nede og få den kjørende igjen!"
-      severity: danger
-    - alert: FAILURES IN CRONJOB FOR SENDING DIALOGMELDING
-      expr: sum(increase(isdialogmelding_cronjob_dialogmelding_fail_count_total{app="isdialogmelding"} [1h])) > 1
-      for: 5m
-      description: "{{ $labels.app }} klarer ikke å sende dialogmeldinger."
-      action: "Undersøk hvorfor det feiler i logger og om det er en midlertidig feil eller ikke."
-      severity: danger
-    - alert: CRONJOB FOR SENDING DIALOGMELDING INACTIVE
-      expr: sum(increase(isdialogmelding_kafka_consumer_dialogmelding_bestilling_read_total{app="isdialogmelding"} [24h])) - sum(increase(isdialogmelding_cronjob_dialogmelding_send_count_total{app="isdialogmelding"} [24h])) > 100
-      for: 5m
-      description: "{{ $labels.app }} sender få dialogmeldinger sammenliknet med innkomne bestillinger."
-      action: "Undersøk hvorfor det feiler i logger og om det er en midlertidig feil eller ikke."
-      severity: danger
+  groups:
+    - name: isdialogmelding-alerts
+      rules:
+        - alert: ISDIALOGMELDING IS DOWN
+          expr: kube_deployment_status_replicas_available{deployment="isdialogmelding"} == 0
+          for: 5m
+          annotations:
+            consequence: Application is unavailable
+            action: "Undersøk hvorfor pods er nede og få den kjørende igjen!"
+            summary: "Det er ingen pods for app kjørende i namespace og dermed er appen nede."
+          labels:
+            namespace: teamsykefravr
+            severity: danger
+        - alert: FAILURES IN CRONJOB FOR SENDING DIALOGMELDING
+          expr: sum(increase(isdialogmelding_cronjob_dialogmelding_fail_count_total{app="isdialogmelding"} [1h])) > 1
+          for: 5m
+          annotations:
+            action: "Undersøk hvorfor det feiler i logger og om det er en midlertidig feil eller ikke."
+            summary: "{{ $labels.app }} klarer ikke å sende dialogmeldinger."
+          labels:
+            namespace: teamsykefravr
+            severity: danger
+        - alert: CRONJOB FOR SENDING DIALOGMELDING INACTIVE
+          expr: sum(increase(isdialogmelding_kafka_consumer_dialogmelding_bestilling_read_total{app="isdialogmelding"} [24h])) - sum(increase(isdialogmelding_cronjob_dialogmelding_send_count_total{app="isdialogmelding"} [24h])) > 100
+          for: 5m
+          annotations:
+            action: "Undersøk hvorfor det feiler i logger og om det er en midlertidig feil eller ikke."
+            summary: "{{ $labels.app }} sender få dialogmeldinger sammenliknet med innkomne bestillinger."
+          labels:
+            namespace: teamsykefravr
+            severity: danger
