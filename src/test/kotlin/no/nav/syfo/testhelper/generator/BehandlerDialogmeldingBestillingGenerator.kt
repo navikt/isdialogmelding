@@ -156,3 +156,20 @@ fun generateDialogmeldingToBehandlerBestillingOppfolgingsplanDTO(
     dialogmeldingTekst = null,
     dialogmeldingVedlegg = byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
 )
+
+fun generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
+    behandlerRef: UUID,
+    uuid: UUID,
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
+) = DialogmeldingToBehandlerBestillingDTO(
+    behandlerRef = behandlerRef.toString(),
+    personIdent = arbeidstakerPersonident.value,
+    dialogmeldingUuid = uuid.toString(),
+    dialogmeldingRefParent = uuid.toString(),
+    dialogmeldingRefConversation = uuid.toString(),
+    dialogmeldingType = DialogmeldingType.DIALOG_NOTAT.name,
+    dialogmeldingKodeverk = DialogmeldingKodeverk.HENVENDELSE.name,
+    dialogmeldingKode = DialogmeldingKode.KODE8.value,
+    dialogmeldingTekst = "Dette er en generell henvendelse fra NAV som ikke utløser takst",
+    dialogmeldingVedlegg = null,
+)

@@ -24,6 +24,7 @@ enum class DialogmeldingKode(
     KODE2(2),
     KODE3(3),
     KODE4(4),
+    KODE8(8),
     KODE9(9);
 
     companion object {

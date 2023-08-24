@@ -305,5 +305,29 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
+        it("Sends correct message on MQ when melding fra NAV") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val melding = generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
+                behandlerRef = behandlerRef,
+                uuid = uuid,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+            ).toDialogmeldingToBehandlerBestilling(
+                behandler = behandler,
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingHenvendelseMeldingFraNavXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+        }
     }
 })
