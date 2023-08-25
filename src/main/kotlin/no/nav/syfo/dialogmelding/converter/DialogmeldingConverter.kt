@@ -22,6 +22,7 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                                 when (kode) {
                                     3 -> "Retur av legeerklæring"
                                     4 -> "Avlysning dialogmøte"
+                                    8 -> "Melding fra NAV"
                                     9 -> "Informasjon fra NAV" // referat fra dialogmøte
                                     else -> throw IllegalArgumentException("Unsupported kode-value")
                                 }
