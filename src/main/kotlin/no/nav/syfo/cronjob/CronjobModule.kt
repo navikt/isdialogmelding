@@ -21,15 +21,18 @@ fun cronjobModule(
         applicationState = applicationState,
         leaderPodClient = leaderPodClient,
     )
+    /*
     val dialogmeldingSendCronjob = DialogmeldingSendCronjob(
         dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
         dialogmeldingService = dialogmeldingService,
         dialogmeldingStatusService = dialogmeldingStatusService,
     )
+    */
     val dialogmeldingStatusCronjob =
         DialogmeldingStatusCronjob(dialogmeldingStatusService = dialogmeldingStatusService)
 
-    listOf(dialogmeldingSendCronjob, dialogmeldingStatusCronjob).forEach {
+    // listOf(dialogmeldingSendCronjob, dialogmeldingStatusCronjob).forEach {
+    listOf(dialogmeldingStatusCronjob).forEach {
         launchBackgroundTask(
             applicationState = applicationState,
         ) {

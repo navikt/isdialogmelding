@@ -47,6 +47,8 @@ data class Environment(
     val mqHostname: String = getEnvVar("MQGATEWAY_HOSTNAME"),
     val mqPort: Int = getEnvVar("MQGATEWAY_PORT", "1413").toInt(),
     val mqChannelName: String = getEnvVar("MQGATEWAY_CHANNEL_NAME"),
+    val mqKeystorePassword: String = getEnvVar("MQ_KEYSTORE_PASSWORD"),
+    val mqKeystorePath: String = getEnvVar("MQ_KEYSTORE_PATH"),
     val apprecQueueName: String = getEnvVar("APPREC_QUEUE"),
     val emottakQueuename: String = getEnvVar("MOTTAK_QUEUE_UTSENDING_QUEUENAME"),
     val mqApplicationName: String = "isdialogmelding",

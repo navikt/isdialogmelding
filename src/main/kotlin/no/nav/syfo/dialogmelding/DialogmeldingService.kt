@@ -1,6 +1,5 @@
 package no.nav.syfo.dialogmelding
 
-import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
@@ -15,13 +14,13 @@ private val log = LoggerFactory.getLogger("no.nav.syfo.dialogmelding")
 
 class DialogmeldingService(
     val pdlClient: PdlClient,
-    val mqSender: MQSender,
+    // val mqSender: MQSender,
 ) {
     suspend fun sendMelding(melding: DialogmeldingToBehandlerBestilling) {
         log.info("Sending dialogmelding med type ${melding.type} to behandler with partnerId: ${melding.behandler.kontor.partnerId}")
         val arbeidstaker = getArbeidstaker(melding.arbeidstakerPersonident)
         val fellesformat: Fellesformat = opprettDialogmelding(melding, arbeidstaker)
-        mqSender.sendMessageToEmottak(fellesformat.message!!)
+        // mqSender.sendMessageToEmottak(fellesformat.message!!)
     }
 
     private suspend fun getArbeidstaker(

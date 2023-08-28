@@ -78,23 +78,29 @@ spec:
         diskAutoresize: true
   envFrom:
     - secret: isdialogmelding-serviceuser
+    - secret: isdialogmelding-keystore-pwd
+  filesFrom:
+    - mountPath: /var/run/keystore
+      secret: isdialogmelding-keystore
   kafka:
     pool: nav-dev
   env:
     - name: KTOR_ENV
-      value: production
+      value: "production"
     - name: MQGATEWAY_NAME
       value: "MQLS02"
     - name: MQGATEWAY_HOSTNAME
       value: "b27apvl220.preprod.local"
     - name: MQGATEWAY_PORT
-      value: '1413'
+      value: "1413"
     - name: MQGATEWAY_CHANNEL_NAME
-      value: Q1_ISDIALOGMELDING
+      value: "Q1_ISDIALOGMELDING"
+    - name: MQ_KEYSTORE_PATH
+      value: "/var/run/keystore/isdialogmelding-keystore.jks"
     - name: APPREC_QUEUE
-      value: QA.Q1_ISDIALOGMELDING.IU03_UTSENDING_REPLY
+      value: "QA.Q1_ISDIALOGMELDING.IU03_UTSENDING_REPLY"
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
-      value: QA.Q414.IU03_UTSENDING
+      value: "QA.Q414.IU03_UTSENDING"
     - name: AAP_SOKNAD_API_CLIENT_ID
       value: "dev-gcp:aap:soknad-api"
     - name: SYFOOPPFOLGINGSPLANSERVICE_CLIENT_ID
