@@ -26,3 +26,5 @@ fun connectionFactory(env: Environment): ConnectionFactory {
         setStringProperty(CommonConstants.PASSWORD, env.serviceuserPassword)
     }
 }
+
+fun Session.consumerForQueue(queueName: String): MessageConsumer = createConsumer(createQueue(queueName))

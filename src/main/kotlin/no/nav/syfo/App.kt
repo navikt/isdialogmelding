@@ -22,6 +22,8 @@ import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.dialogmelding.apprec.ApprecService
+import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 import no.nav.syfo.dialogmelding.status.kafka.*
 import no.nav.syfo.identhendelse.IdenthendelseService
@@ -30,6 +32,7 @@ import no.nav.syfo.identhendelse.kafka.launchKafkaTaskIdenthendelse
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
+import javax.jms.Session
 
 const val applicationPort = 8080
 
@@ -41,7 +44,7 @@ fun main() {
     val logger = LoggerFactory.getLogger("ktor.application")
     val environment = Environment()
     setMQTlsProperties(environment)
-    // val mqSender = MQSender(environment)
+    val mqSender = MQSender(environment)
     val wellKnownInternalAzureAD = getWellKnown(environment.azureAppWellKnownUrl)
     val wellKnownInternalIdportenTokenX = getWellKnown(environment.idportenTokenXWellKnownUrl)
     val azureAdClient = AzureAdClient(
@@ -128,7 +131,7 @@ fun main() {
         )
         val dialogmeldingService = DialogmeldingService(
             pdlClient = pdlClient,
-            // mqSender = mqSender,
+            mqSender = mqSender,
         )
         cronjobModule(
             applicationState = applicationState,
@@ -147,7 +150,6 @@ fun main() {
             applicationEnvironmentKafka = environment.kafka,
             database = applicationDatabase,
         )
-        /*
         launchBackgroundTask(
             applicationState = applicationState,
         ) {
@@ -173,7 +175,6 @@ fun main() {
                 blockingApplicationRunner.run()
             }
         }
-        */
         val identhendelseService = IdenthendelseService(
             database = applicationDatabase,
             pdlClient = pdlClient,
