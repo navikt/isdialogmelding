@@ -65,7 +65,7 @@ class DialogmeldingCronjobSpek : Spek({
             )
             val dialogmeldingService = DialogmeldingService(
                 pdlClient = pdlClient,
-                // mqSender = mqSenderMock,
+                mqSender = mqSenderMock,
             )
             val dialogmeldingSendCronjob = DialogmeldingSendCronjob(
                 dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
@@ -80,7 +80,7 @@ class DialogmeldingCronjobSpek : Spek({
             }
 
             describe("Cronjob sender bestilte dialogmeldinger") {
-                xit("Sender bestilt dialogmelding") {
+                it("Sender bestilt dialogmelding") {
                     val behandlerRef = UUID.randomUUID()
                     val partnerId = PartnerId(random.nextInt())
                     val behandler = generateBehandler(behandlerRef, partnerId)
@@ -127,7 +127,7 @@ class DialogmeldingCronjobSpek : Spek({
                     }
                     verify(exactly = 0) { mqSenderMock.sendMessageToEmottak(any()) }
                 }
-                xit("Sender bestilt dialogmelding uten relasjon mellom arbeidstaker og behandler") {
+                it("Sender bestilt dialogmelding uten relasjon mellom arbeidstaker og behandler") {
                     val behandlerRef = UUID.randomUUID()
                     val partnerId = PartnerId(random.nextInt())
                     val behandler = generateBehandler(behandlerRef, partnerId)
@@ -167,7 +167,7 @@ class DialogmeldingCronjobSpek : Spek({
                     pBehandlerDialogmeldingBestillingAfter!!.sendt shouldNotBeEqualTo null
                     pBehandlerDialogmeldingBestillingAfter.sendtTries shouldBeEqualTo 1
                 }
-                xit("Sender bestilt oppfølgingsplan") {
+                it("Sender bestilt oppfølgingsplan") {
                     clearAllMocks()
                     val messageSlot = slot<String>()
                     justRun { mqSenderMock.sendMessageToEmottak(capture(messageSlot)) }

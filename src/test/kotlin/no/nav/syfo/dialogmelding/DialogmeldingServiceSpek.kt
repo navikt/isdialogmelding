@@ -35,7 +35,7 @@ object DialogmeldingServiceSpek : Spek({
 
     val dialogmeldingService = DialogmeldingService(
         pdlClient = pdlClient,
-        // mqSender = mqSender,
+        mqSender = mqSender,
     )
 
     val arbeidstakerPersonident = Personident("01010112345")
@@ -67,7 +67,7 @@ object DialogmeldingServiceSpek : Spek({
         database.dropData()
     }
     describe("DialogmeldingService") {
-        xit("Sends correct message on MQ when foresporsel dialogmote-innkalling") {
+        it("Sends correct message on MQ when foresporsel dialogmote-innkalling") {
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
@@ -91,7 +91,7 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
-        xit("Sends correct message on MQ when foresporsel dialogmote-innkalling for behandler and arbeidstaker with dnr") {
+        it("Sends correct message on MQ when foresporsel dialogmote-innkalling for behandler and arbeidstaker with dnr") {
             clearAllMocks()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -116,7 +116,7 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
-        xit("Sends correct message on MQ when foresporsel dialogmote-innkalling to behandler without orgnr") {
+        it("Sends correct message on MQ when foresporsel dialogmote-innkalling to behandler without orgnr") {
             clearAllMocks()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -134,7 +134,7 @@ object DialogmeldingServiceSpek : Spek({
             }
             verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
         }
-        xit("Sends correct message on MQ when foresporsel endre tid-sted") {
+        it("Sends correct message on MQ when foresporsel endre tid-sted") {
             clearAllMocks()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -159,7 +159,7 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
-        xit("Sends correct message on MQ when referat") {
+        it("Sends correct message on MQ when referat") {
             clearAllMocks()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -184,7 +184,7 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
-        xit("Sends correct message on MQ when avlysning") {
+        it("Sends correct message on MQ when avlysning") {
             clearAllMocks()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -209,7 +209,7 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
-        xit("Sends correct message on MQ when foresporsel") {
+        it("Sends correct message on MQ when foresporsel") {
             clearAllMocks()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -233,7 +233,7 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
-        xit("Sends correct message on MQ when purring foresporsel") {
+        it("Sends correct message on MQ when purring foresporsel") {
             clearAllMocks()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -257,7 +257,7 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
-        xit("Sends correct message on MQ when foresporsel om legeerklæring") {
+        it("Sends correct message on MQ when foresporsel om legeerklæring") {
             clearAllMocks()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -281,7 +281,7 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
-        xit("Sends correct message on MQ when retur av legeerklæring") {
+        it("Sends correct message on MQ when retur av legeerklæring") {
             clearAllMocks()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -305,7 +305,7 @@ object DialogmeldingServiceSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
-        xit("Sends correct message on MQ when melding fra NAV") {
+        it("Sends correct message on MQ when melding fra NAV") {
             clearAllMocks()
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }

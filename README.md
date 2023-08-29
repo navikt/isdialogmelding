@@ -4,7 +4,9 @@
 
 Applikasjon for håndtering av dialogmeldinger i SYFO-domenet. Funksjonalitet:
 
-* Deling av oppfølgingsplan
+* Deling av oppfølgingsplan 
+* Sending av dialogmøterelaterte dialogmeldinger
+* Sending av andre dialogmeldinger
 * API med informasjon om behandlere (fastlege) som kan motta dialogmelding
 
 ## Technologies used
@@ -94,6 +96,17 @@ Creating a docker image should be as simple as `docker build -t isdialogmelding 
 This application owns and consumes from the following topic:
 
 * isdialogmelding-behandler-dialogmelding-bestilling
+
+### MQ config
+
+This application uses an encrypted channel when reading av sending messages to MQ. The certificate and password for 
+the jks-file can be found in Fasit. The resources must be stored in GCP as secrets:
+
+`kubectl create secret generic isdialogmelding-keystore-pwd --from-literal MQ_KEYSTORE_PASSWORD=xxxxxxxx`
+
+and
+
+`kubectl create secret generic isdialogmelding-keystore --from-file isdialogmelding-keystore.jks=./srvisdialogmelding_p.jks`
 
 ## Contact
 
