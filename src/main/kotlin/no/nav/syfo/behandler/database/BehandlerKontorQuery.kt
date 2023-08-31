@@ -4,6 +4,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.database.toList
 import no.nav.syfo.behandler.database.domain.PBehandlerKontor
 import no.nav.syfo.behandler.domain.BehandlerKontor
+import no.nav.syfo.dialogmelding.bestilling.database.toPBehandlerDialogmeldingBestilling
 import no.nav.syfo.domain.PartnerId
 import java.sql.*
 import java.time.OffsetDateTime
@@ -147,6 +148,18 @@ fun Connection.getBehandlerKontor(partnerId: PartnerId): PBehandlerKontor? {
             it.executeQuery().toList { toPBehandlerKontor() }
         }.firstOrNull()
 }
+
+const val queryGetAllBehandlerKontor =
+    """
+        SELECT * FROM BEHANDLER_KONTOR
+    """
+
+fun DatabaseInterface.getAllBehandlerKontor(): List<PBehandlerKontor> =
+    connection.use { connection ->
+        connection.prepareStatement(queryGetAllBehandlerKontor).use {
+            it.executeQuery().toList { toPBehandlerKontor() }
+        }
+    }
 
 fun ResultSet.toPBehandlerKontor(): PBehandlerKontor =
     PBehandlerKontor(

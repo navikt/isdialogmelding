@@ -7,6 +7,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
+import no.nav.syfo.behandler.database.queryGetAllBehandlerKontor
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
 import no.nav.syfo.util.NAV_CALL_ID_HEADER
@@ -28,6 +29,30 @@ class PartnerinfoClient(
         callId: String,
         systemRequest: Boolean = false,
     ): PartnerinfoResponse? {
+        val response = allPartnerinfo(
+            herId = herId,
+            token = token,
+            callId = callId,
+            systemRequest = systemRequest,
+        )
+        if (response.isEmpty()) {
+            log.warn("Response from syfopartnerinfo for herId $herId is empty")
+            COUNT_CALL_PARTNERINFO_EMPTY_RESPONSE.increment()
+        }
+        if (response.size > 1) {
+            log.warn("Response from syfopartnerinfo for herId $herId contains more than one partnerId: ${response.map { it.partnerId }}")
+            COUNT_CALL_PARTNERINFO_MULTIPLE_RESPONSE.increment()
+        }
+        return response.maxByOrNull { it.partnerId }
+    }
+
+    suspend fun allPartnerinfo(
+        herId: String,
+        token: String,
+        callId: String,
+        systemRequest: Boolean = false,
+    ): List<PartnerinfoResponse> {
+
         val newToken = if (systemRequest) {
             azureAdClient.getSystemToken(
                 scopeClientId = syfoPartnerinfoClientId,
@@ -41,32 +66,22 @@ class PartnerinfoClient(
                 ?: throw RuntimeException("Failed to request partnerinfo from syfopartnerinfo: Failed to get OBO token")
         }
 
-        try {
-            val response = httpClient.get(partnerinfoBehandlerUrl) {
+        return try {
+            httpClient.get(partnerinfoBehandlerUrl) {
                 header(HttpHeaders.Authorization, bearerHeader(newToken))
                 header(NAV_CALL_ID_HEADER, callId)
                 accept(ContentType.Application.Json)
                 parameter(HERID_PARAM, herId)
-            }.body<List<PartnerinfoResponse>>()
-            COUNT_CALL_PARTNERINFO_SUCCESS.increment()
-
-            if (response.isEmpty()) {
-                log.warn("Response from syfopartnerinfo for herId $herId is empty")
-                COUNT_CALL_PARTNERINFO_EMPTY_RESPONSE.increment()
+            }.body<List<PartnerinfoResponse>>().also {
+                COUNT_CALL_PARTNERINFO_SUCCESS.increment()
             }
-            if (response.size > 1) {
-                log.warn("Response from syfopartnerinfo for herId $herId contains more than one partnerId: ${response.map { it.partnerId }}")
-                COUNT_CALL_PARTNERINFO_MULTIPLE_RESPONSE.increment()
-            }
-
-            return response.maxByOrNull { it.partnerId }
         } catch (e: ClientRequestException) {
             handleUnexpectedResponseException(e.response, e.message, callId)
+            emptyList()
         } catch (e: ServerResponseException) {
             handleUnexpectedResponseException(e.response, e.message, callId)
+            emptyList()
         }
-
-        return null
     }
 
     private fun handleUnexpectedResponseException(response: HttpResponse, message: String?, callId: String) {
