@@ -7,7 +7,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.syfo.behandler.database.queryGetAllBehandlerKontor
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
 import no.nav.syfo.util.NAV_CALL_ID_HEADER
@@ -52,7 +51,6 @@ class PartnerinfoClient(
         callId: String,
         systemRequest: Boolean = false,
     ): List<PartnerinfoResponse> {
-
         val newToken = if (systemRequest) {
             azureAdClient.getSystemToken(
                 scopeClientId = syfoPartnerinfoClientId,

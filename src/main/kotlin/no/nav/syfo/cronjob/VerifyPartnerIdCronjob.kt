@@ -3,9 +3,6 @@ package no.nav.syfo.cronjob
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
-import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingKodeverk
-import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingType
-import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatus
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
@@ -15,7 +12,7 @@ class VerifyPartnerIdCronjob(
 ) : DialogmeldingCronjob {
 
     override val initialDelayMinutes: Long = 20
-    override val intervalDelayMinutes: Long = 24*60
+    override val intervalDelayMinutes: Long = 24 * 60
 
     override suspend fun run() {
         dialogmeldingVerifyPartnerIdJob()

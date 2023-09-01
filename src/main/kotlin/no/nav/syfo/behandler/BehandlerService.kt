@@ -238,7 +238,7 @@ class BehandlerService(
     }
 
     fun getKontor(): List<BehandlerKontor> =
-        database.getAllBehandlerKontor().map{ it.toBehandlerKontor() }
+        database.getAllBehandlerKontor().map { it.toBehandlerKontor() }
 
     private fun getBehandler(behandler: Behandler): PBehandler? {
         return when {
