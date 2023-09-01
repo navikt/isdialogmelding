@@ -1,6 +1,8 @@
 package no.nav.syfo.cronjob
 
 import no.nav.syfo.application.*
+import no.nav.syfo.behandler.BehandlerService
+import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.cronjob.leaderelection.LeaderPodClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
@@ -13,6 +15,8 @@ fun cronjobModule(
     dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
     dialogmeldingService: DialogmeldingService,
     dialogmeldingStatusService: DialogmeldingStatusService,
+    behandlerService: BehandlerService,
+    partnerinfoClient: PartnerinfoClient,
 ) {
     val leaderPodClient = LeaderPodClient(
         environment = environment,
@@ -29,7 +33,12 @@ fun cronjobModule(
     val dialogmeldingStatusCronjob =
         DialogmeldingStatusCronjob(dialogmeldingStatusService = dialogmeldingStatusService)
 
-    listOf(dialogmeldingSendCronjob, dialogmeldingStatusCronjob).forEach {
+    val verifyPartnerIdCronjob = VerifyPartnerIdCronjob(
+        behandlerService = behandlerService,
+        partnerinfoClient = partnerinfoClient,
+    )
+
+    listOf(dialogmeldingSendCronjob, dialogmeldingStatusCronjob, verifyPartnerIdCronjob).forEach {
         launchBackgroundTask(
             applicationState = applicationState,
         ) {
