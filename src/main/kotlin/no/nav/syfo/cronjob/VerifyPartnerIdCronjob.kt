@@ -24,14 +24,14 @@ class VerifyPartnerIdCronjob(
         val behandlerKontorMedHerId = behandlerService.getKontor().filter { it.herId != null }
         behandlerKontorMedHerId.forEach { behandlerKontor ->
             try {
-                val partnerIdResponse = partnerinfoClient.allPartnerinfo(
+                val partnerIdsForKontor = partnerinfoClient.allPartnerinfo(
                     herId = behandlerKontor.herId!!.toString(),
                     token = "",
                     systemRequest = true,
                     callId = UUID.randomUUID().toString(),
-                )
-                if (!partnerIdResponse.map { it.partnerId }.contains(behandlerKontor.partnerId.value)) {
-                    log.warn("Kontor med herId ${behandlerKontor.herId} er ikke lengre knyttet til partnerId ${behandlerKontor.partnerId} hos e-mottak")
+                ).map { it.partnerId }
+                if (!partnerIdsForKontor.contains(behandlerKontor.partnerId.value)) {
+                    log.warn("Kontor med herId ${behandlerKontor.herId} er ikke lengre knyttet til partnerId ${behandlerKontor.partnerId.value} hos e-mottak")
                 }
             } catch (e: Exception) {
                 log.error("Exception caught while checking behandlerkontor", e)
