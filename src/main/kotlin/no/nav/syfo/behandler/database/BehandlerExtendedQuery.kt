@@ -101,6 +101,7 @@ fun ResultSet.toPBehandlerAndPBehandlerKontor(): Pair<PBehandler, PBehandlerKont
         dialogmeldingEnabled = getObject("dialogmelding_enabled")?.let {
             getObject("dialogmelding_enabled", OffsetDateTime::class.java)
         },
+        dialogmeldingEnabledLocked = getBoolean("dialogmelding_enabled_locked"),
         system = getString("system"),
         createdAt = getObject("kontorcreatedat", OffsetDateTime::class.java),
         updatedAt = getObject("kontorupdatedat", OffsetDateTime::class.java),

@@ -60,6 +60,7 @@ fun FastlegeResponse.toBehandler(
         poststed = this.fastlegekontor.postadresse?.poststed,
         orgnummer = this.fastlegekontor.orgnummer?.let { Virksomhetsnummer(it) },
         dialogmeldingEnabled = dialogmeldingEnabled,
+        dialogmeldingEnabledLocked = false,
         system = null,
         mottatt = OffsetDateTime.now(),
     ),

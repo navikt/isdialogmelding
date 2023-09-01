@@ -54,6 +54,23 @@ class KafkaDialogmeldingFromBehandlerSpek : Spek({
                         val kontor = database.connection.getBehandlerKontor(UserConstants.PARTNERID)
                         kontor?.dialogmeldingEnabled shouldNotBe null
                     }
+                    it("do not mark kontor as ready to receive dialogmeldinger if locked") {
+                        addBehandlerAndKontorToDatabase(behandlerService)
+                        database.setDialogmeldingEnabledLocked(UserConstants.PARTNERID.toString())
+                        val dialogmelding = generateDialogmeldingFromBehandlerDTO(UUID.randomUUID())
+                        val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
+
+                        runBlocking {
+                            pollAndProcessDialogmeldingFromBehandler(
+                                kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                                database = database,
+                            )
+                        }
+
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+                        val kontor = database.connection.getBehandlerKontor(UserConstants.PARTNERID)
+                        kontor!!.dialogmeldingEnabled shouldBe null
+                    }
                     it("update identer for behandler if stored idents are null") {
                         val behandlerRef = database.createBehandlerForArbeidstaker(
                             behandler = generateBehandler(

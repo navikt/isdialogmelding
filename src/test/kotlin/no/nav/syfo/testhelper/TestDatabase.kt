@@ -144,6 +144,21 @@ fun DatabaseInterface.getDialogmeldingStatuses(): List<PDialogmeldingStatus> = t
     }
 }
 
+const val querySetDialogmeldingEnabledLocked =
+    """
+        UPDATE BEHANDLER_KONTOR SET dialogmelding_enabled_locked=true WHERE partner_id=?
+    """
+
+fun DatabaseInterface.setDialogmeldingEnabledLocked(partnerId: String) = this.connection.use { connection ->
+    connection.prepareStatement(
+        querySetDialogmeldingEnabledLocked
+    ).use {
+        it.setString(1, partnerId)
+        it.executeUpdate()
+    }
+    connection.commit()
+}
+
 fun DatabaseInterface.dropData() {
     val queryList = listOf(
         """
