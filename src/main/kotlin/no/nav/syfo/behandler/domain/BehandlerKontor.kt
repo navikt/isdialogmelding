@@ -13,6 +13,7 @@ data class BehandlerKontor(
     val poststed: String?,
     val orgnummer: Virksomhetsnummer?,
     val dialogmeldingEnabled: Boolean,
+    val dialogmeldingEnabledLocked: Boolean,
     val system: String?,
     val mottatt: OffsetDateTime,
 )

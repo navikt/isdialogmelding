@@ -126,6 +126,7 @@ class BehandlerServiceSpek : Spek({
                                 poststed = behandlerFromDB.kontor.poststed,
                                 orgnummer = behandlerFromDB.kontor.orgnummer,
                                 dialogmeldingEnabled = behandlerFromDB.kontor.dialogmeldingEnabled,
+                                dialogmeldingEnabledLocked = behandlerFromDB.kontor.dialogmeldingEnabledLocked,
                                 system = "EPJ-systemet",
                                 mottatt = OffsetDateTime.now(),
                             ),

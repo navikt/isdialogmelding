@@ -20,11 +20,12 @@ const val queryCreateBehandlerKontor =
             poststed,
             orgnummer,
             dialogmelding_enabled,
+            dialogmelding_enabled_locked,
             system,
             created_at,
             updated_at,
             mottatt
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             RETURNING ID;
     """
 
@@ -45,10 +46,11 @@ fun Connection.createBehandlerKontor(
         } else {
             it.setNull(8, Types.TIMESTAMP_WITH_TIMEZONE)
         }
-        it.setString(9, kontor.system)
-        it.setObject(10, now)
+        it.setBoolean(9, kontor.dialogmeldingEnabledLocked)
+        it.setString(10, kontor.system)
         it.setObject(11, now)
-        it.setObject(12, kontor.mottatt)
+        it.setObject(12, now)
+        it.setObject(13, kontor.mottatt)
         it.executeQuery().toList { getInt("id") }
     }
 
@@ -61,7 +63,7 @@ fun Connection.createBehandlerKontor(
 
 const val queryUpdateBehandlerKontorDialogmeldingEnabled =
     """
-        UPDATE BEHANDLER_KONTOR SET dialogmelding_enabled=? WHERE partner_id=?
+        UPDATE BEHANDLER_KONTOR SET dialogmelding_enabled=? WHERE partner_id=? AND NOT dialogmelding_enabled_locked
     """
 
 fun DatabaseInterface.updateBehandlerKontorDialogmeldingEnabled(partnerId: PartnerId): Boolean {
@@ -159,6 +161,7 @@ fun ResultSet.toPBehandlerKontor(): PBehandlerKontor =
         dialogmeldingEnabled = getObject("dialogmelding_enabled")?.let {
             getObject("dialogmelding_enabled", OffsetDateTime::class.java)
         },
+        dialogmeldingEnabledLocked = getBoolean("dialogmelding_enabled_locked"),
         system = getString("system"),
         createdAt = getObject("created_at", OffsetDateTime::class.java),
         updatedAt = getObject("updated_at", OffsetDateTime::class.java),

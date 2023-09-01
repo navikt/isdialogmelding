@@ -114,6 +114,7 @@ private fun createAndStoreBehandlerFromSykmelding(
             poststed = null,
             orgnummer = receivedSykmeldingDTO.legekontorOrgNr?.let { Virksomhetsnummer(it) },
             dialogmeldingEnabled = false,
+            dialogmeldingEnabledLocked = false,
             system = receivedSykmeldingDTO.sykmelding.avsenderSystem.navn,
             mottatt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
         ),
