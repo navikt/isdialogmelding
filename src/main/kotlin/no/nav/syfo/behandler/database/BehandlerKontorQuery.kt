@@ -148,6 +148,18 @@ fun Connection.getBehandlerKontor(partnerId: PartnerId): PBehandlerKontor? {
         }.firstOrNull()
 }
 
+const val queryGetAllBehandlerKontor =
+    """
+        SELECT * FROM BEHANDLER_KONTOR
+    """
+
+fun DatabaseInterface.getAllBehandlerKontor(): List<PBehandlerKontor> =
+    connection.use { connection ->
+        connection.prepareStatement(queryGetAllBehandlerKontor).use {
+            it.executeQuery().toList { toPBehandlerKontor() }
+        }
+    }
+
 fun ResultSet.toPBehandlerKontor(): PBehandlerKontor =
     PBehandlerKontor(
         id = getInt("id"),

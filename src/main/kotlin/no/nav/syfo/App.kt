@@ -139,6 +139,8 @@ fun main() {
             dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
             dialogmeldingService = dialogmeldingService,
             dialogmeldingStatusService = dialogmeldingStatusService,
+            behandlerService = behandlerService,
+            partnerinfoClient = partnerinfoClient,
         )
         launchKafkaTaskSykmelding(
             applicationState = applicationState,
