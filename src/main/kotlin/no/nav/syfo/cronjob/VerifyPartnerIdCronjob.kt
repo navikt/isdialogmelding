@@ -30,8 +30,8 @@ class VerifyPartnerIdCronjob(
                     systemRequest = true,
                     callId = UUID.randomUUID().toString(),
                 ).map { it.partnerId }
-                if (!partnerIdsForKontor.contains(behandlerKontor.partnerId.value)) {
-                    log.warn("Kontor med herId ${behandlerKontor.herId} er ikke lengre knyttet til partnerId ${behandlerKontor.partnerId.value} hos e-mottak")
+                if (!partnerIdsForKontor.contains(behandlerKontor.partnerId.toInt())) {
+                    log.warn("Kontor med herId ${behandlerKontor.herId} er ikke lengre knyttet til partnerId ${behandlerKontor.partnerId} hos e-mottak")
                 }
             } catch (e: Exception) {
                 log.error("Exception caught while checking behandlerkontor", e)

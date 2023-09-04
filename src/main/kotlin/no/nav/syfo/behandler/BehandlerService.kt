@@ -7,8 +7,7 @@ import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
-import no.nav.syfo.domain.PartnerId
-import no.nav.syfo.domain.Personident
+import no.nav.syfo.domain.*
 import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.time.OffsetDateTime
@@ -237,8 +236,8 @@ class BehandlerService(
         )
     }
 
-    fun getKontor(): List<BehandlerKontor> =
-        database.getAllBehandlerKontor().map { it.toBehandlerKontor() }
+    fun getKontor(): List<PBehandlerKontor> =
+        database.getAllBehandlerKontor()
 
     private fun getBehandler(behandler: Behandler): PBehandler? {
         return when {
