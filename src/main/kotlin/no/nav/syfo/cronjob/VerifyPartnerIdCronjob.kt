@@ -15,10 +15,10 @@ class VerifyPartnerIdCronjob(
     override val intervalDelayMinutes: Long = 24 * 60
 
     override suspend fun run() {
-        dialogmeldingVerifyPartnerIdJob()
+        verifyPartnerIdJob()
     }
 
-    suspend fun dialogmeldingVerifyPartnerIdJob(): DialogmeldingCronjobResult {
+    suspend fun verifyPartnerIdJob() {
         val verifyResult = DialogmeldingCronjobResult()
 
         val behandlerKontorMedHerId = behandlerService.getKontor().filter { it.herId != null }
@@ -43,7 +43,6 @@ class VerifyPartnerIdCronjob(
             StructuredArguments.keyValue("failed", verifyResult.failed),
             StructuredArguments.keyValue("updated", verifyResult.updated),
         )
-        return verifyResult
     }
 
     companion object {
