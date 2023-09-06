@@ -80,6 +80,20 @@ fun DatabaseInterface.updateBehandlerKontorDialogmeldingEnabled(partnerId: Partn
     }
 }
 
+fun DatabaseInterface.updateBehandlerKontorDialogmeldingDisabled(partnerId: PartnerId): Boolean {
+    return this.connection.use { connection ->
+        val rowCount = connection.prepareStatement(queryUpdateBehandlerKontorDialogmeldingEnabled)
+            .use {
+                it.setNull(1, Types.TIMESTAMP_WITH_TIMEZONE)
+                it.setString(2, partnerId.toString())
+                it.executeUpdate()
+            }
+        connection.commit()
+
+        rowCount > 0
+    }
+}
+
 const val queryUpdateBehandlerKontorSystem =
     """
         UPDATE BEHANDLER_KONTOR SET system=?,updated_at=?,mottatt=? WHERE partner_id=?
@@ -133,6 +147,21 @@ fun DatabaseInterface.getBehandlerKontorById(id: Int): PBehandlerKontor {
                 it.executeQuery().toList { toPBehandlerKontor() }
             }
     }.first()
+}
+
+const val queryGetBehandlerKontorByHerId =
+    """
+        SELECT * FROM BEHANDLER_KONTOR WHERE her_id = ?
+    """
+
+fun DatabaseInterface.getBehandlerKontorByHerId(herId: String): List<PBehandlerKontor> {
+    return this.connection.use { connection ->
+        connection.prepareStatement(queryGetBehandlerKontorByHerId)
+            .use {
+                it.setString(1, herId)
+                it.executeQuery().toList { toPBehandlerKontor() }
+            }
+    }
 }
 
 const val queryGetBehandlerKontor =
