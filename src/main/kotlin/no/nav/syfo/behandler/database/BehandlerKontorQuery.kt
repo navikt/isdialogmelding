@@ -80,17 +80,15 @@ fun DatabaseInterface.updateBehandlerKontorDialogmeldingEnabled(partnerId: Partn
     }
 }
 
-fun DatabaseInterface.updateBehandlerKontorDialogmeldingDisabled(partnerId: PartnerId): Boolean {
-    return this.connection.use { connection ->
-        val rowCount = connection.prepareStatement(queryUpdateBehandlerKontorDialogmeldingEnabled)
+fun DatabaseInterface.updateBehandlerKontorDialogmeldingDisabled(partnerId: PartnerId) {
+    this.connection.use { connection ->
+        connection.prepareStatement(queryUpdateBehandlerKontorDialogmeldingEnabled)
             .use {
                 it.setNull(1, Types.TIMESTAMP_WITH_TIMEZONE)
                 it.setString(2, partnerId.toString())
                 it.executeUpdate()
             }
         connection.commit()
-
-        rowCount > 0
     }
 }
 
