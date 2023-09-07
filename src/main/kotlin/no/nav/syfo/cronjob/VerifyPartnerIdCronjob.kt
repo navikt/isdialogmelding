@@ -34,7 +34,10 @@ class VerifyPartnerIdCronjob(
                 ).map { it.partnerId }
                 if (!partnerIdsForKontor.contains(behandlerKontor.partnerId.toInt())) {
                     log.warn("Kontor med herId ${behandlerKontor.herId} er ikke lengre knyttet til partnerId ${behandlerKontor.partnerId} hos e-mottak")
-                    behandlerService.disableKontorIfExistsOtherValidKontorWithSameHerId(behandlerKontor, partnerIdsForKontor)
+                    if (behandlerService.disableKontorIfExistsOtherValidKontorWithSameHerId(behandlerKontor, partnerIdsForKontor)) {
+                        log.info("Disabled dialogmelding for kontor med partnerId ${behandlerKontor.partnerId}")
+                        verifyResult.updated++
+                    }
                 }
             } catch (e: Exception) {
                 log.error("Exception caught while checking behandlerkontor", e)
