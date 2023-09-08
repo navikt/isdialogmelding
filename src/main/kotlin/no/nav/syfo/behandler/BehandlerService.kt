@@ -239,20 +239,19 @@ class BehandlerService(
     fun getKontor(): List<PBehandlerKontor> =
         database.getAllBehandlerKontor()
 
-    fun disableKontorIfExistsOtherValidKontorWithSameHerId(
+    fun existsOtherValidKontorWithSameHerId(
         behandlerKontor: PBehandlerKontor,
         partnerIds: List<Int>,
     ): Boolean {
-        behandlerKontor.herId?.let {
-            if (database.getBehandlerKontorByHerId(it).find { other ->
+        return behandlerKontor.herId?.let {
+            database.getBehandlerKontorByHerId(it).any { other ->
                 other.partnerId != behandlerKontor.partnerId && partnerIds.contains(other.partnerId.toInt())
-            } != null
-            ) {
-                database.updateBehandlerKontorDialogmeldingDisabled(PartnerId(behandlerKontor.partnerId.toInt()))
-                return true
             }
-        }
-        return false
+        } ?: false
+    }
+
+    fun disableDialogmeldingerForKontor(behandlerKontor: PBehandlerKontor) {
+        database.updateBehandlerKontorDialogmeldingDisabled(PartnerId(behandlerKontor.partnerId.toInt()))
     }
 
     private fun getBehandler(behandler: Behandler): PBehandler? {

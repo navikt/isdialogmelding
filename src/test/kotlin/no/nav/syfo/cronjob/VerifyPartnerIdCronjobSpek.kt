@@ -4,22 +4,18 @@ import io.ktor.server.testing.*
 import io.mockk.clearAllMocks
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.BehandlerService
-import no.nav.syfo.behandler.database.createBehandlerKontor
 import no.nav.syfo.behandler.database.getBehandlerKontorById
-import no.nav.syfo.behandler.domain.BehandlerKontor
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
-import no.nav.syfo.testhelper.ExternalMockEnvironment
+import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.KONTOR_NAVN
 import no.nav.syfo.testhelper.UserConstants.OTHER_HERID
 import no.nav.syfo.testhelper.UserConstants.OTHER_PARTNERID
 import no.nav.syfo.testhelper.UserConstants.PARTNERID
-import no.nav.syfo.testhelper.dropData
 import org.amshove.kluent.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import java.time.OffsetDateTime
 
 class VerifyPartnerIdCronjobSpek : Spek({
     describe(VerifyPartnerIdCronjobSpek::class.java.simpleName) {
@@ -71,41 +67,16 @@ class VerifyPartnerIdCronjobSpek : Spek({
                     }
                 }
                 it("Cronjob disabler duplikat kontor med udatert partnerID") {
-                    var kontorId1: Int
-                    var kontorId2: Int
-                    database.connection.use { connection ->
-                        kontorId1 = connection.createBehandlerKontor(
-                            kontor = BehandlerKontor(
-                                partnerId = PARTNERID,
-                                herId = OTHER_HERID,
-                                navn = KONTOR_NAVN,
-                                adresse = null,
-                                postnummer = null,
-                                poststed = null,
-                                orgnummer = null,
-                                dialogmeldingEnabled = true,
-                                dialogmeldingEnabledLocked = false,
-                                system = null,
-                                mottatt = OffsetDateTime.now()
-                            )
-                        )
-                        kontorId2 = connection.createBehandlerKontor(
-                            kontor = BehandlerKontor(
-                                partnerId = OTHER_PARTNERID,
-                                herId = OTHER_HERID,
-                                navn = KONTOR_NAVN,
-                                adresse = null,
-                                postnummer = null,
-                                poststed = null,
-                                orgnummer = null,
-                                dialogmeldingEnabled = true,
-                                dialogmeldingEnabledLocked = false,
-                                system = null,
-                                mottatt = OffsetDateTime.now()
-                            )
-                        )
-                        connection.commit()
-                    }
+                    val kontorId1 = database.createKontor(
+                        partnerId = PARTNERID,
+                        herId = OTHER_HERID,
+                        navn = KONTOR_NAVN,
+                    )
+                    val kontorId2 = database.createKontor(
+                        partnerId = OTHER_PARTNERID,
+                        herId = OTHER_HERID,
+                        navn = KONTOR_NAVN,
+                    )
                     runBlocking {
                         cronJob.verifyPartnerIdJob()
                     }
@@ -115,41 +86,17 @@ class VerifyPartnerIdCronjobSpek : Spek({
                     kontor2.dialogmeldingEnabled shouldNotBe null
                 }
                 it("Cronjob gjør ingenting med duplikat kontor med udatert partnerID hvis allerede disabled") {
-                    var kontorId1: Int
-                    var kontorId2: Int
-                    database.connection.use { connection ->
-                        kontorId1 = connection.createBehandlerKontor(
-                            kontor = BehandlerKontor(
-                                partnerId = PARTNERID,
-                                herId = OTHER_HERID,
-                                navn = KONTOR_NAVN,
-                                adresse = null,
-                                postnummer = null,
-                                poststed = null,
-                                orgnummer = null,
-                                dialogmeldingEnabled = false,
-                                dialogmeldingEnabledLocked = false,
-                                system = null,
-                                mottatt = OffsetDateTime.now()
-                            )
-                        )
-                        kontorId2 = connection.createBehandlerKontor(
-                            kontor = BehandlerKontor(
-                                partnerId = OTHER_PARTNERID,
-                                herId = OTHER_HERID,
-                                navn = KONTOR_NAVN,
-                                adresse = null,
-                                postnummer = null,
-                                poststed = null,
-                                orgnummer = null,
-                                dialogmeldingEnabled = true,
-                                dialogmeldingEnabledLocked = false,
-                                system = null,
-                                mottatt = OffsetDateTime.now()
-                            )
-                        )
-                        connection.commit()
-                    }
+                    val kontorId1 = database.createKontor(
+                        partnerId = PARTNERID,
+                        herId = OTHER_HERID,
+                        navn = KONTOR_NAVN,
+                        dialogmeldingEnabled = false,
+                    )
+                    val kontorId2 = database.createKontor(
+                        partnerId = OTHER_PARTNERID,
+                        herId = OTHER_HERID,
+                        navn = KONTOR_NAVN,
+                    )
                     runBlocking {
                         cronJob.verifyPartnerIdJob()
                     }
@@ -159,25 +106,11 @@ class VerifyPartnerIdCronjobSpek : Spek({
                     kontor2.dialogmeldingEnabled shouldNotBe null
                 }
                 it("Cronjob gjør ingenting med kontor med udatert partnerID hvis det ikke finnes et annet kontor med samme herId") {
-                    val kontorId = database.connection.use { connection ->
-                        connection.createBehandlerKontor(
-                            kontor = BehandlerKontor(
-                                partnerId = PARTNERID,
-                                herId = OTHER_HERID,
-                                navn = KONTOR_NAVN,
-                                adresse = null,
-                                postnummer = null,
-                                poststed = null,
-                                orgnummer = null,
-                                dialogmeldingEnabled = true,
-                                dialogmeldingEnabledLocked = false,
-                                system = null,
-                                mottatt = OffsetDateTime.now()
-                            )
-                        ).also {
-                            connection.commit()
-                        }
-                    }
+                    val kontorId = database.createKontor(
+                        partnerId = PARTNERID,
+                        herId = OTHER_HERID,
+                        navn = KONTOR_NAVN,
+                    )
                     runBlocking {
                         cronJob.verifyPartnerIdJob()
                     }
