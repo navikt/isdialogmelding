@@ -26,6 +26,7 @@ object UserConstants {
     const val PERSON_FORNAVN = "Fornavn"
     const val PERSON_MELLOMNAVN = "Mellomnavn"
     const val PERSON_ETTERNAVN = "Etternavn"
+    const val KONTOR_NAVN = "Legekontoret"
 
     const val HERID = 404
     const val HPRID = 1337

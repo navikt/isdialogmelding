@@ -8,6 +8,7 @@ import no.nav.syfo.behandler.database.domain.PBehandlerArbeidstaker
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.dialogmelding.status.database.PDialogmeldingStatus
 import no.nav.syfo.dialogmelding.status.database.toPDialogmeldingStatus
+import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.Personident
 import org.flywaydb.core.Flyway
 import java.sql.Connection
@@ -107,6 +108,31 @@ fun DatabaseInterface.createBehandlerAndTwoArbeidstakerRelasjoner(
         connection.commit()
 
         return createdBehandler.behandlerRef
+    }
+}
+
+fun DatabaseInterface.createKontor(
+    partnerId: PartnerId = UserConstants.PARTNERID,
+    herId: Int = UserConstants.HERID,
+    navn: String = UserConstants.KONTOR_NAVN,
+    dialogmeldingEnabled: Boolean = true,
+) = this.connection.use { connection ->
+    connection.createBehandlerKontor(
+        kontor = BehandlerKontor(
+            partnerId = partnerId,
+            herId = herId,
+            navn = navn,
+            adresse = null,
+            postnummer = null,
+            poststed = null,
+            orgnummer = null,
+            dialogmeldingEnabled = dialogmeldingEnabled,
+            dialogmeldingEnabledLocked = false,
+            system = null,
+            mottatt = OffsetDateTime.now()
+        )
+    ).also {
+        connection.commit()
     }
 }
 

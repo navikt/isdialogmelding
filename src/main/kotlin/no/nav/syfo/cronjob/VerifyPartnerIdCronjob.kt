@@ -21,8 +21,10 @@ class VerifyPartnerIdCronjob(
     suspend fun verifyPartnerIdJob() {
         val verifyResult = DialogmeldingCronjobResult()
 
-        val behandlerKontorMedHerId = behandlerService.getKontor().filter { it.herId != null }
-        behandlerKontorMedHerId.forEach { behandlerKontor ->
+        val behandlerKontorListe = behandlerService.getKontor().filter {
+            it.herId != null && it.dialogmeldingEnabled != null
+        }
+        behandlerKontorListe.forEach { behandlerKontor ->
             try {
                 val partnerIdsForKontor = partnerinfoClient.allPartnerinfo(
                     herId = behandlerKontor.herId!!.toString(),
@@ -32,6 +34,11 @@ class VerifyPartnerIdCronjob(
                 ).map { it.partnerId }
                 if (!partnerIdsForKontor.contains(behandlerKontor.partnerId.toInt())) {
                     log.warn("Kontor med herId ${behandlerKontor.herId} er ikke lengre knyttet til partnerId ${behandlerKontor.partnerId} hos e-mottak")
+                    if (behandlerService.existsOtherValidKontorWithSameHerId(behandlerKontor, partnerIdsForKontor)) {
+                        behandlerService.disableDialogmeldingerForKontor(behandlerKontor)
+                        log.info("Disabled dialogmelding for kontor med partnerId ${behandlerKontor.partnerId}")
+                        verifyResult.updated++
+                    }
                 }
             } catch (e: Exception) {
                 log.error("Exception caught while checking behandlerkontor", e)
