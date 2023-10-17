@@ -5,33 +5,32 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 object Versions {
-    const val confluent = "7.3.1"
+    const val confluent = "7.4.0"
     const val dialogmeldingVersion = "1.5d21db9"
     const val fellesformat2Version = "1.0329dd1"
-    const val flyway = "9.7.0"
+    const val flyway = "9.22.3"
     const val hikari = "5.0.1"
-    const val jackson = "2.14.0"
+    const val jackson = "2.15.2"
     const val jaxb = "2.3.1"
-    const val kafka = "3.3.1"
+    const val kafka = "3.6.0"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluent = "1.72"
-    const val ktor = "2.3.1"
+    const val ktor = "2.3.5"
     const val logback = "1.4.4"
-    const val logstashEncoder = "7.2"
-    const val micrometerRegistry = "1.10.0"
-    const val mockk = "1.13.2"
-    const val mq = "9.2.5.0"
-    const val nimbusjosejwt = "9.25.6"
+    const val logstashEncoder = "7.3"
+    const val micrometerRegistry = "1.11.0"
+    const val mockk = "1.13.5"
+    const val mq = "9.3.3.1"
+    const val nimbusjosejwt = "9.31"
     const val postgres = "42.5.1"
     val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
-    const val scala = "2.13.9"
     const val spek = "2.0.19"
     const val syfotjenester = "1.2021.06.09-13.09-b3d30de9996e"
 }
 
 plugins {
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.10"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "11.4.2"
 }
@@ -101,9 +100,18 @@ dependencies {
     }
     implementation("org.apache.kafka:kafka_2.13:${Versions.kafka}", excludeLog4j)
     implementation("io.confluent:kafka-avro-serializer:${Versions.confluent}", excludeLog4j)
-    implementation("org.scala-lang:scala-library") {
-        version {
-            strictly(Versions.scala)
+    constraints {
+        implementation("org.apache.avro:avro") {
+            because("org.apache.avro:avro:1.11.0 -> https://www.cve.org/CVERecord?id=CVE-2023-39410")
+            version {
+                require("1.11.3")
+            }
+        }
+        implementation("com.google.guava:guava") {
+            because("com.google.guava:guava:30.1.1-jre -> https://www.cve.org/CVERecord?id=CVE-2020-8908")
+            version {
+                require("32.1.3-jre")
+            }
         }
     }
 
