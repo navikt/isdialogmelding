@@ -4,17 +4,26 @@ import kotlinx.coroutines.delay
 import no.nav.helse.apprecV1.XMLAppRec
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.apprec.ApprecService
 import no.nav.syfo.dialogmelding.apprec.domain.Apprec
 import no.nav.syfo.dialogmelding.apprec.domain.ApprecStatus
-import no.nav.syfo.metric.*
-import no.nav.syfo.util.*
+import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
+import no.nav.syfo.metric.RECEIVED_APPREC_COUNTER
+import no.nav.syfo.metric.RECEIVED_APPREC_MESSAGE_COUNTER
+import no.nav.syfo.metric.STORED_APPREC_COUNTER
+import no.nav.syfo.util.apprecUnmarshaller
+import no.nav.syfo.util.log
 import no.nav.xml.eiff._2.XMLEIFellesformat
+import org.xml.sax.InputSource
 import java.io.StringReader
-import java.util.UUID
-import javax.jms.*
+import java.util.*
+import javax.jms.Message
+import javax.jms.MessageConsumer
+import javax.jms.TextMessage
 import javax.xml.bind.JAXBException
+import javax.xml.parsers.SAXParserFactory
+import javax.xml.transform.Source
+import javax.xml.transform.sax.SAXSource
 
 class ApprecConsumer(
     val applicationState: ApplicationState,
@@ -62,7 +71,7 @@ class ApprecConsumer(
     ) {
         var xmlApprec: XMLAppRec? = null
         try {
-            val fellesformat = apprecUnmarshaller.unmarshal(StringReader(inputMessageText)) as XMLEIFellesformat
+            val fellesformat = safeUnmarshal(inputMessageText)
             xmlApprec = fellesformat.get()
         } catch (exc: JAXBException) {
             log.warn("ApprecConsumer received message that could not be parsed", exc)
@@ -109,6 +118,20 @@ class ApprecConsumer(
         }
         RECEIVED_APPREC_COUNTER.increment()
     }
+}
+
+private fun safeUnmarshal(inputMessageText: String): XMLEIFellesformat {
+    // Disable XXE
+    val spf: SAXParserFactory = SAXParserFactory.newInstance()
+    spf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+    spf.isNamespaceAware = true
+
+    val xmlSource: Source =
+        SAXSource(
+            spf.newSAXParser().xmlReader,
+            InputSource(StringReader(inputMessageText)),
+        )
+    return apprecUnmarshaller.unmarshal(xmlSource) as XMLEIFellesformat
 }
 
 inline fun <reified T> XMLEIFellesformat.get() = this.any.find { it is T } as T
