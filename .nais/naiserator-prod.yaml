@@ -54,9 +54,7 @@ spec:
       external:
         - host: "mpls02.adeo.no"
           ports:
-            - name: MQ
-              port: 1414
-              protocol: TCP
+            - port: 1414
         - host: "pdl-api.prod-fss-pub.nais.io"
         - host: "syfopartnerinfo.prod-fss-pub.nais.io"
       rules:

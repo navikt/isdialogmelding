@@ -54,9 +54,7 @@ spec:
       external:
         - host: "b27apvl220.preprod.local"
           ports:
-            - name: MQ
-              port: 1413
-              protocol: TCP
+            - port: 1413
         - host: "pdl-api.dev-fss-pub.nais.io"
         - host: "syfopartnerinfo.dev-fss-pub.nais.io"
       rules:
