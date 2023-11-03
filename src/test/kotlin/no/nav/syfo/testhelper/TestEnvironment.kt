@@ -50,8 +50,8 @@ fun testEnvironment() = Environment(
     pdlUrl = "pdlUrl",
     syfoPartnerinfoClientId = "syfopartnerinfo-client-id",
     syfoPartnerinfoUrl = "syfoPartnerinfoUrl",
-    syfotilgangskontrollClientId = "syfo-tilgangskontroll-client-id",
-    syfotilgangskontrollUrl = "syfoTilgangskontrollUrl",
+    istilgangskontrollClientId = "istilgangskontroll-client-id",
+    istilgangskontrollUrl = "isTilgangskontrollUrl",
 )
 
 const val testAapSoknadApiClientId = "soknad-api-client-id"
