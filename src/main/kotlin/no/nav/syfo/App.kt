@@ -69,8 +69,8 @@ fun main() {
     )
     val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
         azureAdClient = azureAdClient,
-        syfotilgangskontrollClientId = environment.syfotilgangskontrollClientId,
-        tilgangskontrollBaseUrl = environment.syfotilgangskontrollUrl,
+        istilgangskontrollClientId = environment.istilgangskontrollClientId,
+        tilgangskontrollBaseUrl = environment.istilgangskontrollUrl,
     )
     val dialogmeldingStatusProducer = DialogmeldingStatusProducer(
         kafkaProducer = KafkaProducer(

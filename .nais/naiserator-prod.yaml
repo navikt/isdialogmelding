@@ -42,8 +42,6 @@ spec:
     inbound:
       rules:
         - application: syfomodiaperson
-          namespace: teamsykefravr
-          cluster: prod-gcp
         - application: soknad-api
           namespace: aap
           cluster: prod-gcp
@@ -59,7 +57,7 @@ spec:
         - host: "syfopartnerinfo.prod-fss-pub.nais.io"
       rules:
         - application: fastlegerest
-        - application: syfo-tilgangskontroll
+        - application: istilgangskontroll
   azure:
     application:
       allowAllUsers: true
@@ -116,7 +114,7 @@ spec:
       value: "prod-fss.teamsykefravr.syfopartnerinfo"
     - name: SYFOPARTNERINFO_URL
       value: "https://syfopartnerinfo.prod-fss-pub.nais.io"
-    - name: SYFOTILGANGSKONTROLL_CLIENT_ID
-      value: "prod-gcp.teamsykefravr.syfo-tilgangskontroll"
-    - name: SYFOTILGANGSKONTROLL_URL
-      value: "http://syfo-tilgangskontroll"
+    - name: ISTILGANGSKONTROLL_CLIENT_ID
+      value: "prod-gcp.teamsykefravr.istilgangskontroll"
+    - name: ISTILGANGSKONTROLL_URL
+      value: "http://istilgangskontroll"

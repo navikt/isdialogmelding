@@ -12,7 +12,7 @@ fun mockHttpClient(environment: Environment) = HttpClient(MockEngine) {
             val requestUrl = request.url.encodedPath
             when {
                 requestUrl == "/${environment.azureOpenidConfigTokenEndpoint}" -> azureAdMockResponse()
-                requestUrl.startsWith("/${environment.syfotilgangskontrollUrl}") -> syfoTilgangskontrollResponse(
+                requestUrl.startsWith("/${environment.istilgangskontrollUrl}") -> tilgangskontrollResponse(
                     request
                 )
 

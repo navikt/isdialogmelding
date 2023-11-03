@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 
 class VeilederTilgangskontrollClient(
     private val azureAdClient: AzureAdClient,
-    private val syfotilgangskontrollClientId: String,
+    private val istilgangskontrollClientId: String,
     tilgangskontrollBaseUrl: String,
     private val httpClient: HttpClient = httpClientDefault(),
 ) {
@@ -30,7 +30,7 @@ class VeilederTilgangskontrollClient(
         token: String,
     ): Boolean {
         val onBehalfOfToken = azureAdClient.getOnBehalfOfToken(
-            scopeClientId = syfotilgangskontrollClientId,
+            scopeClientId = istilgangskontrollClientId,
             token = token,
         )?.accessToken ?: throw RuntimeException("Failed to request access to Person: Failed to get OBO token")
 
@@ -42,7 +42,7 @@ class VeilederTilgangskontrollClient(
                 accept(ContentType.Application.Json)
             }
             COUNT_CALL_TILGANGSKONTROLL_PERSON_SUCCESS.increment()
-            response.body<Tilgang>().harTilgang
+            response.body<Tilgang>().erGodkjent
         } catch (e: ClientRequestException) {
             if (e.response.status == HttpStatusCode.Forbidden) {
                 COUNT_CALL_TILGANGSKONTROLL_PERSON_FORBIDDEN.increment()
@@ -61,7 +61,7 @@ class VeilederTilgangskontrollClient(
         callId: String,
     ) {
         log.error(
-            "Error while requesting access to person from syfo-tilgangskontroll with {}, {}",
+            "Error while requesting access to person from istilgangskontroll with {}, {}",
             StructuredArguments.keyValue("statusCode", response.status.value.toString()),
             callIdArgument(callId)
         )
@@ -71,6 +71,6 @@ class VeilederTilgangskontrollClient(
     companion object {
         private val log = LoggerFactory.getLogger(VeilederTilgangskontrollClient::class.java)
 
-        const val TILGANGSKONTROLL_PERSON_PATH = "/syfo-tilgangskontroll/api/tilgang/navident/person"
+        const val TILGANGSKONTROLL_PERSON_PATH = "/api/tilgang/navident/person"
     }
 }
