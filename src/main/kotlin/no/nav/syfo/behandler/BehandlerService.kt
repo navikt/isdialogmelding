@@ -329,9 +329,11 @@ class BehandlerService(
             updateBehandlerKontorAddress(behandler.kontor.partnerId, behandler.kontor)
         }
         if (behandler.kontor.herId != null && behandler.kontor.herId.toString().trim() != existingBehandlerKontor.herId) {
-            log.error("Persistert behandlerkontor har muligens feil herId ${existingBehandlerKontor.herId}: " +
-                "Sjekk kontor med partnerId ${existingBehandlerKontor.partnerId}." +
-                "Adresseregisteret returnerte overordnet herId ${behandler.kontor.herId} for behandler ${behandler.behandlerRef}")
+            log.error(
+                "Persistert behandlerkontor har muligens feil herId ${existingBehandlerKontor.herId}: " +
+                    "Sjekk kontor med partnerId ${existingBehandlerKontor.partnerId}." +
+                    "Adresseregisteret returnerte overordnet herId ${behandler.kontor.herId} for behandler ${behandler.behandlerRef}"
+            )
         }
     }
 
