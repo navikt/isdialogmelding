@@ -344,7 +344,7 @@ class BehandlerService(
             log.error(
                 "Persistert behandlerkontor har muligens feil herId ${existingBehandlerKontor.herId}: " +
                     "Sjekk kontor med partnerId ${existingBehandlerKontor.partnerId}." +
-                    "Adresseregisteret returnerte overordnet herId ${behandler.kontor.herId} for behandler ${behandler.behandlerRef}"
+                    "Adresseregisteret returnerte overordnet herId ${behandler.kontor.herId} for behandler herId ${behandler.herId}"
             )
         }
     }
