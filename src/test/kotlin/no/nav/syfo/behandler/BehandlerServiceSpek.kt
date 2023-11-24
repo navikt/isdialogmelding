@@ -91,6 +91,39 @@ class BehandlerServiceSpek : Spek({
                     behandlerFromDBUpdated.behandlerRef shouldBeEqualTo behandler.behandlerRef
                     behandlerFromDBUpdated.kontor.dialogmeldingEnabled shouldBeEqualTo true
                 }
+                it("lagrer behandler for arbeidstaker og oppdaterer telefon senere") {
+                    val behandler =
+                        behandlerService.createOrGetBehandler(
+                            generateFastlegeResponse().toBehandler(
+                                partnerId = UserConstants.PARTNERID,
+                                dialogmeldingEnabled = false,
+                            ),
+                            Arbeidstaker(
+                                arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                                mottatt = OffsetDateTime.now(),
+                            ),
+                            relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                        )
+
+                    val pBehandlerList = database.getBehandlerByArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_FNR,
+                    )
+                    pBehandlerList.size shouldBeEqualTo 1
+                    pBehandlerList[0].telefon shouldBeEqualTo ""
+                    behandlerService.createOrGetBehandler(
+                        behandler.copy(telefon = "987654321"),
+                        Arbeidstaker(
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
+                        ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                    )
+                    val pBehandlerListUpdated = database.getBehandlerByArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_FNR,
+                    )
+                    pBehandlerListUpdated.size shouldBeEqualTo 1
+                    pBehandlerListUpdated[0].telefon shouldBeEqualTo "987654321"
+                }
                 it("lagrer behandler for arbeidstaker og setter system senere") {
                     val behandler =
                         behandlerService.createOrGetBehandler(
