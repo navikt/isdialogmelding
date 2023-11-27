@@ -316,6 +316,7 @@ class BehandlerService(
                     id = existingBehandler.id,
                     telefon = behandler.telefon,
                 )
+                COUNT_BEHANDLER_UPDATED.increment()
             }
             val existingBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)!!
             connection.updateBehandlerKontor(

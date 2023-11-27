@@ -91,7 +91,7 @@ class BehandlerServiceSpek : Spek({
                     behandlerFromDBUpdated.behandlerRef shouldBeEqualTo behandler.behandlerRef
                     behandlerFromDBUpdated.kontor.dialogmeldingEnabled shouldBeEqualTo true
                 }
-                it("lagrer behandler for arbeidstaker og oppdaterer telefon senere") {
+                it("Oppdaterer telefonnr på eksisterende behandler når telefonnr endret") {
                     val behandler =
                         behandlerService.createOrGetBehandler(
                             generateFastlegeResponse().toBehandler(
