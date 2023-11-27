@@ -181,6 +181,21 @@ fun DatabaseInterface.getBehandlerByArbeidstaker(personident: Personident): List
     return getBehandlerAndRelasjonstypeList(personident).map { it.first }
 }
 
+const val queryUpdateBehandlerTelefon =
+    """
+        UPDATE BEHANDLER
+        SET telefon=?,updated_at=now()
+        WHERE id=?
+    """
+
+fun Connection.updateBehandlerTelefon(id: Int, telefon: String) {
+    prepareStatement(queryUpdateBehandlerTelefon).use {
+        it.setString(1, telefon)
+        it.setInt(2, id)
+        it.executeUpdate()
+    }
+}
+
 const val queryUpdateBehandlerIdenter =
     """
         UPDATE BEHANDLER

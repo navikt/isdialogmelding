@@ -192,6 +192,7 @@ class BehandlerService(
         } else {
             updateBehandler(
                 behandler = behandler,
+                existingBehandler = pBehandler,
             )
         }
 
@@ -307,8 +308,16 @@ class BehandlerService(
 
     private fun updateBehandler(
         behandler: Behandler,
+        existingBehandler: PBehandler,
     ) {
         database.connection.use { connection ->
+            if (behandler.telefon?.isNotBlank() == true && behandler.telefon != existingBehandler.telefon) {
+                connection.updateBehandlerTelefon(
+                    id = existingBehandler.id,
+                    telefon = behandler.telefon,
+                )
+                COUNT_BEHANDLER_UPDATED.increment()
+            }
             val existingBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)!!
             connection.updateBehandlerKontor(
                 behandler = behandler,
@@ -336,7 +345,7 @@ class BehandlerService(
             log.error(
                 "Persistert behandlerkontor har muligens feil herId ${existingBehandlerKontor.herId}: " +
                     "Sjekk kontor med partnerId ${existingBehandlerKontor.partnerId}." +
-                    "Adresseregisteret returnerte overordnet herId ${behandler.kontor.herId} for behandler ${behandler.behandlerRef}"
+                    "Adresseregisteret returnerte overordnet herId ${behandler.kontor.herId} for behandler herId ${behandler.herId}"
             )
         }
     }
