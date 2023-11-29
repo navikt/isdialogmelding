@@ -283,6 +283,7 @@ class BehandlerService(
             val kontorId = if (pBehandlerKontor != null) {
                 connection.updateBehandlerKontor(
                     behandler = behandler,
+                    existingBehandler = null,
                     existingBehandlerKontor = pBehandlerKontor,
                 )
                 pBehandlerKontor.id
@@ -321,6 +322,7 @@ class BehandlerService(
             val existingBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)!!
             connection.updateBehandlerKontor(
                 behandler = behandler,
+                existingBehandler = existingBehandler,
                 existingBehandlerKontor = existingBehandlerKontor,
             )
             connection.commit()
@@ -329,6 +331,7 @@ class BehandlerService(
 
     private fun Connection.updateBehandlerKontor(
         behandler: Behandler,
+        existingBehandler: PBehandler?,
         existingBehandlerKontor: PBehandlerKontor,
     ) {
         if (shouldUpdateKontorSystem(behandler.kontor, existingBehandlerKontor)) {
@@ -342,10 +345,10 @@ class BehandlerService(
             behandler.kontor.herId.toString() != existingBehandlerKontor.herId &&
             existingBehandlerKontor.dialogmeldingEnabled != null
         ) {
-            log.error(
+            log.warn(
                 "Persistert behandlerkontor har muligens feil herId ${existingBehandlerKontor.herId}: " +
                     "Sjekk kontor med partnerId ${existingBehandlerKontor.partnerId}." +
-                    "Adresseregisteret returnerte overordnet herId ${behandler.kontor.herId} for behandler herId ${behandler.herId}"
+                    "Adresseregisteret returnerte overordnet herId ${behandler.kontor.herId} for behandler id ${existingBehandler?.id}"
             )
         }
     }
