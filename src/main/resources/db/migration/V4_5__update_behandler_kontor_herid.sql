@@ -1,0 +1,4 @@
+UPDATE BEHANDLER_KONTOR SET
+her_id='181573',
+updated_at=now()
+WHERE ID=1586;
