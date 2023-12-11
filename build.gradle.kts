@@ -16,8 +16,8 @@ object Versions {
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
     const val kluent = "1.72"
-    const val ktor = "2.3.5"
-    const val logback = "1.4.4"
+    const val ktor = "2.3.7"
+    const val logback = "1.4.14"
     const val logstashEncoder = "7.3"
     const val micrometerRegistry = "1.11.0"
     const val mockk = "1.13.5"
@@ -30,7 +30,7 @@ object Versions {
 }
 
 plugins {
-    kotlin("jvm") version "1.9.20"
+    kotlin("jvm") version "1.9.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "11.4.2"
 }
