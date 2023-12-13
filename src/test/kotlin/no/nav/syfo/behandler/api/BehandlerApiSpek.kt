@@ -79,6 +79,42 @@ class BehandlerApiSpek : Spek({
                             behandlerDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
                         }
                     }
+                    it("should exclude suspendert Behandler") {
+                        val fastlegeResponse = generateFastlegeResponse()
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
+                            val behandlerForPersonList = database.getBehandlerByArbeidstaker(
+                                ARBEIDSTAKER_FNR,
+                            )
+                            behandlerForPersonList.size shouldBeEqualTo 1
+                            database.setSuspendert(behandlerList[0].behandlerRef)
+                        }
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+
+                            val behandlerList =
+                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 0
+                            val behandlerForPersonList = database.getBehandlerByArbeidstaker(
+                                ARBEIDSTAKER_FNR,
+                            )
+                            behandlerForPersonList.size shouldBeEqualTo 0
+                        }
+                    }
                     it("search should return list of Behandler") {
                         generateFastlegeResponse()
                         with(
@@ -114,6 +150,31 @@ class BehandlerApiSpek : Spek({
                             UUID.fromString(behandlerList[0].behandlerRef)
                         }
                         database.invalidateBehandler(behandlerRef)
+                        with(
+                            handleRequest(HttpMethod.Get, searchUrl) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader("searchstring", "Scully")
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                            val behandlerList = objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 0
+                        }
+                    }
+                    it("search should exclude suspendert Behandler") {
+                        generateFastlegeResponse()
+                        val behandlerRef = with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+                            val behandlerList = objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
+                            behandlerList[0].behandlerRef
+                        }
+                        database.setSuspendert(behandlerRef)
                         with(
                             handleRequest(HttpMethod.Get, searchUrl) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))

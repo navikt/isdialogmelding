@@ -167,6 +167,7 @@ const val queryGetBehandlerAndRelasjonstype =
         FROM BEHANDLER
         INNER JOIN BEHANDLER_ARBEIDSTAKER ON BEHANDLER_ARBEIDSTAKER.behandler_id = BEHANDLER.id
         AND BEHANDLER_ARBEIDSTAKER.arbeidstaker_personident = ?
+        WHERE BEHANDLER.suspendert=false
         ORDER BY BEHANDLER_ARBEIDSTAKER.updated_at DESC
     """
 
