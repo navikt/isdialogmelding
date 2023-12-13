@@ -85,11 +85,12 @@ class BehandlerService(
                 arbeidstakerPersonident = personident,
                 mottatt = OffsetDateTime.now(),
             )
-            createOrGetBehandler(
+            val behandler = createOrGetBehandler(
                 behandler = fastlege,
                 arbeidstaker = arbeidstaker,
                 relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
             )
+            if (behandler.suspendert) null else behandler
         } else null
     }
 
@@ -108,11 +109,12 @@ class BehandlerService(
                 arbeidstakerPersonident = personident,
                 mottatt = OffsetDateTime.now(),
             )
-            createOrGetBehandler(
+            val behandler = createOrGetBehandler(
                 behandler = vikar,
                 arbeidstaker = arbeidstaker,
                 relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGEVIKAR,
             )
+            if (behandler.suspendert) null else behandler
         } else null
     }
 
