@@ -73,4 +73,5 @@ fun FastlegeResponse.toBehandler(
     telefon = this.fastlegekontor.telefon,
     kategori = BehandlerKategori.LEGE,
     mottatt = OffsetDateTime.now(),
+    suspendert = false,
 )

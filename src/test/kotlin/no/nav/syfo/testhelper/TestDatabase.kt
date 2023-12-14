@@ -185,6 +185,21 @@ fun DatabaseInterface.setDialogmeldingEnabledLocked(partnerId: String) = this.co
     connection.commit()
 }
 
+const val querySetSuspendert =
+    """
+        UPDATE BEHANDLER SET suspendert=true WHERE behandler_ref=?
+    """
+
+fun DatabaseInterface.setSuspendert(uuid: String) = this.connection.use { connection ->
+    connection.prepareStatement(
+        querySetSuspendert
+    ).use {
+        it.setString(1, uuid)
+        it.executeUpdate()
+    }
+    connection.commit()
+}
+
 fun DatabaseInterface.dropData() {
     val queryList = listOf(
         """

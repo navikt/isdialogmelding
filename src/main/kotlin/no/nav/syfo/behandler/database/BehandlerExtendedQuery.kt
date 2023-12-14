@@ -11,12 +11,13 @@ import java.util.*
 
 const val querySykmelderAndKontor =
     """
-        SELECT b.id behandlerid, b.her_id behandlerherid, b.created_at behandlercreatedat, b.updated_at behandlerupdatedat, b.mottatt behandlermottatt, b.*, 
+        SELECT b.id behandlerid, b.her_id behandlerherid, b.created_at behandlercreatedat, b.updated_at behandlerupdatedat, b.mottatt behandlermottatt, b.suspendert behandlersuspendert, b.*, 
         k.id kontorid, k.her_id kontorherid, k.created_at kontorcreatedat, k.updated_at kontorupdatedat, k.mottatt kontormottatt, k.*
         FROM BEHANDLER AS b
         INNER JOIN BEHANDLER_ARBEIDSTAKER AS r ON r.behandler_id = b.id AND r.arbeidstaker_personident = ? 
         AND r.type = 'SYKMELDER'
         INNER JOIN BEHANDLER_KONTOR AS k ON k.id = b.kontor_id AND k.dialogmelding_enabled IS NOT NULL = ?
+        WHERE b.invalidated IS NULL AND b.suspendert=false
         ORDER BY r.mottatt DESC
     """
 
@@ -39,12 +40,12 @@ fun DatabaseInterface.getSykmeldereExtended(
 
 const val querySearchBehandler =
     """
-SELECT b.id behandlerid, b.her_id behandlerherid, b.created_at behandlercreatedat, b.updated_at behandlerupdatedat, b.mottatt behandlermottatt, b.*, 
+SELECT b.id behandlerid, b.her_id behandlerherid, b.created_at behandlercreatedat, b.updated_at behandlerupdatedat, b.mottatt behandlermottatt, b.suspendert behandlersuspendert, b.*, 
         k.id kontorid, k.her_id kontorherid, k.created_at kontorcreatedat, k.updated_at kontorupdatedat, k.mottatt kontormottatt, k.*
         FROM BEHANDLER AS b
         INNER JOIN BEHANDLER_KONTOR AS k ON (k.id = b.kontor_id)
         WHERE k.dialogmelding_enabled IS NOT NULL 
-        AND b.invalidated IS NULL
+        AND b.invalidated IS NULL AND b.suspendert=false
         AND (b.fornavn ilike ? OR b.etternavn ilike ? 
             OR position(? IN k.navn)>0 OR position(UPPER(?) IN k.navn)>0 OR position(INITCAP(?) IN k.navn)>0 
             OR k.orgnummer = ?)
@@ -87,6 +88,7 @@ fun ResultSet.toPBehandlerAndPBehandlerKontor(): Pair<PBehandler, PBehandlerKont
         createdAt = getObject("behandlercreatedat", OffsetDateTime::class.java),
         updatedAt = getObject("behandlerupdatedat", OffsetDateTime::class.java),
         mottatt = getObject("behandlermottatt", OffsetDateTime::class.java),
+        suspendert = getBoolean("behandlersuspendert"),
     )
 
     val pBehandlerKontor = PBehandlerKontor(

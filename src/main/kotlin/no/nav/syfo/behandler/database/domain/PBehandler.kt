@@ -22,6 +22,7 @@ data class PBehandler(
     val updatedAt: OffsetDateTime,
     val mottatt: OffsetDateTime,
     val invalidated: OffsetDateTime? = null,
+    val suspendert: Boolean,
 )
 
 fun PBehandler.toBehandler(
@@ -39,4 +40,5 @@ fun PBehandler.toBehandler(
     kategori = BehandlerKategori.valueOf(this.kategori),
     mottatt = this.mottatt,
     invalidated = this.invalidated,
+    suspendert = this.suspendert,
 )

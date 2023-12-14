@@ -30,6 +30,7 @@ fun Connection.createBehandler(
         it.setObject(12, now)
         it.setObject(13, behandler.mottatt)
         it.setNull(14, Types.TIMESTAMP_WITH_TIMEZONE)
+        it.setBoolean(15, false)
         it.executeQuery().toList { toPBehandler() }
     }
 
@@ -57,8 +58,9 @@ const val queryCreateBehandler =
             created_at,
             updated_at,
             mottatt,
-            invalidated
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            invalidated,
+            suspendert
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             RETURNING
             id,
             behandler_ref,
@@ -74,7 +76,8 @@ const val queryCreateBehandler =
             created_at,
             updated_at,
             mottatt,
-            invalidated
+            invalidated,
+            suspendert
     """
 
 const val queryGetBehandlerByBehandlerPersonidentAndPartnerId =
@@ -164,6 +167,7 @@ const val queryGetBehandlerAndRelasjonstype =
         FROM BEHANDLER
         INNER JOIN BEHANDLER_ARBEIDSTAKER ON BEHANDLER_ARBEIDSTAKER.behandler_id = BEHANDLER.id
         AND BEHANDLER_ARBEIDSTAKER.arbeidstaker_personident = ?
+        WHERE BEHANDLER.suspendert=false
         ORDER BY BEHANDLER_ARBEIDSTAKER.updated_at DESC
     """
 
@@ -262,4 +266,5 @@ fun ResultSet.toPBehandler(): PBehandler =
         updatedAt = getObject("updated_at", OffsetDateTime::class.java),
         mottatt = getObject("mottatt", OffsetDateTime::class.java),
         invalidated = getObject("invalidated", OffsetDateTime::class.java),
+        suspendert = getBoolean("suspendert")
     )

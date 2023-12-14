@@ -40,4 +40,5 @@ fun generateBehandler(
     telefon = null,
     kategori = BehandlerKategori.LEGE,
     mottatt = OffsetDateTime.now(),
+    suspendert = false,
 )

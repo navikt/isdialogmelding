@@ -120,6 +120,7 @@ private fun createAndStoreBehandlerFromSykmelding(
         ),
         kategori = behandlerKategori,
         mottatt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
+        suspendert = false,
     )
 
     val arbeidstaker = Arbeidstaker(

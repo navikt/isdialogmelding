@@ -19,6 +19,7 @@ data class Behandler(
     val kategori: BehandlerKategori,
     val mottatt: OffsetDateTime,
     val invalidated: OffsetDateTime? = null,
+    val suspendert: Boolean,
 )
 
 // TODO: Få med behandlerkategori
