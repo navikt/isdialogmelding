@@ -52,6 +52,8 @@ fun testEnvironment() = Environment(
     syfoPartnerinfoUrl = "syfoPartnerinfoUrl",
     istilgangskontrollClientId = "istilgangskontroll-client-id",
     istilgangskontrollUrl = "isTilgangskontrollUrl",
+    btsysClientId = "btsys-client-id",
+    btsysUrl = "btsysUrl",
 )
 
 const val testAapSoknadApiClientId = "soknad-api-client-id"

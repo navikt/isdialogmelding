@@ -38,6 +38,7 @@ object UserConstants {
     const val VEILEDER_IDENT = "Z999999"
 
     val FASTLEGE_FNR = Personident("12125678911")
+    val FASTLEGE_FNR_SUSPENDERT = Personident("12125678912")
     val FASTLEGE_DNR = Personident("52125678911")
     val FASTLEGE_ANNEN_FNR = Personident(FASTLEGE_FNR.value.replace("2", "4"))
 }

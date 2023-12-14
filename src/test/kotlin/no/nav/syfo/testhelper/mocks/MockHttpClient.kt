@@ -21,7 +21,7 @@ fun mockHttpClient(environment: Environment) = HttpClient(MockEngine) {
                 requestUrl.startsWith("/${environment.syfoPartnerinfoUrl}") -> syfoPartnerInfoMockResponse(
                     request
                 )
-
+                requestUrl.startsWith("/${environment.btsysUrl}") -> btsysMockResponse(request)
                 else -> error("Unhandled ${request.url.encodedPath}")
             }
         }
