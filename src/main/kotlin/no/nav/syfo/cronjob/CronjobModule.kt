@@ -3,6 +3,7 @@ package no.nav.syfo.cronjob
 import no.nav.syfo.application.*
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
+import no.nav.syfo.client.btsys.LegeSuspensjonClient
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.cronjob.leaderelection.LeaderPodClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
@@ -17,6 +18,7 @@ fun cronjobModule(
     dialogmeldingStatusService: DialogmeldingStatusService,
     behandlerService: BehandlerService,
     partnerinfoClient: PartnerinfoClient,
+    legeSuspensjonClient: LegeSuspensjonClient,
 ) {
     val leaderPodClient = LeaderPodClient(
         environment = environment,
@@ -38,7 +40,12 @@ fun cronjobModule(
         partnerinfoClient = partnerinfoClient,
     )
 
-    listOf(dialogmeldingSendCronjob, dialogmeldingStatusCronjob, verifyPartnerIdCronjob).forEach {
+    val suspensjonCronjob = SuspensjonCronjob(
+        behandlerService = behandlerService,
+        legeSuspensjonClient = legeSuspensjonClient,
+    )
+
+    listOf(dialogmeldingSendCronjob, dialogmeldingStatusCronjob, verifyPartnerIdCronjob, suspensjonCronjob).forEach {
         launchBackgroundTask(
             applicationState = applicationState,
         ) {

@@ -249,6 +249,38 @@ fun Connection.invalidateBehandler(behandlerRef: UUID) {
         }
 }
 
+const val queryGetBehandlerIdenter =
+    """
+        SELECT DISTINCT personident FROM behandler
+        WHERE kontor_id IN (SELECT id FROM behandler_kontor WHERE dialogmelding_enabled IS NOT NULL)
+    """
+
+fun DatabaseInterface.getBehandlerIdenter() =
+    this.connection.use { connection ->
+        connection.prepareStatement(queryGetBehandlerIdenter).use {
+            it.executeQuery().toList { getString("personident") }
+        }
+    }
+
+const val queryUpdateSuspensjon =
+    """
+        UPDATE BEHANDLER
+        SET suspendert=?
+        WHERE personident=?
+    """
+
+fun DatabaseInterface.updateSuspensjon(behandlerIdent: Personident, suspendert: Boolean) {
+    this.connection.use { connection ->
+        connection.prepareStatement(queryUpdateSuspensjon)
+            .use {
+                it.setBoolean(1, suspendert)
+                it.setString(2, behandlerIdent.value)
+                it.executeUpdate()
+            }
+        connection.commit()
+    }
+}
+
 fun ResultSet.toPBehandler(): PBehandler =
     PBehandler(
         id = getInt("id"),
