@@ -1,7 +1,6 @@
 package no.nav.syfo.cronjob
 
 import io.ktor.server.testing.*
-import io.mockk.clearAllMocks
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.getBehandlerByBehandlerRef
@@ -30,12 +29,6 @@ class SuspensjonCronjobSpek : Spek({
                 azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
                 httpClient = externalMockEnvironment.mockHttpClient,
             )
-            val partnerinfoClient = PartnerinfoClient(
-                azureAdClient = azureAdClient,
-                syfoPartnerinfoClientId = environment.syfoPartnerinfoClientId,
-                syfoPartnerinfoUrl = environment.syfoPartnerinfoUrl,
-                httpClient = externalMockEnvironment.mockHttpClient,
-            )
             val behandlerService = BehandlerService(
                 fastlegeClient = FastlegeClient(
                     azureAdClient = azureAdClient,
@@ -62,7 +55,6 @@ class SuspensjonCronjobSpek : Spek({
             )
             beforeEachTest {
                 database.dropData()
-                clearAllMocks()
             }
 
             describe("Cronjob oppdaterer suspendert for behandlere") {

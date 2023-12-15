@@ -23,14 +23,14 @@ class LegeSuspensjonClient(
     private val httpClient: HttpClient = httpClientDefault(),
 ) {
     suspend fun sjekkSuspensjon(
-        behandlerId: Personident,
+        behandlerPersonident: Personident,
     ): Suspendert {
         val token = azureAdClient.getSystemToken(endpointClientId)
             ?: throw RuntimeException("Failed to sjekk suspensjon: No token was found")
 
         val httpResponse: HttpResponse = httpClient.get("$endpointUrl/api/v1/suspensjon/status") {
             accept(ContentType.Application.Json)
-            header(NAV_PERSONIDENT_HEADER, behandlerId.value)
+            header(NAV_PERSONIDENT_HEADER, behandlerPersonident.value)
             header("Nav-Consumer-Id", APPLICATION_NAME)
             header(NAV_CALL_ID_HEADER, UUID.randomUUID().toString())
             header("Authorization", bearerHeader(token.accessToken))

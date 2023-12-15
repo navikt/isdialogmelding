@@ -13,7 +13,7 @@ class SuspensjonCronjob(
     val behandlerService: BehandlerService,
     val legeSuspensjonClient: LegeSuspensjonClient,
 ) : DialogmeldingCronjob {
-    private val runAtHour = 14
+    private val runAtHour = 5
 
     override val initialDelayMinutes: Long = calculateInitialDelay()
     override val intervalDelayMinutes: Long = 24 * 60
@@ -25,13 +25,13 @@ class SuspensjonCronjob(
     suspend fun checkLegeSuspensjonJob() {
         val verifyResult = DialogmeldingCronjobResult()
 
-        behandlerService.getBehandlerIdenter().forEach { behandlerIdent ->
+        behandlerService.getBehandlerPersonidenterForAktiveKontor().forEach { behandlerPersonident ->
             try {
-                val suspendert = legeSuspensjonClient.sjekkSuspensjon(behandlerIdent).suspendert
+                val suspendert = legeSuspensjonClient.sjekkSuspensjon(behandlerPersonident).suspendert
                 if (suspendert) {
                     COUNT_CRONJOB_SUSPENSJON_FOUND_COUNT.increment()
                 }
-                behandlerService.updateBehandlerSuspensjon(behandlerIdent, suspendert)
+                behandlerService.updateBehandlerSuspensjon(behandlerPersonident, suspendert)
                 verifyResult.updated++
             } catch (e: Exception) {
                 log.error("Exception caught while checking suspensjon", e)
@@ -45,9 +45,9 @@ class SuspensjonCronjob(
         )
     }
 
-    internal fun calculateInitialDelay() = calculateInitialDelay(LocalDateTime.now())
+    private fun calculateInitialDelay() = calculateInitialDelay(LocalDateTime.now())
 
-    internal fun calculateInitialDelay(from: LocalDateTime): Long {
+    private fun calculateInitialDelay(from: LocalDateTime): Long {
         val nowDate = LocalDate.now()
         val nextTimeToRun = LocalDateTime.of(
             if (from.hour < runAtHour) nowDate else nowDate.plusDays(1),

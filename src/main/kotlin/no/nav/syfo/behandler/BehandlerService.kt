@@ -242,11 +242,11 @@ class BehandlerService(
     fun getKontor(): List<PBehandlerKontor> =
         database.getAllBehandlerKontor()
 
-    fun getBehandlerIdenter(): List<Personident> =
-        database.getBehandlerIdenter().filterNot { it.isNullOrBlank() }.map { Personident(it) }
+    fun getBehandlerPersonidenterForAktiveKontor(): List<Personident> =
+        database.getBehandlerPersonidenterForAktiveKontor().filterNot { it.isNullOrBlank() }.map { Personident(it) }
 
-    fun updateBehandlerSuspensjon(behandlerIdent: Personident, suspendert: Boolean) {
-        database.updateSuspensjon(behandlerIdent, suspendert)
+    fun updateBehandlerSuspensjon(behandlerPersonident: Personident, suspendert: Boolean) {
+        database.updateSuspensjon(behandlerPersonident, suspendert)
     }
 
     fun existsOtherValidKontorWithSameHerId(
