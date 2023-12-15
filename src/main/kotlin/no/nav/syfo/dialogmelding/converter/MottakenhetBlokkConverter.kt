@@ -1,6 +1,7 @@
 package no.nav.syfo.dialogmelding.converter
 
 import no.nav.syfo.dialogmelding.bestilling.domain.*
+import no.nav.syfo.domain.PartnerId
 import no.nav.xml.eiff._2.ObjectFactory
 import no.nav.xml.eiff._2.XMLMottakenhetBlokk
 
@@ -8,8 +9,10 @@ fun createMottakenhetBlokk(
     melding: DialogmeldingToBehandlerBestilling,
 ): XMLMottakenhetBlokk {
     val factory = ObjectFactory()
+    val storedPartnerId = melding.behandler.kontor.partnerId
+    val partnerId = if (storedPartnerId.value == 14859 || storedPartnerId.value == 41578) PartnerId(60274) else storedPartnerId
     return factory.createXMLMottakenhetBlokk()
-        .withPartnerReferanse(melding.behandler.kontor.partnerId.toString())
+        .withPartnerReferanse(partnerId.toString())
         .withEbRole("Saksbehandler")
         .withEbService(
             when (Pair(melding.type, melding.kodeverk)) {
