@@ -8,10 +8,13 @@ import io.ktor.http.*
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
 import no.nav.syfo.domain.Personident
+import no.nav.syfo.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
 import java.io.IOException
 import java.util.*
+
+const val APPLICATION_NAME = "isdialogmelding"
 
 class LegeSuspensjonClient(
     private val azureAdClient: AzureAdClient,
@@ -28,7 +31,8 @@ class LegeSuspensjonClient(
         val httpResponse: HttpResponse = httpClient.get("$endpointUrl/api/v1/suspensjon/status") {
             accept(ContentType.Application.Json)
             header(NAV_PERSONIDENT_HEADER, behandlerId.value)
-            header("Nav-Consumer-Id", UUID.randomUUID().toString())
+            header("Nav-Consumer-Id", APPLICATION_NAME)
+            header(NAV_CALL_ID_HEADER, UUID.randomUUID().toString())
             header("Authorization", bearerHeader(token.accessToken))
         }
         if (httpResponse.status != HttpStatusCode.OK) {
