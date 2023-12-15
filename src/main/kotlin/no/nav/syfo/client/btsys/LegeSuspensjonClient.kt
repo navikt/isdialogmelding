@@ -29,7 +29,7 @@ class LegeSuspensjonClient(
         val httpResponse: HttpResponse = httpClient.get("$endpointUrl/api/v1/suspensjon/status") {
             accept(ContentType.Application.Json)
             header(NAV_PERSONIDENT_HEADER, behandlerId.value)
-            header(NAV_CALL_ID_HEADER, UUID.randomUUID().toString())
+            header("Nav-Consumer-Id", UUID.randomUUID().toString())
             header("Authorization", bearerHeader(token.accessToken))
         }
         if (httpResponse.status != HttpStatusCode.OK) {
