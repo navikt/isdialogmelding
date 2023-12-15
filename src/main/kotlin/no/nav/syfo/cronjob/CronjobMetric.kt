@@ -11,6 +11,7 @@ const val CRONJOB_DIALOGMELDING_DIALOGMOTE_SEND = "${CRONJOB_METRICS_BASE}_dialo
 const val CRONJOB_DIALOGMELDING_FORESPORSEL_SEND = "${CRONJOB_METRICS_BASE}_dialogmelding_foresporsel_count"
 const val CRONJOB_DIALOGMELDING_NOTAT_SEND = "${CRONJOB_METRICS_BASE}_dialogmelding_notat_count"
 const val CRONJOB_DIALOGMELDING_SEND_FAIL = "${CRONJOB_METRICS_BASE}_dialogmelding_fail_count"
+const val CRONJOB_SUSPENSJON_FOUND = "${CRONJOB_METRICS_BASE}_suspensjon_found_count"
 
 val COUNT_CRONJOB_DIALOGMELDING_SEND_COUNT: Counter = Counter
     .builder(CRONJOB_DIALOGMELDING_SEND)
@@ -35,4 +36,8 @@ val COUNT_CRONJOB_DIALOGMELDING_NOTAT_SEND_COUNT: Counter = Counter
 val COUNT_CRONJOB_DIALOGMELDING_FAIL_COUNT: Counter = Counter
     .builder(CRONJOB_DIALOGMELDING_SEND_FAIL)
     .description("Counts the number of failures in Cronjob - DialogmeldingSend")
+    .register(METRICS_REGISTRY)
+val COUNT_CRONJOB_SUSPENSJON_FOUND_COUNT: Counter = Counter
+    .builder(CRONJOB_SUSPENSJON_FOUND)
+    .description("Counts the number of suspensjon found in Cronjob - SuspensjonCronjob")
     .register(METRICS_REGISTRY)
