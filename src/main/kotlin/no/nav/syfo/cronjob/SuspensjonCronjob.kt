@@ -13,7 +13,7 @@ class SuspensjonCronjob(
     val behandlerService: BehandlerService,
     val legeSuspensjonClient: LegeSuspensjonClient,
 ) : DialogmeldingCronjob {
-    private val runAtHour = 13
+    private val runAtHour = 14
 
     override val initialDelayMinutes: Long = calculateInitialDelay()
     override val intervalDelayMinutes: Long = 24 * 60
