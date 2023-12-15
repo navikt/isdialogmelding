@@ -8,7 +8,6 @@ import io.ktor.http.*
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
 import no.nav.syfo.domain.Personident
-import no.nav.syfo.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
 import java.io.IOException
