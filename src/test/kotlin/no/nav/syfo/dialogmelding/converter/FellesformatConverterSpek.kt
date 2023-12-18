@@ -34,11 +34,60 @@ class FellesformatConverterSpek : Spek({
                 expectedFellesformatMessageAsRegex.matches(actualFellesformat.message!!),
             )
         }
+
+        it("create XMLEIFellesformat with replaced partnerId for kontor with parnerId 14859") {
+            val storedPartnerId = 14859
+            val wantedPartnerId = 60274
+            val melding = createDialogmeldingToBehandlerBestilling(
+                arbeidstakerPersonident = arbeidstakerPersonident,
+                PartnerId(storedPartnerId),
+                herId = null,
+            )
+
+            val arbeidstaker = generateArbeidstaker(arbeidstakerPersonident)
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingNoHerIdXmlRegex().pattern
+                .replace("partnerReferanse=\"1\"", "partnerReferanse=\"${wantedPartnerId}\"").toRegex()
+
+            val actualXMLEIFellesformat = createFellesformat(
+                melding,
+                arbeidstaker,
+            )
+            val actualFellesformat = Fellesformat(actualXMLEIFellesformat, JAXB::marshallDialogmelding1_0)
+
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformat.message!!),
+            )
+        }
+
+        it("create XMLEIFellesformat with replaced partnerId for kontor with parnerId 41578") {
+            val storedPartnerId = 41578
+            val wantedPartnerId = 60274
+            val melding = createDialogmeldingToBehandlerBestilling(
+                arbeidstakerPersonident = arbeidstakerPersonident,
+                PartnerId(storedPartnerId),
+                herId = null,
+            )
+
+            val arbeidstaker = generateArbeidstaker(arbeidstakerPersonident)
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingNoHerIdXmlRegex().pattern
+                .replace("partnerReferanse=\"1\"", "partnerReferanse=\"${wantedPartnerId}\"").toRegex()
+
+            val actualXMLEIFellesformat = createFellesformat(
+                melding,
+                arbeidstaker,
+            )
+            val actualFellesformat = Fellesformat(actualXMLEIFellesformat, JAXB::marshallDialogmelding1_0)
+
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformat.message!!),
+            )
+        }
     }
 })
 
 fun createDialogmeldingToBehandlerBestilling(
     arbeidstakerPersonident: Personident,
+    partnerId: PartnerId = PartnerId(1),
     herId: Int? = 77,
 ): DialogmeldingToBehandlerBestilling {
     val behandlerRef = UUID.randomUUID()
@@ -50,7 +99,7 @@ fun createDialogmeldingToBehandlerBestilling(
     ).toDialogmeldingToBehandlerBestilling(
         behandler = generateBehandler(
             behandlerRef = behandlerRef,
-            partnerId = PartnerId(1),
+            partnerId = partnerId,
             herId = herId,
         ),
     )
