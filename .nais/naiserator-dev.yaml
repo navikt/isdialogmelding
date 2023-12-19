@@ -48,6 +48,9 @@ spec:
         - application: syfooppfolgingsplanservice
           namespace: team-esyfo
           cluster: dev-fss
+        - application: lps-oppfolgingsplan-mottak
+          namespace: team-esyfo
+          cluster: dev-gcp
     outbound:
       external:
         - host: "b27apvl220.preprod.local"
