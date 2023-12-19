@@ -1,29 +1,31 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 
 group = "no.nav.syfo"
 version = "1.0.0"
 
 object Versions {
-    const val confluent = "7.4.0"
+    const val confluent = "7.5.1"
     const val dialogmeldingVersion = "1.5d21db9"
     const val fellesformat2Version = "1.0329dd1"
     const val flyway = "9.22.3"
     const val hikari = "5.0.1"
     const val jackson = "2.15.2"
     const val jaxb = "2.3.1"
+    const val json = "20231013"
     const val kafka = "3.6.0"
     const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
     const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
-    const val kluent = "1.72"
+    const val kluent = "1.73"
     const val ktor = "2.3.7"
     const val logback = "1.4.14"
     const val logstashEncoder = "7.3"
-    const val micrometerRegistry = "1.11.0"
+    const val micrometerRegistry = "1.12.0"
     const val mockk = "1.13.5"
     const val mq = "9.3.3.1"
-    const val nimbusjosejwt = "9.31"
-    const val postgres = "42.5.1"
+    const val nimbusjosejwt = "9.37.2"
+    const val postgres = "42.6.0"
     val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
     const val spek = "2.0.19"
     const val syfotjenester = "1.2021.06.09-13.09-b3d30de9996e"
@@ -72,6 +74,7 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:${Versions.logback}")
     implementation("net.logstash.logback:logstash-logback-encoder:${Versions.logstashEncoder}")
+    implementation("org.json:json:${Versions.json}")
 
     // Metrics and Prometheus
     implementation("io.ktor:ktor-server-metrics-micrometer:${Versions.ktor}")
@@ -99,6 +102,14 @@ dependencies {
         exclude(group = "log4j")
     }
     implementation("org.apache.kafka:kafka_2.13:${Versions.kafka}", excludeLog4j)
+    constraints {
+        implementation("org.apache.zookeeper:zookeeper") {
+            because("org.apache.kafka:kafka_2.13:${Versions.kafka} -> https://www.cve.org/CVERecord?id=CVE-2023-44981")
+            version {
+                require("3.8.3")
+            }
+        }
+    }
     implementation("io.confluent:kafka-avro-serializer:${Versions.confluent}", excludeLog4j)
     constraints {
         implementation("org.apache.avro:avro") {
