@@ -137,13 +137,12 @@ class BehandlerService(
             return null
         }
 
-        val partnerinfoResponseList = partnerinfoClient.partnerinfo(
+        val partnerinfoResponse = partnerinfoClient.partnerinfo(
             herId = fastlegeResponse.foreldreEnhetHerId.toString(),
             systemRequest = systemRequest,
             token = token,
             callId = callId,
-        )
-        val partnerinfoResponse = partnerinfoResponseList.choose()
+        ).selectActiveBehandlerKontor()
 
         return if (partnerinfoResponse != null) {
             fastlegeResponse.toBehandler(
@@ -167,13 +166,12 @@ class BehandlerService(
             return null
         }
 
-        val partnerinfoResponseList = partnerinfoClient.partnerinfo(
+        val partnerinfoResponse = partnerinfoClient.partnerinfo(
             herId = fastlegeResponse.foreldreEnhetHerId.toString(),
             systemRequest = true,
             token = token,
             callId = callId,
-        )
-        val partnerinfoResponse = partnerinfoResponseList.choose()
+        ).selectActiveBehandlerKontor()
 
         return if (partnerinfoResponse != null) {
             fastlegeResponse.toBehandler(
@@ -395,7 +393,7 @@ class BehandlerService(
         }
     }
 
-    private fun List<PartnerinfoResponse>.choose(): PartnerinfoResponse? =
+    private fun List<PartnerinfoResponse>.selectActiveBehandlerKontor(): PartnerinfoResponse? =
         if (this.isEmpty())
             null
         else if (this.size == 1)
