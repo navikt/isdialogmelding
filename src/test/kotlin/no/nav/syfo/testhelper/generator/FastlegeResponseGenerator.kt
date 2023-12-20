@@ -5,13 +5,15 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.UserConstants
 import java.time.LocalDate
 
-fun generateFastlegeResponse() = FastlegeResponse(
+fun generateFastlegeResponse(
+    kontorHerId: Int = UserConstants.HERID,
+) = FastlegeResponse(
     fornavn = "Dana",
     mellomnavn = "Katherine",
     etternavn = "Scully",
     fnr = UserConstants.FASTLEGE_FNR.value,
     herId = 1337,
-    foreldreEnhetHerId = UserConstants.HERID,
+    foreldreEnhetHerId = kontorHerId,
     helsepersonellregisterId = 1234,
     pasient = FastlegeResponse.Pasient(
         fornavn = null,

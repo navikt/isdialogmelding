@@ -27,7 +27,7 @@ class PartnerinfoClient(
         token: String,
         callId: String,
         systemRequest: Boolean = false,
-    ): PartnerinfoResponse? {
+    ): List<PartnerinfoResponse> {
         val response = allPartnerinfo(
             herId = herId,
             token = token,
@@ -42,7 +42,7 @@ class PartnerinfoClient(
             log.warn("Response from syfopartnerinfo for herId $herId contains more than one partnerId: ${response.map { it.partnerId }}")
             COUNT_CALL_PARTNERINFO_MULTIPLE_RESPONSE.increment()
         }
-        return response.maxByOrNull { it.partnerId }
+        return response
     }
 
     suspend fun allPartnerinfo(

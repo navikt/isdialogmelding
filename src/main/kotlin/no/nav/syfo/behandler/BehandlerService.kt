@@ -7,6 +7,7 @@ import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
+import no.nav.syfo.behandler.partnerinfo.PartnerinfoResponse
 import no.nav.syfo.domain.*
 import org.slf4j.LoggerFactory
 import java.sql.Connection
@@ -136,12 +137,13 @@ class BehandlerService(
             return null
         }
 
-        val partnerinfoResponse = partnerinfoClient.partnerinfo(
+        val partnerinfoResponseList = partnerinfoClient.partnerinfo(
             herId = fastlegeResponse.foreldreEnhetHerId.toString(),
             systemRequest = systemRequest,
             token = token,
             callId = callId,
         )
+        val partnerinfoResponse = partnerinfoResponseList.choose()
 
         return if (partnerinfoResponse != null) {
             fastlegeResponse.toBehandler(
@@ -165,12 +167,13 @@ class BehandlerService(
             return null
         }
 
-        val partnerinfoResponse = partnerinfoClient.partnerinfo(
+        val partnerinfoResponseList = partnerinfoClient.partnerinfo(
             herId = fastlegeResponse.foreldreEnhetHerId.toString(),
             systemRequest = true,
             token = token,
             callId = callId,
         )
+        val partnerinfoResponse = partnerinfoResponseList.choose()
 
         return if (partnerinfoResponse != null) {
             fastlegeResponse.toBehandler(
@@ -391,4 +394,24 @@ class BehandlerService(
             connection.commit()
         }
     }
+
+    private fun List<PartnerinfoResponse>.choose(): PartnerinfoResponse? =
+        if (this.isEmpty())
+            null
+        else if (this.size == 1)
+            this.first()
+        else {
+            // If duplicate partnerId for a herId, prefer partnerId of kontor with latest
+            // timestamp for dialogmeldingEnabled, else pick largest partnerId
+            val pBehandlerKontor = this.mapNotNull { partnerInfoResponse ->
+                database.connection.use { it.getBehandlerKontor(PartnerId(partnerInfoResponse.partnerId)) }
+            }.filter {
+                it.dialogmeldingEnabled != null
+            }.maxByOrNull {
+                it.dialogmeldingEnabled!!
+            }
+            if (pBehandlerKontor != null) {
+                this.first { it.partnerId == pBehandlerKontor.partnerId.toInt() }
+            } else null
+        } ?: this.maxByOrNull { it.partnerId }
 }

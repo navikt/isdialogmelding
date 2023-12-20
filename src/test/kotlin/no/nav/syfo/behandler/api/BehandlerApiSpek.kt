@@ -8,6 +8,7 @@ import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
+import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import no.nav.syfo.testhelper.UserConstants.OTHER_PARTNERID
 import no.nav.syfo.testhelper.UserConstants.PARTNERID
@@ -55,8 +56,7 @@ class BehandlerApiSpek : Spek({
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
 
-                            val behandlerList =
-                                objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            val behandlerList = objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
                             behandlerList.size shouldBeEqualTo 1
 
                             val behandlerForPersonList = database.getBehandlerByArbeidstaker(
@@ -77,6 +77,78 @@ class BehandlerApiSpek : Spek({
                             behandlerDTO.type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.FASTLEGE.name
                             behandlerDTO.behandlerRef shouldBeEqualTo behandlerForPersonList.first().behandlerRef.toString()
                             behandlerDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
+                        }
+                    }
+                    it("should return list of Behandler and store behandler connected to kontor with latest dialogmeldingEnabled") {
+                        database.createKontor(
+                            partnerId = OTHER_PARTNERID,
+                            navn = OTHER_PARTNERID.toString()
+                        )
+                        database.createKontor(
+                            partnerId = PARTNERID,
+                            navn = PARTNERID.toString()
+                        )
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+
+                            val behandlerList = objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
+                            val behandlerDTO = behandlerList.first()
+                            behandlerDTO.kontor shouldBeEqualTo PARTNERID.toString()
+                        }
+                    }
+                    it("should return list of Behandler and store behandler connected to kontor with dialogmeldingEnabled") {
+                        database.createKontor(
+                            partnerId = OTHER_PARTNERID,
+                            navn = OTHER_PARTNERID.toString()
+                        )
+                        database.createKontor(
+                            partnerId = PARTNERID,
+                            navn = PARTNERID.toString(),
+                            dialogmeldingEnabled = false,
+                        )
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+
+                            val behandlerList = objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
+                            val behandlerDTO = behandlerList.first()
+                            behandlerDTO.kontor shouldBeEqualTo OTHER_PARTNERID.toString()
+                        }
+                    }
+                    it("should return list of Behandler and store behandler connected to kontor with larges partnerId if dialogmelding not enabled") {
+                        database.createKontor(
+                            partnerId = OTHER_PARTNERID,
+                            navn = OTHER_PARTNERID.toString(),
+                            dialogmeldingEnabled = false,
+                        )
+                        database.createKontor(
+                            partnerId = PARTNERID,
+                            navn = PARTNERID.toString(),
+                            dialogmeldingEnabled = false,
+                        )
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+
+                            val behandlerList = objectMapper.readValue<List<BehandlerDTO>>(response.content!!)
+                            behandlerList.size shouldBeEqualTo 1
+                            val behandlerDTO = behandlerList.first()
+                            behandlerDTO.kontor shouldBeEqualTo OTHER_PARTNERID.toString()
                         }
                     }
                     it("should exclude suspendert Behandler") {

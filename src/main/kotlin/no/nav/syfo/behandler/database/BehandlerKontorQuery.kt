@@ -170,7 +170,7 @@ const val queryGetBehandlerKontor =
 fun Connection.getBehandlerKontor(partnerId: PartnerId): PBehandlerKontor? {
     return prepareStatement(queryGetBehandlerKontor)
         .use {
-            it.setString(1, partnerId.toString())
+            it.setString(1, partnerId.value.toString())
             it.executeQuery().toList { toPBehandlerKontor() }
         }.firstOrNull()
 }
