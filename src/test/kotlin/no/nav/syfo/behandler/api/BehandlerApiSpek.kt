@@ -126,7 +126,7 @@ class BehandlerApiSpek : Spek({
                             behandlerDTO.kontor shouldBeEqualTo OTHER_PARTNERID.toString()
                         }
                     }
-                    it("should return list of Behandler and store behandler connected to kontor with larges partnerId if dialogmelding not enabled") {
+                    it("should return list of Behandler and store behandler connected to kontor with largest partnerId if dialogmelding not enabled") {
                         database.createKontor(
                             partnerId = OTHER_PARTNERID,
                             navn = OTHER_PARTNERID.toString(),
