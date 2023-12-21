@@ -394,22 +394,22 @@ class BehandlerService(
     }
 
     private fun List<PartnerinfoResponse>.selectActiveBehandlerKontor(): PartnerinfoResponse? =
-        if (this.isEmpty())
-            null
-        else if (this.size == 1)
-            this.first()
+        if (this.size < 2)
+            this.firstOrNull()
         else {
-            // If duplicate partnerId for a herId, prefer partnerId of kontor with latest
-            // timestamp for dialogmeldingEnabled, else pick largest partnerId
-            val pBehandlerKontor = this.mapNotNull { partnerInfoResponse ->
-                database.connection.use { it.getBehandlerKontor(PartnerId(partnerInfoResponse.partnerId)) }
-            }.filter {
-                it.dialogmeldingEnabled != null
-            }.maxByOrNull {
-                it.dialogmeldingEnabled!!
-            }
-            if (pBehandlerKontor != null) {
-                this.first { it.partnerId == pBehandlerKontor.partnerId.toInt() }
-            } else null
+            this.selectBehandlerKontorWithLatestDialogmeldingEnabled()
         } ?: this.maxByOrNull { it.partnerId }
+
+    private fun List<PartnerinfoResponse>.selectBehandlerKontorWithLatestDialogmeldingEnabled(): PartnerinfoResponse? {
+        val pBehandlerKontor = this.mapNotNull { partnerInfoResponse ->
+            database.connection.use { it.getBehandlerKontor(PartnerId(partnerInfoResponse.partnerId)) }
+        }.filter {
+            it.dialogmeldingEnabled != null
+        }.maxByOrNull {
+            it.dialogmeldingEnabled!!
+        }
+        return if (pBehandlerKontor != null) {
+            this.first { it.partnerId == pBehandlerKontor.partnerId.toInt() }
+        } else null
+    }
 }
