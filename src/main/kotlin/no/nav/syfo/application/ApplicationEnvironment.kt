@@ -21,8 +21,10 @@ data class Environment(
         syfooppfolgingsplanserviceClientId,
     ),
     private val syfooppfolgingsplanserviceApplicationName: String = "syfooppfolgingsplanservice",
+    private val lpsOppfolgingsplanMottakApplicationName: String = "lps-oppfolgingsplan-mottak",
     val oppfolgingsplanSystemAPIAuthorizedConsumerApplicationNameList: List<String> = listOf(
         syfooppfolgingsplanserviceApplicationName,
+        lpsOppfolgingsplanMottakApplicationName,
     ),
 
     val electorPath: String = getEnvVar("ELECTOR_PATH"),
