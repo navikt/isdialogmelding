@@ -7,6 +7,7 @@ import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
+import no.nav.syfo.behandler.partnerinfo.PartnerinfoResponse
 import no.nav.syfo.domain.*
 import org.slf4j.LoggerFactory
 import java.sql.Connection
@@ -141,7 +142,7 @@ class BehandlerService(
             systemRequest = systemRequest,
             token = token,
             callId = callId,
-        )
+        ).selectActiveBehandlerKontor()
 
         return if (partnerinfoResponse != null) {
             fastlegeResponse.toBehandler(
@@ -170,7 +171,7 @@ class BehandlerService(
             systemRequest = true,
             token = token,
             callId = callId,
-        )
+        ).selectActiveBehandlerKontor()
 
         return if (partnerinfoResponse != null) {
             fastlegeResponse.toBehandler(
@@ -390,5 +391,25 @@ class BehandlerService(
             )
             connection.commit()
         }
+    }
+
+    private fun List<PartnerinfoResponse>.selectActiveBehandlerKontor(): PartnerinfoResponse? =
+        if (this.size < 2)
+            this.firstOrNull()
+        else {
+            this.selectBehandlerKontorWithLatestDialogmeldingEnabled()
+        } ?: this.maxByOrNull { it.partnerId }
+
+    private fun List<PartnerinfoResponse>.selectBehandlerKontorWithLatestDialogmeldingEnabled(): PartnerinfoResponse? {
+        val pBehandlerKontor = this.mapNotNull { partnerInfoResponse ->
+            database.connection.use { it.getBehandlerKontor(PartnerId(partnerInfoResponse.partnerId)) }
+        }.filter {
+            it.dialogmeldingEnabled != null
+        }.maxByOrNull {
+            it.dialogmeldingEnabled!!
+        }
+        return if (pBehandlerKontor != null) {
+            this.first { it.partnerId == pBehandlerKontor.partnerId.toInt() }
+        } else null
     }
 }
