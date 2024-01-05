@@ -51,6 +51,9 @@ spec:
         - application: lps-oppfolgingsplan-mottak
           namespace: team-esyfo
           cluster: prod-gcp
+        - application: oppslag
+          namespace: aap
+          cluster: prod-gcp
     outbound:
       external:
         - host: "mpls02.adeo.no"
