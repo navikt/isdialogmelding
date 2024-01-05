@@ -51,6 +51,9 @@ spec:
         - application: lps-oppfolgingsplan-mottak
           namespace: team-esyfo
           cluster: dev-gcp
+        - application: oppslag
+          namespace: aap
+          cluster: dev-gcp
     outbound:
       external:
         - host: "b27apvl220.preprod.local"
