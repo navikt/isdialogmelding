@@ -106,6 +106,8 @@ spec:
       value: "QA.Q414.IU03_UTSENDING"
     - name: AAP_SOKNAD_API_CLIENT_ID
       value: "dev-gcp:aap:soknad-api"
+    - name: AAP_OPPSLAG_CLIENT_ID
+      value: "dev-gcp:aap:oppslag"
     - name: SYFOOPPFOLGINGSPLANSERVICE_CLIENT_ID
       value: "dev-fss:team-esyfo:syfooppfolgingsplanservice"
     - name: FASTLEGEREST_CLIENT_ID
