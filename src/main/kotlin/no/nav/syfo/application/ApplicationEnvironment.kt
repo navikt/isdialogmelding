@@ -13,8 +13,10 @@ data class Environment(
     val idportenTokenXClientId: String = getEnvVar("TOKEN_X_CLIENT_ID"),
     val idportenTokenXWellKnownUrl: String = getEnvVar("TOKEN_X_WELL_KNOWN_URL"),
     val aapSoknadApiClientId: String = getEnvVar("AAP_SOKNAD_API_CLIENT_ID"),
+    val aapOppslagClientId: String = getEnvVar("AAP_OPPSLAG_CLIENT_ID"),
     val personAPIAuthorizedConsumerClientIdList: List<String> = listOf(
         aapSoknadApiClientId,
+        aapOppslagClientId,
     ),
     val syfooppfolgingsplanserviceClientId: String = getEnvVar("SYFOOPPFOLGINGSPLANSERVICE_CLIENT_ID"),
     val oppfolgingsplanAPIAuthorizedConsumerClientIdList: List<String> = listOf(
