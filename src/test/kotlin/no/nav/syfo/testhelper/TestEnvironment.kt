@@ -15,6 +15,7 @@ fun testEnvironment() = Environment(
     idportenTokenXClientId = "dev-gcp.teamsykefravr.isdialogmelding",
     idportenTokenXWellKnownUrl = "wellknown-idporten-tokenx",
     aapSoknadApiClientId = testAapSoknadApiClientId,
+    aapOppslagClientId = "oppslag-client-id",
     personAPIAuthorizedConsumerClientIdList = listOf(testAapSoknadApiClientId),
     syfooppfolgingsplanserviceClientId = testSyfooppfolgingsplanserviceClientId,
     oppfolgingsplanAPIAuthorizedConsumerClientIdList = listOf(testSyfooppfolgingsplanserviceClientId),
