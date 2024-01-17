@@ -15,8 +15,8 @@ fun testEnvironment() = Environment(
     idportenTokenXClientId = "dev-gcp.teamsykefravr.isdialogmelding",
     idportenTokenXWellKnownUrl = "wellknown-idporten-tokenx",
     aapSoknadApiClientId = testAapSoknadApiClientId,
-    aapOppslagClientId = "oppslag-client-id",
-    personAPIAuthorizedConsumerClientIdList = listOf(testAapSoknadApiClientId),
+    aapOppslagClientId = testAapOppslagApiClientId,
+    personAPIAuthorizedConsumerClientIdList = listOf(testAapSoknadApiClientId, testAapOppslagApiClientId),
     syfooppfolgingsplanserviceClientId = testSyfooppfolgingsplanserviceClientId,
     oppfolgingsplanAPIAuthorizedConsumerClientIdList = listOf(testSyfooppfolgingsplanserviceClientId),
     electorPath = "/tmp",
@@ -58,6 +58,7 @@ fun testEnvironment() = Environment(
 )
 
 const val testAapSoknadApiClientId = "soknad-api-client-id"
+const val testAapOppslagApiClientId = "oppslag-client-id"
 const val testSyfooppfolgingsplanserviceClientId = "syfooppfolgingsplanservice-client-id"
 
 fun testAppState() = ApplicationState(
