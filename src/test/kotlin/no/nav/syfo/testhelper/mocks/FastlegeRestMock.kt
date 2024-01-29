@@ -3,15 +3,27 @@ package no.nav.syfo.testhelper.mocks
 import io.ktor.client.engine.mock.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import no.nav.syfo.behandler.fastlege.FastlegeClient.Companion.BEHANDLERE_SUFFIX
 import no.nav.syfo.behandler.fastlege.FastlegeClient.Companion.FASTLEGEVIKAR_SYSTEM_PATH
 import no.nav.syfo.testhelper.UserConstants
+import no.nav.syfo.testhelper.generator.generateBehandlerKontorResponse
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
 import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 
 fun MockRequestHandleScope.fastlegeRestMockResponse(request: HttpRequestData): HttpResponseData {
     val personident = request.headers[NAV_PERSONIDENT_HEADER]
+    val isBehandlereForKontorRequest = request.url.encodedPath.endsWith(BEHANDLERE_SUFFIX)
     val isVikarRequest = request.url.encodedPath.contains(FASTLEGEVIKAR_SYSTEM_PATH)
-    return if (isVikarRequest) {
+    return if (isBehandlereForKontorRequest) {
+        val requestStringNoSuffix = request.url.encodedPath.removeSuffix(BEHANDLERE_SUFFIX)
+        val kontorHerId = requestStringNoSuffix.substring(requestStringNoSuffix.lastIndexOf("/") + 1).toInt()
+        respondOk(
+            generateBehandlerKontorResponse(
+                kontorHerId = kontorHerId,
+                aktiv = kontorHerId != UserConstants.OTHER_HERID,
+            )
+        )
+    } else if (isVikarRequest) {
         when (personident) {
             UserConstants.ARBEIDSTAKER_MED_VIKARFASTLEGE.value -> respondOk(
                 generateFastlegeResponse(UserConstants.HERID),

@@ -148,6 +148,7 @@ fun main() {
             behandlerService = behandlerService,
             partnerinfoClient = partnerinfoClient,
             legeSuspensjonClient = legeSuspensjonClient,
+            fastlegeClient = fastlegeClient,
         )
         launchKafkaTaskSykmelding(
             applicationState = applicationState,

@@ -22,6 +22,7 @@ class FastlegeClient(
     private val finnFastlegeUrl: String = "$fastlegeRestUrl$FASTLEGE_PATH"
     private val finnFastlegeSystemUrl: String = "$fastlegeRestUrl$FASTLEGE_SYSTEM_PATH"
     private val finnFastlegevikarSystemUrl: String = "$fastlegeRestUrl$FASTLEGEVIKAR_SYSTEM_PATH"
+    private val finnBehandlereSystemUrl: String = "$fastlegeRestUrl$BEHANDLERE_SYSTEM_PATH"
 
     suspend fun fastlege(
         callId: String,
@@ -75,6 +76,31 @@ class FastlegeClient(
         }
     }
 
+    suspend fun behandlereForKontor(
+        callId: String,
+        kontorHerId: Int,
+    ): BehandlerKontorFraAdresseregisteretDTO? {
+        val url = "$finnBehandlereSystemUrl/$kontorHerId$BEHANDLERE_SUFFIX"
+        val token = azureAdClient.getSystemToken(
+            scopeClientId = fastlegeRestClientId,
+        )?.accessToken
+            ?: throw RuntimeException("Failed to request behandlere from fastlegerest: Failed to get System token")
+        return try {
+            val response = httpClient.get(url) {
+                header(HttpHeaders.Authorization, bearerHeader(token))
+                header(NAV_CALL_ID_HEADER, callId)
+                accept(ContentType.Application.Json)
+            }
+            if (response.status == HttpStatusCode.OK) response.body() else null
+        } catch (e: ClientRequestException) {
+            handleUnexpectedClientRequestException(e.response, e.message, callId)
+            null
+        } catch (e: ServerResponseException) {
+            handleUnexpectedResponseException(e.response, e.message, callId)
+            null
+        }
+    }
+
     private suspend fun fastlege(
         callId: String,
         token: String,
@@ -122,6 +148,8 @@ class FastlegeClient(
         const val FASTLEGE_PATH = "/fastlegerest/api/v2/fastlege"
         const val FASTLEGE_SYSTEM_PATH = "/fastlegerest/api/system/v1/fastlege/aktiv/personident"
         const val FASTLEGEVIKAR_SYSTEM_PATH = "/fastlegerest/api/system/v1/fastlege/vikar/personident"
+        const val BEHANDLERE_SYSTEM_PATH = "/fastlegerest/api/system/v1"
+        const val BEHANDLERE_SUFFIX = "/behandlere"
         private val log = LoggerFactory.getLogger(FastlegeClient::class.java)
     }
 }

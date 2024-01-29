@@ -10,6 +10,16 @@ import java.sql.*
 import java.time.OffsetDateTime
 import java.util.*
 
+fun DatabaseInterface.createBehandler(
+    behandler: Behandler,
+    kontorId: Int,
+): PBehandler =
+    this.connection.use { connection ->
+        connection.createBehandler(behandler, kontorId).also {
+            connection.commit()
+        }
+    }
+
 fun Connection.createBehandler(
     behandler: Behandler,
     kontorId: Int,
@@ -248,6 +258,20 @@ fun Connection.invalidateBehandler(behandlerRef: UUID) {
             it.executeUpdate()
         }
 }
+
+const val queryGetBehandlereForKontor =
+    """
+        SELECT * FROM behandler
+        WHERE kontor_id=?
+    """
+
+fun DatabaseInterface.getBehandlereForKontor(kontorId: Int) =
+    this.connection.use { connection ->
+        connection.prepareStatement(queryGetBehandlereForKontor).use {
+            it.setInt(1, kontorId)
+            it.executeQuery().toList { toPBehandler() }
+        }
+    }
 
 const val queryGetBehandlerPersonidenterForAktiveKontor =
     """
