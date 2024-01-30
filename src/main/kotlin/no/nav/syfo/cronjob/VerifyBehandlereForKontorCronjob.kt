@@ -32,12 +32,10 @@ class VerifyBehandlereForKontorCronjob(
                 )
                 if (behandlerKontorFraAdresseregisteret != null) {
                     if (!behandlerKontorFraAdresseregisteret.aktiv) {
-                        // Deaktiver kontor
-                        log.info("VerifyBehandlereForKontorCronjob: Disable dialogmelding for kontor med herId ${behandlerKontor.herId} and partnerId ${behandlerKontor.partnerId}")
+                        log.info("VerifyBehandlereForKontorCronjob: Disable dialogmelding for kontor siden inaktiv i Adresseregisteret: herId ${behandlerKontor.herId} partnerId ${behandlerKontor.partnerId}")
                         behandlerService.disableDialogmeldingerForKontor(behandlerKontor)
                     } else {
-                        val aktiveBehandlereForKontor = behandlerKontorFraAdresseregisteret.behandlere.filter { it.aktiv }
-                        val inaktiveBehandlereForKontor = behandlerKontorFraAdresseregisteret.behandlere.filter { !it.aktiv }
+                        val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = behandlerKontorFraAdresseregisteret.behandlere.partition { it.aktiv }
                         val existingBehandlereForKontor = behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.invalidated == null }
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${aktiveBehandlereForKontor.size} aktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${inaktiveBehandlereForKontor.size} inaktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
