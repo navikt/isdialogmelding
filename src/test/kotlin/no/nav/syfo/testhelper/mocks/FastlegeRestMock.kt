@@ -20,7 +20,7 @@ fun MockRequestHandleScope.fastlegeRestMockResponse(request: HttpRequestData): H
         respondOk(
             generateBehandlerKontorResponse(
                 kontorHerId = kontorHerId,
-                aktiv = kontorHerId != UserConstants.OTHER_HERID,
+                aktiv = kontorHerId != UserConstants.HERID_NOT_ACTIVE,
             )
         )
     } else if (isVikarRequest) {

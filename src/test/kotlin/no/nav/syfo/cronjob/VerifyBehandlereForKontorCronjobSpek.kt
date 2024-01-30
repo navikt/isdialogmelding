@@ -10,8 +10,8 @@ import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.HERID
+import no.nav.syfo.testhelper.UserConstants.HERID_NOT_ACTIVE
 import no.nav.syfo.testhelper.UserConstants.KONTOR_NAVN
-import no.nav.syfo.testhelper.UserConstants.OTHER_HERID
 import no.nav.syfo.testhelper.UserConstants.PARTNERID
 import org.amshove.kluent.*
 import org.spekframework.spek2.Spek
@@ -69,7 +69,7 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                 it("Cronjob disabler kontor som ikke lengre er aktivt") {
                     val kontorId = database.createKontor(
                         partnerId = PARTNERID,
-                        herId = OTHER_HERID,
+                        herId = HERID_NOT_ACTIVE,
                         navn = KONTOR_NAVN,
                     )
                     val kontorBefore = database.getBehandlerKontorById(kontorId)

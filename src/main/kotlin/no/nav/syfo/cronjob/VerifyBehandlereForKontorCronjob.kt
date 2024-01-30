@@ -2,13 +2,8 @@ package no.nav.syfo.cronjob
 
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.BehandlerService
-import no.nav.syfo.behandler.database.domain.toBehandlerKontor
-import no.nav.syfo.behandler.domain.Behandler
-import no.nav.syfo.behandler.domain.BehandlerKategori
 import no.nav.syfo.behandler.fastlege.FastlegeClient
-import no.nav.syfo.domain.Personident
 import org.slf4j.LoggerFactory
-import java.time.OffsetDateTime
 import java.util.UUID
 
 class VerifyBehandlereForKontorCronjob(
@@ -16,7 +11,7 @@ class VerifyBehandlereForKontorCronjob(
     val fastlegeClient: FastlegeClient,
 ) : DialogmeldingCronjob {
 
-    override val initialDelayMinutes: Long = 2
+    override val initialDelayMinutes: Long = 15
     override val intervalDelayMinutes: Long = 24 * 60
 
     override suspend fun run() {
@@ -29,68 +24,37 @@ class VerifyBehandlereForKontorCronjob(
         val behandlerKontorListe = behandlerService.getKontor().filter {
             it.herId != null && it.dialogmeldingEnabled != null
         }
-        // .filter {
-        // TODO: Dette er bare for den første utprøvingen
-        // it.herId in herIdsToUpdate
-        // }
         behandlerKontorListe.forEach { behandlerKontor ->
             try {
                 val behandlerKontorFraAdresseregisteret = fastlegeClient.behandlereForKontor(
                     callId = UUID.randomUUID().toString(),
                     kontorHerId = behandlerKontor.herId!!.toInt()
                 )
-                log.info("Behandlerkontor mer herId ${behandlerKontor.herId} ble funnet: ${behandlerKontorFraAdresseregisteret != null}")
                 if (behandlerKontorFraAdresseregisteret != null) {
-                    log.info("Behandlerkontor med herId ${behandlerKontorFraAdresseregisteret.herId} er aktivt: ${behandlerKontorFraAdresseregisteret.aktiv}")
                     if (!behandlerKontorFraAdresseregisteret.aktiv) {
                         // Deaktiver kontor
+                        log.info("VerifyBehandlereForKontorCronjob: Disable dialogmelding for kontor med herId ${behandlerKontor.herId} and partnerId ${behandlerKontor.partnerId}")
                         behandlerService.disableDialogmeldingerForKontor(behandlerKontor)
                     } else {
-                        log.info("Fant ${behandlerKontorFraAdresseregisteret.behandlere.size} behandlere for kontor ${behandlerKontor.herId}")
-                        val existingBehandlereForKontor = behandlerService.getBehandlereForKontor(behandlerKontor)
-                        behandlerKontorFraAdresseregisteret.behandlere.forEach { behandlerDTO ->
-                            log.info("Checking behandler with hprId ${behandlerDTO.hprId}")
-                            // Sjekk om behandler finnes fra før og er unik med hensyn til hprNr
-                            val existingBehandlere = existingBehandlereForKontor.filter { it.hprId == behandlerDTO.hprId.toString() }
-                            if (existingBehandlere.size > 1) {
-                                // handle duplicates
-                            } else if (existingBehandlere.size == 1) {
-                                // update existing instance
-                            } else {
-                                // add new behandler valid kategori
-                                val kategori = BehandlerKategori.fromKategoriKode(behandlerDTO.kategori)
-                                if (kategori != null) {
-                                    behandlerService.createBehandler(
-                                        Behandler(
-                                            behandlerRef = UUID.randomUUID(),
-                                            personident = behandlerDTO.personIdent?.let { Personident(it) },
-                                            fornavn = behandlerDTO.fornavn,
-                                            mellomnavn = behandlerDTO.mellomnavn,
-                                            etternavn = behandlerDTO.etternavn,
-                                            herId = behandlerDTO.herId,
-                                            hprId = behandlerDTO.hprId,
-                                            telefon = behandlerKontorFraAdresseregisteret.telefon,
-                                            kontor = behandlerKontor.toBehandlerKontor(),
-                                            kategori = kategori,
-                                            mottatt = OffsetDateTime.now(),
-                                            suspendert = false,
-                                        ),
-                                        kontorId = behandlerKontor.id,
-                                    )
-                                }
-                            }
-                        }
+                        val aktiveBehandlereForKontor = behandlerKontorFraAdresseregisteret.behandlere.filter { it.aktiv }
+                        val inaktiveBehandlereForKontor = behandlerKontorFraAdresseregisteret.behandlere.filter { !it.aktiv }
+                        val existingBehandlereForKontor = behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.invalidated == null }
+                        log.info("VerifyBehandlereForKontorCronjob: Fant ${aktiveBehandlereForKontor.size} aktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
+                        log.info("VerifyBehandlereForKontorCronjob: Fant ${inaktiveBehandlereForKontor.size} inaktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
+                        log.info("VerifyBehandlereForKontorCronjob: Fant ${existingBehandlereForKontor.size} behandlere for kontor ${behandlerKontor.herId} i Modia")
 
-                        // Hvis duplikater fra før: invalidere forekomst med D-nr
+                        // TODO: Hvis duplikater fra før: invalidere behandlerforekomst med D-nr
 
-                        // Hvis duplikat fra før: invalidere forekomst som ikke stemmer overens med Adresseregisteret
+                        // TODO: Hvis duplikat fra før: invalidere behandlerforekomst som ikke stemmer overens med Adresseregisteret
 
-                        // Hvis finnes fra før: oppdatere
+                        // TODO: Hvis finnes fra før: oppdatere behandlerforekomst
 
-                        // Hvis finnes fra før, men deaktivert i adresseregisteret: sette invalidated-timestamp
+                        // TODO: Hvis finnes fra før, men deaktivert i adresseregisteret: sette invalidated-timestamp
 
-                        // Hvis deaktivert fra før, men aktiv i adresseregisteret: sette invalidated=null
+                        // TODO: Hvis deaktivert fra før, men aktiv i adresseregisteret: sette invalidated=null
                     }
+                } else {
+                    log.warn("VerifyBehandlereForKontorCronjob: Behandlerkontor mer herId ${behandlerKontor.herId} ble ikke funnet i Adresseregisteret")
                 }
                 verifyResult.updated++
             } catch (e: Exception) {
@@ -106,7 +70,6 @@ class VerifyBehandlereForKontorCronjob(
     }
 
     companion object {
-        private val herIdsToUpdate = listOf("2175", "80481")
         private val log = LoggerFactory.getLogger(VerifyBehandlereForKontorCronjob::class.java)
     }
 }
