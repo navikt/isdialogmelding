@@ -3,6 +3,7 @@ package no.nav.syfo.cronjob
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.fastlege.FastlegeClient
+import no.nav.syfo.domain.Personident
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
@@ -40,6 +41,14 @@ class VerifyBehandlereForKontorCronjob(
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${aktiveBehandlereForKontor.size} aktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${inaktiveBehandlereForKontor.size} inaktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${existingBehandlereForKontor.size} behandlere for kontor ${behandlerKontor.herId} i Modia")
+                        val firstBehandler = aktiveBehandlereForKontor.firstOrNull { it.personIdent != null }
+                        if (firstBehandler != null) {
+                            try {
+                                Personident(firstBehandler.personIdent!!)
+                            } catch (exc: IllegalArgumentException) {
+                                log.info("VerifyBehandlereForKontorCronjob: Got invalid personident for behandler")
+                            }
+                        }
 
                         // TODO: Hvis duplikater fra før: invalidere behandlerforekomst med D-nr
 
