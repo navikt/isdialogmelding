@@ -231,6 +231,16 @@ class BehandlerService(
         )
     }
 
+    fun createBehandler(
+        behandler: Behandler,
+        kontorId: Int,
+    ) {
+        database.createBehandler(
+            behandler = behandler,
+            kontorId = kontorId,
+        )
+    }
+
     fun getBehandler(behandlerRef: UUID): Behandler? {
         val pBehandler = database.getBehandlerByBehandlerRef(
             behandlerRef = behandlerRef,
@@ -242,6 +252,9 @@ class BehandlerService(
 
     fun getKontor(): List<PBehandlerKontor> =
         database.getAllBehandlerKontor()
+
+    fun getBehandlereForKontor(kontor: PBehandlerKontor): List<PBehandler> =
+        database.getBehandlereForKontor(kontor.id)
 
     fun getBehandlerPersonidenterForAktiveKontor(): List<Personident> =
         database.getBehandlerPersonidenterForAktiveKontor().filterNot { it.isNullOrBlank() }.map { Personident(it) }

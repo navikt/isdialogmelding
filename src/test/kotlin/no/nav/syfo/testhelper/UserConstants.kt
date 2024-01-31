@@ -34,6 +34,7 @@ object UserConstants {
     const val OTHER_HPRID = 804
     const val HERID_UTEN_PARTNERINFO = 504
     const val HERID_MED_FLERE_PARTNERINFO = 704
+    const val HERID_NOT_ACTIVE = 904
 
     const val VEILEDER_IDENT = "Z999999"
 
@@ -41,4 +42,7 @@ object UserConstants {
     val FASTLEGE_FNR_SUSPENDERT = Personident("12125678912")
     val FASTLEGE_DNR = Personident("52125678911")
     val FASTLEGE_ANNEN_FNR = Personident(FASTLEGE_FNR.value.replace("2", "4"))
+
+    val BEHANDLER_FORNAVN = "Behandler"
+    val BEHANDLER_ETTERNAVN = "BehandlerEtternavn"
 }
