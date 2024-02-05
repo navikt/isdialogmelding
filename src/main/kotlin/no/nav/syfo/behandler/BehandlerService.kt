@@ -1,6 +1,7 @@
 package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.behandler.api.behandlerPersonident
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.*
@@ -261,6 +262,10 @@ class BehandlerService(
 
     fun updateBehandlerSuspensjon(behandlerPersonident: Personident, suspendert: Boolean) {
         database.updateSuspensjon(behandlerPersonident, suspendert)
+    }
+
+    fun invalidateBehandler(behandlerRef: UUID) {
+        database.invalidateBehandler(behandlerRef)
     }
 
     fun existsOtherValidKontorWithSameHerId(

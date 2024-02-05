@@ -2,8 +2,9 @@ package no.nav.syfo.cronjob
 
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.BehandlerService
+import no.nav.syfo.behandler.database.domain.PBehandler
+import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO
 import no.nav.syfo.behandler.fastlege.FastlegeClient
-import no.nav.syfo.domain.Personident
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
@@ -42,22 +43,14 @@ class VerifyBehandlereForKontorCronjob(
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${aktiveBehandlereForKontor.size} aktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${inaktiveBehandlereForKontor.size} inaktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${existingBehandlereForKontor.size} behandlere for kontor ${behandlerKontor.herId} i Modia")
-                        val firstBehandler = aktiveBehandlereForKontor.firstOrNull { it.personIdent != null }
-                        if (firstBehandler != null) {
-                            try {
-                                Personident(firstBehandler.personIdent!!)
-                            } catch (exc: IllegalArgumentException) {
-                                log.info("VerifyBehandlereForKontorCronjob: Got invalid personident for behandler")
-                            }
-                        }
+
+                        invalidateInactiveBehandlere(inaktiveBehandlereForKontor, existingBehandlereForKontor)
 
                         // TODO: Hvis duplikater fra før: invalidere behandlerforekomst med D-nr
 
                         // TODO: Hvis duplikat fra før: invalidere behandlerforekomst som ikke stemmer overens med Adresseregisteret
 
                         // TODO: Hvis finnes fra før: oppdatere behandlerforekomst
-
-                        // TODO: Hvis finnes fra før, men deaktivert i adresseregisteret: sette invalidated-timestamp
 
                         // TODO: Hvis deaktivert fra før, men aktiv i adresseregisteret: sette invalidated=null
                     }
@@ -75,6 +68,24 @@ class VerifyBehandlereForKontorCronjob(
             StructuredArguments.keyValue("failed", verifyResult.failed),
             StructuredArguments.keyValue("updated", verifyResult.updated),
         )
+    }
+
+    private fun invalidateInactiveBehandlere(
+        inaktiveBehandlereForKontor: List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>,
+        existingBehandlereForKontor: List<PBehandler>
+    ) {
+        inaktiveBehandlereForKontor.filter {
+            it.hprId != null
+        }.forEach { behandlerFraAdresseregisteret ->
+            val behandlerFraAdresseregisteretHprId = behandlerFraAdresseregisteret.hprId!!.toString()
+            val existingBehandlere = existingBehandlereForKontor.filter {
+                it.hprId == behandlerFraAdresseregisteretHprId && it.invalidated == null
+            }
+            existingBehandlere.forEach { existingBehandler ->
+                behandlerService.invalidateBehandler(existingBehandler.behandlerRef)
+                log.info("VerifyBehandlereForKontorCronjob: behandler ${existingBehandler.behandlerRef} invalidated since inactive in Adresseregisteret")
+            }
+        }
     }
 
     companion object {
