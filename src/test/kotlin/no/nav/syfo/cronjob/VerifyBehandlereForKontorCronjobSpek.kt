@@ -102,7 +102,8 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     val kontorAfter = database.getBehandlerKontorById(kontorId)
                     kontorAfter.dialogmeldingEnabled shouldNotBeEqualTo null
                 }
-                it("Cronjob invaliderer eksisterende behandler hvis inaktiv i Adresseregisteret") {
+                it("Cronjob invaliderer behandler som er inaktiv i Adresseregisteret") {
+                    val hprIdForInactiveBehandlerInAdresseregistreret = HPRID_INACTVE
                     val kontorId = database.createKontor(
                         partnerId = PARTNERID,
                         herId = HERID,
@@ -117,7 +118,7 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                             telefon = null,
                             personident = null,
                             herId = HERID,
-                            hprId = HPRID_INACTVE,
+                            hprId = hprIdForInactiveBehandlerInAdresseregistreret,
                             kontor = database.getBehandlerKontorById(kontorId).toBehandlerKontor(),
                             kategori = BehandlerKategori.LEGE,
                             mottatt = OffsetDateTime.now(),
@@ -125,6 +126,8 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                         ),
                         kontorId = kontorId,
                     )
+                    val behandlerBefore = database.getBehandlerById(pBehandler.id)
+                    behandlerBefore!!.invalidated shouldBeEqualTo null
                     runBlocking {
                         cronJob.verifyBehandlereForKontorJob()
                     }
