@@ -11,8 +11,9 @@ class VerifyBehandlereForKontorCronjob(
     val behandlerService: BehandlerService,
     val fastlegeClient: FastlegeClient,
 ) : DialogmeldingCronjob {
+    private val runAtHour = 3
 
-    override val initialDelayMinutes: Long = 15
+    override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60
 
     override suspend fun run() {

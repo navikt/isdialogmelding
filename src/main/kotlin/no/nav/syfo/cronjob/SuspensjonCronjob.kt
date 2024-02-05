@@ -4,10 +4,6 @@ import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.client.btsys.LegeSuspensjonClient
 import org.slf4j.LoggerFactory
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
 
 class SuspensjonCronjob(
     val behandlerService: BehandlerService,
@@ -15,7 +11,7 @@ class SuspensjonCronjob(
 ) : DialogmeldingCronjob {
     private val runAtHour = 5
 
-    override val initialDelayMinutes: Long = calculateInitialDelay()
+    override val initialDelayMinutes: Long = calculateInitialDelay("SuspensjonCronJob", runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60
 
     override suspend fun run() {
@@ -43,19 +39,6 @@ class SuspensjonCronjob(
             StructuredArguments.keyValue("failed", verifyResult.failed),
             StructuredArguments.keyValue("updated", verifyResult.updated),
         )
-    }
-
-    private fun calculateInitialDelay() = calculateInitialDelay(LocalDateTime.now())
-
-    private fun calculateInitialDelay(from: LocalDateTime): Long {
-        val nowDate = LocalDate.now()
-        val nextTimeToRun = LocalDateTime.of(
-            if (from.hour < runAtHour) nowDate else nowDate.plusDays(1),
-            LocalTime.of(runAtHour, 0),
-        )
-        val initialDelay = Duration.between(from, nextTimeToRun).toMinutes()
-        log.info("SuspensjonCronJob will run in $initialDelay minutes at $nextTimeToRun")
-        return initialDelay
     }
 
     companion object {
