@@ -29,10 +29,13 @@ class VerifyBehandlereForKontorCronjob(
         }
         behandlerKontorListe.forEach { behandlerKontor ->
             try {
+                val start = System.currentTimeMillis()
+                log.info("VerifyBehandlereForKontorCronjob: Starter henting av behandlere for ${behandlerKontor.herId} fra Adresseregisteret")
                 val behandlerKontorFraAdresseregisteret = fastlegeClient.behandlereForKontor(
                     callId = UUID.randomUUID().toString(),
                     kontorHerId = behandlerKontor.herId!!.toInt()
                 )
+                log.info("VerifyBehandlereForKontorCronjob: Behandlere for ${behandlerKontor.herId} hentet fra Adresseregisteret, brukte ${System.currentTimeMillis() - start} ms")
                 if (behandlerKontorFraAdresseregisteret != null) {
                     if (!behandlerKontorFraAdresseregisteret.aktiv) {
                         log.info("VerifyBehandlereForKontorCronjob: Disable dialogmelding for kontor siden inaktiv i Adresseregisteret: herId ${behandlerKontor.herId} partnerId ${behandlerKontor.partnerId}")
