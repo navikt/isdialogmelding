@@ -5,11 +5,12 @@ import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO
 import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_FNR
 import no.nav.syfo.testhelper.UserConstants.HERID
-import no.nav.syfo.testhelper.UserConstants.HPRID
+import no.nav.syfo.testhelper.UserConstants.HPRID_INACTVE
 
 fun generateBehandlerKontorResponse(
     kontorHerId: Int,
     aktiv: Boolean = true,
+    behandlerHprIdInactive: Int,
 ) = BehandlerKontorFraAdresseregisteretDTO(
     aktiv = aktiv,
     herId = kontorHerId,
@@ -19,7 +20,7 @@ fun generateBehandlerKontorResponse(
     telefon = "",
     epost = "",
     orgnummer = null,
-    behandlere = listOf(generateBehandlerFraAdresseregisteret()),
+    behandlere = listOf(generateBehandlerFraAdresseregisteret(behandlerHprIdInactive)),
 )
 
 fun generateBehandlerKontorAdresse() = BehandlerKontorFraAdresseregisteretDTO.Adresse(
@@ -28,13 +29,15 @@ fun generateBehandlerKontorAdresse() = BehandlerKontorFraAdresseregisteretDTO.Ad
     poststed = "Oslo",
 )
 
-fun generateBehandlerFraAdresseregisteret() = BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO(
-    aktiv = true,
+fun generateBehandlerFraAdresseregisteret(
+    hprId: Int,
+) = BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO(
+    aktiv = hprId != HPRID_INACTVE,
     fornavn = UserConstants.BEHANDLER_FORNAVN,
     mellomnavn = null,
     etternavn = UserConstants.BEHANDLER_ETTERNAVN,
     personIdent = FASTLEGE_FNR.value,
     herId = HERID,
-    hprId = HPRID,
+    hprId = hprId,
     kategori = BehandlerKategori.LEGE.kategoriKode,
 )
