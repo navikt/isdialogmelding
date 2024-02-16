@@ -8,6 +8,9 @@ on:
       - '.github/workflows/kafka.yaml'
       - '.nais/kafka/**'
 
+permissions:
+  id-token: write
+
 jobs:
   deploy-kafka-dev:
     name: Deploy Kafka topic to NAIS dev-gcp
@@ -16,17 +19,15 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Deploy behandler-dialogmelding-bestilling dev
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/kafka/behandler-dialogmelding-bestilling.yaml
           VARS: .nais/kafka/dev.json
 
       - name: Deploy behandler-dialogmelding-status dev
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/kafka/behandler-dialogmelding-status.yaml
           VARS: .nais/kafka/dev.json
@@ -39,17 +40,15 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Deploy behandler-dialogmelding-bestilling prod
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           RESOURCE: .nais/kafka/behandler-dialogmelding-bestilling.yaml
           VARS: .nais/kafka/prod.json
 
       - name: Deploy behandler-dialogmelding-status prod
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           RESOURCE: .nais/kafka/behandler-dialogmelding-status.yaml
           VARS: .nais/kafka/prod.json
