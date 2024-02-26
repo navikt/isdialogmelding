@@ -12,9 +12,6 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 
-const val TEMA_HEADER = "Tema"
-const val ALLE_TEMA_HEADERVERDI = "GEN"
-
 class PdlClient(
     private val azureAdClient: AzureAdClient,
     private val pdlClientId: String,
@@ -35,7 +32,7 @@ class PdlClient(
             setBody(request)
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Authorization, bearerHeader(token))
-            header(TEMA_HEADER, ALLE_TEMA_HEADERVERDI)
+            header(BEHANDLINGSNUMMER_HEADER_KEY, BEHANDLINGSNUMMER_HEADER_VALUE)
         }
 
         when (response.status) {
@@ -86,7 +83,7 @@ class PdlClient(
         val response: HttpResponse = httpClient.post(pdlUrl) {
             header(HttpHeaders.Authorization, bearerHeader(token))
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-            header(TEMA_HEADER, ALLE_TEMA_HEADERVERDI)
+            header(BEHANDLINGSNUMMER_HEADER_KEY, BEHANDLINGSNUMMER_HEADER_VALUE)
             header(NAV_CALL_ID_HEADER, callId)
             header(IDENTER_HEADER, IDENTER_HEADER)
             setBody(request)
@@ -126,7 +123,13 @@ class PdlClient(
     }
 
     companion object {
-        const val IDENTER_HEADER = "identer"
         private val logger = LoggerFactory.getLogger(PdlClient::class.java)
+        const val IDENTER_HEADER = "identer"
+
+        // Se behandlingskatalog https://behandlingskatalog.intern.nav.no/
+        // Behandling: Sende, innhente og videreformidle informasjon mellom behandler og NAV. I sykefraværsoppfølgingen
+        // mottar NAV helseopplysninger fra behandler.
+        private const val BEHANDLINGSNUMMER_HEADER_KEY = "behandlingsnummer"
+        private const val BEHANDLINGSNUMMER_HEADER_VALUE = "B389"
     }
 }
