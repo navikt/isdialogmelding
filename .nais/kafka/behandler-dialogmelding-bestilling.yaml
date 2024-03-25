@@ -28,6 +28,9 @@ spec:
     - team: teamsykefravr
       application: isbehandlerdialog
       access: write
+    - team: teamsykefravr
+      application: isfrisktilarbeid
+      access: write
     - team: disykefravar
       application: dvh-sykefravar-airflow-kafka
       access: read
