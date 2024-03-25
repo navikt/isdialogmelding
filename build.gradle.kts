@@ -1,5 +1,4 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.apache.tools.ant.taskdefs.condition.Os
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -25,7 +24,7 @@ object Versions {
     const val mq = "9.3.4.1"
     const val nimbusjosejwt = "9.37.3"
     const val postgres = "42.7.2"
-    val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
+    const val postgresEmbedded = "2.0.6"
     const val spek = "2.0.19"
     const val syfotjenester = "1.2021.06.09-13.09-b3d30de9996e"
 }
@@ -127,7 +126,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core:${Versions.flyway}")
     implementation("com.zaxxer:HikariCP:${Versions.hikari}")
     implementation("org.postgresql:postgresql:${Versions.postgres}")
-    testImplementation("com.opentable.components:otj-pg-embedded:${Versions.postgresEmbedded}")
+    testImplementation("io.zonky.test:embedded-postgres:${Versions.postgresEmbedded}")
 
     testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusjosejwt}")
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktor}")

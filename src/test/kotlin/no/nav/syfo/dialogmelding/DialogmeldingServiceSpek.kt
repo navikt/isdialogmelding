@@ -286,7 +286,7 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val melding = generateDialogmeldingToBehandlerBestillingNotatReturLegeerklæringDTO(
+            val melding = generateDialogmeldingToBehandlerBestillingNotatReturLegeerklaringDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
                 arbeidstakerPersonident = arbeidstakerPersonident,
@@ -300,6 +300,30 @@ object DialogmeldingServiceSpek : Spek({
             verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingReturLegeerklaringXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+        }
+        it("Sends correct message on MQ when friskmelding til arbeidsformidling") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val melding = generateDialogmeldingToBehandlerBestillingNotatFriskmeldingTilArbeidsformidlingDTO(
+                behandlerRef = behandlerRef,
+                uuid = uuid,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+            ).toDialogmeldingToBehandlerBestilling(
+                behandler = behandler,
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingFriskmeldingTilArbeidsformidlingXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
             assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),

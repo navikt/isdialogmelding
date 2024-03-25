@@ -20,6 +20,7 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                         fellesFactory.createXMLCV()
                             .withDN(
                                 when (kode) {
+                                    2 -> "Friskmelding til arbeidsformidling"
                                     3 -> "Retur av legeerklæring"
                                     4 -> "Avlysning dialogmøte"
                                     8 -> "Melding fra NAV"
