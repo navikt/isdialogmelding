@@ -42,34 +42,24 @@ fun generateDialogmeldingToBehandlerBestillingAvlysningDTO(
     behandlerRef: UUID,
     uuid: UUID,
     arbeidstakerPersonident: Personident = Personident("01010112345"),
-) = DialogmeldingToBehandlerBestillingDTO(
-    behandlerRef = behandlerRef.toString(),
-    personIdent = arbeidstakerPersonident.value,
-    dialogmeldingUuid = uuid.toString(),
-    dialogmeldingRefParent = uuid.toString(),
-    dialogmeldingRefConversation = uuid.toString(),
-    dialogmeldingType = DialogmeldingType.DIALOG_NOTAT.name,
-    dialogmeldingKodeverk = DialogmeldingKodeverk.HENVENDELSE.name,
-    dialogmeldingKode = DialogmeldingKode.KODE4.value,
-    dialogmeldingTekst = "Møtet er avlyst",
-    dialogmeldingVedlegg = null,
+) = generateDialogmeldingToBehandlerBestillingHenvendelseNotat(
+    behandlerRef = behandlerRef,
+    uuid = uuid,
+    arbeidstakerPersonident = arbeidstakerPersonident,
+    kode = DialogmeldingKode.KODE4,
+    tekst = "Møtet er avlyst",
 )
 
 fun generateDialogmeldingToBehandlerBestillingReferatDTO(
     behandlerRef: UUID,
     uuid: UUID,
     arbeidstakerPersonident: Personident = Personident("01010112345"),
-) = DialogmeldingToBehandlerBestillingDTO(
-    behandlerRef = behandlerRef.toString(),
-    personIdent = arbeidstakerPersonident.value,
-    dialogmeldingUuid = uuid.toString(),
-    dialogmeldingRefParent = uuid.toString(),
-    dialogmeldingRefConversation = uuid.toString(),
-    dialogmeldingType = DialogmeldingType.DIALOG_NOTAT.name,
-    dialogmeldingKodeverk = DialogmeldingKodeverk.HENVENDELSE.name,
-    dialogmeldingKode = DialogmeldingKode.KODE9.value,
-    dialogmeldingTekst = "Dette er et referat",
-    dialogmeldingVedlegg = null,
+) = generateDialogmeldingToBehandlerBestillingHenvendelseNotat(
+    behandlerRef = behandlerRef,
+    uuid = uuid,
+    arbeidstakerPersonident = arbeidstakerPersonident,
+    kode = DialogmeldingKode.KODE9,
+    tekst = "Dette er et referat",
 )
 
 fun generateDialogmeldingToBehandlerBestillingForesporselDTO(
@@ -123,21 +113,28 @@ fun generateDialogmeldingToBehandlerBestillingForesporselLegeerklaringDTO(
     dialogmeldingVedlegg = null,
 )
 
-fun generateDialogmeldingToBehandlerBestillingNotatReturLegeerklæringDTO(
+fun generateDialogmeldingToBehandlerBestillingNotatReturLegeerklaringDTO(
     behandlerRef: UUID,
     uuid: UUID,
     arbeidstakerPersonident: Personident = Personident("01010112345"),
-) = DialogmeldingToBehandlerBestillingDTO(
-    behandlerRef = behandlerRef.toString(),
-    personIdent = arbeidstakerPersonident.value,
-    dialogmeldingUuid = uuid.toString(),
-    dialogmeldingRefParent = uuid.toString(),
-    dialogmeldingRefConversation = uuid.toString(),
-    dialogmeldingType = DialogmeldingType.DIALOG_NOTAT.name,
-    dialogmeldingKodeverk = DialogmeldingKodeverk.HENVENDELSE.name,
-    dialogmeldingKode = DialogmeldingKode.KODE3.value,
-    dialogmeldingTekst = "Dette er en henvendelse om retur av legeerklæring",
-    dialogmeldingVedlegg = null,
+) = generateDialogmeldingToBehandlerBestillingHenvendelseNotat(
+    behandlerRef = behandlerRef,
+    uuid = uuid,
+    arbeidstakerPersonident = arbeidstakerPersonident,
+    kode = DialogmeldingKode.KODE3,
+    tekst = "Dette er en henvendelse om retur av legeerklæring",
+)
+
+fun generateDialogmeldingToBehandlerBestillingNotatFriskmeldingTilArbeidsformidlingDTO(
+    behandlerRef: UUID,
+    uuid: UUID,
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
+) = generateDialogmeldingToBehandlerBestillingHenvendelseNotat(
+    behandlerRef = behandlerRef,
+    uuid = uuid,
+    arbeidstakerPersonident = arbeidstakerPersonident,
+    kode = DialogmeldingKode.KODE2,
+    tekst = "Dette er en henvendelse om friskmelding til arbeidsformidling",
 )
 
 fun generateDialogmeldingToBehandlerBestillingOppfolgingsplanDTO(
@@ -161,6 +158,20 @@ fun generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
     behandlerRef: UUID,
     uuid: UUID,
     arbeidstakerPersonident: Personident = Personident("01010112345"),
+) = generateDialogmeldingToBehandlerBestillingHenvendelseNotat(
+    behandlerRef = behandlerRef,
+    uuid = uuid,
+    arbeidstakerPersonident = arbeidstakerPersonident,
+    kode = DialogmeldingKode.KODE8,
+    tekst = "Dette er en generell henvendelse fra NAV som ikke utløser takst",
+)
+
+private fun generateDialogmeldingToBehandlerBestillingHenvendelseNotat(
+    behandlerRef: UUID,
+    uuid: UUID,
+    kode: DialogmeldingKode,
+    tekst: String,
+    arbeidstakerPersonident: Personident = Personident("01010112345"),
 ) = DialogmeldingToBehandlerBestillingDTO(
     behandlerRef = behandlerRef.toString(),
     personIdent = arbeidstakerPersonident.value,
@@ -169,7 +180,7 @@ fun generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
     dialogmeldingRefConversation = uuid.toString(),
     dialogmeldingType = DialogmeldingType.DIALOG_NOTAT.name,
     dialogmeldingKodeverk = DialogmeldingKodeverk.HENVENDELSE.name,
-    dialogmeldingKode = DialogmeldingKode.KODE8.value,
-    dialogmeldingTekst = "Dette er en generell henvendelse fra NAV som ikke utløser takst",
+    dialogmeldingKode = kode.value,
+    dialogmeldingTekst = tekst,
     dialogmeldingVedlegg = null,
 )
