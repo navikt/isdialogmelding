@@ -42,6 +42,7 @@ spec:
     inbound:
       rules:
         - application: syfomodiaperson
+        - application: isfrisktilarbeid
         - application: soknad-api
           namespace: aap
           cluster: prod-gcp
