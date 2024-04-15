@@ -62,10 +62,11 @@ spec:
             - port: 1413
         - host: "pdl-api.dev-fss-pub.nais.io"
         - host: "syfopartnerinfo.dev-fss-pub.nais.io"
-        - host: "btsys.dev-fss-pub.nais.io"
       rules:
         - application: fastlegerest
         - application: istilgangskontroll
+        - application: btsys-api
+          namespace: team-rocket
   azure:
     application:
       allowAllUsers: true
@@ -128,7 +129,7 @@ spec:
     - name: ISTILGANGSKONTROLL_URL
       value: "http://istilgangskontroll"
     - name: BTSYS_CLIENT_ID
-      value: "dev-fss.team-rocket.btsys"
+      value: "dev-gcp.team-rocket.btsys-api"
     - name: BTSYS_ENDPOINT_URL
-      value: "https://btsys.dev-fss-pub.nais.io"
+      value: "http://btsys.team-rocket"
 
