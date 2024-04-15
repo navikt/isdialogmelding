@@ -10,7 +10,7 @@ import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.util.*
 import java.util.*
 
-const val behandlerSystemApiPath = "/api/system/v1/behandler"
+const val behandlerSystemApiPath = "/api/system/v1/behandlere"
 
 fun Route.registerBehandlerSystemApi(
     behandlerService: BehandlerService,
