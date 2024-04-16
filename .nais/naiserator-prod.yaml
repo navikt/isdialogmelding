@@ -132,4 +132,4 @@ spec:
     - name: BTSYS_CLIENT_ID
       value: "prod-gcp.team-rocket.btsys-api"
     - name: BTSYS_ENDPOINT_URL
-      value: "http://btsys.team-rocket"
+      value: "http://btsys-api.team-rocket"
