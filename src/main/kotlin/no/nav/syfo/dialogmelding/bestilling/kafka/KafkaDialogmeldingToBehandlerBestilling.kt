@@ -55,8 +55,12 @@ fun createAndStoreDialogmeldingBestillingFromRecords(
     consumerRecords.forEach {
         log.info("Received consumer record with key: ${it.key()}")
         it.value()?.let { dialogmeldingToBehandlerBestillingDTO ->
-            dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingToBehandlerBestillingDTO)
-            COUNT_KAFKA_CONSUMER_DIALOGMELDING_BESTILLING_READ.increment()
+            try {
+                dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(dialogmeldingToBehandlerBestillingDTO)
+                COUNT_KAFKA_CONSUMER_DIALOGMELDING_BESTILLING_READ.increment()
+            } catch (e: Exception) {
+                log.error("Failed to process DialogmeldingToBehandlerBestillingDTO", e)
+            }
         } ?: COUNT_KAFKA_CONSUMER_DIALOGMELDING_BESTILLING_TOMBSTONE.increment()
     }
 }
