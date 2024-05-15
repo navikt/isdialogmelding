@@ -10,7 +10,7 @@ import no.nav.syfo.testhelper.UserConstants.HPRID_INACTVE
 fun generateBehandlerKontorResponse(
     kontorHerId: Int,
     aktiv: Boolean = true,
-    behandlerHprIdInactive: Int,
+    behandlerHpr: Int,
 ) = BehandlerKontorFraAdresseregisteretDTO(
     aktiv = aktiv,
     herId = kontorHerId,
@@ -20,7 +20,7 @@ fun generateBehandlerKontorResponse(
     telefon = "",
     epost = "",
     orgnummer = null,
-    behandlere = listOf(generateBehandlerFraAdresseregisteret(behandlerHprIdInactive)),
+    behandlere = listOf(generateBehandlerFraAdresseregisteret(behandlerHpr)),
 )
 
 fun generateBehandlerKontorAdresse() = BehandlerKontorFraAdresseregisteretDTO.Adresse(

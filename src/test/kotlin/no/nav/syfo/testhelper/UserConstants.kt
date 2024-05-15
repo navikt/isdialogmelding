@@ -36,6 +36,8 @@ object UserConstants {
     const val HERID_UTEN_PARTNERINFO = 504
     const val HERID_MED_FLERE_PARTNERINFO = 704
     const val HERID_NOT_ACTIVE = 904
+    const val HERID_KONTOR_WITH_INACTIVE_BEHANDLER = 905
+    const val HERID_KONTOR_OK = 906
 
     const val VEILEDER_IDENT = "Z999999"
 

@@ -70,6 +70,8 @@ data class Environment(
     val istilgangskontrollUrl: String = getEnvVar("ISTILGANGSKONTROLL_URL"),
     val btsysClientId: String = getEnvVar("BTSYS_CLIENT_ID"),
     val btsysUrl: String = getEnvVar("BTSYS_ENDPOINT_URL"),
+    val syfohelsenettproxyClientId: String = getEnvVar("SYFOHELSENETTPROXY_CLIENT_ID"),
+    val syfohelsenettproxyUrl: String = getEnvVar("SYFOHELSENETTPROXY_URL"),
 ) {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$isdialogmeldingDbHost:$isdialogmeldingDbPort/$isdialogmeldingDbName"

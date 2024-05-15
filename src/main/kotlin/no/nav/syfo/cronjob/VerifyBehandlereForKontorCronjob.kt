@@ -3,14 +3,21 @@ package no.nav.syfo.cronjob
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.domain.PBehandler
+import no.nav.syfo.behandler.database.domain.PBehandlerKontor
+import no.nav.syfo.behandler.database.domain.toBehandlerKontor
+import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO
 import no.nav.syfo.behandler.fastlege.FastlegeClient
+import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
+import no.nav.syfo.domain.Personident
+import no.nav.syfo.util.nowUTC
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
 class VerifyBehandlereForKontorCronjob(
     val behandlerService: BehandlerService,
     val fastlegeClient: FastlegeClient,
+    val syfohelsenettproxyClient: SyfohelsenettproxyClient,
 ) : DialogmeldingCronjob {
     private val runAtHour = 3
 
@@ -42,20 +49,27 @@ class VerifyBehandlereForKontorCronjob(
                         behandlerService.disableDialogmeldingerForKontor(behandlerKontor)
                     } else {
                         val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = behandlerKontorFraAdresseregisteret.behandlere.partition { it.aktiv }
-                        val existingBehandlereForKontor = behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.invalidated == null }
+                        val (existingBehandlereForKontor, existingInvalidatedBehandlereForKontor) = behandlerService.getBehandlereForKontor(behandlerKontor).partition { it.invalidated == null }
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${aktiveBehandlereForKontor.size} aktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${inaktiveBehandlereForKontor.size} inaktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${existingBehandlereForKontor.size} behandlere for kontor ${behandlerKontor.herId} i Modia")
 
                         invalidateInactiveBehandlere(inaktiveBehandlereForKontor, existingBehandlereForKontor)
 
+                        val revalidated = revalidateBehandlere(aktiveBehandlereForKontor, existingInvalidatedBehandlereForKontor)
+
+                        addNewBehandlere(
+                            aktiveBehandlereForKontor.toMutableList().also { it.removeAll(revalidated) },
+                            existingBehandlereForKontor,
+                            behandlerKontor,
+                            behandlerKontorFraAdresseregisteret,
+                        )
+
                         // TODO: Hvis duplikater fra før: invalidere behandlerforekomst med D-nr
 
                         // TODO: Hvis duplikat fra før: invalidere behandlerforekomst som ikke stemmer overens med Adresseregisteret
 
                         // TODO: Hvis finnes fra før: oppdatere behandlerforekomst
-
-                        // TODO: Hvis deaktivert fra før, men aktiv i adresseregisteret: sette invalidated=null
                     }
                 } else {
                     log.warn("VerifyBehandlereForKontorCronjob: Behandlerkontor mer herId ${behandlerKontor.herId} ble ikke funnet i Adresseregisteret")
@@ -87,6 +101,67 @@ class VerifyBehandlereForKontorCronjob(
             existingBehandlere.forEach { existingBehandler ->
                 behandlerService.invalidateBehandler(existingBehandler.behandlerRef)
                 log.info("VerifyBehandlereForKontorCronjob: behandler ${existingBehandler.behandlerRef} invalidated since inactive in Adresseregisteret")
+            }
+        }
+    }
+
+    private fun revalidateBehandlere(
+        aktiveBehandlereForKontor: List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>,
+        existingInvalidatedBehandlereForKontor: List<PBehandler>
+    ): List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO> {
+        val revalidated = mutableListOf<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>()
+        aktiveBehandlereForKontor.filter {
+            it.hprId != null
+        }.forEach { behandlerFraAdresseregisteret ->
+            val behandlerFraAdresseregisteretHprId = behandlerFraAdresseregisteret.hprId!!.toString()
+            val existingBehandler = existingInvalidatedBehandlereForKontor.filter {
+                it.hprId == behandlerFraAdresseregisteretHprId && it.invalidated != null
+            }.firstOrNull()
+            existingBehandler?.let {
+                behandlerService.revalidateBehandler(it.behandlerRef)
+                revalidated.add(behandlerFraAdresseregisteret)
+                log.info("VerifyBehandlereForKontorCronjob: behandler ${it.behandlerRef} revalidated since active in Adresseregisteret")
+            }
+        }
+        return revalidated
+    }
+
+    private suspend fun addNewBehandlere(
+        aktiveBehandlereForKontor: List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>,
+        existingBehandlereForKontor: List<PBehandler>,
+        behandlerKontor: PBehandlerKontor,
+        behandlerKontorFraAdresseregisteret: BehandlerKontorFraAdresseregisteretDTO,
+    ) {
+        aktiveBehandlereForKontor.filter {
+            it.hprId != null
+        }.forEach { behandlerFraAdresseregisteret ->
+            val behandlerFraAdresseregisteretHprId = behandlerFraAdresseregisteret.hprId!!.toString()
+            val existingBehandler = existingBehandlereForKontor.filter {
+                it.hprId == behandlerFraAdresseregisteretHprId
+            }.firstOrNull()
+            if (existingBehandler == null) {
+                val hprBehandler = syfohelsenettproxyClient.finnBehandlerFraHpr(behandlerFraAdresseregisteretHprId)
+                if (hprBehandler != null && hprBehandler.getBehandlerKategori() != null) {
+                    val behandlerRef = UUID.randomUUID()
+                    behandlerService.createBehandler(
+                        behandler = Behandler(
+                            behandlerRef = behandlerRef,
+                            personident = Personident(hprBehandler.fnr!!),
+                            fornavn = hprBehandler.fornavn ?: behandlerFraAdresseregisteret.fornavn,
+                            mellomnavn = hprBehandler.mellomnavn ?: behandlerFraAdresseregisteret.mellomnavn,
+                            etternavn = hprBehandler.etternavn ?: behandlerFraAdresseregisteret.etternavn,
+                            herId = behandlerFraAdresseregisteret.herId,
+                            hprId = behandlerFraAdresseregisteretHprId.toInt(),
+                            telefon = behandlerKontorFraAdresseregisteret.telefon,
+                            kontor = behandlerKontor.toBehandlerKontor(),
+                            kategori = hprBehandler.getBehandlerKategori()!!,
+                            mottatt = nowUTC(),
+                            suspendert = false,
+                        ),
+                        kontorId = behandlerKontor.id,
+                    )
+                    log.info("VerifyBehandlereForKontorCronjob: added new behandler from Adresseregisteret: $behandlerRef")
+                }
             }
         }
     }

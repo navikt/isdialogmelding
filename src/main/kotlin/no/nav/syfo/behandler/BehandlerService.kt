@@ -268,6 +268,10 @@ class BehandlerService(
         database.invalidateBehandler(behandlerRef)
     }
 
+    fun revalidateBehandler(behandlerRef: UUID) {
+        database.revalidateBehandler(behandlerRef)
+    }
+
     fun existsOtherValidKontorWithSameHerId(
         behandlerKontor: PBehandlerKontor,
         partnerIds: List<Int>,

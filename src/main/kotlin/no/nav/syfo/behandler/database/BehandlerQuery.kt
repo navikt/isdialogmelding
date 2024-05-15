@@ -248,11 +248,29 @@ fun DatabaseInterface.invalidateBehandler(behandlerRef: UUID) {
     }
 }
 
+fun DatabaseInterface.revalidateBehandler(behandlerRef: UUID) {
+    this.connection.use { connection ->
+        connection.revalidateBehandler(behandlerRef)
+        connection.commit()
+    }
+}
+
 fun Connection.invalidateBehandler(behandlerRef: UUID) {
     val now = OffsetDateTime.now()
     this.prepareStatement(queryInvalidateBehandler)
         .use {
             it.setObject(1, now)
+            it.setObject(2, now)
+            it.setString(3, behandlerRef.toString())
+            it.executeUpdate()
+        }
+}
+
+fun Connection.revalidateBehandler(behandlerRef: UUID) {
+    val now = OffsetDateTime.now()
+    this.prepareStatement(queryInvalidateBehandler)
+        .use {
+            it.setObject(1, null)
             it.setObject(2, now)
             it.setString(3, behandlerRef.toString())
             it.executeUpdate()

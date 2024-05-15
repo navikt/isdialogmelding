@@ -52,6 +52,8 @@ fun testEnvironment() = Environment(
     syfoPartnerinfoUrl = "syfoPartnerinfoUrl",
     istilgangskontrollClientId = "istilgangskontroll-client-id",
     istilgangskontrollUrl = "isTilgangskontrollUrl",
+    syfohelsenettproxyClientId = "syfohelsenettproxy-client-id",
+    syfohelsenettproxyUrl = "syfohelsenettproxyUrl",
     btsysClientId = "btsys-client-id",
     btsysUrl = "btsysUrl",
 )

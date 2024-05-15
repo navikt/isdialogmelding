@@ -8,15 +8,19 @@ import no.nav.syfo.behandler.database.createBehandler
 import no.nav.syfo.behandler.database.domain.toBehandlerKontor
 import no.nav.syfo.behandler.database.getBehandlerById
 import no.nav.syfo.behandler.database.getBehandlerKontorById
+import no.nav.syfo.behandler.database.getBehandlereForKontor
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerKategori
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_ETTERNAVN
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_FORNAVN
 import no.nav.syfo.testhelper.UserConstants.HERID
+import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_OK
+import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_WITH_INACTIVE_BEHANDLER
 import no.nav.syfo.testhelper.UserConstants.HERID_NOT_ACTIVE
 import no.nav.syfo.testhelper.UserConstants.HPRID_INACTVE
 import no.nav.syfo.testhelper.UserConstants.KONTOR_NAVN
@@ -38,6 +42,12 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                 azureAppClientId = environment.aadAppClient,
                 azureAppClientSecret = environment.azureAppClientSecret,
                 azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+                httpClient = externalMockEnvironment.mockHttpClient,
+            )
+            val syfohelsenettproxyClient = SyfohelsenettproxyClient(
+                azureAdClient = azureAdClient,
+                endpointUrl = environment.syfohelsenettproxyUrl,
+                endpointClientId = environment.syfohelsenettproxyClientId,
                 httpClient = externalMockEnvironment.mockHttpClient,
             )
             val fastlegeClient = FastlegeClient(
@@ -64,6 +74,7 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
             val cronJob = VerifyBehandlereForKontorCronjob(
                 behandlerService = behandlerService,
                 fastlegeClient = fastlegeClient,
+                syfohelsenettproxyClient = syfohelsenettproxyClient,
             )
             beforeEachTest {
                 database.dropData()
@@ -106,7 +117,7 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     val hprIdForInactiveBehandlerInAdresseregistreret = HPRID_INACTVE
                     val kontorId = database.createKontor(
                         partnerId = PARTNERID,
-                        herId = HERID,
+                        herId = HERID_KONTOR_WITH_INACTIVE_BEHANDLER,
                         navn = KONTOR_NAVN,
                     )
                     val pBehandler = database.createBehandler(
@@ -127,12 +138,26 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                         kontorId = kontorId,
                     )
                     val behandlerBefore = database.getBehandlerById(pBehandler.id)
-                    behandlerBefore!!.invalidated shouldBeEqualTo null
+                    behandlerBefore!!.invalidated shouldBe null
                     runBlocking {
                         cronJob.verifyBehandlereForKontorJob()
                     }
                     val behandlerAfter = database.getBehandlerById(pBehandler.id)
-                    behandlerAfter!!.invalidated shouldNotBeEqualTo null
+                    behandlerAfter!!.invalidated shouldNotBe null
+                }
+                it("Cronjob legger til ny behandler") {
+                    val kontorId = database.createKontor(
+                        partnerId = PARTNERID,
+                        herId = HERID_KONTOR_OK,
+                        navn = KONTOR_NAVN,
+                    )
+                    val behandlerBefore = database.getBehandlereForKontor(kontorId)
+                    behandlerBefore.size shouldBeEqualTo 0
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerAfter = database.getBehandlereForKontor(kontorId)
+                    behandlerAfter.size shouldBeEqualTo 1
                 }
             }
         }
