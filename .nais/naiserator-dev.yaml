@@ -131,7 +131,7 @@ spec:
     - name: ISTILGANGSKONTROLL_URL
       value: "http://istilgangskontroll"
     - name: SYFOHELSENETTPROXY_CLIENT_ID
-      value: prod-gcp.teamsykmelding.syfohelsenettproxy
+      value: dev-gcp.teamsykmelding.syfohelsenettproxy
     - name: SYFOHELSENETTPROXY_URL
       value: http://syfohelsenettproxy.teamsykmelding
     - name: BTSYS_CLIENT_ID
