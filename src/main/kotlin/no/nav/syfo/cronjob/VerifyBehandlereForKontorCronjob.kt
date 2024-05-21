@@ -19,7 +19,7 @@ class VerifyBehandlereForKontorCronjob(
     val fastlegeClient: FastlegeClient,
     val syfohelsenettproxyClient: SyfohelsenettproxyClient,
 ) : DialogmeldingCronjob {
-    private val runAtHour = 15
+    private val runAtHour = 16
 
     override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60
@@ -141,7 +141,7 @@ class VerifyBehandlereForKontorCronjob(
             }.firstOrNull()
             if (existingBehandler == null) {
                 val hprBehandler = syfohelsenettproxyClient.finnBehandlerFraHpr(behandlerFraAdresseregisteretHprId)
-                if (hprBehandler != null && hprBehandler.getBehandlerKategori() != null) {
+                if (hprBehandler != null && hprBehandler.fnr != null && hprBehandler.getBehandlerKategori() != null) {
                     val behandlerRef = UUID.randomUUID()
                     behandlerService.createBehandler(
                         behandler = Behandler(
@@ -161,6 +161,8 @@ class VerifyBehandlereForKontorCronjob(
                         kontorId = behandlerKontor.id,
                     )
                     log.info("VerifyBehandlereForKontorCronjob: added new behandler from Adresseregisteret: $behandlerRef")
+                } else {
+                    log.warn("VerifyBehandlereForKontorCronjob: could not add new behandler from Adresseregisteret because hprBehandler incomplete")
                 }
             }
         }
