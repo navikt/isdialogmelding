@@ -19,7 +19,7 @@ class VerifyBehandlereForKontorCronjob(
     val fastlegeClient: FastlegeClient,
     val syfohelsenettproxyClient: SyfohelsenettproxyClient,
 ) : DialogmeldingCronjob {
-    private val runAtHour = 16
+    private val runAtHour = 3
 
     override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60
