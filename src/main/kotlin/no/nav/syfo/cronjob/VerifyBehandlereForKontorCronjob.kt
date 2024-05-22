@@ -114,10 +114,10 @@ class VerifyBehandlereForKontorCronjob(
             it.hprId != null
         }.forEach { behandlerFraAdresseregisteret ->
             val behandlerFraAdresseregisteretHprId = behandlerFraAdresseregisteret.hprId!!.toString()
-            val existingBehandler = existingInvalidatedBehandlereForKontor.filter {
+            val existingInvalidatedBehandler = existingInvalidatedBehandlereForKontor.firstOrNull {
                 it.hprId == behandlerFraAdresseregisteretHprId && it.invalidated != null
-            }.firstOrNull()
-            existingBehandler?.let {
+            }
+            existingInvalidatedBehandler?.let {
                 behandlerService.revalidateBehandler(it.behandlerRef)
                 revalidated.add(behandlerFraAdresseregisteret)
                 log.info("VerifyBehandlereForKontorCronjob: behandler ${it.behandlerRef} revalidated since active in Adresseregisteret")
@@ -136,12 +136,13 @@ class VerifyBehandlereForKontorCronjob(
             it.hprId != null
         }.forEach { behandlerFraAdresseregisteret ->
             val behandlerFraAdresseregisteretHprId = behandlerFraAdresseregisteret.hprId!!.toString()
-            val existingBehandler = existingBehandlereForKontor.filter {
+            val existingBehandler = existingBehandlereForKontor.firstOrNull {
                 it.hprId == behandlerFraAdresseregisteretHprId
-            }.firstOrNull()
+            }
             if (existingBehandler == null) {
                 val hprBehandler = syfohelsenettproxyClient.finnBehandlerFraHpr(behandlerFraAdresseregisteretHprId)
-                if (hprBehandler != null && hprBehandler.fnr != null && hprBehandler.getBehandlerKategori() != null) {
+                val hprBehandlerKategori = hprBehandler?.getBehandlerKategori()
+                if (hprBehandler != null && hprBehandler.fnr != null && hprBehandlerKategori != null) {
                     val behandlerRef = UUID.randomUUID()
                     behandlerService.createBehandler(
                         behandler = Behandler(
@@ -154,7 +155,7 @@ class VerifyBehandlereForKontorCronjob(
                             hprId = behandlerFraAdresseregisteretHprId.toInt(),
                             telefon = behandlerKontorFraAdresseregisteret.telefon,
                             kontor = behandlerKontor.toBehandlerKontor(),
-                            kategori = hprBehandler.getBehandlerKategori()!!,
+                            kategori = hprBehandlerKategori,
                             mottatt = nowUTC(),
                             suspendert = false,
                         ),

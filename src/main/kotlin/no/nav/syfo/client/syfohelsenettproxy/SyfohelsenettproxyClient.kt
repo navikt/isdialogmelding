@@ -70,11 +70,8 @@ data class HelsenettProxyBehandler(
         return if (godkjenninger.any { it.helsepersonellkategori?.aktiv == true && it.helsepersonellkategori?.verdi == BehandlerKategori.LEGE.kategoriKode }) {
             BehandlerKategori.LEGE
         } else {
-            val kode = godkjenninger.filter { it.helsepersonellkategori?.aktiv == true }.firstOrNull()?.helsepersonellkategori?.verdi
-            if (kode != null) {
-                BehandlerKategori.fromKategoriKode(kode)
-            } else {
-                null
+            godkjenninger.firstOrNull { it.helsepersonellkategori?.aktiv == true }?.helsepersonellkategori?.let {
+                BehandlerKategori.fromKategoriKode(it.verdi)
             }
         }
     }
