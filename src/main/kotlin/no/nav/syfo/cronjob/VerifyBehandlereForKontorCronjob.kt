@@ -32,7 +32,7 @@ class VerifyBehandlereForKontorCronjob(
         val verifyResult = DialogmeldingCronjobResult()
 
         val behandlerKontorListe = behandlerService.getKontor().filter {
-            it.herId != null && it.dialogmeldingEnabled != null
+            it.herId != null && it.dialogmeldingEnabled != null && (it.herId == "80433" || it.herId == "80434")
         }
         behandlerKontorListe.forEach { behandlerKontor ->
             try {
