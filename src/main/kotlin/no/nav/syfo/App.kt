@@ -20,6 +20,7 @@ import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.btsys.LegeSuspensjonClient
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.dialogmelding.DialogmeldingService
@@ -72,6 +73,11 @@ fun main() {
         azureAdClient = azureAdClient,
         pdlClientId = environment.pdlClientId,
         pdlUrl = environment.pdlUrl,
+    )
+    val syfohelsenettproxyClient = SyfohelsenettproxyClient(
+        azureAdClient = azureAdClient,
+        endpointUrl = environment.syfohelsenettproxyUrl,
+        endpointClientId = environment.syfohelsenettproxyClientId,
     )
     val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
         azureAdClient = azureAdClient,
@@ -149,6 +155,7 @@ fun main() {
             partnerinfoClient = partnerinfoClient,
             legeSuspensjonClient = legeSuspensjonClient,
             fastlegeClient = fastlegeClient,
+            syfohelsenettproxyClient = syfohelsenettproxyClient,
         )
         launchKafkaTaskSykmelding(
             applicationState = applicationState,

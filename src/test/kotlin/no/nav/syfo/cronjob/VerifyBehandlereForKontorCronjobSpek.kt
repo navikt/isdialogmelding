@@ -8,15 +8,19 @@ import no.nav.syfo.behandler.database.createBehandler
 import no.nav.syfo.behandler.database.domain.toBehandlerKontor
 import no.nav.syfo.behandler.database.getBehandlerById
 import no.nav.syfo.behandler.database.getBehandlerKontorById
+import no.nav.syfo.behandler.database.getBehandlereForKontor
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerKategori
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
+import no.nav.syfo.dialogmelding.apprec.database
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_ETTERNAVN
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_FORNAVN
 import no.nav.syfo.testhelper.UserConstants.HERID
+import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_OK
 import no.nav.syfo.testhelper.UserConstants.HERID_NOT_ACTIVE
 import no.nav.syfo.testhelper.UserConstants.HPRID_INACTVE
 import no.nav.syfo.testhelper.UserConstants.KONTOR_NAVN
@@ -38,6 +42,12 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                 azureAppClientId = environment.aadAppClient,
                 azureAppClientSecret = environment.azureAppClientSecret,
                 azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+                httpClient = externalMockEnvironment.mockHttpClient,
+            )
+            val syfohelsenettproxyClient = SyfohelsenettproxyClient(
+                azureAdClient = azureAdClient,
+                endpointUrl = environment.syfohelsenettproxyUrl,
+                endpointClientId = environment.syfohelsenettproxyClientId,
                 httpClient = externalMockEnvironment.mockHttpClient,
             )
             val fastlegeClient = FastlegeClient(
@@ -64,6 +74,7 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
             val cronJob = VerifyBehandlereForKontorCronjob(
                 behandlerService = behandlerService,
                 fastlegeClient = fastlegeClient,
+                syfohelsenettproxyClient = syfohelsenettproxyClient,
             )
             beforeEachTest {
                 database.dropData()
@@ -77,11 +88,7 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     }
                 }
                 it("Cronjob disabler kontor som ikke lengre er aktivt") {
-                    val kontorId = database.createKontor(
-                        partnerId = PARTNERID,
-                        herId = HERID_NOT_ACTIVE,
-                        navn = KONTOR_NAVN,
-                    )
+                    val kontorId = createKontor(HERID_NOT_ACTIVE)
                     val kontorBefore = database.getBehandlerKontorById(kontorId)
                     kontorBefore.dialogmeldingEnabled shouldNotBeEqualTo null
                     runBlocking {
@@ -91,11 +98,7 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     kontorAfter.dialogmeldingEnabled shouldBeEqualTo null
                 }
                 it("Cronjob endrer ikke kontorets aktivflagg hvis fortsatt aktivt ") {
-                    val kontorId = database.createKontor(
-                        partnerId = PARTNERID,
-                        herId = HERID,
-                        navn = KONTOR_NAVN,
-                    )
+                    val kontorId = createKontor(HERID_KONTOR_OK)
                     runBlocking {
                         cronJob.verifyBehandlereForKontorJob()
                     }
@@ -103,38 +106,62 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     kontorAfter.dialogmeldingEnabled shouldNotBeEqualTo null
                 }
                 it("Cronjob invaliderer behandler som er inaktiv i Adresseregisteret") {
-                    val hprIdForInactiveBehandlerInAdresseregistreret = HPRID_INACTVE
-                    val kontorId = database.createKontor(
-                        partnerId = PARTNERID,
-                        herId = HERID,
-                        navn = KONTOR_NAVN,
-                    )
-                    val pBehandler = database.createBehandler(
-                        behandler = Behandler(
-                            behandlerRef = UUID.randomUUID(),
-                            fornavn = BEHANDLER_FORNAVN,
-                            mellomnavn = null,
-                            etternavn = BEHANDLER_ETTERNAVN,
-                            telefon = null,
-                            personident = null,
-                            herId = HERID,
-                            hprId = hprIdForInactiveBehandlerInAdresseregistreret,
-                            kontor = database.getBehandlerKontorById(kontorId).toBehandlerKontor(),
-                            kategori = BehandlerKategori.LEGE,
-                            mottatt = OffsetDateTime.now(),
-                            suspendert = false,
-                        ),
-                        kontorId = kontorId,
-                    )
+                    val kontorId = createKontor(HERID_KONTOR_OK)
+                    val pBehandler = createBehandler(kontorId)
                     val behandlerBefore = database.getBehandlerById(pBehandler.id)
-                    behandlerBefore!!.invalidated shouldBeEqualTo null
+                    behandlerBefore!!.invalidated shouldBe null
                     runBlocking {
                         cronJob.verifyBehandlereForKontorJob()
                     }
                     val behandlerAfter = database.getBehandlerById(pBehandler.id)
-                    behandlerAfter!!.invalidated shouldNotBeEqualTo null
+                    behandlerAfter!!.invalidated shouldNotBe null
+                }
+                it("Cronjob legger til ny behandler") {
+                    val kontorId = createKontor(HERID_KONTOR_OK)
+                    val behandlerBefore = database.getBehandlereForKontor(kontorId)
+                    behandlerBefore.size shouldBeEqualTo 0
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerAfter = database.getBehandlereForKontor(kontorId)
+                    behandlerAfter.size shouldBeEqualTo 1
+                }
+                it("Cronjob legger til ny behandler og invaliderer eksisterende") {
+                    val kontorId = createKontor(HERID_KONTOR_OK)
+                    val pBehandler = createBehandler(kontorId)
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerForKontorAfter = database.getBehandlereForKontor(kontorId)
+                    behandlerForKontorAfter.size shouldBeEqualTo 2
+                    val behandlerAfter = database.getBehandlerById(pBehandler.id)
+                    behandlerAfter!!.invalidated shouldNotBe null
                 }
             }
         }
     }
 })
+
+private fun createKontor(herId: Int) = database.createKontor(
+    partnerId = PARTNERID,
+    herId = herId,
+    navn = KONTOR_NAVN,
+)
+
+private fun createBehandler(kontorId: Int) = database.createBehandler(
+    behandler = Behandler(
+        behandlerRef = UUID.randomUUID(),
+        fornavn = BEHANDLER_FORNAVN,
+        mellomnavn = null,
+        etternavn = BEHANDLER_ETTERNAVN,
+        telefon = null,
+        personident = null,
+        herId = HERID,
+        hprId = HPRID_INACTVE,
+        kontor = database.getBehandlerKontorById(kontorId).toBehandlerKontor(),
+        kategori = BehandlerKategori.LEGE,
+        mottatt = OffsetDateTime.now(),
+        suspendert = false,
+    ),
+    kontorId = kontorId,
+)
