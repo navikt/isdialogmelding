@@ -32,7 +32,7 @@ class VerifyBehandlereForKontorCronjob(
         val verifyResult = DialogmeldingCronjobResult()
 
         val behandlerKontorListe = behandlerService.getKontor().filter {
-            it.herId != null && it.dialogmeldingEnabled != null && (it.herId == "80433" || it.herId == "80434")
+            it.herId != null && it.dialogmeldingEnabled != null
         }
         behandlerKontorListe.forEach { behandlerKontor ->
             try {
@@ -69,7 +69,11 @@ class VerifyBehandlereForKontorCronjob(
 
                         // TODO: Hvis duplikat fra før: invalidere behandlerforekomst som ikke stemmer overens med Adresseregisteret
 
-                        // TODO: Hvis finnes fra før: oppdatere behandlerforekomst
+                        // TODO: Hvis finnes fra før: oppdatere behandlerforekomst med info fra Adresseregisteret/HPR: navn, herId, behandlerKategori
+
+                        // TODO: Vi har ca 150 forekomster i databasen som mangler hprId: må få oppdatert disse, men må da matche på personident.
+
+                        // TODO: Hvis finnes fra før, men ikke finnes for aktuelt kontor i Adresseregisteret: invalidere
                     }
                 } else {
                     log.warn("VerifyBehandlereForKontorCronjob: Behandlerkontor mer herId ${behandlerKontor.herId} ble ikke funnet i Adresseregisteret")
