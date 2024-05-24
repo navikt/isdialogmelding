@@ -233,6 +233,48 @@ fun DatabaseInterface.updateBehandlerIdenter(behandlerRef: UUID, identer: Map<Be
     }
 }
 
+const val queryUpdateBehandler =
+    """
+        UPDATE BEHANDLER
+        SET personident = ?, 
+        hpr_id = ?,
+        her_id = ?,
+        fornavn = ?,
+        mellomnavn = ?,
+        etternavn = ?,
+        kategori = COALESCE(?, kategori),
+        updated_at = ?
+        WHERE behandler_ref=?
+    """
+
+fun DatabaseInterface.updateBehandler(
+    behandlerRef: UUID,
+    personident: Personident,
+    hprId: String?,
+    herId: String?,
+    fornavn: String,
+    mellomnavn: String?,
+    etternavn: String,
+    kategori: BehandlerKategori?,
+) {
+    this.connection.use { connection ->
+        connection.prepareStatement(queryUpdateBehandler)
+            .use {
+                it.setString(1, personident.value)
+                it.setString(2, hprId)
+                it.setString(3, herId)
+                it.setString(4, fornavn)
+                it.setString(5, mellomnavn)
+                it.setString(6, etternavn)
+                it.setString(7, kategori.name)
+                it.setObject(3, OffsetDateTime.now())
+                it.setString(4, behandlerRef.toString())
+                it.executeUpdate()
+            }
+        connection.commit()
+    }
+}
+
 const val queryInvalidateBehandler =
     """
         UPDATE BEHANDLER

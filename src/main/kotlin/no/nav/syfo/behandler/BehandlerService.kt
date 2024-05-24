@@ -242,6 +242,26 @@ class BehandlerService(
         )
     }
 
+    fun updateBehandler(
+        behandlerRef: UUID,
+        personident: Personident,
+        hprId: String?,
+        herId: String?,
+        fornavn: String,
+        mellomnavn: String?,
+        etternavn: String,
+        kategori: BehandlerKategori?,
+    ) = database.updateBehandler(
+            behandlerRef = behandlerRef,
+            personident = personident,
+            hprId = hprId,
+            herId = herId,
+            fornavn = fornavn,
+            mellomnavn = mellomnavn,
+            etternavn = etternavn,
+            kategori = kategori,
+        )
+
     fun getBehandler(behandlerRef: UUID): Behandler? {
         val pBehandler = database.getBehandlerByBehandlerRef(
             behandlerRef = behandlerRef,
