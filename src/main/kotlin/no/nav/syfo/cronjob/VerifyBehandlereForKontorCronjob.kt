@@ -64,18 +64,14 @@ class VerifyBehandlereForKontorCronjob(
                         )
 
                         val added = addNewBehandlere(
-                            aktiveBehandlereForKontor.toMutableList().also { it.removeAll(revalidated) },
+                            aktiveBehandlereForKontor.toMutableList().also { it - revalidated },
                             existingBehandlereForKontor,
                             behandlerKontor,
                             behandlerKontorFraAdresseregisteret,
                         )
 
-                        // TODO: Hvis duplikater fra før: invalidere behandlerforekomst med D-nr
-
-                        // TODO: Hvis duplikat fra før: invalidere behandlerforekomst som ikke stemmer overens med Adresseregisteret
-
                         invalidateDuplicates(
-                            aktiveBehandlereForKontor.toMutableList().also { it.removeAll(revalidated) }.also { it.removeAll(added) },
+                            aktiveBehandlereForKontor.toMutableList().also { it - revalidated - added },
                             existingBehandlereForKontor,
                         )
 
