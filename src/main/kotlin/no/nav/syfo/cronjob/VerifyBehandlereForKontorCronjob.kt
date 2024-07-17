@@ -207,12 +207,21 @@ class VerifyBehandlereForKontorCronjob(
                 val existingBehandlerWithoutDNummer = existingBehandlereWithSameId.firstOrNull {
                     it.personident != null && !Personident(it.personident).isDNR()
                 }
-                if (existingBehandlerWithoutDNummer != null) {
+                val existingBehandlerToKeep = if (existingBehandlerWithoutDNummer != null) {
+                    existingBehandlerWithoutDNummer
+                } else {
+                     existingBehandlereWithSameId.firstOrNull {
+                        it.hprId != null && it.personident != null
+                    }
+                }
+                if (existingBehandlerToKeep != null) {
                     // invalidate the others
-                    existingBehandlereWithSameId.filter { it != existingBehandlerWithoutDNummer }.forEach {
+                    existingBehandlereWithSameId.filter { it != existingBehandlerToKeep }.forEach {
                         behandlerService.invalidateBehandler(it.behandlerRef)
                         log.info("VerifyBehandlereForKontorCronjob: invalidated duplicate: ${it.behandlerRef}")
                     }
+                } else {
+                    log.warn("VerifyBehandlereForKontorCronjob: Found duplicates, but could noe decide which instance to keep: ${existingBehandlereWithSameId.first().behandlerRef}")
                 }
             }
         }
