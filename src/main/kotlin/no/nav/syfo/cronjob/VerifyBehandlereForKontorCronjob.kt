@@ -10,6 +10,7 @@ import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
 import no.nav.syfo.domain.Personident
+import no.nav.syfo.domain.isDNR
 import no.nav.syfo.util.nowUTC
 import org.slf4j.LoggerFactory
 import java.util.UUID
@@ -56,9 +57,13 @@ class VerifyBehandlereForKontorCronjob(
 
                         invalidateInactiveBehandlere(inaktiveBehandlereForKontor, existingBehandlereForKontor)
 
-                        val revalidated = revalidateBehandlere(aktiveBehandlereForKontor, existingInvalidatedBehandlereForKontor)
+                        val revalidated = revalidateBehandlere(
+                            aktiveBehandlereForKontor,
+                            existingBehandlereForKontor,
+                            existingInvalidatedBehandlereForKontor,
+                        )
 
-                        addNewBehandlere(
+                        val added = addNewBehandlere(
                             aktiveBehandlereForKontor.toMutableList().also { it.removeAll(revalidated) },
                             existingBehandlereForKontor,
                             behandlerKontor,
@@ -68,6 +73,11 @@ class VerifyBehandlereForKontorCronjob(
                         // TODO: Hvis duplikater fra før: invalidere behandlerforekomst med D-nr
 
                         // TODO: Hvis duplikat fra før: invalidere behandlerforekomst som ikke stemmer overens med Adresseregisteret
+
+                        invalidateDuplicates(
+                            aktiveBehandlereForKontor.toMutableList().also { it.removeAll(revalidated) }.also { it.removeAll(added) },
+                            existingBehandlereForKontor,
+                        )
 
                         // TODO: Hvis finnes fra før: oppdatere behandlerforekomst med info fra Adresseregisteret/HPR: navn, herId, behandlerKategori
 
@@ -111,7 +121,8 @@ class VerifyBehandlereForKontorCronjob(
 
     private fun revalidateBehandlere(
         aktiveBehandlereForKontor: List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>,
-        existingInvalidatedBehandlereForKontor: List<PBehandler>
+        existingBehandlereForKontor: List<PBehandler>,
+        existingInvalidatedBehandlereForKontor: List<PBehandler>,
     ): List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO> {
         val revalidated = mutableListOf<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>()
         aktiveBehandlereForKontor.filter {
@@ -121,10 +132,17 @@ class VerifyBehandlereForKontorCronjob(
             val existingInvalidatedBehandler = existingInvalidatedBehandlereForKontor.firstOrNull {
                 it.hprId == behandlerFraAdresseregisteretHprId && it.invalidated != null
             }
-            existingInvalidatedBehandler?.let {
-                behandlerService.revalidateBehandler(it.behandlerRef)
-                revalidated.add(behandlerFraAdresseregisteret)
-                log.info("VerifyBehandlereForKontorCronjob: behandler ${it.behandlerRef} revalidated since active in Adresseregisteret")
+            existingInvalidatedBehandler?.let { invalidated ->
+                val existingBehandler = existingBehandlereForKontor.firstOrNull {
+                    it.hprId == existingInvalidatedBehandler.hprId ||
+                        (it.personident != null && it.personident == existingInvalidatedBehandler.personident)
+                }
+                if (existingBehandler == null) {
+                    // Only revalidate if there is no active duplicate
+                    behandlerService.revalidateBehandler(invalidated.behandlerRef)
+                    revalidated.add(behandlerFraAdresseregisteret)
+                    log.info("VerifyBehandlereForKontorCronjob: behandler ${invalidated.behandlerRef} revalidated since active in Adresseregisteret")
+                }
             }
         }
         return revalidated
@@ -135,7 +153,8 @@ class VerifyBehandlereForKontorCronjob(
         existingBehandlereForKontor: List<PBehandler>,
         behandlerKontor: PBehandlerKontor,
         behandlerKontorFraAdresseregisteret: BehandlerKontorFraAdresseregisteretDTO,
-    ) {
+    ): List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO> {
+        val added = mutableListOf<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>()
         aktiveBehandlereForKontor.filter {
             it.hprId != null
         }.forEach { behandlerFraAdresseregisteret ->
@@ -165,9 +184,39 @@ class VerifyBehandlereForKontorCronjob(
                         ),
                         kontorId = behandlerKontor.id,
                     )
+                    added.add(behandlerFraAdresseregisteret)
                     log.info("VerifyBehandlereForKontorCronjob: added new behandler from Adresseregisteret: $behandlerRef")
                 } else {
                     log.warn("VerifyBehandlereForKontorCronjob: could not add new behandler from Adresseregisteret because hprBehandler incomplete")
+                }
+            }
+        }
+        return added
+    }
+
+    private suspend fun invalidateDuplicates(
+        aktiveBehandlereForKontor: List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>,
+        existingBehandlereForKontor: List<PBehandler>,
+    ) {
+        aktiveBehandlereForKontor.filter {
+            it.hprId != null
+        }.forEach { behandlerFraAdresseregisteret ->
+            val behandlerFraAdresseregisteretHprId = behandlerFraAdresseregisteret.hprId!!.toString()
+            val hprBehandlerFnr = syfohelsenettproxyClient.finnBehandlerFraHpr(behandlerFraAdresseregisteretHprId)?.fnr
+            val existingBehandlereWithSameId = existingBehandlereForKontor.filter {
+                it.hprId == behandlerFraAdresseregisteretHprId ||
+                    (hprBehandlerFnr != null && hprBehandlerFnr == it.personident)
+            }
+            if (existingBehandlereWithSameId.size > 1) {
+                val existingBehandlerWithoutDNummer = existingBehandlereWithSameId.firstOrNull {
+                    it.personident != null && !Personident(it.personident).isDNR()
+                }
+                if (existingBehandlerWithoutDNummer != null) {
+                    // invalidate the others
+                    existingBehandlereWithSameId.filter { it != existingBehandlerWithoutDNummer }.forEach {
+                        behandlerService.invalidateBehandler(it.behandlerRef)
+                        log.info("VerifyBehandlereForKontorCronjob: invalidated duplicate: ${it.behandlerRef}")
+                    }
                 }
             }
         }
