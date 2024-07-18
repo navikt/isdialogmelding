@@ -221,7 +221,7 @@ class VerifyBehandlereForKontorCronjob(
                         log.info("VerifyBehandlereForKontorCronjob: invalidated duplicate: ${it.behandlerRef}")
                     }
                 } else {
-                    log.warn("VerifyBehandlereForKontorCronjob: Found duplicates, but could noe decide which instance to keep: ${existingBehandlereWithSameId.first().behandlerRef}")
+                    log.warn("VerifyBehandlereForKontorCronjob: Found duplicates, but could not decide which instance to keep: ${existingBehandlereWithSameId.first().behandlerRef}")
                 }
             }
         }
