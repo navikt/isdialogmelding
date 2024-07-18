@@ -13,7 +13,10 @@ import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
 import no.nav.syfo.dialogmelding.apprec.database
+import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.*
+import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_DNR
+import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_ETTERNAVN
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_FORNAVN
 import no.nav.syfo.testhelper.UserConstants.HERID
@@ -158,6 +161,34 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     val behandlerAfter = database.getBehandlerById(pBehandler.id)
                     behandlerAfter!!.invalidated shouldNotBe null
                 }
+                it("Cronjob invaliderer duplikater") {
+                    val kontorId = createKontor(HERID_KONTOR_OK)
+                    val pBehandler1 = createBehandler(kontorId, HPRID, ARBEIDSTAKER_FNR)
+                    val pBehandler2 = createBehandler(kontorId, HPRID)
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerForKontorAfter = database.getBehandlereForKontor(kontorId)
+                    behandlerForKontorAfter.size shouldBeEqualTo 2
+                    val behandler1After = database.getBehandlerById(pBehandler1.id)
+                    behandler1After!!.invalidated shouldBe null
+                    val behandler2After = database.getBehandlerById(pBehandler2.id)
+                    behandler2After!!.invalidated shouldNotBe null
+                }
+                it("Cronjob invaliderer duplikat med D-nummer") {
+                    val kontorId = createKontor(HERID_KONTOR_OK)
+                    val pBehandler1 = createBehandler(kontorId, HPRID, ARBEIDSTAKER_DNR)
+                    val pBehandler2 = createBehandler(kontorId, HPRID, ARBEIDSTAKER_FNR)
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerForKontorAfter = database.getBehandlereForKontor(kontorId)
+                    behandlerForKontorAfter.size shouldBeEqualTo 2
+                    val behandler1After = database.getBehandlerById(pBehandler1.id)
+                    behandler1After!!.invalidated shouldNotBe null
+                    val behandler2After = database.getBehandlerById(pBehandler2.id)
+                    behandler2After!!.invalidated shouldBe null
+                }
             }
         }
     }
@@ -172,6 +203,7 @@ private fun createKontor(herId: Int) = database.createKontor(
 private fun createBehandler(
     kontorId: Int,
     hprId: Int = HPRID_INACTVE,
+    personident: Personident? = null,
 ) = database.createBehandler(
     behandler = Behandler(
         behandlerRef = UUID.randomUUID(),
@@ -179,7 +211,7 @@ private fun createBehandler(
         mellomnavn = null,
         etternavn = BEHANDLER_ETTERNAVN,
         telefon = null,
-        personident = null,
+        personident = personident,
         herId = HERID,
         hprId = hprId,
         kontor = database.getBehandlerKontorById(kontorId).toBehandlerKontor(),

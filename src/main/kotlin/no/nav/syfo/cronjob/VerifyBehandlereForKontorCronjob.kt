@@ -210,7 +210,7 @@ class VerifyBehandlereForKontorCronjob(
                 val existingBehandlerToKeep = if (existingBehandlerWithoutDNummer != null) {
                     existingBehandlerWithoutDNummer
                 } else {
-                     existingBehandlereWithSameId.firstOrNull {
+                    existingBehandlereWithSameId.firstOrNull {
                         it.hprId != null && it.personident != null
                     }
                 }
