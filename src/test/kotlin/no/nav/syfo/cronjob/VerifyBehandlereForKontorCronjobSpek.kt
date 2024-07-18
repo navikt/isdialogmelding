@@ -19,11 +19,13 @@ import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_DNR
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_ETTERNAVN
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_FORNAVN
+import no.nav.syfo.testhelper.UserConstants.FASTLEGE_DNR
+import no.nav.syfo.testhelper.UserConstants.FASTLEGE_FNR
 import no.nav.syfo.testhelper.UserConstants.HERID
 import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_OK
 import no.nav.syfo.testhelper.UserConstants.HERID_NOT_ACTIVE
 import no.nav.syfo.testhelper.UserConstants.HPRID
-import no.nav.syfo.testhelper.UserConstants.HPRID_INACTVE
+import no.nav.syfo.testhelper.UserConstants.HPRID_INACTIVE
 import no.nav.syfo.testhelper.UserConstants.HPRID_UNKNOWN
 import no.nav.syfo.testhelper.UserConstants.KONTOR_NAVN
 import no.nav.syfo.testhelper.UserConstants.PARTNERID
@@ -107,6 +109,19 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     val kontorAfter = database.getBehandlerKontorById(kontorId)
                     kontorAfter.dialogmeldingEnabled shouldNotBeEqualTo null
                 }
+                it("Cronjob setter hprId på behandlere som mangler det") {
+                    val kontorId = createKontor(HERID_KONTOR_OK)
+                    val pBehandler = createBehandler(
+                        kontorId = kontorId,
+                        hprId = null,
+                        personident = FASTLEGE_FNR,
+                    )
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerAfter = database.getBehandlerById(pBehandler.id)
+                    behandlerAfter!!.hprId shouldBeEqualTo HPRID.toString()
+                }
                 it("Cronjob invaliderer behandler som ikke finnes for kontor i Adresseregisteret") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
                     val pBehandler = createBehandler(kontorId, HPRID_UNKNOWN)
@@ -175,7 +190,7 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                 }
                 it("Cronjob invaliderer duplikater") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
-                    val pBehandler1 = createBehandler(kontorId, HPRID, ARBEIDSTAKER_FNR)
+                    val pBehandler1 = createBehandler(kontorId, HPRID, FASTLEGE_FNR)
                     val pBehandler2 = createBehandler(kontorId, HPRID)
                     runBlocking {
                         cronJob.verifyBehandlereForKontorJob()
@@ -189,8 +204,8 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                 }
                 it("Cronjob invaliderer duplikat med D-nummer") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
-                    val pBehandler1 = createBehandler(kontorId, HPRID, ARBEIDSTAKER_DNR)
-                    val pBehandler2 = createBehandler(kontorId, HPRID, ARBEIDSTAKER_FNR)
+                    val pBehandler1 = createBehandler(kontorId, HPRID, FASTLEGE_DNR)
+                    val pBehandler2 = createBehandler(kontorId, HPRID, FASTLEGE_FNR)
                     runBlocking {
                         cronJob.verifyBehandlereForKontorJob()
                     }
@@ -214,7 +229,7 @@ private fun createKontor(herId: Int) = database.createKontor(
 
 private fun createBehandler(
     kontorId: Int,
-    hprId: Int = HPRID_INACTVE,
+    hprId: Int? = HPRID_INACTIVE,
     personident: Personident? = null,
 ) = database.createBehandler(
     behandler = Behandler(

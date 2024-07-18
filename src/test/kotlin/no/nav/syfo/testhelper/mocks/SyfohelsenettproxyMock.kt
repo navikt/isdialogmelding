@@ -8,11 +8,12 @@ import no.nav.syfo.client.syfohelsenettproxy.Kode
 import no.nav.syfo.testhelper.UserConstants
 
 fun MockRequestHandleScope.syfohelsenettproxyResponse(request: HttpRequestData): HttpResponseData {
+    val hprId = request.headers["hprNummer"]!!.toInt()
     return respondOk(
         HelsenettProxyBehandler(
             godkjenninger = listOf(Godkjenning(Kode(true, 1, "LE"))),
-            fnr = UserConstants.FASTLEGE_FNR.value,
-            hprNummer = request.headers["hprNummer"]!!.toInt(),
+            fnr = if (hprId == UserConstants.HPRID) UserConstants.FASTLEGE_FNR.value else UserConstants.FASTLEGE_ANNEN_FNR.value,
+            hprNummer = hprId,
             fornavn = UserConstants.BEHANDLER_FORNAVN,
             mellomnavn = null,
             etternavn = UserConstants.BEHANDLER_ETTERNAVN,

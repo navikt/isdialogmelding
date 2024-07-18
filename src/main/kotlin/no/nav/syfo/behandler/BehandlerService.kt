@@ -264,6 +264,10 @@ class BehandlerService(
         database.updateSuspensjon(behandlerPersonident, suspendert)
     }
 
+    fun updateBehandlerIdenter(behandlerRef: UUID, identer: Map<BehandleridentType, String>) {
+        database.updateBehandlerIdenter(behandlerRef, identer)
+    }
+
     fun invalidateBehandler(behandlerRef: UUID) {
         database.invalidateBehandler(behandlerRef)
     }

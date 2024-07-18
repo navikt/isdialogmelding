@@ -7,7 +7,7 @@ import no.nav.syfo.testhelper.UserConstants.FASTLEGE_ANNEN_FNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_FNR
 import no.nav.syfo.testhelper.UserConstants.HERID
 import no.nav.syfo.testhelper.UserConstants.HPRID
-import no.nav.syfo.testhelper.UserConstants.HPRID_INACTVE
+import no.nav.syfo.testhelper.UserConstants.HPRID_INACTIVE
 import no.nav.syfo.testhelper.UserConstants.OTHER_HERID
 
 fun generateBehandlerKontorResponse(
@@ -23,7 +23,7 @@ fun generateBehandlerKontorResponse(
     epost = "",
     orgnummer = null,
     behandlere = listOf(
-        generateBehandlerFraAdresseregisteret(HPRID_INACTVE),
+        generateBehandlerFraAdresseregisteret(HPRID_INACTIVE),
         generateBehandlerFraAdresseregisteret(HPRID)
     ),
 )
@@ -37,7 +37,7 @@ fun generateBehandlerKontorAdresse() = BehandlerKontorFraAdresseregisteretDTO.Ad
 fun generateBehandlerFraAdresseregisteret(
     hprId: Int,
 ) = BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO(
-    aktiv = hprId != HPRID_INACTVE,
+    aktiv = hprId != HPRID_INACTIVE,
     fornavn = UserConstants.BEHANDLER_FORNAVN,
     mellomnavn = null,
     etternavn = UserConstants.BEHANDLER_ETTERNAVN,
