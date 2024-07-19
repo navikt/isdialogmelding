@@ -58,7 +58,7 @@ fun processSykmelding(
             if (receivedSykmeldingDTO.mottattDato.isAfter(PROCESS_SYKMELDING_INCOMING_AFTER)) {
                 COUNT_MOTTATT_SYKMELDING.increment()
                 if (validateReceivedSykmelding(it)) {
-                    createAndStoreBehandlerFromSykmelding(
+                    createAndStoreBehandlerKontorFromSykmelding(
                         receivedSykmeldingDTO = receivedSykmeldingDTO,
                         behandlerService = behandlerService,
                     )
@@ -88,7 +88,7 @@ private fun validateReceivedSykmelding(
     return true
 }
 
-private fun createAndStoreBehandlerFromSykmelding(
+private fun createAndStoreBehandlerKontorFromSykmelding(
     receivedSykmeldingDTO: ReceivedSykmeldingDTO,
     behandlerService: BehandlerService,
 ) {
@@ -96,6 +96,21 @@ private fun createAndStoreBehandlerFromSykmelding(
     val behandlerKategori = BehandlerKategori.fromKategoriKode(receivedSykmeldingDTO.legeHelsepersonellkategori)!!
     val arbeidstakerPersonident = Personident(receivedSykmeldingDTO.personNrPasient)
     val sykmeldingBehandler = receivedSykmeldingDTO.sykmelding.behandler
+    val behandlerKontor = BehandlerKontor(
+        partnerId = PartnerId(partnerId.toInt()),
+        herId = receivedSykmeldingDTO.legekontorHerId?.toIntOrNull(),
+        navn = receivedSykmeldingDTO.legekontorOrgName,
+        adresse = sykmeldingBehandler.adresse.gate,
+        postnummer = sykmeldingBehandler.adresse.postnummer?.toString(),
+        poststed = null,
+        orgnummer = receivedSykmeldingDTO.legekontorOrgNr?.let { Virksomhetsnummer(it) },
+        dialogmeldingEnabled = false,
+        dialogmeldingEnabledLocked = false,
+        system = receivedSykmeldingDTO.sykmelding.avsenderSystem.navn,
+        mottatt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
+    )
+    behandlerService.createBehandlerKontorIfMissing(behandlerKontor)
+
     val sykmelder = Behandler(
         behandlerRef = UUID.randomUUID(),
         personident = Personident(sykmeldingBehandler.fnr),
@@ -105,19 +120,7 @@ private fun createAndStoreBehandlerFromSykmelding(
         herId = sykmeldingBehandler.her?.toIntOrNull(),
         hprId = sykmeldingBehandler.hpr?.toIntOrNull(),
         telefon = sykmeldingBehandler.tlf?.removePrefix("tel:")?.removePrefix("Tel:"),
-        kontor = BehandlerKontor(
-            partnerId = PartnerId(partnerId.toInt()),
-            herId = receivedSykmeldingDTO.legekontorHerId?.toIntOrNull(),
-            navn = receivedSykmeldingDTO.legekontorOrgName,
-            adresse = sykmeldingBehandler.adresse.gate,
-            postnummer = sykmeldingBehandler.adresse.postnummer?.toString(),
-            poststed = null,
-            orgnummer = receivedSykmeldingDTO.legekontorOrgNr?.let { Virksomhetsnummer(it) },
-            dialogmeldingEnabled = false,
-            dialogmeldingEnabledLocked = false,
-            system = receivedSykmeldingDTO.sykmelding.avsenderSystem.navn,
-            mottatt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
-        ),
+        kontor = behandlerKontor,
         kategori = behandlerKategori,
         mottatt = receivedSykmeldingDTO.mottattDato.toOffsetDateTime(),
         suspendert = false,
@@ -131,6 +134,7 @@ private fun createAndStoreBehandlerFromSykmelding(
         behandler = sykmelder,
         arbeidstaker = arbeidstaker,
         relasjonstype = BehandlerArbeidstakerRelasjonstype.SYKMELDER,
+        disableCreate = true,
     )
 }
 
