@@ -15,8 +15,6 @@ import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
 import no.nav.syfo.dialogmelding.apprec.database
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.*
-import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_DNR
-import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_ETTERNAVN
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_FORNAVN
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_DNR
