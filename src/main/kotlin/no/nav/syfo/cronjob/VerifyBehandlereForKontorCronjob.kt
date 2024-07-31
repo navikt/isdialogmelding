@@ -55,6 +55,7 @@ class VerifyBehandlereForKontorCronjob(
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${inaktiveBehandlereForKontor.size} inaktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${existingBehandlereForKontor.size} behandlere for kontor ${behandlerKontor.herId} i Modia")
 
+                        invalidateUnknownBehandlere(behandlerKontorFraAdresseregisteret.behandlere, existingBehandlereForKontor)
                         invalidateInactiveBehandlere(inaktiveBehandlereForKontor, existingBehandlereForKontor)
 
                         val revalidated = revalidateBehandlere(
@@ -78,8 +79,6 @@ class VerifyBehandlereForKontorCronjob(
                         // TODO: Hvis finnes fra før: oppdatere behandlerforekomst med info fra Adresseregisteret/HPR: navn, herId, behandlerKategori
 
                         // TODO: Vi har ca 150 forekomster i databasen som mangler hprId: må få oppdatert disse, men må da matche på personident.
-
-                        // TODO: Hvis finnes fra før, men ikke finnes for aktuelt kontor i Adresseregisteret: invalidere
                     }
                 } else {
                     log.warn("VerifyBehandlereForKontorCronjob: Behandlerkontor mer herId ${behandlerKontor.herId} ble ikke funnet i Adresseregisteret")
@@ -99,7 +98,7 @@ class VerifyBehandlereForKontorCronjob(
 
     private fun invalidateInactiveBehandlere(
         inaktiveBehandlereForKontor: List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>,
-        existingBehandlereForKontor: List<PBehandler>
+        existingBehandlereForKontor: List<PBehandler>,
     ) {
         inaktiveBehandlereForKontor.filter {
             it.hprId != null
@@ -111,6 +110,23 @@ class VerifyBehandlereForKontorCronjob(
             existingBehandlere.forEach { existingBehandler ->
                 behandlerService.invalidateBehandler(existingBehandler.behandlerRef)
                 log.info("VerifyBehandlereForKontorCronjob: behandler ${existingBehandler.behandlerRef} invalidated since inactive in Adresseregisteret")
+            }
+        }
+    }
+
+    private fun invalidateUnknownBehandlere(
+        allBehandlereForKontor: List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>,
+        existingBehandlereForKontor: List<PBehandler>,
+    ) {
+        existingBehandlereForKontor.filter {
+            it.hprId != null
+        }.forEach { existingBehandler ->
+            val existingBehandlereFraAdresseregisteret = allBehandlereForKontor.filter {
+                it.hprId.toString() == existingBehandler.hprId
+            }
+            if (existingBehandlereFraAdresseregisteret.isEmpty()) {
+                behandlerService.invalidateBehandler(existingBehandler.behandlerRef)
+                log.info("VerifyBehandlereForKontorCronjob: behandler ${existingBehandler.behandlerRef} invalidated since not found in Adresseregisteret")
             }
         }
     }
@@ -166,7 +182,7 @@ class VerifyBehandlereForKontorCronjob(
                     behandlerService.createBehandler(
                         behandler = Behandler(
                             behandlerRef = behandlerRef,
-                            personident = Personident(hprBehandler.fnr!!),
+                            personident = Personident(hprBehandler.fnr),
                             fornavn = hprBehandler.fornavn ?: behandlerFraAdresseregisteret.fornavn,
                             mellomnavn = hprBehandler.mellomnavn ?: behandlerFraAdresseregisteret.mellomnavn,
                             etternavn = hprBehandler.etternavn ?: behandlerFraAdresseregisteret.etternavn,

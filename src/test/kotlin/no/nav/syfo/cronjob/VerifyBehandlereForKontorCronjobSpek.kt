@@ -24,6 +24,7 @@ import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_OK
 import no.nav.syfo.testhelper.UserConstants.HERID_NOT_ACTIVE
 import no.nav.syfo.testhelper.UserConstants.HPRID
 import no.nav.syfo.testhelper.UserConstants.HPRID_INACTVE
+import no.nav.syfo.testhelper.UserConstants.HPRID_UNKNOWN
 import no.nav.syfo.testhelper.UserConstants.KONTOR_NAVN
 import no.nav.syfo.testhelper.UserConstants.PARTNERID
 import org.amshove.kluent.*
@@ -105,6 +106,17 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     }
                     val kontorAfter = database.getBehandlerKontorById(kontorId)
                     kontorAfter.dialogmeldingEnabled shouldNotBeEqualTo null
+                }
+                it("Cronjob invaliderer behandler som ikke finnes for kontor i Adresseregisteret") {
+                    val kontorId = createKontor(HERID_KONTOR_OK)
+                    val pBehandler = createBehandler(kontorId, HPRID_UNKNOWN)
+                    val behandlerBefore = database.getBehandlerById(pBehandler.id)
+                    behandlerBefore!!.invalidated shouldBe null
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerAfter = database.getBehandlerById(pBehandler.id)
+                    behandlerAfter!!.invalidated shouldNotBe null
                 }
                 it("Cronjob invaliderer behandler som er inaktiv i Adresseregisteret") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
