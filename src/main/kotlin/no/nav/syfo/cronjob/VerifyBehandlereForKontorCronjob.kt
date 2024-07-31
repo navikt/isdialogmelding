@@ -83,8 +83,6 @@ class VerifyBehandlereForKontorCronjob(
                         )
 
                         // TODO: Hvis finnes fra før: oppdatere behandlerforekomst med info fra Adresseregisteret/HPR: navn, herId, behandlerKategori
-
-                        // TODO: Vi har ca 150 forekomster i databasen som mangler hprId: må få oppdatert disse, men må da matche på personident.
                     }
                 } else {
                     log.warn("VerifyBehandlereForKontorCronjob: Behandlerkontor mer herId ${behandlerKontor.herId} ble ikke funnet i Adresseregisteret")
