@@ -5,7 +5,6 @@ import no.nav.syfo.domain.Personident
 
 object UserConstants {
     val ARBEIDSTAKER_FNR = Personident("12345678912")
-    val ARBEIDSTAKER_DNR = Personident("42345678912")
     val ANNEN_ARBEIDSTAKER_FNR = Personident(ARBEIDSTAKER_FNR.value.replace("2", "8"))
     val TREDJE_ARBEIDSTAKER_FNR = Personident("12345678913")
     val ARBEIDSTAKER_FNR_WITH_ERROR = Personident("12345678666")
@@ -31,7 +30,7 @@ object UserConstants {
 
     const val HERID = 404
     const val HPRID = 1337
-    const val HPRID_INACTVE = 1338
+    const val HPRID_INACTIVE = 1338
     const val HPRID_UNKNOWN = 1339
     const val OTHER_HERID = 604
     const val OTHER_HPRID = 804

@@ -6,6 +6,7 @@ import no.nav.syfo.behandler.database.domain.PBehandler
 import no.nav.syfo.behandler.database.domain.PBehandlerKontor
 import no.nav.syfo.behandler.database.domain.toBehandlerKontor
 import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.domain.BehandleridentType
 import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
@@ -50,6 +51,11 @@ class VerifyBehandlereForKontorCronjob(
                         behandlerService.disableDialogmeldingerForKontor(behandlerKontor)
                     } else {
                         val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = behandlerKontorFraAdresseregisteret.behandlere.partition { it.aktiv }
+                        val existingBehandlereForKontorWithoutHPR = behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.hprId.isNullOrEmpty() }
+                        if (existingBehandlereForKontorWithoutHPR.isNotEmpty()) {
+                            repairMissingHPR(existingBehandlereForKontorWithoutHPR, behandlerKontorFraAdresseregisteret.behandlere)
+                        }
+
                         val (existingBehandlereForKontor, existingInvalidatedBehandlereForKontor) = behandlerService.getBehandlereForKontor(behandlerKontor).partition { it.invalidated == null }
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${aktiveBehandlereForKontor.size} aktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${inaktiveBehandlereForKontor.size} inaktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
@@ -77,8 +83,6 @@ class VerifyBehandlereForKontorCronjob(
                         )
 
                         // TODO: Hvis finnes fra før: oppdatere behandlerforekomst med info fra Adresseregisteret/HPR: navn, herId, behandlerKategori
-
-                        // TODO: Vi har ca 150 forekomster i databasen som mangler hprId: må få oppdatert disse, men må da matche på personident.
                     }
                 } else {
                     log.warn("VerifyBehandlereForKontorCronjob: Behandlerkontor mer herId ${behandlerKontor.herId} ble ikke funnet i Adresseregisteret")
@@ -94,6 +98,34 @@ class VerifyBehandlereForKontorCronjob(
             StructuredArguments.keyValue("failed", verifyResult.failed),
             StructuredArguments.keyValue("updated", verifyResult.updated),
         )
+    }
+
+    private suspend fun repairMissingHPR(
+        existingBehandlereForKontorWithoutHPR: List<PBehandler>,
+        behandlereForKontor: List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>,
+    ) {
+        existingBehandlereForKontorWithoutHPR.forEach { behandler ->
+            if (behandler.personident.isNullOrEmpty()) {
+                log.warn("VerifyBehandlereForKontorCronjob: Behandler missing both hpr and fnr: ${behandler.behandlerRef}")
+            } else {
+                val match = behandlereForKontor.firstOrNull {
+                    val hprBehandler = syfohelsenettproxyClient.finnBehandlerFraHpr(it.hprId!!.toString())
+                    hprBehandler != null && behandler.personident!! == hprBehandler.fnr
+                }
+                if (match != null) {
+                    behandlerService.updateBehandlerIdenter(
+                        behandlerRef = behandler.behandlerRef,
+                        identer = mapOf(
+                            Pair(BehandleridentType.HER, match.herId.toString()),
+                            Pair(BehandleridentType.HPR, match.hprId.toString())
+                        ),
+                    )
+                    log.info("VerifyBehandlereForKontorCronjob: Fixed missing hprId for behandler: ${behandler.behandlerRef}")
+                } else {
+                    log.warn("VerifyBehandlereForKontorCronjob: Behandler missing hpr but found no match: ${behandler.behandlerRef}")
+                }
+            }
+        }
     }
 
     private fun invalidateInactiveBehandlere(
