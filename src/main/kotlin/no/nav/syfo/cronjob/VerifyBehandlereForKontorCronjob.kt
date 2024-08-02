@@ -6,6 +6,7 @@ import no.nav.syfo.behandler.database.domain.PBehandler
 import no.nav.syfo.behandler.database.domain.PBehandlerKontor
 import no.nav.syfo.behandler.database.domain.toBehandlerKontor
 import no.nav.syfo.behandler.domain.Behandler
+import no.nav.syfo.behandler.domain.BehandlerKategori
 import no.nav.syfo.behandler.domain.BehandleridentType
 import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO
 import no.nav.syfo.behandler.fastlege.FastlegeClient
@@ -82,7 +83,10 @@ class VerifyBehandlereForKontorCronjob(
                             existingBehandlereForKontor,
                         )
 
-                        // TODO: Hvis finnes fra før: oppdatere behandlerforekomst med info fra Adresseregisteret/HPR: navn, herId, behandlerKategori
+                        updateExistingBehandlere(
+                            aktiveBehandlereForKontor,
+                            behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.invalidated == null },
+                        )
                     }
                 } else {
                     log.warn("VerifyBehandlereForKontorCronjob: Behandlerkontor mer herId ${behandlerKontor.herId} ble ikke funnet i Adresseregisteret")
@@ -270,6 +274,39 @@ class VerifyBehandlereForKontorCronjob(
                     }
                 } else {
                     log.warn("VerifyBehandlereForKontorCronjob: Found duplicates, but could not decide which instance to keep: ${existingBehandlereWithSameId.first().behandlerRef}")
+                }
+            }
+        }
+    }
+
+    private suspend fun updateExistingBehandlere(
+        aktiveBehandlereForKontor: List<BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO>,
+        existingBehandlereForKontor: List<PBehandler>,
+    ) {
+        aktiveBehandlereForKontor.filter {
+            it.hprId != null
+        }.forEach { behandlerFraAdresseregisteret ->
+            val behandlerFraAdresseregisteretHprId = behandlerFraAdresseregisteret.hprId!!.toString()
+            val existingBehandlereWithSameHprId = existingBehandlereForKontor.filter {
+                it.hprId == behandlerFraAdresseregisteretHprId
+            }
+            if (existingBehandlereWithSameHprId.size != 1) {
+                log.warn("VerifyBehandlereForKontorCronjob: Expected to find exactly one behandler: ${existingBehandlereWithSameHprId.firstOrNull()?.behandlerRef}")
+            } else {
+                val existingBehandler = existingBehandlereWithSameHprId[0]
+                val hprBehandlerFnr = syfohelsenettproxyClient.finnBehandlerFraHpr(behandlerFraAdresseregisteretHprId)?.fnr
+                if (hprBehandlerFnr == null || hprBehandlerFnr != existingBehandler.personident) {
+                    log.warn("VerifyBehandlereForKontorCronjob: Mismatched personident: ${existingBehandler.behandlerRef}")
+                } else {
+                    // both hpr and personident match: update name, herid and kategori
+                    behandlerService.updateBehandlerNavnAndKategoriAndHerId(
+                        behandlerRef = existingBehandler.behandlerRef,
+                        fornavn = behandlerFraAdresseregisteret.fornavn,
+                        mellomnavn = behandlerFraAdresseregisteret.mellomnavn,
+                        etternavn = behandlerFraAdresseregisteret.etternavn,
+                        kategori = BehandlerKategori.fromKategoriKode(behandlerFraAdresseregisteret.kategori),
+                        herId = behandlerFraAdresseregisteret.herId.toString(),
+                    )
                 }
             }
         }
