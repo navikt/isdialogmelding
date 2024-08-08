@@ -1,7 +1,6 @@
 package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.api.behandlerPersonident
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.*
@@ -194,7 +193,7 @@ class BehandlerService(
                 relasjonstype = relasjonstype,
             )
         } else {
-            updateBehandler(
+            updateBehandlerTelefon(
                 behandler = behandler,
                 existingBehandler = pBehandler,
             )
@@ -268,6 +267,24 @@ class BehandlerService(
         database.updateBehandlerIdenter(behandlerRef, identer)
     }
 
+    fun updateBehandlerNavnAndKategoriAndHerId(
+        behandlerRef: UUID,
+        fornavn: String,
+        mellomnavn: String?,
+        etternavn: String,
+        kategori: BehandlerKategori?,
+        herId: String,
+    ) {
+        database.updateBehandlerNavnAndKategoriAndHerId(
+            behandlerRef = behandlerRef,
+            fornavn = fornavn,
+            mellomnavn = mellomnavn,
+            etternavn = etternavn,
+            kategori = kategori,
+            herId = herId,
+        )
+    }
+
     fun invalidateBehandler(behandlerRef: UUID) {
         database.invalidateBehandler(behandlerRef)
     }
@@ -317,7 +334,7 @@ class BehandlerService(
         database.connection.use { connection ->
             val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)
             val kontorId = if (pBehandlerKontor != null) {
-                connection.updateBehandlerKontor(
+                connection.updateBehandlerKontorSystemAndAdresse(
                     behandler = behandler,
                     existingBehandler = null,
                     existingBehandlerKontor = pBehandlerKontor,
@@ -343,7 +360,7 @@ class BehandlerService(
         }
     }
 
-    private fun updateBehandler(
+    private fun updateBehandlerTelefon(
         behandler: Behandler,
         existingBehandler: PBehandler,
     ) {
@@ -356,7 +373,7 @@ class BehandlerService(
                 COUNT_BEHANDLER_UPDATED.increment()
             }
             val existingBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)!!
-            connection.updateBehandlerKontor(
+            connection.updateBehandlerKontorSystemAndAdresse(
                 behandler = behandler,
                 existingBehandler = existingBehandler,
                 existingBehandlerKontor = existingBehandlerKontor,
@@ -365,7 +382,7 @@ class BehandlerService(
         }
     }
 
-    private fun Connection.updateBehandlerKontor(
+    private fun Connection.updateBehandlerKontorSystemAndAdresse(
         behandler: Behandler,
         existingBehandler: PBehandler?,
         existingBehandlerKontor: PBehandlerKontor,

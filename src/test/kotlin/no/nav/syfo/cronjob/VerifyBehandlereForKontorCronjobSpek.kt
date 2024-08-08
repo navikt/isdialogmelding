@@ -175,6 +175,29 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     val behandlerAfter = database.getBehandlereForKontor(kontorId)
                     behandlerAfter.size shouldBeEqualTo 1
                 }
+                it("Cronjob oppdaterer eksisterende behandler") {
+                    val kontorId = createKontor(HERID_KONTOR_OK)
+                    val pBehandler = createBehandler(
+                        kontorId = kontorId,
+                        hprId = HPRID,
+                        personident = FASTLEGE_FNR,
+                        fornavn = "for",
+                        etternavn = "etter",
+                        kategori = BehandlerKategori.TANNLEGE,
+                    )
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerAfter = database.getBehandlereForKontor(kontorId)
+                    behandlerAfter.size shouldBeEqualTo 1
+                    val pBehandlerAfter = behandlerAfter[0]
+                    pBehandlerAfter.id shouldBeEqualTo pBehandler.id
+                    pBehandlerAfter.behandlerRef shouldBeEqualTo pBehandler.behandlerRef
+                    pBehandlerAfter.fornavn shouldBeEqualTo BEHANDLER_FORNAVN
+                    pBehandlerAfter.etternavn shouldBeEqualTo BEHANDLER_ETTERNAVN
+                    pBehandlerAfter.herId shouldBeEqualTo HERID.toString()
+                    pBehandlerAfter.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
+                }
                 it("Cronjob legger til ny behandler og invaliderer eksisterende") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
                     val pBehandler = createBehandler(kontorId)
@@ -188,7 +211,7 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                 }
                 it("Cronjob invaliderer duplikater") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
-                    val pBehandler1 = createBehandler(kontorId, HPRID, FASTLEGE_FNR)
+                    val pBehandler1 = createBehandler(kontorId = kontorId, hprId = HPRID, personident = FASTLEGE_FNR)
                     val pBehandler2 = createBehandler(kontorId, HPRID)
                     runBlocking {
                         cronJob.verifyBehandlereForKontorJob()
@@ -202,8 +225,8 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                 }
                 it("Cronjob invaliderer duplikat med D-nummer") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
-                    val pBehandler1 = createBehandler(kontorId, HPRID, FASTLEGE_DNR)
-                    val pBehandler2 = createBehandler(kontorId, HPRID, FASTLEGE_FNR)
+                    val pBehandler1 = createBehandler(kontorId = kontorId, hprId = HPRID, personident = FASTLEGE_DNR)
+                    val pBehandler2 = createBehandler(kontorId = kontorId, hprId = HPRID, personident = FASTLEGE_FNR)
                     runBlocking {
                         cronJob.verifyBehandlereForKontorJob()
                     }
@@ -228,19 +251,23 @@ private fun createKontor(herId: Int) = database.createKontor(
 private fun createBehandler(
     kontorId: Int,
     hprId: Int? = HPRID_INACTIVE,
+    herId: Int? = HERID,
     personident: Personident? = null,
+    fornavn: String = BEHANDLER_FORNAVN,
+    etternavn: String = BEHANDLER_ETTERNAVN,
+    kategori: BehandlerKategori = BehandlerKategori.LEGE,
 ) = database.createBehandler(
     behandler = Behandler(
         behandlerRef = UUID.randomUUID(),
-        fornavn = BEHANDLER_FORNAVN,
+        fornavn = fornavn,
         mellomnavn = null,
-        etternavn = BEHANDLER_ETTERNAVN,
+        etternavn = etternavn,
         telefon = null,
         personident = personident,
-        herId = HERID,
+        herId = herId,
         hprId = hprId,
         kontor = database.getBehandlerKontorById(kontorId).toBehandlerKontor(),
-        kategori = BehandlerKategori.LEGE,
+        kategori = kategori,
         mottatt = OffsetDateTime.now(),
         suspendert = false,
     ),

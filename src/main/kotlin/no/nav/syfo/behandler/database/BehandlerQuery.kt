@@ -195,6 +195,35 @@ fun DatabaseInterface.getBehandlerByArbeidstaker(personident: Personident): List
     return getBehandlerAndRelasjonstypeList(personident).map { it.first }
 }
 
+const val queryUpdateBehandlerNavnOgKategoriAndHerId =
+    """
+        UPDATE BEHANDLER
+        SET fornavn=?,mellomnavn=?,etternavn=?,kategori=COALESCE(?,kategori),her_id=?,updated_at=now()
+        WHERE behandler_ref=?
+    """
+
+fun DatabaseInterface.updateBehandlerNavnAndKategoriAndHerId(
+    behandlerRef: UUID,
+    fornavn: String,
+    mellomnavn: String?,
+    etternavn: String,
+    kategori: BehandlerKategori?,
+    herId: String,
+) {
+    connection.use {
+        it.prepareStatement(queryUpdateBehandlerNavnOgKategoriAndHerId).use {
+            it.setString(1, fornavn)
+            it.setString(2, mellomnavn)
+            it.setString(3, etternavn)
+            it.setString(4, kategori?.name)
+            it.setString(5, herId)
+            it.setString(6, behandlerRef.toString())
+            it.executeUpdate()
+        }
+        it.commit()
+    }
+}
+
 const val queryUpdateBehandlerTelefon =
     """
         UPDATE BEHANDLER
