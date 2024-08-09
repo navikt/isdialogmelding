@@ -234,8 +234,6 @@ class VerifyBehandlereForKontorCronjob(
                     )
                     added.add(behandlerFraAdresseregisteret)
                     log.info("VerifyBehandlereForKontorCronjob: added new behandler from Adresseregisteret: $behandlerRef")
-                } else {
-                    log.warn("VerifyBehandlereForKontorCronjob: could not add new behandler from Adresseregisteret because hprBehandler incomplete")
                 }
             }
         }
@@ -284,7 +282,7 @@ class VerifyBehandlereForKontorCronjob(
         existingBehandlereForKontor: List<PBehandler>,
     ) {
         aktiveBehandlereForKontor.filter {
-            it.hprId != null
+            it.hprId != null && BehandlerKategori.fromKategoriKode(it.kategori) != null
         }.forEach { behandlerFraAdresseregisteret ->
             val behandlerFraAdresseregisteretHprId = behandlerFraAdresseregisteret.hprId!!.toString()
             val existingBehandlereWithSameHprId = existingBehandlereForKontor.filter {
