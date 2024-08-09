@@ -34,10 +34,10 @@ object UserConstants {
     const val HPRID_UNKNOWN = 1339
     const val OTHER_HERID = 604
     const val OTHER_HPRID = 804
-    const val HERID_UTEN_PARTNERINFO = 504
-    const val HERID_MED_FLERE_PARTNERINFO = 704
-    const val HERID_NOT_ACTIVE = 80434
-    const val HERID_KONTOR_OK = 80433
+    const val HERID_UTEN_PARTNERINFO = 2543
+    const val HERID_MED_FLERE_PARTNERINFO = 50031
+    const val HERID_NOT_ACTIVE = 175469
+    const val HERID_KONTOR_OK = 1841
 
     const val VEILEDER_IDENT = "Z999999"
 
