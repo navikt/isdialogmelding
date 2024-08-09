@@ -60,7 +60,7 @@ fun cronjobModule(
         dialogmeldingStatusCronjob,
         verifyPartnerIdCronjob,
         suspensjonCronjob,
-        verifyBehandlereForKontorCronjob,
+        // verifyBehandlereForKontorCronjob,
     ).forEach {
         launchBackgroundTask(
             applicationState = applicationState,
