@@ -23,11 +23,11 @@ class VerifyBehandlereForKontorCronjob(
     val fastlegeClient: FastlegeClient,
     val syfohelsenettproxyClient: SyfohelsenettproxyClient,
 ) : DialogmeldingCronjob {
-    private val runAtHour = 12
+    private val runAtHour = 6
     private val runDay = DayOfWeek.SUNDAY
 
     override val initialDelayMinutes: Long = calculateWeeklyInitialDelay("VerifyBehandlereForKontorCronjob", runDay, runAtHour)
-    override val intervalDelayMinutes: Long = 24 * 60
+    override val intervalDelayMinutes: Long = 24 * 60 * 7
 
     override suspend fun run() {
         verifyBehandlereForKontorJob()
