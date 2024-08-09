@@ -22,7 +22,7 @@ class VerifyBehandlereForKontorCronjob(
     val fastlegeClient: FastlegeClient,
     val syfohelsenettproxyClient: SyfohelsenettproxyClient,
 ) : DialogmeldingCronjob {
-    private val runAtHour = 3
+    private val runAtHour = 12
 
     override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60
@@ -35,7 +35,7 @@ class VerifyBehandlereForKontorCronjob(
         val verifyResult = DialogmeldingCronjobResult()
 
         val behandlerKontorListe = behandlerService.getKontor().filter {
-            it.herId != null && it.dialogmeldingEnabled != null
+            it.herId != null && it.dialogmeldingEnabled != null && (it.herId == "1841" || it.herId == "50031" || it.herId == "2543" || it.herId == "175469")
         }
         behandlerKontorListe.forEach { behandlerKontor ->
             try {
