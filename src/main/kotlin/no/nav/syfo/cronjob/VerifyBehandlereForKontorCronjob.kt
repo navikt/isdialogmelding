@@ -15,6 +15,7 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.domain.isDNR
 import no.nav.syfo.util.nowUTC
 import org.slf4j.LoggerFactory
+import java.time.DayOfWeek
 import java.util.UUID
 
 class VerifyBehandlereForKontorCronjob(
@@ -23,8 +24,9 @@ class VerifyBehandlereForKontorCronjob(
     val syfohelsenettproxyClient: SyfohelsenettproxyClient,
 ) : DialogmeldingCronjob {
     private val runAtHour = 12
+    private val runDay = DayOfWeek.SUNDAY
 
-    override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
+    override val initialDelayMinutes: Long = calculateWeeklyInitialDelay("VerifyBehandlereForKontorCronjob", runDay, runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60
 
     override suspend fun run() {
