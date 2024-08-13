@@ -4,14 +4,12 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.toBehandler
+import no.nav.syfo.behandler.database.getBehandlerByArbeidstaker
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.behandler.fastlege.toBehandler
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
-import no.nav.syfo.testhelper.ExternalMockEnvironment
-import no.nav.syfo.testhelper.UserConstants
-import no.nav.syfo.testhelper.createBehandlerForArbeidstaker
-import no.nav.syfo.testhelper.dropData
+import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.generator.generateFastlegeResponse
 import org.amshove.kluent.*
 import org.junit.Assert.assertThrows
@@ -193,6 +191,38 @@ class BehandlerServiceSpek : Spek({
                         UserConstants.ARBEIDSTAKER_FNR,
                     )
                     pBehandlerList.size shouldBeEqualTo 1
+                }
+                it("oppretter ikke duplikate koblinger til arbeidstaker for suspendert behandler") {
+                    val behandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
+                    behandlerService.createOrGetBehandler(
+                        behandler,
+                        Arbeidstaker(
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
+                        ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                    )
+                    val pBehandlerListBefore = database.getBehandlerArbeidstakerRelasjoner(
+                        UserConstants.ARBEIDSTAKER_FNR,
+                    )
+                    pBehandlerListBefore.size shouldBeEqualTo 1
+                    behandlerService.updateBehandlerSuspensjon(behandler.personident!!, true)
+                    behandlerService.createOrGetBehandler(
+                        behandler,
+                        Arbeidstaker(
+                            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+                            mottatt = OffsetDateTime.now(),
+                        ),
+                        relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
+                    )
+                    val pBehandlerListAfter = database.getBehandlerArbeidstakerRelasjoner(
+                        UserConstants.ARBEIDSTAKER_FNR,
+                    )
+                    pBehandlerListAfter.size shouldBeEqualTo 1
+                    val pBehandlerList = database.getBehandlerByArbeidstaker(
+                        UserConstants.ARBEIDSTAKER_FNR,
+                    )
+                    pBehandlerList.size shouldBeEqualTo 0
                 }
                 it("lagrer én behandler koblet til begge arbeidstakere når kalt for to ulike arbeidstakere med samme behandler") {
                     val behandler = generateFastlegeResponse().toBehandler(UserConstants.PARTNERID)
