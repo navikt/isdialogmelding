@@ -198,32 +198,33 @@ class BehandlerService(
                 existingBehandler = pBehandler,
             )
         }
+        if (!pBehandler.suspendert) {
+            val pBehandlereForArbeidstakerList =
+                database.getBehandlerAndRelasjonstypeList(
+                    arbeidstakerIdent = arbeidstaker.arbeidstakerPersonident,
+                )
 
-        val pBehandlereForArbeidstakerList =
-            database.getBehandlerAndRelasjonstypeList(
-                arbeidstakerIdent = arbeidstaker.arbeidstakerPersonident,
-            )
+            val isBytteAvFastlege = relasjonstype == BehandlerArbeidstakerRelasjonstype.FASTLEGE && pBehandlereForArbeidstakerList
+                .filter { (_, behandlerType) -> behandlerType == BehandlerArbeidstakerRelasjonstype.FASTLEGE }
+                .map { (pBehandler, _) -> pBehandler.id }.firstOrNull() != pBehandler.id
 
-        val isBytteAvFastlege = relasjonstype == BehandlerArbeidstakerRelasjonstype.FASTLEGE && pBehandlereForArbeidstakerList
-            .filter { (_, behandlerType) -> behandlerType == BehandlerArbeidstakerRelasjonstype.FASTLEGE }
-            .map { (pBehandler, _) -> pBehandler.id }.firstOrNull() != pBehandler.id
+            val behandlerIkkeKnyttetTilArbeidstaker = !pBehandlereForArbeidstakerList
+                .filter { (_, behandlerType) -> behandlerType == relasjonstype }
+                .map { (pBehandler, _) -> pBehandler.id }.contains(pBehandler.id)
 
-        val behandlerIkkeKnyttetTilArbeidstaker = !pBehandlereForArbeidstakerList
-            .filter { (_, behandlerType) -> behandlerType == relasjonstype }
-            .map { (pBehandler, _) -> pBehandler.id }.contains(pBehandler.id)
-
-        if (isBytteAvFastlege || behandlerIkkeKnyttetTilArbeidstaker) {
-            addBehandlerToArbeidstaker(
-                arbeidstaker = arbeidstaker,
-                relasjonstype = relasjonstype,
-                behandlerId = pBehandler.id,
-            )
-        } else if (relasjonstype == BehandlerArbeidstakerRelasjonstype.SYKMELDER) {
-            database.updateBehandlerArbeidstakerRelasjon(
-                arbeidstaker = arbeidstaker,
-                relasjonstype = relasjonstype,
-                behandlerId = pBehandler.id,
-            )
+            if (isBytteAvFastlege || behandlerIkkeKnyttetTilArbeidstaker) {
+                addBehandlerToArbeidstaker(
+                    arbeidstaker = arbeidstaker,
+                    relasjonstype = relasjonstype,
+                    behandlerId = pBehandler.id,
+                )
+            } else if (relasjonstype == BehandlerArbeidstakerRelasjonstype.SYKMELDER) {
+                database.updateBehandlerArbeidstakerRelasjon(
+                    arbeidstaker = arbeidstaker,
+                    relasjonstype = relasjonstype,
+                    behandlerId = pBehandler.id,
+                )
+            }
         }
 
         return pBehandler.toBehandler(
