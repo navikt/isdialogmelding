@@ -15,6 +15,7 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.domain.isDNR
 import no.nav.syfo.util.nowUTC
 import org.slf4j.LoggerFactory
+import java.time.DayOfWeek
 import java.util.UUID
 
 class VerifyBehandlereForKontorCronjob(
@@ -22,10 +23,11 @@ class VerifyBehandlereForKontorCronjob(
     val fastlegeClient: FastlegeClient,
     val syfohelsenettproxyClient: SyfohelsenettproxyClient,
 ) : DialogmeldingCronjob {
-    private val runAtHour = 12
+    private val runAtHour = 6
+    private val runDay = DayOfWeek.SUNDAY
 
-    override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
-    override val intervalDelayMinutes: Long = 24 * 60
+    override val initialDelayMinutes: Long = calculateWeeklyInitialDelay("VerifyBehandlereForKontorCronjob", runDay, runAtHour)
+    override val intervalDelayMinutes: Long = 24 * 60 * 7
 
     override suspend fun run() {
         verifyBehandlereForKontorJob()
@@ -35,7 +37,7 @@ class VerifyBehandlereForKontorCronjob(
         val verifyResult = DialogmeldingCronjobResult()
 
         val behandlerKontorListe = behandlerService.getKontor().filter {
-            it.herId != null && it.dialogmeldingEnabled != null && (it.herId == "1841" || it.herId == "50031" || it.herId == "2543" || it.herId == "175469")
+            it.herId != null && it.dialogmeldingEnabled != null
         }
         behandlerKontorListe.forEach { behandlerKontor ->
             try {
