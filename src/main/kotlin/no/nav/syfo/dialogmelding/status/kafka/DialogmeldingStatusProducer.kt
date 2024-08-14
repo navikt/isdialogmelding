@@ -19,7 +19,7 @@ class DialogmeldingStatusProducer(
                     key.toString(),
                     kafkaDialogmeldingStatusDTO,
                 ),
-            ).get()
+            ).also { it.get() }
         } catch (e: Exception) {
             log.error(
                 "Exception was thrown when attempting to send DialogmeldingStatusDTO with key $key to kafka: ${e.message}",
