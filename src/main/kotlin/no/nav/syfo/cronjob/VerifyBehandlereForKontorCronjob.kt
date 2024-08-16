@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory
 import java.time.DayOfWeek
 import java.util.UUID
 
+const val ALERIS_HER_ID = "2033"
+
 class VerifyBehandlereForKontorCronjob(
     val behandlerService: BehandlerService,
     val fastlegeClient: FastlegeClient,
@@ -37,7 +39,7 @@ class VerifyBehandlereForKontorCronjob(
         val verifyResult = DialogmeldingCronjobResult()
 
         val behandlerKontorListe = behandlerService.getKontor().filter {
-            it.herId != null && it.dialogmeldingEnabled != null
+            it.herId != null && it.dialogmeldingEnabled != null && it.herId != ALERIS_HER_ID
         }
         behandlerKontorListe.forEach { behandlerKontor ->
             try {
