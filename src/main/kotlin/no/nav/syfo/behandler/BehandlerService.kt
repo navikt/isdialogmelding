@@ -1,6 +1,7 @@
 package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.behandler.api.behandlerPersonident
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.*
@@ -180,18 +181,37 @@ class BehandlerService(
         } else null
     }
 
+    fun createBehandlerKontorIfMissing(
+        behandlerKontor: BehandlerKontor,
+    ) {
+        database.connection.use { connection ->
+            val pBehandlerKontor = connection.getBehandlerKontor(behandlerKontor.partnerId)
+            if (pBehandlerKontor == null) {
+                connection.createBehandlerKontor(behandlerKontor)
+            } else {
+                connection.updateBehandlerKontorSystemAndAdresse(behandlerKontor, pBehandlerKontor)
+            }
+            connection.commit()
+        }
+    }
+
     fun createOrGetBehandler(
         behandler: Behandler,
         arbeidstaker: Arbeidstaker,
         relasjonstype: BehandlerArbeidstakerRelasjonstype,
+        disableCreate: Boolean = false,
     ): Behandler {
         val pBehandler = getBehandler(behandler = behandler)
         if (pBehandler == null) {
-            return createBehandlerForArbeidstaker(
-                behandler = behandler,
-                arbeidstaker = arbeidstaker,
-                relasjonstype = relasjonstype,
-            )
+            return if (!disableCreate) {
+                createBehandlerForArbeidstaker(
+                    behandler = behandler,
+                    arbeidstaker = arbeidstaker,
+                    relasjonstype = relasjonstype,
+                )
+            } else {
+                behandler
+            }
         } else {
             updateBehandlerTelefon(
                 behandler = behandler,
@@ -336,8 +356,7 @@ class BehandlerService(
             val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)
             val kontorId = if (pBehandlerKontor != null) {
                 connection.updateBehandlerKontorSystemAndAdresse(
-                    behandler = behandler,
-                    existingBehandler = null,
+                    behandlerKontor = behandler.kontor,
                     existingBehandlerKontor = pBehandlerKontor,
                 )
                 pBehandlerKontor.id
@@ -375,34 +394,35 @@ class BehandlerService(
             }
             val existingBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)!!
             connection.updateBehandlerKontorSystemAndAdresse(
-                behandler = behandler,
-                existingBehandler = existingBehandler,
+                behandlerKontor = behandler.kontor,
                 existingBehandlerKontor = existingBehandlerKontor,
+                existingBehandler = existingBehandler,
             )
             connection.commit()
         }
     }
 
     private fun Connection.updateBehandlerKontorSystemAndAdresse(
-        behandler: Behandler,
-        existingBehandler: PBehandler?,
+        behandlerKontor: BehandlerKontor,
         existingBehandlerKontor: PBehandlerKontor,
+        existingBehandler: PBehandler? = null,
+
     ) {
-        if (shouldUpdateKontorSystem(behandler.kontor, existingBehandlerKontor)) {
-            updateBehandlerKontorSystem(behandler.kontor.partnerId, behandler.kontor)
+        if (shouldUpdateKontorSystem(behandlerKontor, existingBehandlerKontor)) {
+            updateBehandlerKontorSystem(behandlerKontor.partnerId, behandlerKontor)
         }
-        if (shouldUpdateKontorAdresse(behandler.kontor, existingBehandlerKontor)) {
-            updateBehandlerKontorAddress(behandler.kontor.partnerId, behandler.kontor)
+        if (shouldUpdateKontorAdresse(behandlerKontor, existingBehandlerKontor)) {
+            updateBehandlerKontorAddress(behandlerKontor.partnerId, behandlerKontor)
         }
         if (
-            behandler.kontor.herId != null &&
-            behandler.kontor.herId.toString() != existingBehandlerKontor.herId &&
+            behandlerKontor.herId != null &&
+            behandlerKontor.herId.toString() != existingBehandlerKontor.herId &&
             existingBehandlerKontor.dialogmeldingEnabled != null
         ) {
             log.warn(
                 "Persistert behandlerkontor har muligens feil herId ${existingBehandlerKontor.herId}: " +
                     "Sjekk kontor med partnerId ${existingBehandlerKontor.partnerId}." +
-                    "Adresseregisteret returnerte overordnet herId ${behandler.kontor.herId} for behandler id ${existingBehandler?.id}"
+                    "Adresseregisteret returnerte overordnet herId ${behandlerKontor.herId} for behandler id ${existingBehandler?.id}"
             )
         }
     }

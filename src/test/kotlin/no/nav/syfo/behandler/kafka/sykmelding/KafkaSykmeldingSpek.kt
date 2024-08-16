@@ -80,7 +80,7 @@ class KafkaSykmeldingSpek : Spek({
                 )
 
                 describe("Happy path") {
-                    it("should persist behandler from incoming sykmelding") {
+                    it("should persist behandlerkontor from incoming sykmelding") {
                         val sykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
                         )
@@ -104,125 +104,7 @@ class KafkaSykmeldingSpek : Spek({
                         kontorAfter.herId shouldBeEqualTo sykmelding.legekontorHerId
 
                         val behandlereAfter = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandlereAfter.size shouldBeEqualTo 1
-                        behandlereAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
-                        behandlereAfter[0].kategori shouldBeEqualTo BehandlerKategori.LEGE.name
-                        behandlereAfter[0].herId shouldBeEqualTo sykmelding.sykmelding.behandler.her
-                        behandlereAfter[0].fornavn shouldBeEqualTo sykmelding.sykmelding.behandler.fornavn
-                        behandlereAfter[0].etternavn shouldBeEqualTo sykmelding.sykmelding.behandler.etternavn
-                        behandlereAfter[0].telefon shouldBeEqualTo sykmelding.sykmelding.behandler.tlf
-
-                        val behandlerRelasjonerAfter = database.getBehandlerArbeidstakerRelasjon(
-                            personident = Personident(sykmelding.personNrPasient),
-                            behandlerRef = behandlereAfter[0].behandlerRef,
-                        )
-                        behandlerRelasjonerAfter.size shouldBeEqualTo 1
-                        behandlerRelasjonerAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.SYKMELDER.name
-                    }
-                    it("should persist behandler from incoming sykmelding even if herid is blank") {
-                        val sykmelding = generateSykmeldingDTO(
-                            uuid = UUID.randomUUID(),
-                            herId = " ",
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns
-                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
-
-                        val kontorBefore = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
-                        val behandlereBefore = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        kontorBefore shouldBe null
-                        behandlereBefore.size shouldBeEqualTo 0
-
-                        runBlocking {
-                            pollAndProcessSykmelding(
-                                kafkaConsumerSykmelding = mockConsumer,
-                                behandlerService = behandlerService,
-                            )
-                        }
-                        verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
-                        kontorAfter!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
-                        kontorAfter.herId shouldBeEqualTo sykmelding.legekontorHerId
-
-                        val behandlereAfter = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandlereAfter.size shouldBeEqualTo 1
-                        behandlereAfter[0].personident shouldBeEqualTo sykmelding.personNrLege
-                        behandlereAfter[0].kategori shouldBeEqualTo BehandlerKategori.LEGE.name
-                        behandlereAfter[0].herId shouldBe null
-                        behandlereAfter[0].fornavn shouldBeEqualTo sykmelding.sykmelding.behandler.fornavn
-                        behandlereAfter[0].etternavn shouldBeEqualTo sykmelding.sykmelding.behandler.etternavn
-                        behandlereAfter[0].telefon shouldBeEqualTo sykmelding.sykmelding.behandler.tlf
-
-                        val behandlerRelasjonerAfter = database.getBehandlerArbeidstakerRelasjon(
-                            personident = Personident(sykmelding.personNrPasient),
-                            behandlerRef = behandlereAfter[0].behandlerRef,
-                        )
-                        behandlerRelasjonerAfter.size shouldBeEqualTo 1
-                        behandlerRelasjonerAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.SYKMELDER.name
-                    }
-                    it("should remove telephone-prefix") {
-                        val sykmelding = generateSykmeldingDTO(
-                            uuid = UUID.randomUUID(),
-                            fornavnLege = "ANNE",
-                            etternavnLege = "LEGE",
-                            telefonLege = "tel:99999999"
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns
-                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
-
-                        runBlocking {
-                            pollAndProcessSykmelding(
-                                kafkaConsumerSykmelding = mockConsumer,
-                                behandlerService = behandlerService,
-                            )
-                        }
-                        verify(exactly = 1) { mockConsumer.commitSync() }
-                        val behandlerList = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandlerList.size shouldBeEqualTo 1
-                        behandlerList[0].personident shouldBeEqualTo sykmelding.personNrLege
-                        behandlerList[0].fornavn shouldBeEqualTo sykmelding.sykmelding.behandler.fornavn
-                        behandlerList[0].etternavn shouldBeEqualTo sykmelding.sykmelding.behandler.etternavn
-                        behandlerList[0].telefon shouldBeEqualTo "99999999"
-                    }
-                    it("should add second behandler from incoming sykmelding") {
-                        val sykmelding = generateSykmeldingDTO(
-                            uuid = UUID.randomUUID(),
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns
-                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
-
-                        runBlocking {
-                            pollAndProcessSykmelding(
-                                kafkaConsumerSykmelding = mockConsumer,
-                                behandlerService = behandlerService,
-                            )
-                        }
-                        verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
-                        kontor!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
-
-                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandler.size shouldBeEqualTo 1
-
-                        val newSykmelding = generateSykmeldingDTO(
-                            uuid = UUID.randomUUID(),
-                            personNrLege = "02020212346",
-                            behandlerFnr = "02020212346",
-                            herId = "1234",
-                            hprId = "4321",
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns
-                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
-
-                        runBlocking {
-                            pollAndProcessSykmelding(
-                                kafkaConsumerSykmelding = mockConsumer,
-                                behandlerService = behandlerService,
-                            )
-                        }
-                        verify(exactly = 2) { mockConsumer.commitSync() }
-
-                        val behandlerAfterSecondSykmelding = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandlerAfterSecondSykmelding.size shouldBeEqualTo 2
+                        behandlereAfter.size shouldBeEqualTo 0
                     }
                     it("sykmelding from existing fastlege should add new sykmelder-relation") {
                         val behandler =
@@ -283,112 +165,6 @@ class KafkaSykmeldingSpek : Spek({
                         behandlerRelasjonAfter[0].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.SYKMELDER.name
                         behandlerRelasjonAfter[1].type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.FASTLEGE.name
                     }
-                    it("should not create duplicate when same sykmelder twice, but updates timestamp") {
-                        val sykmelding = generateSykmeldingDTO(
-                            uuid = UUID.randomUUID(),
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns
-                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
-
-                        runBlocking {
-                            pollAndProcessSykmelding(
-                                kafkaConsumerSykmelding = mockConsumer,
-                                behandlerService = behandlerService,
-                            )
-                        }
-                        verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
-                        kontor!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
-
-                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandler.size shouldBeEqualTo 1
-
-                        val behandlerRelasjon = database.getBehandlerArbeidstakerRelasjon(
-                            personident = Personident(sykmelding.personNrPasient),
-                            behandlerRef = behandler[0].behandlerRef,
-                        )
-                        behandlerRelasjon.size shouldBeEqualTo 1
-
-                        val newSykmelding = generateSykmeldingDTO(
-                            uuid = UUID.randomUUID(),
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns
-                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
-
-                        runBlocking {
-                            pollAndProcessSykmelding(
-                                kafkaConsumerSykmelding = mockConsumer,
-                                behandlerService = behandlerService,
-                            )
-                        }
-                        verify(exactly = 2) { mockConsumer.commitSync() }
-
-                        val behandlerAfterSecondSykmelding = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandlerAfterSecondSykmelding.size shouldBeEqualTo 1
-
-                        val behandlerRelasjonAfterSecondSykmelding = database.getBehandlerArbeidstakerRelasjon(
-                            personident = Personident(sykmelding.personNrPasient),
-                            behandlerRef = behandler[0].behandlerRef,
-                        )
-                        behandlerRelasjonAfterSecondSykmelding.size shouldBeEqualTo 1
-                        behandlerRelasjonAfterSecondSykmelding[0].updatedAt shouldBeGreaterThan behandlerRelasjon[0].updatedAt
-                        behandlerRelasjonAfterSecondSykmelding[0].mottatt shouldBeGreaterThan behandlerRelasjon[0].mottatt
-                    }
-                    it("should not create duplicate when same sykmelder twice and should not update timestamps if second sykmelding is older") {
-                        val sykmelding = generateSykmeldingDTO(
-                            uuid = UUID.randomUUID(),
-                            mottattTidspunkt = LocalDateTime.now().minusDays(1),
-                            behandletTidspunkt = LocalDateTime.now().minusDays(1),
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns
-                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
-
-                        runBlocking {
-                            pollAndProcessSykmelding(
-                                kafkaConsumerSykmelding = mockConsumer,
-                                behandlerService = behandlerService,
-                            )
-                        }
-                        verify(exactly = 1) { mockConsumer.commitSync() }
-                        val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
-                        kontor!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
-
-                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandler.size shouldBeEqualTo 1
-
-                        val behandlerRelasjon = database.getBehandlerArbeidstakerRelasjon(
-                            personident = Personident(sykmelding.personNrPasient),
-                            behandlerRef = behandler[0].behandlerRef,
-                        )
-                        behandlerRelasjon.size shouldBeEqualTo 1
-
-                        val newSykmelding = generateSykmeldingDTO(
-                            uuid = UUID.randomUUID(),
-                            mottattTidspunkt = LocalDateTime.now().minusDays(2),
-                            behandletTidspunkt = LocalDateTime.now().minusDays(2),
-                        )
-                        every { mockConsumer.poll(any<Duration>()) } returns
-                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
-
-                        runBlocking {
-                            pollAndProcessSykmelding(
-                                kafkaConsumerSykmelding = mockConsumer,
-                                behandlerService = behandlerService,
-                            )
-                        }
-                        verify(exactly = 2) { mockConsumer.commitSync() }
-
-                        val behandlerAfterSecondSykmelding = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandlerAfterSecondSykmelding.size shouldBeEqualTo 1
-
-                        val behandlerRelasjonAfterSecondSykmelding = database.getBehandlerArbeidstakerRelasjon(
-                            personident = Personident(sykmelding.personNrPasient),
-                            behandlerRef = behandler[0].behandlerRef,
-                        )
-                        behandlerRelasjonAfterSecondSykmelding.size shouldBeEqualTo 1
-                        behandlerRelasjonAfterSecondSykmelding[0].updatedAt shouldBeEqualTo behandlerRelasjon[0].updatedAt
-                        behandlerRelasjonAfterSecondSykmelding[0].mottatt shouldBeEqualTo behandlerRelasjon[0].mottatt
-                    }
                     it("behandler from sykmelding should not shadow existing fastlege") {
                         val url = "$behandlerPath$behandlerPersonident"
                         val validToken = generateJWT(
@@ -425,8 +201,8 @@ class KafkaSykmeldingSpek : Spek({
                         verify(exactly = 1) { mockConsumer.commitSync() }
 
                         val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandler.size shouldBeEqualTo 2
-                        val fastlegeBehandlerRef = behandler[1].behandlerRef
+                        behandler.size shouldBeEqualTo 1
+                        val fastlegeBehandlerRef = behandler[0].behandlerRef
 
                         with(
                             handleRequest(HttpMethod.Get, url) {
@@ -441,7 +217,7 @@ class KafkaSykmeldingSpek : Spek({
                         }
 
                         val behandlerAfterAnotherGet = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandlerAfterAnotherGet.size shouldBeEqualTo 2
+                        behandlerAfterAnotherGet.size shouldBeEqualTo 1
                     }
 
                     it("should update system for kontor") {
@@ -460,9 +236,6 @@ class KafkaSykmeldingSpek : Spek({
                         verify(exactly = 1) { mockConsumer.commitSync() }
                         val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontor!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
-
-                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandler.size shouldBeEqualTo 1
 
                         val newSykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
@@ -500,9 +273,6 @@ class KafkaSykmeldingSpek : Spek({
                         verify(exactly = 1) { mockConsumer.commitSync() }
                         val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
                         kontor!!.partnerId shouldBeEqualTo sykmelding.partnerreferanse
-
-                        val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandler.size shouldBeEqualTo 1
 
                         val newSykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
