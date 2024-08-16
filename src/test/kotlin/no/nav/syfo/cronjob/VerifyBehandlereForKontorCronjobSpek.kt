@@ -131,6 +131,17 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     val behandlerAfter = database.getBehandlerById(pBehandler.id)
                     behandlerAfter!!.invalidated shouldNotBe null
                 }
+                it("Cronjob invaliderer ikke behandler knyttet til Aleris") {
+                    val kontorId = createKontor(ALERIS_HER_ID.toInt())
+                    val pBehandler = createBehandler(kontorId, HPRID_UNKNOWN)
+                    val behandlerBefore = database.getBehandlerById(pBehandler.id)
+                    behandlerBefore!!.invalidated shouldBe null
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerAfter = database.getBehandlerById(pBehandler.id)
+                    behandlerAfter!!.invalidated shouldBe null
+                }
                 it("Cronjob invaliderer behandler som er inaktiv i Adresseregisteret") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
                     val pBehandler = createBehandler(kontorId)
