@@ -32,6 +32,7 @@ object UserConstants {
     const val HPRID = 1337
     const val HPRID_INACTIVE = 1338
     const val HPRID_UNKNOWN = 1339
+    const val HPRID_UTEN_KATEGORI = 1340
     const val OTHER_HERID = 604
     const val OTHER_HPRID = 804
     const val HERID_UTEN_PARTNERINFO = 2543
@@ -45,6 +46,7 @@ object UserConstants {
     val FASTLEGE_FNR_SUSPENDERT = Personident("12125678912")
     val FASTLEGE_DNR = Personident("52125678911")
     val FASTLEGE_ANNEN_FNR = Personident(FASTLEGE_FNR.value.replace("2", "4"))
+    val FASTLEGE_UTEN_KATEGORI_FNR = Personident(FASTLEGE_FNR.value.replace("2", "5"))
 
     val BEHANDLER_FORNAVN = "Behandler"
     val BEHANDLER_ETTERNAVN = "BehandlerEtternavn"

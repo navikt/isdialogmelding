@@ -12,7 +12,7 @@ fun MockRequestHandleScope.syfohelsenettproxyResponse(request: HttpRequestData):
     return respondOk(
         HelsenettProxyBehandler(
             godkjenninger = listOf(Godkjenning(Kode(true, 1, "LE"))),
-            fnr = if (hprId == UserConstants.HPRID) UserConstants.FASTLEGE_FNR.value else UserConstants.FASTLEGE_ANNEN_FNR.value,
+            fnr = if (hprId == UserConstants.HPRID) UserConstants.FASTLEGE_FNR.value else if (hprId == UserConstants.HPRID_UTEN_KATEGORI) UserConstants.FASTLEGE_UTEN_KATEGORI_FNR.value else UserConstants.FASTLEGE_ANNEN_FNR.value,
             hprNummer = hprId,
             fornavn = UserConstants.BEHANDLER_FORNAVN,
             mellomnavn = null,
