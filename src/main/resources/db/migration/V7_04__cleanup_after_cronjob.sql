@@ -7,4 +7,4 @@ UPDATE BEHANDLER_KONTOR SET her_id='179561' WHERE partner_id='48084';
 
 UPDATE BEHANDLER_KONTOR SET her_id='178068',navn='DURBAN AS',orgnummer='991160981',dialogmelding_enabled=now() WHERE id=358;
 UPDATE BEHANDLER SET invalidated=now(),updated_at=now() WHERE kontor_id=358;
-UPDATE BEHANDLER SET invalidated=null,updated_at=now() WHERE kontor_id=358 AND behandler_ref='75b356c8-e236-460f-83b1-dd58a49f2475';
+UPDATE BEHANDLER SET invalidated=null,updated_at=now(),her_id='182487' WHERE kontor_id=358 AND behandler_ref='75b356c8-e236-460f-83b1-dd58a49f2475';
