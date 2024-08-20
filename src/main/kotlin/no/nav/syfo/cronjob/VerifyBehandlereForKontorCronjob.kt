@@ -76,14 +76,14 @@ class VerifyBehandlereForKontorCronjob(
                         )
 
                         val added = addNewBehandlere(
-                            aktiveBehandlereForKontor.toMutableList().also { it - revalidated },
+                            aktiveBehandlereForKontor.toMutableList().also { it.removeAll(revalidated) },
                             existingBehandlereForKontor,
                             behandlerKontor,
                             behandlerKontorFraAdresseregisteret,
                         )
 
                         invalidateDuplicates(
-                            aktiveBehandlereForKontor.toMutableList().also { it - revalidated - added },
+                            aktiveBehandlereForKontor.toMutableList().also { it.removeAll(revalidated) }.also { it.removeAll(added) },
                             existingBehandlereForKontor,
                         )
 
@@ -286,15 +286,15 @@ class VerifyBehandlereForKontorCronjob(
         existingBehandlereForKontor: List<PBehandler>,
     ) {
         aktiveBehandlereForKontor.filter {
-            it.hprId != null && BehandlerKategori.fromKategoriKode(it.kategori) != null
+            it.hprId != null
         }.forEach { behandlerFraAdresseregisteret ->
             val behandlerFraAdresseregisteretHprId = behandlerFraAdresseregisteret.hprId!!.toString()
             val existingBehandlereWithSameHprId = existingBehandlereForKontor.filter {
                 it.hprId == behandlerFraAdresseregisteretHprId
             }
-            if (existingBehandlereWithSameHprId.size != 1) {
+            if (existingBehandlereWithSameHprId.size > 1) {
                 log.warn("VerifyBehandlereForKontorCronjob: Expected to find exactly one behandler: ${existingBehandlereWithSameHprId.firstOrNull()?.behandlerRef}")
-            } else {
+            } else if (existingBehandlereWithSameHprId.size == 1) {
                 val existingBehandler = existingBehandlereWithSameHprId[0]
                 val hprBehandlerFnr = syfohelsenettproxyClient.finnBehandlerFraHpr(behandlerFraAdresseregisteretHprId)?.fnr
                 if (hprBehandlerFnr == null || hprBehandlerFnr != existingBehandler.personident) {

@@ -93,7 +93,7 @@ const val queryCreateBehandler =
 const val queryGetBehandlerByBehandlerPersonidentAndPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
-        WHERE B.personident = ? and K.partner_id = ?
+        WHERE B.personident = ? AND B.invalidated is null AND K.partner_id = ?
     """
 
 fun DatabaseInterface.getBehandlerByBehandlerPersonidentAndPartnerId(behandlerPersonident: Personident, partnerId: PartnerId): PBehandler? {
@@ -110,7 +110,7 @@ fun DatabaseInterface.getBehandlerByBehandlerPersonidentAndPartnerId(behandlerPe
 const val queryGetBehandlerByHprIdAndPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
-        WHERE B.hpr_id = ? and K.partner_id = ?
+        WHERE B.hpr_id = ? AND B.invalidated is null AND K.partner_id = ?
     """
 
 fun DatabaseInterface.getBehandlerByHprIdAndPartnerId(hprId: Int, partnerId: PartnerId): PBehandler? {
@@ -127,7 +127,7 @@ fun DatabaseInterface.getBehandlerByHprIdAndPartnerId(hprId: Int, partnerId: Par
 const val queryGetBehandlerByHerIdAndPartnerId =
     """
         SELECT B.* FROM BEHANDLER B INNER JOIN BEHANDLER_KONTOR K ON (K.id = B.kontor_id) 
-        WHERE B.her_id = ? and K.partner_id = ?
+        WHERE B.her_id = ? AND B.invalidated is null AND K.partner_id = ?
     """
 
 fun DatabaseInterface.getBehandlerByHerIdAndPartnerId(herId: Int, partnerId: PartnerId): PBehandler? {

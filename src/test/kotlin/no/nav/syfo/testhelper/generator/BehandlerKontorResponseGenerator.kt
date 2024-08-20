@@ -5,9 +5,11 @@ import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO
 import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_ANNEN_FNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_FNR
+import no.nav.syfo.testhelper.UserConstants.FASTLEGE_UTEN_KATEGORI_FNR
 import no.nav.syfo.testhelper.UserConstants.HERID
 import no.nav.syfo.testhelper.UserConstants.HPRID
 import no.nav.syfo.testhelper.UserConstants.HPRID_INACTIVE
+import no.nav.syfo.testhelper.UserConstants.HPRID_UTEN_KATEGORI
 import no.nav.syfo.testhelper.UserConstants.OTHER_HERID
 
 fun generateBehandlerKontorResponse(
@@ -24,7 +26,8 @@ fun generateBehandlerKontorResponse(
     orgnummer = null,
     behandlere = listOf(
         generateBehandlerFraAdresseregisteret(HPRID_INACTIVE),
-        generateBehandlerFraAdresseregisteret(HPRID)
+        generateBehandlerFraAdresseregisteret(HPRID),
+        generateBehandlerFraAdresseregisteret(HPRID_UTEN_KATEGORI),
     ),
 )
 
@@ -41,8 +44,8 @@ fun generateBehandlerFraAdresseregisteret(
     fornavn = UserConstants.BEHANDLER_FORNAVN,
     mellomnavn = null,
     etternavn = UserConstants.BEHANDLER_ETTERNAVN,
-    personIdent = if (hprId == HPRID) FASTLEGE_FNR.value else FASTLEGE_ANNEN_FNR.value,
-    herId = if (hprId == HPRID) HERID else OTHER_HERID,
+    personIdent = if (hprId == HPRID) FASTLEGE_FNR.value else if (hprId == HPRID_UTEN_KATEGORI) FASTLEGE_UTEN_KATEGORI_FNR.value else FASTLEGE_ANNEN_FNR.value,
+    herId = if (hprId == HPRID || hprId == HPRID_UTEN_KATEGORI) HERID else OTHER_HERID,
     hprId = hprId,
-    kategori = BehandlerKategori.LEGE.kategoriKode,
+    kategori = if (hprId == HPRID_UTEN_KATEGORI) null else BehandlerKategori.LEGE.kategoriKode,
 )

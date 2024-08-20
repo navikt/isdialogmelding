@@ -134,7 +134,7 @@ class BehandlerService(
         ) ?: return null
 
         if (fastlegeResponse.foreldreEnhetHerId == null) {
-            log.warn("Aktiv fastlege missing foreldreEnhetHerId so cannot request partnerinfo")
+            log.warn("Aktiv fastlege missing foreldreEnhetHerId so cannot request partnerinfo: ${fastlegeResponse.herId}")
             return null
         }
 
