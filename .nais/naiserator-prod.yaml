@@ -43,9 +43,6 @@ spec:
       rules:
         - application: syfomodiaperson
         - application: isfrisktilarbeid
-        - application: soknad-api
-          namespace: aap
-          cluster: prod-gcp
         - application: syfooppfolgingsplanservice
           namespace: team-esyfo
           cluster: prod-fss
