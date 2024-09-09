@@ -1,59 +1,43 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 group = "no.nav.syfo"
 version = "1.0.0"
 
-object Versions {
-    const val confluent = "7.5.1"
-    const val dialogmeldingVersion = "1.5d21db9"
-    const val fellesformat2Version = "1.0329dd1"
-    const val flyway = "9.22.3"
-    const val hikari = "5.1.0"
-    const val jackson = "2.16.1"
-    const val jaxb = "2.3.1"
-    const val json = "20231013"
-    const val kafka = "3.6.1"
-    const val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
-    const val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
-    const val kluent = "1.73"
-    const val ktor = "2.3.8"
-    const val logback = "1.4.14"
-    const val logstashEncoder = "7.4"
-    const val micrometerRegistry = "1.12.2"
-    const val mockk = "1.13.9"
-    const val mq = "9.3.4.1"
-    const val nimbusjosejwt = "9.37.3"
-    const val postgres = "42.7.2"
-    const val postgresEmbedded = "2.0.6"
-    const val spek = "2.0.19"
-    const val syfotjenester = "1.2021.06.09-13.09-b3d30de9996e"
-}
+val confluentVersion = "7.5.1"
+val dialogmeldingVersion = "1.5d21db9"
+val fellesformat2Version = "1.0329dd1"
+val flywayVersion = "9.22.3"
+val hikariVersion = "5.1.0"
+val jacksonVersion = "2.16.1"
+val jaxbVersion = "2.3.1"
+val jsonVersion = "20231013"
+val kafkaVersion = "3.6.1"
+val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
+val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
+val kluentVersion = "1.73"
+val ktorVersion = "2.3.8"
+val logbackVersion = "1.4.14"
+val logstashEncoderVersion = "7.4"
+val micrometerRegistryVersion = "1.12.2"
+val mockkVersion = "1.13.9"
+val mqVersion = "9.3.4.1"
+val nimbusjosejwtVersion = "9.37.3"
+val postgresVersion = "42.7.2"
+val postgresEmbeddedVersion = "2.0.6"
+val spekVersion = "2.0.19"
+val syfotjenesterVersion = "1.2021.06.09-13.09-b3d30de9996e"
 
 plugins {
-    kotlin("jvm") version "2.0.10"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    kotlin("jvm") version "2.0.20"
+    id("com.gradleup.shadow") version "8.3.0"
     id("org.jlleitschuh.gradle.ktlint") version "11.4.2"
 }
 
-val githubUser: String by project
-val githubPassword: String by project
 repositories {
     mavenCentral()
     maven(url = "https://packages.confluent.io/maven/")
     maven(url = "https://jitpack.io")
     maven {
-        url = uri("https://maven.pkg.github.com/navikt/syfotjenester")
-        credentials {
-            username = githubUser
-            password = githubPassword
-        }
-    }
-    maven {
-        url = uri("https://maven.pkg.github.com/navikt/syfo-xml-codegen")
-        credentials {
-            username = githubUser
-            password = githubPassword
-        }
+        url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     }
 }
 
@@ -61,46 +45,46 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
 
-    implementation("io.ktor:ktor-client-apache:${Versions.ktor}")
-    implementation("io.ktor:ktor-client-cio:${Versions.ktor}")
-    implementation("io.ktor:ktor-client-content-negotiation:${Versions.ktor}")
-    implementation("io.ktor:ktor-serialization-jackson:${Versions.ktor}")
-    implementation("io.ktor:ktor-server-auth-jwt:${Versions.ktor}")
-    implementation("io.ktor:ktor-server-content-negotiation:${Versions.ktor}")
-    implementation("io.ktor:ktor-server-netty:${Versions.ktor}")
-    implementation("io.ktor:ktor-server-status-pages:${Versions.ktor}")
+    implementation("io.ktor:ktor-client-apache:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
 
-    implementation("ch.qos.logback:logback-classic:${Versions.logback}")
-    implementation("net.logstash.logback:logstash-logback-encoder:${Versions.logstashEncoder}")
-    implementation("org.json:json:${Versions.json}")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
+    implementation("org.json:json:$jsonVersion")
 
     // Metrics and Prometheus
-    implementation("io.ktor:ktor-server-metrics-micrometer:${Versions.ktor}")
-    implementation("io.micrometer:micrometer-registry-prometheus:${Versions.micrometerRegistry}")
+    implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
+    implementation("io.micrometer:micrometer-registry-prometheus:$micrometerRegistryVersion")
 
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jackson}")
-    implementation("javax.xml.bind:jaxb-api:${Versions.jaxb}")
-    implementation("org.glassfish.jaxb:jaxb-runtime:${Versions.jaxb}")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    implementation("javax.xml.bind:jaxb-api:$jaxbVersion")
+    implementation("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
 
     // MQ
-    implementation("com.ibm.mq:com.ibm.mq.allclient:${Versions.mq}")
+    implementation("com.ibm.mq:com.ibm.mq.allclient:$mqVersion")
 
-    implementation("no.nav.helse.xml:xmlfellesformat2:${Versions.fellesformat2Version}")
-    implementation("no.nav.helse.xml:kith-hodemelding:${Versions.kithHodemeldingVersion}")
-    implementation("no.nav.helse.xml:kith-apprec:${Versions.kithApprecVersion}")
-    implementation("no.nav.helse.xml:dialogmelding:${Versions.dialogmeldingVersion}")
+    implementation("no.nav.helse.xml:xmlfellesformat2:$fellesformat2Version")
+    implementation("no.nav.helse.xml:kith-hodemelding:$kithHodemeldingVersion")
+    implementation("no.nav.helse.xml:kith-apprec:$kithApprecVersion")
+    implementation("no.nav.helse.xml:dialogmelding:$dialogmeldingVersion")
 
-    implementation("no.nav.syfotjenester:fellesformat:${Versions.syfotjenester}")
-    implementation("no.nav.syfotjenester:kith-base64:${Versions.syfotjenester}")
-    implementation("no.nav.syfotjenester:kith-dialogmelding:${Versions.syfotjenester}")
-    implementation("no.nav.syfotjenester:kith-hodemelding:${Versions.syfotjenester}")
+    implementation("no.nav.syfotjenester:fellesformat:$syfotjenesterVersion")
+    implementation("no.nav.syfotjenester:kith-base64:$syfotjenesterVersion")
+    implementation("no.nav.syfotjenester:kith-dialogmelding:$syfotjenesterVersion")
+    implementation("no.nav.syfotjenester:kith-hodemelding:$syfotjenesterVersion")
 
     // Kafka
     val excludeLog4j = fun ExternalModuleDependency.() {
         exclude(group = "log4j")
     }
-    implementation("org.apache.kafka:kafka_2.13:${Versions.kafka}", excludeLog4j)
-    implementation("io.confluent:kafka-avro-serializer:${Versions.confluent}", excludeLog4j)
+    implementation("org.apache.kafka:kafka_2.13:$kafkaVersion", excludeLog4j)
+    implementation("io.confluent:kafka-avro-serializer:$confluentVersion", excludeLog4j)
     constraints {
         implementation("org.apache.avro:avro") {
             because("org.apache.avro:avro:1.11.0 -> https://www.cve.org/CVERecord?id=CVE-2023-39410")
@@ -123,20 +107,20 @@ dependencies {
     }
 
     // Database
-    implementation("org.flywaydb:flyway-core:${Versions.flyway}")
-    implementation("com.zaxxer:HikariCP:${Versions.hikari}")
-    implementation("org.postgresql:postgresql:${Versions.postgres}")
-    testImplementation("io.zonky.test:embedded-postgres:${Versions.postgresEmbedded}")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
+    implementation("org.postgresql:postgresql:$postgresVersion")
+    testImplementation("io.zonky.test:embedded-postgres:$postgresEmbeddedVersion")
 
-    testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusjosejwt}")
-    testImplementation("io.ktor:ktor-server-test-host:${Versions.ktor}")
-    testImplementation("io.mockk:mockk:${Versions.mockk}")
-    testImplementation("io.ktor:ktor-client-mock:${Versions.ktor}")
-    testImplementation("org.amshove.kluent:kluent:${Versions.kluent}")
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:${Versions.spek}") {
+    testImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusjosejwtVersion")
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
+    testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
+    testImplementation("org.amshove.kluent:kluent:$kluentVersion")
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion") {
         exclude(group = "org.jetbrains.kotlin")
     }
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:${Versions.spek}") {
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion") {
         exclude(group = "org.jetbrains.kotlin")
     }
 }
@@ -146,7 +130,7 @@ kotlin {
 }
 
 tasks {
-    withType<Jar> {
+    jar {
         manifest.attributes["Main-Class"] = "no.nav.syfo.AppKt"
     }
 
@@ -156,13 +140,13 @@ tasks {
         }
     }
 
-    withType<ShadowJar> {
+    shadowJar {
         archiveBaseName.set("app")
         archiveClassifier.set("")
         archiveVersion.set("")
     }
 
-    withType<Test> {
+    test {
         useJUnitPlatform {
             includeEngines("spek2")
         }
