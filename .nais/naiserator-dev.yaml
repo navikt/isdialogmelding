@@ -43,6 +43,8 @@ spec:
       rules:
         - application: syfomodiaperson
         - application: isfrisktilarbeid
+        - application: integrasjonportal
+          namespace: aap
         - application: syfooppfolgingsplanservice
           namespace: team-esyfo
           cluster: dev-fss

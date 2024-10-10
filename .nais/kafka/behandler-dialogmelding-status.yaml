@@ -28,3 +28,6 @@ spec:
     - team: teamsykefravr
       application: isbehandlerdialog
       access: read
+    - team: aap
+      application: integrasjonportal
+      access: read
