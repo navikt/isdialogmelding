@@ -288,6 +288,10 @@ class BehandlerService(
         database.updateBehandlerIdenter(behandlerRef, identer)
     }
 
+    fun updateBehandlerPersonident(behandlerRef: UUID, personident: String) {
+        database.updateBehandlerPersonident(behandlerRef, personident)
+    }
+
     fun updateBehandlerNavnAndKategoriAndHerId(
         behandlerRef: UUID,
         fornavn: String,

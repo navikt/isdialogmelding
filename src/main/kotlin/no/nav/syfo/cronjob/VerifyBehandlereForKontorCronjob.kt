@@ -297,9 +297,31 @@ class VerifyBehandlereForKontorCronjob(
             } else if (existingBehandlereWithSameHprId.size == 1) {
                 val existingBehandler = existingBehandlereWithSameHprId[0]
                 val hprBehandlerFnr = syfohelsenettproxyClient.finnBehandlerFraHpr(behandlerFraAdresseregisteretHprId)?.fnr
-                if (hprBehandlerFnr == null || hprBehandlerFnr != existingBehandler.personident) {
-                    log.warn("VerifyBehandlereForKontorCronjob: Mismatched personident: ${existingBehandler.behandlerRef}")
+                val existingBehandlerFnr = existingBehandler.personident
+                val doUpdate = if (hprBehandlerFnr == null) {
+                    false
+                } else if (existingBehandlerFnr == null) {
+                    behandlerService.updateBehandlerPersonident(
+                        behandlerRef = existingBehandler.behandlerRef,
+                        personident = hprBehandlerFnr,
+                    )
+                    true
+                } else if (existingBehandlerFnr == hprBehandlerFnr) {
+                    true
+                } else if (hprBehandlerFnr != existingBehandlerFnr &&
+                    Personident(existingBehandlerFnr).isDNR() &&
+                    existingBehandlerFnr.substring(1, 6) == hprBehandlerFnr.substring(1, 6)
+                ) {
+                    behandlerService.updateBehandlerPersonident(
+                        behandlerRef = existingBehandler.behandlerRef,
+                        personident = hprBehandlerFnr,
+                    )
+                    true
                 } else {
+                    // TODO: handle remaining case: personident changed, but not DNR from before
+                    false
+                }
+                if (doUpdate) {
                     // both hpr and personident match: update name, herid and kategori
                     behandlerService.updateBehandlerNavnAndKategoriAndHerId(
                         behandlerRef = existingBehandler.behandlerRef,
@@ -309,6 +331,8 @@ class VerifyBehandlereForKontorCronjob(
                         kategori = BehandlerKategori.fromKategoriKode(behandlerFraAdresseregisteret.kategori),
                         herId = behandlerFraAdresseregisteret.herId.toString(),
                     )
+                } else {
+                    log.warn("VerifyBehandlereForKontorCronjob: Mismatched personident: ${existingBehandler.behandlerRef}")
                 }
             }
         }
