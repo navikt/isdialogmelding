@@ -299,10 +299,11 @@ class VerifyBehandlereForKontorCronjob(
                 val hprBehandlerFnr = syfohelsenettproxyClient.finnBehandlerFraHpr(behandlerFraAdresseregisteretHprId)?.fnr
                 val existingBehandlerFnr = existingBehandler.personident
 
-                val doUpdatePersonident = (existingBehandlerFnr == null)
-                        || (hprBehandlerFnr != existingBehandlerFnr
-                            && Personident(existingBehandlerFnr).isDNR()
-                            && existingBehandlerFnr.substring(1, 6) == hprBehandlerFnr?.substring(1, 6))
+                val doUpdatePersonident = (existingBehandlerFnr == null) || (
+                    hprBehandlerFnr != existingBehandlerFnr &&
+                        Personident(existingBehandlerFnr).isDNR() &&
+                        existingBehandlerFnr.substring(1, 6) == hprBehandlerFnr?.substring(1, 6)
+                    )
 
                 // TODO: handle remaining case: personident changed, but not DNR from before
 
