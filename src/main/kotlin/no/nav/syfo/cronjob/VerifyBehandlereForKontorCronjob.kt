@@ -298,31 +298,23 @@ class VerifyBehandlereForKontorCronjob(
                 val existingBehandler = existingBehandlereWithSameHprId[0]
                 val hprBehandlerFnr = syfohelsenettproxyClient.finnBehandlerFraHpr(behandlerFraAdresseregisteretHprId)?.fnr
                 val existingBehandlerFnr = existingBehandler.personident
-                val doUpdate = if (hprBehandlerFnr == null) {
-                    false
-                } else if (existingBehandlerFnr == null) {
+
+                val doUpdatePersonident = (existingBehandlerFnr == null)
+                        || (hprBehandlerFnr != existingBehandlerFnr
+                            && Personident(existingBehandlerFnr).isDNR()
+                            && existingBehandlerFnr.substring(1, 6) == hprBehandlerFnr?.substring(1, 6))
+
+                // TODO: handle remaining case: personident changed, but not DNR from before
+
+                val doUpdate = doUpdatePersonident || (existingBehandlerFnr == hprBehandlerFnr)
+
+                if (doUpdatePersonident && hprBehandlerFnr != null) {
                     behandlerService.updateBehandlerPersonident(
                         behandlerRef = existingBehandler.behandlerRef,
                         personident = hprBehandlerFnr,
                     )
-                    true
-                } else if (existingBehandlerFnr == hprBehandlerFnr) {
-                    true
-                } else if (hprBehandlerFnr != existingBehandlerFnr &&
-                    Personident(existingBehandlerFnr).isDNR() &&
-                    existingBehandlerFnr.substring(1, 6) == hprBehandlerFnr.substring(1, 6)
-                ) {
-                    behandlerService.updateBehandlerPersonident(
-                        behandlerRef = existingBehandler.behandlerRef,
-                        personident = hprBehandlerFnr,
-                    )
-                    true
-                } else {
-                    // TODO: handle remaining case: personident changed, but not DNR from before
-                    false
                 }
-                if (doUpdate) {
-                    // both hpr and personident match: update name, herid and kategori
+                if (doUpdate && hprBehandlerFnr != null) {
                     behandlerService.updateBehandlerNavnAndKategoriAndHerId(
                         behandlerRef = existingBehandler.behandlerRef,
                         fornavn = behandlerFraAdresseregisteret.fornavn,
