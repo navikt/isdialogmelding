@@ -203,13 +203,13 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     }
                     val behandlerAfter = database.getBehandlereForKontor(kontorId)
                     behandlerAfter.size shouldBeEqualTo 2
-                    val pBehandlerAfter = behandlerAfter.firstOrNull { it.hprId == HPRID.toString() }
-                    pBehandlerAfter!!.id shouldBeEqualTo pBehandler.id
-                    pBehandlerAfter!!.behandlerRef shouldBeEqualTo pBehandler.behandlerRef
-                    pBehandlerAfter!!.fornavn shouldBeEqualTo BEHANDLER_FORNAVN
-                    pBehandlerAfter!!.etternavn shouldBeEqualTo BEHANDLER_ETTERNAVN
-                    pBehandlerAfter!!.herId shouldBeEqualTo HERID.toString()
-                    pBehandlerAfter!!.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
+                    val pBehandlerAfter = behandlerAfter.first { it.hprId == HPRID.toString() }
+                    pBehandlerAfter.id shouldBeEqualTo pBehandler.id
+                    pBehandlerAfter.behandlerRef shouldBeEqualTo pBehandler.behandlerRef
+                    pBehandlerAfter.fornavn shouldBeEqualTo BEHANDLER_FORNAVN
+                    pBehandlerAfter.etternavn shouldBeEqualTo BEHANDLER_ETTERNAVN
+                    pBehandlerAfter.herId shouldBeEqualTo HERID.toString()
+                    pBehandlerAfter.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
                 }
                 it("Cronjob oppdaterer eksisterende behandler selv om kategori mangler i Adresseregisteret") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
@@ -226,13 +226,37 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     }
                     val behandlerAfter = database.getBehandlereForKontor(kontorId)
                     behandlerAfter.size shouldBeEqualTo 2
-                    val pBehandlerAfter = behandlerAfter.firstOrNull { it.hprId == HPRID_UTEN_KATEGORI.toString() }
-                    pBehandlerAfter!!.id shouldBeEqualTo pBehandler.id
-                    pBehandlerAfter!!.behandlerRef shouldBeEqualTo pBehandler.behandlerRef
-                    pBehandlerAfter!!.fornavn shouldBeEqualTo BEHANDLER_FORNAVN
-                    pBehandlerAfter!!.etternavn shouldBeEqualTo BEHANDLER_ETTERNAVN
-                    pBehandlerAfter!!.herId shouldBeEqualTo HERID.toString()
-                    pBehandlerAfter!!.kategori shouldBeEqualTo BehandlerKategori.TANNLEGE.name
+                    val pBehandlerAfter = behandlerAfter.first { it.hprId == HPRID_UTEN_KATEGORI.toString() }
+                    pBehandlerAfter.id shouldBeEqualTo pBehandler.id
+                    pBehandlerAfter.behandlerRef shouldBeEqualTo pBehandler.behandlerRef
+                    pBehandlerAfter.fornavn shouldBeEqualTo BEHANDLER_FORNAVN
+                    pBehandlerAfter.etternavn shouldBeEqualTo BEHANDLER_ETTERNAVN
+                    pBehandlerAfter.herId shouldBeEqualTo HERID.toString()
+                    pBehandlerAfter.kategori shouldBeEqualTo BehandlerKategori.TANNLEGE.name
+                }
+                it("Cronjob oppdaterer eksisterende behandler med DNR der forekomsten i Adresseregisteret har FNR") {
+                    val kontorId = createKontor(HERID_KONTOR_OK)
+                    val pBehandler = createBehandler(
+                        kontorId = kontorId,
+                        hprId = HPRID,
+                        personident = FASTLEGE_DNR,
+                        fornavn = "for",
+                        etternavn = "etter",
+                        kategori = BehandlerKategori.LEGE,
+                    )
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerAfter = database.getBehandlereForKontor(kontorId)
+                    behandlerAfter.size shouldBeEqualTo 2
+                    val pBehandlerAfter = behandlerAfter.first { it.hprId == HPRID.toString() }
+                    pBehandlerAfter.id shouldBeEqualTo pBehandler.id
+                    pBehandlerAfter.personident shouldBeEqualTo FASTLEGE_FNR.value
+                    pBehandlerAfter.behandlerRef shouldBeEqualTo pBehandler.behandlerRef
+                    pBehandlerAfter.fornavn shouldBeEqualTo BEHANDLER_FORNAVN
+                    pBehandlerAfter.etternavn shouldBeEqualTo BEHANDLER_ETTERNAVN
+                    pBehandlerAfter.herId shouldBeEqualTo HERID.toString()
+                    pBehandlerAfter.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
                 }
                 it("Cronjob legger til ny behandler og invaliderer eksisterende") {
                     val kontorId = createKontor(HERID_KONTOR_OK)

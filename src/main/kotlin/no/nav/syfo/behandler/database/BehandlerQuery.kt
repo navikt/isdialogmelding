@@ -262,6 +262,27 @@ fun DatabaseInterface.updateBehandlerIdenter(behandlerRef: UUID, identer: Map<Be
     }
 }
 
+const val queryUpdateBehandlerPersonident =
+    """
+        UPDATE BEHANDLER
+        SET personident = ?,
+        updated_at = ?
+        WHERE behandler_ref=?
+    """
+
+fun DatabaseInterface.updateBehandlerPersonident(behandlerRef: UUID, personident: String) {
+    this.connection.use { connection ->
+        connection.prepareStatement(queryUpdateBehandlerPersonident)
+            .use {
+                it.setString(1, personident)
+                it.setObject(2, OffsetDateTime.now())
+                it.setString(3, behandlerRef.toString())
+                it.executeUpdate()
+            }
+        connection.commit()
+    }
+}
+
 const val queryInvalidateBehandler =
     """
         UPDATE BEHANDLER

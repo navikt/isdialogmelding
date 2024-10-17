@@ -13,6 +13,7 @@ import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.domain.isDNR
+import no.nav.syfo.domain.isDnrMatchingFnr
 import no.nav.syfo.util.nowUTC
 import org.slf4j.LoggerFactory
 import java.time.DayOfWeek
@@ -297,18 +298,33 @@ class VerifyBehandlereForKontorCronjob(
             } else if (existingBehandlereWithSameHprId.size == 1) {
                 val existingBehandler = existingBehandlereWithSameHprId[0]
                 val hprBehandlerFnr = syfohelsenettproxyClient.finnBehandlerFraHpr(behandlerFraAdresseregisteretHprId)?.fnr
-                if (hprBehandlerFnr == null || hprBehandlerFnr != existingBehandler.personident) {
-                    log.warn("VerifyBehandlereForKontorCronjob: Mismatched personident: ${existingBehandler.behandlerRef}")
+                if (hprBehandlerFnr == null) {
+                    log.warn("VerifyBehandlereForKontorCronjob: HPR-personident missing: ${existingBehandler.behandlerRef}")
                 } else {
-                    // both hpr and personident match: update name, herid and kategori
-                    behandlerService.updateBehandlerNavnAndKategoriAndHerId(
-                        behandlerRef = existingBehandler.behandlerRef,
-                        fornavn = behandlerFraAdresseregisteret.fornavn,
-                        mellomnavn = behandlerFraAdresseregisteret.mellomnavn,
-                        etternavn = behandlerFraAdresseregisteret.etternavn,
-                        kategori = BehandlerKategori.fromKategoriKode(behandlerFraAdresseregisteret.kategori),
-                        herId = behandlerFraAdresseregisteret.herId.toString(),
-                    )
+                    val hprPersonident = Personident(hprBehandlerFnr)
+                    val existingPersonIdent = existingBehandler.personident?.let { Personident(it) }
+
+                    val doUpdatePersonident = existingPersonIdent == null || existingPersonIdent.isDnrMatchingFnr(hprPersonident)
+                    // TODO: handle remaining case: personident changed, but not DNR from before
+                    if (doUpdatePersonident) {
+                        behandlerService.updateBehandlerPersonident(
+                            behandlerRef = existingBehandler.behandlerRef,
+                            personident = hprBehandlerFnr,
+                        )
+                    }
+                    val doUpdate = doUpdatePersonident || existingPersonIdent == hprPersonident
+                    if (doUpdate) {
+                        behandlerService.updateBehandlerNavnAndKategoriAndHerId(
+                            behandlerRef = existingBehandler.behandlerRef,
+                            fornavn = behandlerFraAdresseregisteret.fornavn,
+                            mellomnavn = behandlerFraAdresseregisteret.mellomnavn,
+                            etternavn = behandlerFraAdresseregisteret.etternavn,
+                            kategori = BehandlerKategori.fromKategoriKode(behandlerFraAdresseregisteret.kategori),
+                            herId = behandlerFraAdresseregisteret.herId.toString(),
+                        )
+                    } else {
+                        log.warn("VerifyBehandlereForKontorCronjob: Mismatched personident: ${existingBehandler.behandlerRef}")
+                    }
                 }
             }
         }
