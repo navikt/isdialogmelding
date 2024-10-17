@@ -304,8 +304,10 @@ class VerifyBehandlereForKontorCronjob(
                     val hprPersonident = Personident(hprBehandlerFnr)
                     val existingPersonIdent = existingBehandler.personident?.let { Personident(it) }
 
-                    val doUpdatePersonident = existingPersonIdent == null || existingPersonIdent.isDnrMatchingFnr(hprPersonident)
-                    // TODO: handle remaining case: personident changed, but not DNR from before
+                    val doUpdatePersonident = existingPersonIdent == null ||
+                        existingPersonIdent.isDnrMatchingFnr(hprPersonident) ||
+                        behandlerToBeUpdated.contains(existingBehandler.behandlerRef)
+
                     if (doUpdatePersonident) {
                         behandlerService.updateBehandlerPersonident(
                             behandlerRef = existingBehandler.behandlerRef,
@@ -332,5 +334,7 @@ class VerifyBehandlereForKontorCronjob(
 
     companion object {
         private val log = LoggerFactory.getLogger(VerifyBehandlereForKontorCronjob::class.java)
+
+        private val behandlerToBeUpdated = listOf(UUID.fromString("3f5c938d-b16a-4474-a294-9e121e7efd17"))
     }
 }

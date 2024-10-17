@@ -17,8 +17,10 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_ETTERNAVN
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_FORNAVN
+import no.nav.syfo.testhelper.UserConstants.FASTLEGE_ANNEN_FNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_DNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_FNR
+import no.nav.syfo.testhelper.UserConstants.FASTLEGE_TREDJE_FNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_UTEN_KATEGORI_FNR
 import no.nav.syfo.testhelper.UserConstants.HERID
 import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_OK
@@ -258,6 +260,31 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                     pBehandlerAfter.herId shouldBeEqualTo HERID.toString()
                     pBehandlerAfter.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
                 }
+                it("Cronjob oppdaterer spesifikk behandler") {
+                    val kontorId = createKontor(HERID_KONTOR_OK)
+                    val pBehandler = createBehandler(
+                        behandlerRef = UUID.fromString("3f5c938d-b16a-4474-a294-9e121e7efd17"),
+                        kontorId = kontorId,
+                        hprId = HPRID,
+                        personident = FASTLEGE_TREDJE_FNR,
+                        fornavn = "for",
+                        etternavn = "etter",
+                        kategori = BehandlerKategori.LEGE,
+                    )
+                    runBlocking {
+                        cronJob.verifyBehandlereForKontorJob()
+                    }
+                    val behandlerAfter = database.getBehandlereForKontor(kontorId)
+                    behandlerAfter.size shouldBeEqualTo 2
+                    val pBehandlerAfter = behandlerAfter.first { it.hprId == HPRID.toString() }
+                    pBehandlerAfter.id shouldBeEqualTo pBehandler.id
+                    pBehandlerAfter.personident shouldBeEqualTo FASTLEGE_FNR.value
+                    pBehandlerAfter.behandlerRef shouldBeEqualTo pBehandler.behandlerRef
+                    pBehandlerAfter.fornavn shouldBeEqualTo BEHANDLER_FORNAVN
+                    pBehandlerAfter.etternavn shouldBeEqualTo BEHANDLER_ETTERNAVN
+                    pBehandlerAfter.herId shouldBeEqualTo HERID.toString()
+                    pBehandlerAfter.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
+                }
                 it("Cronjob legger til ny behandler og invaliderer eksisterende") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
                     val pBehandler = createBehandler(kontorId)
@@ -316,9 +343,10 @@ private fun createBehandler(
     fornavn: String = BEHANDLER_FORNAVN,
     etternavn: String = BEHANDLER_ETTERNAVN,
     kategori: BehandlerKategori = BehandlerKategori.LEGE,
+    behandlerRef: UUID = UUID.randomUUID(),
 ) = database.createBehandler(
     behandler = Behandler(
-        behandlerRef = UUID.randomUUID(),
+        behandlerRef = behandlerRef,
         fornavn = fornavn,
         mellomnavn = null,
         etternavn = etternavn,
