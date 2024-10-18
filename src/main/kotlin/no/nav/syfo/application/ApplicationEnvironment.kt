@@ -28,10 +28,6 @@ data class Environment(
         syfooppfolgingsplanserviceApplicationName,
         lpsOppfolgingsplanMottakApplicationName,
     ),
-    private val isfrisktilarbeidApplicationName: String = "isfrisktilarbeid",
-    val behandlerSystemAPIAuthorizedConsumerApplicationNameList: List<String> = listOf(
-        isfrisktilarbeidApplicationName,
-    ),
 
     val electorPath: String = getEnvVar("ELECTOR_PATH"),
     val serviceuserUsername: String = getEnvVar("SERVICEUSER_USERNAME"),
