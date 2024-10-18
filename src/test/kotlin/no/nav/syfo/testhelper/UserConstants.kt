@@ -46,6 +46,7 @@ object UserConstants {
     val FASTLEGE_FNR_SUSPENDERT = Personident("12125678912")
     val FASTLEGE_DNR = Personident("52125678911")
     val FASTLEGE_ANNEN_FNR = Personident(FASTLEGE_FNR.value.replace("2", "4"))
+    val FASTLEGE_TREDJE_FNR = Personident(FASTLEGE_FNR.value.replace("2", "5"))
     val FASTLEGE_UTEN_KATEGORI_FNR = Personident(FASTLEGE_FNR.value.replace("2", "5"))
 
     val BEHANDLER_FORNAVN = "Behandler"

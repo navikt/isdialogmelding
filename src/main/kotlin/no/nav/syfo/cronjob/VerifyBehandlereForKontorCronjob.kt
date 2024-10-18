@@ -25,6 +25,7 @@ class VerifyBehandlereForKontorCronjob(
     val behandlerService: BehandlerService,
     val fastlegeClient: FastlegeClient,
     val syfohelsenettproxyClient: SyfohelsenettproxyClient,
+    val behandlerToBeUpdated: List<UUID> = emptyList(),
 ) : DialogmeldingCronjob {
     private val runAtHour = 6
     private val runDay = DayOfWeek.SUNDAY
@@ -304,8 +305,10 @@ class VerifyBehandlereForKontorCronjob(
                     val hprPersonident = Personident(hprBehandlerFnr)
                     val existingPersonIdent = existingBehandler.personident?.let { Personident(it) }
 
-                    val doUpdatePersonident = existingPersonIdent == null || existingPersonIdent.isDnrMatchingFnr(hprPersonident)
-                    // TODO: handle remaining case: personident changed, but not DNR from before
+                    val doUpdatePersonident = existingPersonIdent == null ||
+                        existingPersonIdent.isDnrMatchingFnr(hprPersonident) ||
+                        behandlerToBeUpdated.contains(existingBehandler.behandlerRef)
+
                     if (doUpdatePersonident) {
                         behandlerService.updateBehandlerPersonident(
                             behandlerRef = existingBehandler.behandlerRef,

@@ -11,6 +11,7 @@ import no.nav.syfo.cronjob.leaderelection.LeaderPodClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.dialogmelding.cronjob.DialogmeldingStatusCronjob
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
+import java.util.UUID
 
 fun cronjobModule(
     applicationState: ApplicationState,
@@ -53,6 +54,7 @@ fun cronjobModule(
         behandlerService = behandlerService,
         fastlegeClient = fastlegeClient,
         syfohelsenettproxyClient = syfohelsenettproxyClient,
+        behandlerToBeUpdated = listOf(UUID.fromString("3f5c938d-b16a-4474-a294-9e121e7efd17"))
     )
 
     listOf(
