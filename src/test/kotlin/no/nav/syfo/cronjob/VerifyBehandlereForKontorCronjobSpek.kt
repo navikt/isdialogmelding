@@ -17,7 +17,6 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_ETTERNAVN
 import no.nav.syfo.testhelper.UserConstants.BEHANDLER_FORNAVN
-import no.nav.syfo.testhelper.UserConstants.FASTLEGE_ANNEN_FNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_DNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_FNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_TREDJE_FNR
@@ -77,10 +76,12 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                 ),
                 database = database,
             )
+            val behandlerToBeUpdated = UUID.randomUUID()
             val cronJob = VerifyBehandlereForKontorCronjob(
                 behandlerService = behandlerService,
                 fastlegeClient = fastlegeClient,
                 syfohelsenettproxyClient = syfohelsenettproxyClient,
+                behandlerToBeUpdated = listOf(behandlerToBeUpdated),
             )
             beforeEachTest {
                 database.dropData()
@@ -263,7 +264,7 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                 it("Cronjob oppdaterer spesifikk behandler") {
                     val kontorId = createKontor(HERID_KONTOR_OK)
                     val pBehandler = createBehandler(
-                        behandlerRef = UUID.fromString("3f5c938d-b16a-4474-a294-9e121e7efd17"),
+                        behandlerRef = behandlerToBeUpdated,
                         kontorId = kontorId,
                         hprId = HPRID,
                         personident = FASTLEGE_TREDJE_FNR,

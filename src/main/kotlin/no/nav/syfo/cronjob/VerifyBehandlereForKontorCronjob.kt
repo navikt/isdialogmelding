@@ -25,6 +25,7 @@ class VerifyBehandlereForKontorCronjob(
     val behandlerService: BehandlerService,
     val fastlegeClient: FastlegeClient,
     val syfohelsenettproxyClient: SyfohelsenettproxyClient,
+    val behandlerToBeUpdated: List<UUID> = emptyList(),
 ) : DialogmeldingCronjob {
     private val runAtHour = 6
     private val runDay = DayOfWeek.SUNDAY
@@ -334,7 +335,5 @@ class VerifyBehandlereForKontorCronjob(
 
     companion object {
         private val log = LoggerFactory.getLogger(VerifyBehandlereForKontorCronjob::class.java)
-
-        private val behandlerToBeUpdated = listOf(UUID.fromString("3f5c938d-b16a-4474-a294-9e121e7efd17"))
     }
 }
