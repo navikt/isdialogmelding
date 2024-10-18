@@ -61,7 +61,6 @@ fun testEnvironment() = Environment(
 const val testAapSoknadApiClientId = "soknad-api-client-id"
 const val testAapOppslagApiClientId = "oppslag-client-id"
 const val testSyfooppfolgingsplanserviceClientId = "syfooppfolgingsplanservice-client-id"
-const val isfrisktilarbeidClientId = "isfrisktilarbeid-client-id"
 
 fun testAppState() = ApplicationState(
     alive = true,
@@ -73,8 +72,4 @@ val testAzureAppPreAuthorizedApps = listOf(
         name = "dev-fss:team-esyfo:syfooppfolgingsplanservice",
         clientId = testSyfooppfolgingsplanserviceClientId,
     ),
-    PreAuthorizedClient(
-        name = "dev-gcp:teamsykefravr:isfrisktilarbeid",
-        clientId = isfrisktilarbeidClientId,
-    )
 )

@@ -12,7 +12,6 @@ import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.api.person.registerPersonBehandlerApi
 import no.nav.syfo.behandler.api.person.registerPersonOppfolgingsplanApi
 import no.nav.syfo.behandler.api.registerBehandlerApi
-import no.nav.syfo.behandler.api.registerBehandlerSystemApi
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.oppfolgingsplan.OppfolgingsplanService
 
@@ -74,11 +73,6 @@ fun Application.apiModule(
             registerBehandlerApi(
                 behandlerService = behandlerService,
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
-            )
-            registerBehandlerSystemApi(
-                behandlerService = behandlerService,
-                apiConsumerAccessService = systemAPIConsumerAccessService,
-                authorizedApplicationNameList = environment.behandlerSystemAPIAuthorizedConsumerApplicationNameList
             )
         }
         authenticate(JwtIssuerType.IDPORTEN_TOKENX.name) {

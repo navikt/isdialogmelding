@@ -42,7 +42,6 @@ spec:
     inbound:
       rules:
         - application: syfomodiaperson
-        - application: isfrisktilarbeid
         - application: syfooppfolgingsplanservice
           namespace: team-esyfo
           cluster: dev-fss
