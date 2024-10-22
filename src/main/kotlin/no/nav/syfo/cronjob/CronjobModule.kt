@@ -11,7 +11,6 @@ import no.nav.syfo.cronjob.leaderelection.LeaderPodClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.dialogmelding.cronjob.DialogmeldingStatusCronjob
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
-import java.util.UUID
 
 fun cronjobModule(
     applicationState: ApplicationState,
