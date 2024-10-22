@@ -54,7 +54,7 @@ fun cronjobModule(
         behandlerService = behandlerService,
         fastlegeClient = fastlegeClient,
         syfohelsenettproxyClient = syfohelsenettproxyClient,
-        behandlerToBeUpdated = listOf(UUID.fromString("3f5c938d-b16a-4474-a294-9e121e7efd17"))
+        behandlerToBeUpdated = emptyList(),
     )
 
     listOf(
