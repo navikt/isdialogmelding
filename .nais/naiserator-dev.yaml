@@ -42,6 +42,8 @@ spec:
     inbound:
       rules:
         - application: syfomodiaperson
+        - application: dokumentinnhenting
+          namespace: aap
         - application: syfooppfolgingsplanservice
           namespace: team-esyfo
           cluster: dev-fss
