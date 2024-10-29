@@ -81,6 +81,10 @@ private fun validateReceivedSykmelding(
         COUNT_MOTTATT_SYKMELDING_IGNORED_PARTNERID.increment()
         return false
     }
+    if (receivedSykmeldingDTO.legekontorHerId?.toIntOrNull() == null) {
+        COUNT_MOTTATT_SYKMELDING_IGNORED_HERID.increment()
+        return false
+    }
     if (BehandlerKategori.fromKategoriKode(receivedSykmeldingDTO.legeHelsepersonellkategori) == null) {
         COUNT_MOTTATT_SYKMELDING_IGNORED_BEHANDLERKATEGORI.increment()
         return false

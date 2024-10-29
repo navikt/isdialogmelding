@@ -20,7 +20,7 @@ fun generateSykmeldingDTO(
     legeHelsepersonellkategori: String = "LE",
     partnerreferanse: String? = "123",
     avsenderSystemNavn: String = "EPJ-systemet",
-    kontorHerId: String = "404",
+    kontorHerId: String? = "404",
 ) = ReceivedSykmeldingDTO(
     sykmelding = Sykmelding(
         id = "",
