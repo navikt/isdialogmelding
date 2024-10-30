@@ -386,6 +386,24 @@ class KafkaSykmeldingSpek : Spek({
                         kontor shouldBe null
                         behandler.size shouldBeEqualTo 0
                     }
+                    it("should ignore when missing kontor herId") {
+                        val sykmelding = generateSykmeldingDTO(
+                            uuid = UUID.randomUUID(),
+                            kontorHerId = null,
+                        )
+                        every { mockConsumer.poll(any<Duration>()) } returns
+                            consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+
+                        runBlocking {
+                            pollAndProcessSykmelding(
+                                kafkaConsumerSykmelding = mockConsumer,
+                                behandlerService = behandlerService,
+                            )
+                        }
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+                        val behandlerKontor = database.getAllBehandlerKontor()
+                        behandlerKontor.size shouldBeEqualTo 0
+                    }
                     it("should ignore when missing partnerId") {
                         val sykmelding = generateSykmeldingDTO(
                             uuid = UUID.randomUUID(),
@@ -401,9 +419,8 @@ class KafkaSykmeldingSpek : Spek({
                             )
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val behandler =
-                            database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandler.size shouldBeEqualTo 0
+                        val behandlerKontor = database.getAllBehandlerKontor()
+                        behandlerKontor.size shouldBeEqualTo 0
                     }
                     it("should ignore when partnerId is not numeric") {
                         val sykmelding = generateSykmeldingDTO(
@@ -420,9 +437,8 @@ class KafkaSykmeldingSpek : Spek({
                             )
                         }
                         verify(exactly = 1) { mockConsumer.commitSync() }
-                        val behandler =
-                            database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
-                        behandler.size shouldBeEqualTo 0
+                        val behandlerKontor = database.getAllBehandlerKontor()
+                        behandlerKontor.size shouldBeEqualTo 0
                     }
                     it("should ignore when mottatt before cutoff") {
                         val sykmelding = generateSykmeldingDTO(

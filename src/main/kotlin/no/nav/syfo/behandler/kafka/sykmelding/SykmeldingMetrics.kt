@@ -7,6 +7,7 @@ const val MOTTATT_SYKMELDING = "${METRICS_NS}_mottatt_sykmelding_count"
 const val MOTTATT_SYKMELDING_SUCCESS = "${METRICS_NS}_mottatt_sykmelding_success_count"
 const val MOTTATT_SYKMELDING_IGNORED_MISMATCHED = "${METRICS_NS}_mottatt_sykmelding_ignored_mismatched_count"
 const val MOTTATT_SYKMELDING_IGNORED_PARTNERID = "${METRICS_NS}_mottatt_sykmelding_ignored_partnerid_count"
+const val MOTTATT_SYKMELDING_IGNORED_HERID = "${METRICS_NS}_mottatt_sykmelding_ignored_herid_count"
 const val MOTTATT_SYKMELDING_IGNORED_BEHANDLERKATEGORI = "${METRICS_NS}_mottatt_sykmelding_ignored_behandlerkategori_count"
 
 val COUNT_MOTTATT_SYKMELDING: Counter = Counter
@@ -27,6 +28,11 @@ val COUNT_MOTTATT_SYKMELDING_IGNORED_MISMATCHED: Counter = Counter
 val COUNT_MOTTATT_SYKMELDING_IGNORED_PARTNERID: Counter = Counter
     .builder(MOTTATT_SYKMELDING_IGNORED_PARTNERID)
     .description("Counts the number of received sykmelding that were ignored due missing partnerid")
+    .register(METRICS_REGISTRY)
+
+val COUNT_MOTTATT_SYKMELDING_IGNORED_HERID: Counter = Counter
+    .builder(MOTTATT_SYKMELDING_IGNORED_HERID)
+    .description("Counts the number of received sykmelding that were ignored due missing kontor-herid")
     .register(METRICS_REGISTRY)
 
 val COUNT_MOTTATT_SYKMELDING_IGNORED_BEHANDLERKATEGORI: Counter = Counter
