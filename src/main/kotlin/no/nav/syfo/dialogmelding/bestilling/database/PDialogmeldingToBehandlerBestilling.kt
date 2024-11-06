@@ -18,6 +18,7 @@ data class PDialogmeldingToBehandlerBestilling(
     val kode: Int,
     val tekst: String?,
     val vedlegg: ByteArray? = null,
+    val kilde: String?,
     val sendt: Timestamp?,
     val sendtTries: Int,
 )
@@ -35,4 +36,5 @@ fun PDialogmeldingToBehandlerBestilling.toDialogmeldingToBehandlerBestilling(
     kode = DialogmeldingKode.fromInt(this.kode),
     tekst = this.tekst,
     vedlegg = this.vedlegg,
+    kilde = kilde,
 )

@@ -21,11 +21,12 @@ const val queryCreateBehandlerDialogmeldingBestilling =
             kode,
             tekst,
             vedlegg,
+            kilde,
             sendt,
             sendt_tries,
             created_at,
             updated_at
-            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
     """
 
 fun Connection.createBehandlerDialogmeldingBestilling(
@@ -44,10 +45,11 @@ fun Connection.createBehandlerDialogmeldingBestilling(
         it.setInt(8, dialogmeldingToBehandlerBestilling.kode.value)
         it.setString(9, dialogmeldingToBehandlerBestilling.tekst)
         it.setBytes(10, dialogmeldingToBehandlerBestilling.vedlegg)
-        it.setTimestamp(11, null)
-        it.setInt(12, 0)
-        it.setTimestamp(13, now)
+        it.setString(11, dialogmeldingToBehandlerBestilling.kilde)
+        it.setTimestamp(12, null)
+        it.setInt(13, 0)
         it.setTimestamp(14, now)
+        it.setTimestamp(15, now)
         it.executeQuery().toList { getInt("id") }
     }
 
@@ -155,6 +157,7 @@ fun ResultSet.toPBehandlerDialogmeldingBestilling(): PDialogmeldingToBehandlerBe
         kode = getInt("kode"),
         tekst = getString("tekst"),
         vedlegg = getBytes("vedlegg"),
+        kilde = getString("kilde"),
         sendt = getTimestamp("sendt"),
         sendtTries = getInt("sendt_tries"),
     )

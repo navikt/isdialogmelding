@@ -16,6 +16,7 @@ data class DialogmeldingToBehandlerBestillingDTO(
     val dialogmeldingKode: Int,
     val dialogmeldingTekst: String?,
     val dialogmeldingVedlegg: ByteArray? = null,
+    val kilde: String?,
 )
 
 fun DialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(
@@ -31,4 +32,5 @@ fun DialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(
     kode = DialogmeldingKode.fromInt(this.dialogmeldingKode),
     tekst = this.dialogmeldingTekst,
     vedlegg = this.dialogmeldingVedlegg,
+    kilde = this.kilde,
 )

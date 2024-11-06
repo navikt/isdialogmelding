@@ -81,6 +81,7 @@ class OppfolgingsplanService(
             dialogmeldingKode = DialogmeldingKode.KODE1.value,
             dialogmeldingTekst = null, // brukes ikke for oppfølgingsplan
             dialogmeldingVedlegg = oppfolgingsplan.oppfolgingsplanPdf,
+            kilde = "esyfo",
         )
         return dialogmeldingToBehandlerService.handleIncomingDialogmeldingBestilling(
             dialogmeldingToBehandlerBestillingDTO
