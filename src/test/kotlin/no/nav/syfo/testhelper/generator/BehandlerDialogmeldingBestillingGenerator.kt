@@ -20,7 +20,7 @@ fun generateDialogmeldingToBehandlerBestillingDTO(
     dialogmeldingKode = DialogmeldingKode.KODE1.value,
     dialogmeldingTekst = "En tekst",
     dialogmeldingVedlegg = null,
-    kilde = "isbehandlerdialog",
+    kilde = "SYFO",
 )
 fun generateDialogmeldingToBehandlerBestillingEndreTidStedDTO(
     behandlerRef: UUID,
@@ -37,7 +37,7 @@ fun generateDialogmeldingToBehandlerBestillingEndreTidStedDTO(
     dialogmeldingKode = DialogmeldingKode.KODE2.value,
     dialogmeldingTekst = "Nytt tid og sted",
     dialogmeldingVedlegg = null,
-    kilde = "isbehandlerdialog",
+    kilde = "SYFO",
 )
 
 fun generateDialogmeldingToBehandlerBestillingAvlysningDTO(
@@ -79,7 +79,7 @@ fun generateDialogmeldingToBehandlerBestillingForesporselDTO(
     dialogmeldingKode = DialogmeldingKode.KODE1.value,
     dialogmeldingTekst = "Dette er en forespørsel",
     dialogmeldingVedlegg = null,
-    kilde = "isbehandlerdialog",
+    kilde = "SYFO",
 )
 
 fun generateDialogmeldingToBehandlerBestillingForesporselPurringDTO(
@@ -97,7 +97,7 @@ fun generateDialogmeldingToBehandlerBestillingForesporselPurringDTO(
     dialogmeldingKode = DialogmeldingKode.KODE2.value,
     dialogmeldingTekst = "Dette er en påminnelse om en forespørsel",
     dialogmeldingVedlegg = null,
-    kilde = "isbehandlerdialog",
+    kilde = "SYFO",
 )
 
 fun generateDialogmeldingToBehandlerBestillingForesporselLegeerklaringDTO(
@@ -115,7 +115,7 @@ fun generateDialogmeldingToBehandlerBestillingForesporselLegeerklaringDTO(
     dialogmeldingKode = DialogmeldingKode.KODE1.value,
     dialogmeldingTekst = "Dette er en forespørsel om legeerklæring",
     dialogmeldingVedlegg = null,
-    kilde = "isbehandlerdialog",
+    kilde = "SYFO",
 )
 
 fun generateDialogmeldingToBehandlerBestillingNotatReturLegeerklaringDTO(
@@ -157,7 +157,7 @@ fun generateDialogmeldingToBehandlerBestillingOppfolgingsplanDTO(
     dialogmeldingKode = DialogmeldingKode.KODE1.value,
     dialogmeldingTekst = null,
     dialogmeldingVedlegg = byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-    kilde = "isbehandlerdialog",
+    kilde = "SYFO",
 )
 
 fun generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
@@ -189,5 +189,5 @@ private fun generateDialogmeldingToBehandlerBestillingHenvendelseNotat(
     dialogmeldingKode = kode.value,
     dialogmeldingTekst = tekst,
     dialogmeldingVedlegg = null,
-    kilde = "isbehandlerdialog",
+    kilde = "SYFO",
 )

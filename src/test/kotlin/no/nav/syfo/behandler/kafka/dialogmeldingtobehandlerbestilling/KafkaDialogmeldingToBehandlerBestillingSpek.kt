@@ -95,7 +95,7 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         pBehandlerDialogmeldingBestilling shouldNotBeEqualTo null
                         pBehandlerDialogmeldingBestilling!!.uuid shouldBeEqualTo dialogmeldingBestillingUuid
                         pBehandlerDialogmeldingBestilling.tekst!! shouldBeEqualTo dialogmeldingBestilling.dialogmeldingTekst
-                        pBehandlerDialogmeldingBestilling.kilde!! shouldBeEqualTo "isbehandlerdialog"
+                        pBehandlerDialogmeldingBestilling.kilde!! shouldBeEqualTo "SYFO"
                     }
                     it("should persist incoming bestilling with no kilde") {
                         val behandler = lagreBehandler(database)
