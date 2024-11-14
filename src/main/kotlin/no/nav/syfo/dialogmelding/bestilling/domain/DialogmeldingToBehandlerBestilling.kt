@@ -15,6 +15,7 @@ data class DialogmeldingToBehandlerBestilling(
     val kode: DialogmeldingKode,
     val tekst: String?,
     val vedlegg: ByteArray? = null,
+    val kilde: String?,
 )
 
 enum class DialogmeldingKode(

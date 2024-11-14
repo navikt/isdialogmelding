@@ -95,6 +95,49 @@ class KafkaDialogmeldingToBehandlerBestillingSpek : Spek({
                         pBehandlerDialogmeldingBestilling shouldNotBeEqualTo null
                         pBehandlerDialogmeldingBestilling!!.uuid shouldBeEqualTo dialogmeldingBestillingUuid
                         pBehandlerDialogmeldingBestilling.tekst!! shouldBeEqualTo dialogmeldingBestilling.dialogmeldingTekst
+                        pBehandlerDialogmeldingBestilling.kilde!! shouldBeEqualTo "SYFO"
+                    }
+                    it("should persist incoming bestilling with no kilde") {
+                        val behandler = lagreBehandler(database)
+                        val dialogmeldingBestillingUuid = UUID.randomUUID()
+                        val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
+                            uuid = dialogmeldingBestillingUuid,
+                            behandlerRef = behandler.behandlerRef,
+                        ).copy(
+                            kilde = null,
+                        )
+                        val dialogmeldingBestillingRecord = ConsumerRecord(
+                            DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
+                            partition,
+                            1,
+                            dialogmeldingBestilling.dialogmeldingUuid,
+                            dialogmeldingBestilling,
+                        )
+                        val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
+                        every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                            mapOf(
+                                dialogmeldingToBehandlerBestillingTopicPartition to listOf(
+                                    dialogmeldingBestillingRecord,
+                                )
+                            )
+                        )
+                        every { mockConsumer.commitSync() } returns Unit
+
+                        runBlocking {
+                            pollAndProcessDialogmeldingBestilling(
+                                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                                kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+                            )
+                        }
+
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+
+                        val pBehandlerDialogmeldingBestilling =
+                            database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
+                        pBehandlerDialogmeldingBestilling shouldNotBeEqualTo null
+                        pBehandlerDialogmeldingBestilling!!.uuid shouldBeEqualTo dialogmeldingBestillingUuid
+                        pBehandlerDialogmeldingBestilling.tekst!! shouldBeEqualTo dialogmeldingBestilling.dialogmeldingTekst
+                        pBehandlerDialogmeldingBestilling.kilde shouldBe null
                     }
                     it("persists dialogmelding-status BESTILT when incoming bestilling") {
                         val behandler = lagreBehandler(database)
