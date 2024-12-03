@@ -22,13 +22,14 @@ data class Behandler(
     val suspendert: Boolean,
 )
 
-// TODO: Få med behandlerkategori
 fun Behandler.toBehandlerDTO(
     behandlerType: BehandlerArbeidstakerRelasjonstype?,
 ) = BehandlerDTO(
     type = behandlerType?.name,
     behandlerRef = this.behandlerRef.toString(),
     fnr = this.personident?.value,
+    hprId = this.hprId,
+    kategori = this.kategori.name,
     fornavn = this.fornavn,
     mellomnavn = this.mellomnavn,
     etternavn = this.etternavn,

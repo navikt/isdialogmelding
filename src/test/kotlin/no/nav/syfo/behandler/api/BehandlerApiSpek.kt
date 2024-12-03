@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
+import no.nav.syfo.behandler.domain.BehandlerKategori
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_MED_FASTLEGE_MED_FLERE_PARTNERINFO
@@ -77,6 +78,8 @@ class BehandlerApiSpek : Spek({
                             behandlerDTO.type shouldBeEqualTo BehandlerArbeidstakerRelasjonstype.FASTLEGE.name
                             behandlerDTO.behandlerRef shouldBeEqualTo behandlerForPersonList.first().behandlerRef.toString()
                             behandlerDTO.fnr shouldBeEqualTo fastlegeResponse.fnr
+                            behandlerDTO.kategori shouldBeEqualTo BehandlerKategori.LEGE.name
+                            behandlerDTO.hprId shouldBeEqualTo fastlegeResponse.helsepersonellregisterId
                         }
                     }
                     it("should return list of Behandler and store behandler connected to kontor with latest dialogmeldingEnabled") {
