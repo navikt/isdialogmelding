@@ -7,7 +7,7 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.fellesformat.Fellesformat
 import no.nav.syfo.testhelper.generator.*
 import no.nav.syfo.util.JAXB
-import org.junit.Assert.assertTrue
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.util.*
