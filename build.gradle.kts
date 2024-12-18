@@ -3,7 +3,7 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 val confluentVersion = "7.6.1"
-val dialogmeldingVersion = "1.5d21db9"
+val dialogmeldingVersion = "2.0.1"
 val fellesformat2Version = "1.0329dd1"
 val flywayVersion = "10.17.3"
 val hikariVersion = "5.1.0"
