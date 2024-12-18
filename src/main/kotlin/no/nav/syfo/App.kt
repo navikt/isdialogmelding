@@ -94,15 +94,22 @@ fun main() {
     lateinit var dialogmeldingToBehandlerService: DialogmeldingToBehandlerService
     lateinit var dialogmeldingStatusService: DialogmeldingStatusService
 
-    val applicationEngineEnvironment = applicationEngineEnvironment {
+    val applicationEngineEnvironment = applicationEnvironment {
         log = logger
         config = HoconApplicationConfig(ConfigFactory.load())
-
-        connector {
-            port = applicationPort
-        }
-
-        module {
+    }
+    val server = embeddedServer(
+        factory = Netty,
+        environment = applicationEngineEnvironment,
+        configure = {
+            connector {
+                port = applicationPort
+            }
+            connectionGroupSize = 8
+            workerGroupSize = 8
+            callGroupSize = 16
+        },
+        module = {
             databaseModule(environment = environment)
 
             behandlerService = BehandlerService(
@@ -130,91 +137,81 @@ fun main() {
                 dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
             )
-        }
-    }
-
-    applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) {
-        applicationState.ready = true
-        logger.info("Application is ready, running Java VM ${Runtime.version()}")
-        launchKafkaTaskDialogmeldingBestilling(
-            applicationState = applicationState,
-            applicationEnvironmentKafka = environment.kafka,
-            dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-        )
-        val dialogmeldingService = DialogmeldingService(
-            pdlClient = pdlClient,
-            mqSender = mqSender,
-        )
-        cronjobModule(
-            applicationState = applicationState,
-            environment = environment,
-            dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-            dialogmeldingService = dialogmeldingService,
-            dialogmeldingStatusService = dialogmeldingStatusService,
-            behandlerService = behandlerService,
-            partnerinfoClient = partnerinfoClient,
-            legeSuspensjonClient = legeSuspensjonClient,
-            fastlegeClient = fastlegeClient,
-            syfohelsenettproxyClient = syfohelsenettproxyClient,
-        )
-        launchKafkaTaskSykmelding(
-            applicationState = applicationState,
-            applicationEnvironmentKafka = environment.kafka,
-            behandlerService = behandlerService,
-        )
-        launchKafkaTaskDialogmeldingFromBehandler(
-            applicationState = applicationState,
-            applicationEnvironmentKafka = environment.kafka,
-            database = applicationDatabase,
-        )
-        launchBackgroundTask(
-            applicationState = applicationState,
-        ) {
-            val factory = connectionFactory(environment)
-
-            factory.createConnection(
-                environment.serviceuserUsername,
-                environment.serviceuserPassword,
-            ).use { connection ->
-                connection.start()
-                val session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE)
-                val inputconsumer = session.consumerForQueue(environment.apprecQueueName)
-                val apprecService = ApprecService(
-                    database = applicationDatabase,
-                )
-                val blockingApplicationRunner = ApprecConsumer(
+            monitor.subscribe(ApplicationStarted) {
+                applicationState.ready = true
+                logger.info("Application is ready, running Java VM ${Runtime.version()}")
+                launchKafkaTaskDialogmeldingBestilling(
                     applicationState = applicationState,
-                    database = applicationDatabase,
-                    inputconsumer = inputconsumer,
-                    apprecService = apprecService,
+                    applicationEnvironmentKafka = environment.kafka,
                     dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                 )
-                blockingApplicationRunner.run()
+                val dialogmeldingService = DialogmeldingService(
+                    pdlClient = pdlClient,
+                    mqSender = mqSender,
+                )
+                cronjobModule(
+                    applicationState = applicationState,
+                    environment = environment,
+                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                    dialogmeldingService = dialogmeldingService,
+                    dialogmeldingStatusService = dialogmeldingStatusService,
+                    behandlerService = behandlerService,
+                    partnerinfoClient = partnerinfoClient,
+                    legeSuspensjonClient = legeSuspensjonClient,
+                    fastlegeClient = fastlegeClient,
+                    syfohelsenettproxyClient = syfohelsenettproxyClient,
+                )
+                launchKafkaTaskSykmelding(
+                    applicationState = applicationState,
+                    applicationEnvironmentKafka = environment.kafka,
+                    behandlerService = behandlerService,
+                )
+                launchKafkaTaskDialogmeldingFromBehandler(
+                    applicationState = applicationState,
+                    applicationEnvironmentKafka = environment.kafka,
+                    database = applicationDatabase,
+                )
+                launchBackgroundTask(
+                    applicationState = applicationState,
+                ) {
+                    val factory = connectionFactory(environment)
+
+                    factory.createConnection(
+                        environment.serviceuserUsername,
+                        environment.serviceuserPassword,
+                    ).use { connection ->
+                        connection.start()
+                        val session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE)
+                        val inputconsumer = session.consumerForQueue(environment.apprecQueueName)
+                        val apprecService = ApprecService(
+                            database = applicationDatabase,
+                        )
+                        val blockingApplicationRunner = ApprecConsumer(
+                            applicationState = applicationState,
+                            database = applicationDatabase,
+                            inputconsumer = inputconsumer,
+                            apprecService = apprecService,
+                            dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                        )
+                        blockingApplicationRunner.run()
+                    }
+                }
+                val identhendelseService = IdenthendelseService(
+                    database = applicationDatabase,
+                    pdlClient = pdlClient,
+                )
+                val identhendelseConsumerService = IdenthendelseConsumerService(
+                    identhendelseService = identhendelseService,
+                )
+
+                launchKafkaTaskIdenthendelse(
+                    applicationState = applicationState,
+                    applicationEnvironmentKafka = environment.kafka,
+                    kafkaIdenthendelseConsumerService = identhendelseConsumerService,
+                )
             }
         }
-        val identhendelseService = IdenthendelseService(
-            database = applicationDatabase,
-            pdlClient = pdlClient,
-        )
-        val identhendelseConsumerService = IdenthendelseConsumerService(
-            identhendelseService = identhendelseService,
-        )
-
-        launchKafkaTaskIdenthendelse(
-            applicationState = applicationState,
-            applicationEnvironmentKafka = environment.kafka,
-            kafkaIdenthendelseConsumerService = identhendelseConsumerService,
-        )
-    }
-
-    val server = embeddedServer(
-        factory = Netty,
-        environment = applicationEngineEnvironment,
-    ) {
-        connectionGroupSize = 8
-        workerGroupSize = 8
-        callGroupSize = 16
-    }
+    )
 
     Runtime.getRuntime().addShutdownHook(
         Thread {

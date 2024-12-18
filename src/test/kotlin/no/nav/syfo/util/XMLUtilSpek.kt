@@ -5,7 +5,7 @@ import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.generator.*
 import no.nav.xml.eiff._2.XMLMottakenhetBlokk
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.Assert.assertThrows
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
