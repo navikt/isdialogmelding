@@ -16,7 +16,6 @@ import no.nav.syfo.domain.isDNR
 import no.nav.syfo.domain.isDnrMatchingFnr
 import no.nav.syfo.util.nowUTC
 import org.slf4j.LoggerFactory
-import java.time.DayOfWeek
 import java.util.UUID
 
 const val ALERIS_HER_ID = "2033"
@@ -28,10 +27,10 @@ class VerifyBehandlereForKontorCronjob(
     val behandlerToBeUpdated: List<UUID> = emptyList(),
 ) : DialogmeldingCronjob {
     private val runAtHour = 6
-    private val runDay = DayOfWeek.SUNDAY
 
-    override val initialDelayMinutes: Long = calculateWeeklyInitialDelay("VerifyBehandlereForKontorCronjob", runDay, runAtHour)
-    override val intervalDelayMinutes: Long = 24 * 60 * 7
+    override val initialDelayMinutes: Long =
+        calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
+    override val intervalDelayMinutes: Long = 24 * 60 * 2
 
     override suspend fun run() {
         verifyBehandlereForKontorJob()
