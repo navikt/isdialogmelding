@@ -2,34 +2,35 @@
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val confluentVersion = "7.6.1"
+val confluentVersion = "7.8.0"
 val dialogmeldingVersion = "1.5d21db9"
 val fellesformat2Version = "1.0329dd1"
-val flywayVersion = "10.17.3"
-val hikariVersion = "5.1.0"
+val flywayVersion = "11.3.0"
+val hikariVersion = "6.2.1"
 val jacksonVersion = "2.18.2"
 val jaxbVersion = "2.3.1"
-val jsonVersion = "20240303"
-val kafkaVersion = "3.7.0"
+val jsonVersion = "20250107"
+val kafkaVersion = "3.9.0"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val kluentVersion = "1.73"
-val ktorVersion = "3.0.2"
-val logbackVersion = "1.5.12"
-val logstashEncoderVersion = "7.4"
-val micrometerRegistryVersion = "1.12.7"
-val mockkVersion = "1.13.13"
-val mqVersion = "9.3.4.1"
-val nimbusjosejwtVersion = "9.47"
-val postgresVersion = "42.7.4"
+val ktorVersion = "3.1.0"
+val logbackVersion = "1.5.16"
+val logstashEncoderVersion = "8.0"
+val micrometerRegistryVersion = "1.12.13"
+val mockkVersion = "1.13.16"
+val mqVersion = "9.4.1.1"
+val nettyCodecVersion = "4.1.118.Final"
+val nimbusjosejwtVersion = "10.0.1"
+val postgresVersion = "42.7.5"
 val postgresEmbeddedVersion = "2.1.0"
 val spekVersion = "2.0.19"
 val syfotjenesterVersion = "1.2021.06.09-13.09-b3d30de9996e"
 
 plugins {
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.1.10"
     id("com.gradleup.shadow") version "8.3.5"
-    id("org.jlleitschuh.gradle.ktlint") version "11.4.2"
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 }
 
 repositories {
@@ -53,6 +54,7 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.netty:netty-codec-http2:$nettyCodecVersion") // TODO: Remove when Ktor upgrades Netty Codec
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
@@ -84,24 +86,32 @@ dependencies {
         exclude(group = "log4j")
     }
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion", excludeLog4j)
+    constraints {
+        implementation("org.apache.zookeeper:zookeeper") {
+            because("org.apache.kafka:kafka_2.13:$kafkaVersion -> https://www.cve.org/CVERecord?id=CVE-2023-44981")
+            version {
+                require("3.9.3")
+            }
+        }
+    }
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion", excludeLog4j)
     constraints {
         implementation("org.apache.avro:avro") {
             because("org.apache.avro:avro:1.11.0 -> https://www.cve.org/CVERecord?id=CVE-2023-39410")
             version {
-                require("1.11.3")
+                require("1.11.4")
             }
         }
         implementation("org.apache.commons:commons-compress") {
             because("org.apache.commons:commons-compress:1.22 -> https://www.cve.org/CVERecord?id=CVE-2012-2098")
             version {
-                require("1.26.0")
+                require("1.27.1")
             }
         }
         implementation("com.google.guava:guava") {
             because("com.google.guava:guava:30.1.1-jre -> https://www.cve.org/CVERecord?id=CVE-2020-8908")
             version {
-                require("32.1.3-jre")
+                require("33.4.0-jre")
             }
         }
     }

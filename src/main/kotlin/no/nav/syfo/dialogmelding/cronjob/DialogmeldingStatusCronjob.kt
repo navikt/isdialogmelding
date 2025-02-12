@@ -26,12 +26,13 @@ class DialogmeldingStatusCronjob(private val dialogmeldingStatusService: Dialogm
                 result.failed++
             }
         }
-        log.info(
-            "Completed dialogmelding-status publishing with result: {}, {}",
-            StructuredArguments.keyValue("failed", result.failed),
-            StructuredArguments.keyValue("updated", result.updated),
-        )
-
+        if (result.failed + result.updated > 0) {
+            log.info(
+                "Completed dialogmelding-status publishing with result: {}, {}",
+                StructuredArguments.keyValue("failed", result.failed),
+                StructuredArguments.keyValue("updated", result.updated),
+            )
+        }
         return result
     }
 

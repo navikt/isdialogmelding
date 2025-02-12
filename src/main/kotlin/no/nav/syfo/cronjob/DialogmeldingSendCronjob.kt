@@ -54,11 +54,13 @@ class DialogmeldingSendCronjob(
                 COUNT_CRONJOB_DIALOGMELDING_FAIL_COUNT.increment()
             }
         }
-        log.info(
-            "Completed dialogmelding-sending with result: {}, {}",
-            StructuredArguments.keyValue("failed", sendingResult.failed),
-            StructuredArguments.keyValue("updated", sendingResult.updated),
-        )
+        if (sendingResult.failed + sendingResult.updated > 0) {
+            log.info(
+                "Completed dialogmelding-sending with result: {}, {}",
+                StructuredArguments.keyValue("failed", sendingResult.failed),
+                StructuredArguments.keyValue("updated", sendingResult.updated),
+            )
+        }
         return sendingResult
     }
 
