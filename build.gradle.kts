@@ -14,13 +14,12 @@ val kafkaVersion = "3.9.0"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val kluentVersion = "1.73"
-val ktorVersion = "3.0.3"
+val ktorVersion = "3.1.0"
 val logbackVersion = "1.5.16"
 val logstashEncoderVersion = "8.0"
 val micrometerRegistryVersion = "1.12.13"
 val mockkVersion = "1.13.16"
 val mqVersion = "9.4.1.1"
-val nettyCodecVersion = "4.1.118.Final"
 val nimbusjosejwtVersion = "10.0.1"
 val postgresVersion = "42.7.5"
 val postgresEmbeddedVersion = "2.1.0"
@@ -54,7 +53,6 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-    implementation("io.netty:netty-codec-http2:$nettyCodecVersion") // TODO: Remove when Ktor upgrades Netty Codec
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
