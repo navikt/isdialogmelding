@@ -8,6 +8,20 @@ import no.nav.syfo.domain.PartnerId
 import java.sql.*
 import java.time.OffsetDateTime
 
+fun DatabaseInterface.createBehandlerKontorIfMissing(
+    kontor: BehandlerKontor,
+): Int? =
+    this.connection.use { connection ->
+        val pBehandlerKontor = connection.getBehandlerKontor(kontor.partnerId)
+        if (pBehandlerKontor == null) {
+            connection.createBehandlerKontor(kontor).also {
+                connection.commit()
+            }
+        } else {
+            null
+        }
+    }
+
 const val queryCreateBehandlerKontor =
     """
         INSERT INTO BEHANDLER_KONTOR (
