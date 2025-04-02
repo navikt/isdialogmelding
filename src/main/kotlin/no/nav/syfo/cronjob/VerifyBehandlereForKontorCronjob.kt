@@ -10,6 +10,7 @@ import no.nav.syfo.behandler.domain.BehandlerKategori
 import no.nav.syfo.behandler.domain.BehandleridentType
 import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO
 import no.nav.syfo.behandler.fastlege.FastlegeClient
+import no.nav.syfo.behandler.fastlege.toBehandlerKontor
 import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.domain.isDNR
@@ -56,6 +57,8 @@ class VerifyBehandlereForKontorCronjob(
                         log.info("VerifyBehandlereForKontorCronjob: Disable dialogmelding for kontor siden inaktiv i Adresseregisteret: herId ${behandlerKontor.herId} partnerId ${behandlerKontor.partnerId}")
                         behandlerService.disableDialogmeldingerForKontor(behandlerKontor)
                     } else {
+                        behandlerService.updateBehandlerKontorSystemAndAdresse(behandlerKontorFraAdresseregisteret.toBehandlerKontor(behandlerKontor.partnerId))
+
                         val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = behandlerKontorFraAdresseregisteret.behandlere.partition { it.aktiv }
                         val existingBehandlereForKontorWithoutHPR = behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.hprId.isNullOrEmpty() }
                         if (existingBehandlereForKontorWithoutHPR.isNotEmpty()) {

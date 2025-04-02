@@ -114,6 +114,20 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
                 val kontorAfter = database.getBehandlerKontorById(kontorId)
                 kontorAfter.dialogmeldingEnabled shouldNotBeEqualTo null
             }
+            it("Cronjob oppdaterer adresse") {
+                val kontorId = createKontor(HERID_KONTOR_OK)
+                val kontorBefore = database.getBehandlerKontorById(kontorId)
+                kontorBefore.adresse shouldBeEqualTo null
+                kontorBefore.postnummer shouldBeEqualTo null
+                kontorBefore.poststed shouldBeEqualTo null
+                runBlocking {
+                    cronJob.verifyBehandlereForKontorJob()
+                }
+                val kontorAfter = database.getBehandlerKontorById(kontorId)
+                kontorAfter.adresse shouldNotBeEqualTo null
+                kontorAfter.postnummer shouldNotBeEqualTo null
+                kontorAfter.poststed shouldNotBeEqualTo null
+            }
             it("Cronjob setter hprId på behandlere som mangler det") {
                 val kontorId = createKontor(HERID_KONTOR_OK)
                 val pBehandler = createBehandler(
