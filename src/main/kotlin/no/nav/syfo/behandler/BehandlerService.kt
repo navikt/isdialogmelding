@@ -406,6 +406,17 @@ class BehandlerService(
         }
     }
 
+    fun updateBehandlerKontorSystemAndAdresse(
+        behandlerKontor: BehandlerKontor,
+    ) {
+        database.connection.use { connection ->
+            connection.getBehandlerKontor(behandlerKontor.partnerId)?.let { existingBehandlerKontor ->
+                connection.updateBehandlerKontorSystemAndAdresse(behandlerKontor, existingBehandlerKontor)
+            }
+            connection.commit()
+        }
+    }
+
     private fun Connection.updateBehandlerKontorSystemAndAdresse(
         behandlerKontor: BehandlerKontor,
         existingBehandlerKontor: PBehandlerKontor,

@@ -5,8 +5,10 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.application.kafka.ApplicationEnvironmentKafka
 import no.nav.syfo.behandler.database.*
+import no.nav.syfo.behandler.domain.BehandlerKontor
 import no.nav.syfo.behandler.domain.BehandleridentType
 import no.nav.syfo.behandler.kafka.kafkaDialogmeldingFromBehandlerConsumerConfig
+import no.nav.syfo.behandler.kafka.sykmelding.toOffsetDateTime
 import no.nav.syfo.domain.*
 import no.nav.syfo.util.getObjectFromXmlString
 import no.nav.xml.eiff._2.XMLMottakenhetBlokk
@@ -90,6 +92,12 @@ private fun updateKontorAndBehandler(
             partnerId = id,
             database = database,
         )
+
+        createAndStoreBehandlerKontorFromDialogmeldingIfMissing(
+            dialogmeldingFromBehandler = dialogmeldingFromBehandler,
+            partnerId = partnerId,
+            database = database,
+        )
     }
 }
 
@@ -156,6 +164,33 @@ private fun updateIdenterForBehandler(
             }
         } else {
             log.warn("Ignoring invalid behandler fnr, skip update behandler idents")
+        }
+    }
+}
+
+private fun createAndStoreBehandlerKontorFromDialogmeldingIfMissing(
+    partnerId: PartnerId,
+    dialogmeldingFromBehandler: KafkaDialogmeldingFromBehandlerDTO,
+    database: DatabaseInterface,
+) {
+    val kontorHerId = dialogmeldingFromBehandler.legekontorHerId
+    if (kontorHerId != null && kontorHerId.isNotBlank()) {
+        val behandlerKontor = BehandlerKontor(
+            partnerId = partnerId,
+            herId = dialogmeldingFromBehandler.legekontorHerId.toInt(),
+            navn = dialogmeldingFromBehandler.legekontorOrgName,
+            adresse = null,
+            postnummer = null,
+            poststed = null,
+            orgnummer = dialogmeldingFromBehandler.legekontorOrgNr?.let { Virksomhetsnummer(it) },
+            dialogmeldingEnabled = true,
+            dialogmeldingEnabledLocked = false,
+            system = null,
+            mottatt = dialogmeldingFromBehandler.mottattTidspunkt.toOffsetDateTime(),
+        )
+        val kontorId = database.createBehandlerKontorIfMissing(behandlerKontor)
+        if (kontorId != null) {
+            log.info("Created new behandlerkontor from dialogmelding with partnerId: $partnerId, kontorHerId: $kontorHerId")
         }
     }
 }

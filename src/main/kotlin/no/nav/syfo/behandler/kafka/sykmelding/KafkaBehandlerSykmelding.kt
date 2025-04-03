@@ -142,4 +142,4 @@ private fun createAndStoreBehandlerKontorFromSykmelding(
     )
 }
 
-private fun LocalDateTime.toOffsetDateTime() = ZonedDateTime.of(this, ZoneId.of("Europe/Oslo")).toOffsetDateTime()
+fun LocalDateTime.toOffsetDateTime() = ZonedDateTime.of(this, ZoneId.of("Europe/Oslo")).toOffsetDateTime()
