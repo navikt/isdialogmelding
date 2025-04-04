@@ -23,6 +23,7 @@ import no.nav.syfo.testhelper.UserConstants.FASTLEGE_UTEN_KATEGORI_FNR
 import no.nav.syfo.testhelper.UserConstants.HERID
 import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_OK
 import no.nav.syfo.testhelper.UserConstants.HERID_NOT_ACTIVE
+import no.nav.syfo.testhelper.UserConstants.HERID_PSYKOLOG_KONTOR_OK
 import no.nav.syfo.testhelper.UserConstants.HPRID
 import no.nav.syfo.testhelper.UserConstants.HPRID_INACTIVE
 import no.nav.syfo.testhelper.UserConstants.HPRID_UNKNOWN
@@ -199,6 +200,16 @@ class VerifyBehandlereForKontorCronjobSpek : Spek({
             }
             it("Cronjob legger til ny behandlere") {
                 val kontorId = createKontor(HERID_KONTOR_OK)
+                val behandlerBefore = database.getBehandlereForKontor(kontorId)
+                behandlerBefore.size shouldBeEqualTo 0
+                runBlocking {
+                    cronJob.verifyBehandlereForKontorJob()
+                }
+                val behandlerAfter = database.getBehandlereForKontor(kontorId)
+                behandlerAfter.size shouldBeEqualTo 2
+            }
+            it("Cronjob legger til ny behandlere (psykolog)") {
+                val kontorId = createKontor(HERID_PSYKOLOG_KONTOR_OK)
                 val behandlerBefore = database.getBehandlereForKontor(kontorId)
                 behandlerBefore.size shouldBeEqualTo 0
                 runBlocking {
