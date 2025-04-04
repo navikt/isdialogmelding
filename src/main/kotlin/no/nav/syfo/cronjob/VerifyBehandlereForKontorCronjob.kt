@@ -29,9 +29,7 @@ class VerifyBehandlereForKontorCronjob(
 ) : DialogmeldingCronjob {
     private val runAtHour = 6
 
-    override val initialDelayMinutes: Long = 2
-
-    // calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
+    override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60 * 2
 
     override suspend fun run() {
@@ -41,10 +39,9 @@ class VerifyBehandlereForKontorCronjob(
     suspend fun verifyBehandlereForKontorJob() {
         val verifyResult = DialogmeldingCronjobResult()
 
-        val behandlerKontorListe = behandlerService.getKontor().filter { it.herId == "116044" }
-        //    behandlerService.getKontor().filter {
-        //    it.herId != null && it.dialogmeldingEnabled != null && it.herId != ALERIS_HER_ID
-        // }
+        val behandlerKontorListe = behandlerService.getKontor().filter {
+            it.herId != null && it.dialogmeldingEnabled != null && it.herId != ALERIS_HER_ID
+        }
         behandlerKontorListe.forEach { behandlerKontor ->
             try {
                 val start = System.currentTimeMillis()
