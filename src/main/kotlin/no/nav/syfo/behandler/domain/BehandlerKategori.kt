@@ -7,7 +7,8 @@ enum class BehandlerKategori(
     KIROPRAKTOR("KI"),
     LEGE("LE"),
     MANUELLTERAPEUT("MT"),
-    TANNLEGE("TL");
+    TANNLEGE("TL"),
+    PSYKOLOG("PS");
 
     companion object {
         fun fromKategoriKode(kategori: String?): BehandlerKategori? =

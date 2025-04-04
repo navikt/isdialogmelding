@@ -26,7 +26,7 @@ fun generateBehandlerKontorResponse(
     orgnummer = null,
     behandlere = listOf(
         generateBehandlerFraAdresseregisteret(HPRID_INACTIVE),
-        generateBehandlerFraAdresseregisteret(HPRID),
+        if (kontorHerId == UserConstants.HERID_PSYKOLOG_KONTOR_OK) generatePsykologBehandlerFraAdresseregisteret(HPRID) else generateBehandlerFraAdresseregisteret(HPRID),
         generateBehandlerFraAdresseregisteret(HPRID_UTEN_KATEGORI),
     ),
 )
@@ -48,4 +48,17 @@ fun generateBehandlerFraAdresseregisteret(
     herId = if (hprId == HPRID || hprId == HPRID_UTEN_KATEGORI) HERID else OTHER_HERID,
     hprId = hprId,
     kategori = if (hprId == HPRID_UTEN_KATEGORI) null else BehandlerKategori.LEGE.kategoriKode,
+)
+
+fun generatePsykologBehandlerFraAdresseregisteret(
+    hprId: Int,
+) = BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO(
+    aktiv = hprId != HPRID_INACTIVE,
+    fornavn = UserConstants.BEHANDLER_FORNAVN,
+    mellomnavn = null,
+    etternavn = UserConstants.BEHANDLER_ETTERNAVN,
+    personIdent = if (hprId == HPRID) FASTLEGE_FNR.value else if (hprId == HPRID_UTEN_KATEGORI) FASTLEGE_UTEN_KATEGORI_FNR.value else FASTLEGE_ANNEN_FNR.value,
+    herId = if (hprId == HPRID || hprId == HPRID_UTEN_KATEGORI) HERID else OTHER_HERID,
+    hprId = hprId,
+    kategori = BehandlerKategori.PSYKOLOG.kategoriKode,
 )
