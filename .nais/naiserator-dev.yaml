@@ -82,6 +82,13 @@ spec:
         databases:
           - name: isdialogmelding-db
         diskAutoresize: true
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+    logging:
+      destinations:
+        - id: elastic
   envFrom:
     - secret: isdialogmelding-serviceuser
     - secret: isdialogmelding-keystore-pwd
@@ -137,4 +144,3 @@ spec:
       value: "dev-gcp.team-rocket.btsys-api"
     - name: BTSYS_ENDPOINT_URL
       value: "http://btsys-api.team-rocket"
-
