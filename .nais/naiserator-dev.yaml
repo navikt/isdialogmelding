@@ -88,6 +88,7 @@ spec:
       runtime: java
     logging:
       destinations:
+        - id: loki
         - id: elastic
   envFrom:
     - secret: isdialogmelding-serviceuser
