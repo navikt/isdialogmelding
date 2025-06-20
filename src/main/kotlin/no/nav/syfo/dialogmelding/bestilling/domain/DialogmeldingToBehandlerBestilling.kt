@@ -24,7 +24,7 @@ data class DialogmeldingToBehandlerBestilling(
         val vasket = tekst?.replace(Regex("[^\\x00-\\xFF]"), "")
         if (tekst != null && tekst != vasket) {
             // Log warning if tekst contains non-ASCII characters
-            log.warn("tekst contains non-ASCII characters, original:\n $tekst,\n vasket:\n $vasket")
+            log.warn("Fjernet ikke-ASCII-tegn fra tekst i dialogmeldingbestilling med uuid: $uuid")
         }
         return vasket
     }
