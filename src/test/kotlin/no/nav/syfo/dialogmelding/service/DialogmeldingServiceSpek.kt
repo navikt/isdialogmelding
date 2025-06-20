@@ -43,12 +43,13 @@ import org.junit.jupiter.api.Assertions
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.util.UUID
+import kotlin.test.assertTrue
 
 object DialogmeldingServiceSpek : Spek({
 
-    val externalMockEnvironment = ExternalMockEnvironment.Companion.instance
+    val externalMockEnvironment = ExternalMockEnvironment.instance
     val database = externalMockEnvironment.database
-    val environment = ExternalMockEnvironment.Companion.instance.environment
+    val environment = ExternalMockEnvironment.instance.environment
     val pdlClient = PdlClient(
         azureAdClient = AzureAdClient(
             azureAppClientId = environment.aadAppClient,
@@ -117,7 +118,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
 
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -142,7 +143,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlDNRRegex()
             val actualFellesformatMessage = messageSlot.captured
 
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -185,7 +186,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingEndreTidStedXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
 
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -210,7 +211,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingReferatXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
 
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -235,7 +236,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingAvlysningXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
 
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -259,7 +260,7 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -283,7 +284,7 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselPurringXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -307,7 +308,7 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselLegeerklaringXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -331,7 +332,7 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingReturLegeerklaringXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -356,7 +357,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex =
                 defaultFellesformatDialogmeldingFriskmeldingTilArbeidsformidlingXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -382,10 +383,10 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingHenvendelseMeldingFraNavXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
-            Assertions.assertTrue(
+            assertTrue(
                 actualFellesformatMessage.contains(meldingsTekst),
             )
         }
@@ -412,10 +413,10 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingHenvendelseMeldingFraNavXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            Assertions.assertTrue(
+            assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
-            Assertions.assertTrue(
+            assertTrue(
                 actualFellesformatMessage.contains(meldingsTekstVasket),
             )
         }
