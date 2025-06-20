@@ -23,7 +23,6 @@ data class DialogmeldingToBehandlerBestilling(
     fun getTekstRemoveNonAsciiCharacters(): String? {
         val vasket = tekst?.replace(Regex("[^\\x00-\\xFF]"), "")
         if (tekst != null && tekst != vasket) {
-            // Log warning if tekst contains non-ASCII characters
             log.warn("Fjernet ikke-ASCII-tegn fra tekst i dialogmeldingbestilling med uuid: $uuid")
         }
         return vasket
