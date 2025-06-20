@@ -1,25 +1,54 @@
-package no.nav.syfo.dialogmelding
+package no.nav.syfo.dialogmelding.service
 
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.mq.MQSender
-import no.nav.syfo.dialogmelding.bestilling.kafka.toDialogmeldingToBehandlerBestilling
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.dialogmelding.bestilling.kafka.toDialogmeldingToBehandlerBestilling
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.Personident
-import no.nav.syfo.testhelper.*
-import no.nav.syfo.testhelper.generator.*
-import org.junit.jupiter.api.Assertions.assertTrue
+import no.nav.syfo.testhelper.ExternalMockEnvironment
+import no.nav.syfo.testhelper.UserConstants
+import no.nav.syfo.testhelper.createBehandlerForArbeidstaker
+import no.nav.syfo.testhelper.dropData
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingAvlysningXmlRegex
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingEndreTidStedXmlRegex
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingForesporselLegeerklaringXmlRegex
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingForesporselPurringXmlRegex
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingForesporselXmlRegex
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingFriskmeldingTilArbeidsformidlingXmlRegex
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingHenvendelseMeldingFraNavXmlRegex
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingReferatXmlRegex
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingReturLegeerklaringXmlRegex
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingXmlDNRRegex
+import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingXmlRegex
+import no.nav.syfo.testhelper.generator.generateBehandler
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingAvlysningDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingEndreTidStedDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingForesporselDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingForesporselLegeerklaringDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingForesporselPurringDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingNotatFriskmeldingTilArbeidsformidlingDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingNotatReturLegeerklaringDTO
+import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingReferatDTO
+import org.junit.jupiter.api.Assertions
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import java.util.*
+import java.util.UUID
 
 object DialogmeldingServiceSpek : Spek({
 
-    val externalMockEnvironment = ExternalMockEnvironment.instance
+    val externalMockEnvironment = ExternalMockEnvironment.Companion.instance
     val database = externalMockEnvironment.database
-    val environment = ExternalMockEnvironment.instance.environment
+    val environment = ExternalMockEnvironment.Companion.instance.environment
     val pdlClient = PdlClient(
         azureAdClient = AzureAdClient(
             azureAppClientId = environment.aadAppClient,
@@ -46,7 +75,8 @@ object DialogmeldingServiceSpek : Spek({
     val behandlerRefWithoutOrgnr = UUID.randomUUID()
     val behandlerWithoutOrgnr = generateBehandler(behandlerRefWithoutOrgnr, PartnerId(2), orgnummer = null)
     val behandlerRefWithDNR = UUID.randomUUID()
-    val behandlerWithDNR = generateBehandler(behandlerRefWithDNR, PartnerId(1), personident = UserConstants.FASTLEGE_DNR)
+    val behandlerWithDNR =
+        generateBehandler(behandlerRefWithDNR, PartnerId(1), personident = UserConstants.FASTLEGE_DNR)
 
     beforeEachTest {
         database.dropData()
@@ -87,7 +117,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
 
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -112,7 +142,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlDNRRegex()
             val actualFellesformatMessage = messageSlot.captured
 
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -155,7 +185,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingEndreTidStedXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
 
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -180,7 +210,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingReferatXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
 
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -205,7 +235,7 @@ object DialogmeldingServiceSpek : Spek({
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingAvlysningXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
 
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -229,7 +259,7 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -253,7 +283,7 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselPurringXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -277,7 +307,7 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselLegeerklaringXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -301,7 +331,7 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingReturLegeerklaringXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -323,9 +353,10 @@ object DialogmeldingServiceSpek : Spek({
             }
             verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
-            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingFriskmeldingTilArbeidsformidlingXmlRegex()
+            val expectedFellesformatMessageAsRegex =
+                defaultFellesformatDialogmeldingFriskmeldingTilArbeidsformidlingXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
             )
         }
@@ -334,10 +365,12 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
+            val meldingsTekst = "Dette er en generell henvendelse fra NAV som ikke utløser takst"
             val melding = generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
                 arbeidstakerPersonident = arbeidstakerPersonident,
+                tekst = meldingsTekst,
             ).toDialogmeldingToBehandlerBestilling(
                 behandler = behandler,
             )
@@ -349,8 +382,41 @@ object DialogmeldingServiceSpek : Spek({
 
             val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingHenvendelseMeldingFraNavXmlRegex()
             val actualFellesformatMessage = messageSlot.captured
-            assertTrue(
+            Assertions.assertTrue(
                 expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+            Assertions.assertTrue(
+                actualFellesformatMessage.contains(meldingsTekst),
+            )
+        }
+        it("Sends correct message on MQ when melding fra NAV after removing non ascii characters") {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+
+            val meldingsTekstMedMystiskTegn = "Dette er en generell henvendelse fra NAV \u0AAEsom ikke utløser takst"
+            val meldingsTekstVasket = "Dette er en generell henvendelse fra NAV som ikke utløser takst"
+            val melding = generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
+                behandlerRef = behandlerRef,
+                uuid = uuid,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+                tekst = meldingsTekstMedMystiskTegn,
+            ).toDialogmeldingToBehandlerBestilling(
+                behandler = behandler,
+            )
+
+            runBlocking {
+                dialogmeldingService.sendMelding(melding)
+            }
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingHenvendelseMeldingFraNavXmlRegex()
+            val actualFellesformatMessage = messageSlot.captured
+            Assertions.assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
+            Assertions.assertTrue(
+                actualFellesformatMessage.contains(meldingsTekstVasket),
             )
         }
     }

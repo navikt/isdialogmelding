@@ -164,12 +164,13 @@ fun generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
     behandlerRef: UUID,
     uuid: UUID,
     arbeidstakerPersonident: Personident = Personident("01010112345"),
+    tekst: String = "Dette er en generell henvendelse fra NAV som ikke utløser takst",
 ) = generateDialogmeldingToBehandlerBestillingHenvendelseNotat(
     behandlerRef = behandlerRef,
     uuid = uuid,
     arbeidstakerPersonident = arbeidstakerPersonident,
     kode = DialogmeldingKode.KODE8,
-    tekst = "Dette er en generell henvendelse fra NAV som ikke utløser takst",
+    tekst = tekst,
 )
 
 private fun generateDialogmeldingToBehandlerBestillingHenvendelseNotat(
