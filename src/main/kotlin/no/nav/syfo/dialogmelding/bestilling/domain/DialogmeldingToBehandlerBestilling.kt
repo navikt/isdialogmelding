@@ -2,7 +2,10 @@ package no.nav.syfo.dialogmelding.bestilling.domain
 
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.domain.Personident
+import org.slf4j.LoggerFactory
 import java.util.UUID
+
+private val log = LoggerFactory.getLogger("no.nav.syfo.dialogmelding")
 
 data class DialogmeldingToBehandlerBestilling(
     val uuid: UUID,
@@ -16,7 +19,15 @@ data class DialogmeldingToBehandlerBestilling(
     val tekst: String?,
     val vedlegg: ByteArray? = null,
     val kilde: String?,
-)
+) {
+    fun getTekstRemoveNonAsciiCharacters(): String? {
+        val vasket = tekst?.replace(Regex("[^\\x00-\\xFF]"), "")
+        if (tekst != null && tekst != vasket) {
+            log.warn("Fjernet ikke-ASCII-tegn fra tekst i dialogmeldingbestilling med uuid: $uuid")
+        }
+        return vasket
+    }
+}
 
 enum class DialogmeldingKode(
     val value: Int
