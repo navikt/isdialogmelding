@@ -39,7 +39,6 @@ import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestilli
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingNotatFriskmeldingTilArbeidsformidlingDTO
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingNotatReturLegeerklaringDTO
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingReferatDTO
-import org.junit.jupiter.api.Assertions
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.util.UUID
