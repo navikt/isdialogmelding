@@ -103,7 +103,7 @@ private fun createAndStoreBehandlerKontorFromSykmelding(
     val behandlerKontor = BehandlerKontor(
         partnerId = PartnerId(partnerId.toInt()),
         herId = receivedSykmeldingDTO.legekontorHerId?.toIntOrNull(),
-        navn = receivedSykmeldingDTO.legekontorOrgName,
+        navn = receivedSykmeldingDTO.legekontorOrgName ?: "",
         adresse = sykmeldingBehandler.adresse.gate,
         postnummer = sykmeldingBehandler.adresse.postnummer?.toString(),
         poststed = null,
