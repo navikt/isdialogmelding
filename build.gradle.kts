@@ -24,6 +24,7 @@ val nettyCodecVersion = "4.1.118.Final"
 val nimbusjosejwtVersion = "10.0.1"
 val postgresVersion = "42.7.5"
 val postgresEmbeddedVersion = "2.1.0"
+val postgresRuntimeVersion = "17.5.0"
 val spekVersion = "2.0.19"
 val syfotjenesterVersion = "1.2021.06.09-13.09-b3d30de9996e"
 
@@ -121,6 +122,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.postgresql:postgresql:$postgresVersion")
     testImplementation("io.zonky.test:embedded-postgres:$postgresEmbeddedVersion")
+    testImplementation(platform("io.zonky.test.postgres:embedded-postgres-binaries-bom:$postgresRuntimeVersion"))
 
     testImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusjosejwtVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
