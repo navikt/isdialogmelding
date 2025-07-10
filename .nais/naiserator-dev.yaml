@@ -42,6 +42,8 @@ spec:
     inbound:
       rules:
         - application: syfomodiaperson
+        - application: isbehandlerdialog
+        - application: isdialogmote
         - application: dokumentinnhenting
           namespace: aap
         - application: syfooppfolgingsplanservice
