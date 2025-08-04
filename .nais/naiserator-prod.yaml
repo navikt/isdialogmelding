@@ -52,9 +52,6 @@ spec:
         - application: lps-oppfolgingsplan-mottak
           namespace: team-esyfo
           cluster: prod-gcp
-        - application: followupplan-backend
-          namespace: team-esyfo
-          cluster: prod-gcp
         - application: oppslag
           namespace: aap
           cluster: prod-gcp
@@ -126,8 +123,6 @@ spec:
       value: "prod-gcp:aap:oppslag"
     - name: SYFOOPPFOLGINGSPLANSERVICE_CLIENT_ID
       value: "prod-fss:team-esyfo:syfooppfolgingsplanservice"
-    - name: FOLLOWUPPLAN_BACKEND_CLIENT_ID
-      value: "prod-gcp:team-esyfo:followupplan-backend"
     - name: FASTLEGEREST_CLIENT_ID
       value: "prod-gcp.teamsykefravr.fastlegerest"
     - name: FASTLEGEREST_URL

@@ -17,8 +17,7 @@ fun testEnvironment() = Environment(
     aapOppslagClientId = testAapOppslagApiClientId,
     personAPIAuthorizedConsumerClientIdList = listOf(testAapSoknadApiClientId, testAapOppslagApiClientId),
     syfooppfolgingsplanserviceClientId = testSyfooppfolgingsplanserviceClientId,
-    followupplanBackendClientId = testFollowupplanBackendClientId,
-    oppfolgingsplanAPIAuthorizedConsumerClientIdList = listOf(testSyfooppfolgingsplanserviceClientId, testFollowupplanBackendClientId),
+    oppfolgingsplanAPIAuthorizedConsumerClientIdList = listOf(testSyfooppfolgingsplanserviceClientId),
     electorPath = "/tmp",
     serviceuserUsername = "user",
     serviceuserPassword = "password",
@@ -62,7 +61,6 @@ fun testEnvironment() = Environment(
 const val testAapSoknadApiClientId = "soknad-api-client-id"
 const val testAapOppslagApiClientId = "oppslag-client-id"
 const val testSyfooppfolgingsplanserviceClientId = "syfooppfolgingsplanservice-client-id"
-const val testFollowupplanBackendClientId = "followupplan-backend-client-id"
 
 fun testAppState() = ApplicationState(
     alive = true,
