@@ -36,7 +36,7 @@ fun MockRequestHandleScope.fastlegeRestMockResponse(request: HttpRequestData): H
             UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR.value -> respondError(HttpStatusCode.NotFound)
             UserConstants.ARBEIDSTAKER_MED_VIKARFASTLEGE.value -> respondError(HttpStatusCode.NotFound)
             UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET.value -> respondOk(
-                generateFastlegeResponse(foreldreEnhetHerId = null)
+                generateFastlegeResponse(null)
             )
 
             UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO.value -> respondOk(

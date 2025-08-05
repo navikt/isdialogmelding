@@ -5,7 +5,7 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.UserConstants
 import java.time.LocalDate
 
-fun generateFastlegeResponse(fastlegekontorOrgnummer: String? = null) = FastlegeResponse(
+fun generateFastlegeResponse() = FastlegeResponse(
     fornavn = "Dana",
     mellomnavn = "Katherine",
     etternavn = "Scully",
@@ -25,7 +25,7 @@ fun generateFastlegeResponse(fastlegekontorOrgnummer: String? = null) = Fastlege
         postadresse = generateFastlegeResponseAdresse(),
         telefon = "",
         epost = "",
-        orgnummer = fastlegekontorOrgnummer,
+        orgnummer = null,
     ),
     pasientforhold = FastlegeResponse.Pasientforhold(
         fom = LocalDate.now().minusDays(10),
