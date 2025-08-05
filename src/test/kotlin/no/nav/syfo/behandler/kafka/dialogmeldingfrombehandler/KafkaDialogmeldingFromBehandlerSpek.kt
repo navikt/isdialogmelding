@@ -145,22 +145,6 @@ class KafkaDialogmeldingFromBehandlerSpek : Spek({
                     behandler!!.hprId shouldBeEqualTo UserConstants.HPRID.toString()
                     behandler.herId shouldBeEqualTo null
                 }
-                it("Successfully creates BehandlerKontor even if wrong format on virksomhetsnummer") {
-                    addBehandlerAndKontorToDatabase(behandlerService, fastlegekontorOrgnummer = "123456789")
-                    val dialogmelding = generateDialogmeldingFromBehandlerDTO(UUID.randomUUID(), orgnr = "123 456 789")
-                    val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
-
-                    runBlocking {
-                        pollAndProcessDialogmeldingFromBehandler(
-                            kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                            database = database,
-                        )
-                    }
-
-                    verify(exactly = 1) { mockConsumer.commitSync() }
-                    val kontor = database.connection.use { it.getBehandlerKontor(UserConstants.PARTNERID) }
-                    kontor?.orgnummer shouldBeEqualTo "123456789"
-                }
             }
 
             describe("Unhappy path") {
@@ -199,8 +183,7 @@ class KafkaDialogmeldingFromBehandlerSpek : Spek({
                 }
 
                 it("don't update behandleridenter if we can't find partnerId in xml") {
-                    val dialogmeldingWithoutValidPartnerIdWithHealthcareProfessional =
-                        generateDialogmeldingFromBehandlerDTO(fellesformatXmlWithIdenterWithoutPartnerId)
+                    val dialogmeldingWithoutValidPartnerIdWithHealthcareProfessional = generateDialogmeldingFromBehandlerDTO(fellesformatXmlWithIdenterWithoutPartnerId)
                     val behandlerRef = addExistingBehandlerToDatabase(database)
                     val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmeldingWithoutValidPartnerIdWithHealthcareProfessional)
 
@@ -255,8 +238,8 @@ fun addExistingBehandlerToDatabase(database: TestDatabase): UUID {
     )
 }
 
-fun addBehandlerAndKontorToDatabase(behandlerService: BehandlerService, fastlegekontorOrgnummer: String? = null) {
-    val behandler = generateFastlegeResponse(fastlegekontorOrgnummer = fastlegekontorOrgnummer).toBehandler(
+fun addBehandlerAndKontorToDatabase(behandlerService: BehandlerService) {
+    val behandler = generateFastlegeResponse().toBehandler(
         partnerId = UserConstants.PARTNERID,
         dialogmeldingEnabled = false,
     )
