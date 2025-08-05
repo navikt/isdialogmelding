@@ -182,7 +182,9 @@ private fun createAndStoreBehandlerKontorFromDialogmeldingIfMissing(
             adresse = null,
             postnummer = null,
             poststed = null,
-            orgnummer = dialogmeldingFromBehandler.legekontorOrgNr?.let { Virksomhetsnummer(it) },
+            orgnummer = dialogmeldingFromBehandler.legekontorOrgNr?.let {
+                Virksomhetsnummer(it.replace(" ", ""))
+            },
             dialogmeldingEnabled = true,
             dialogmeldingEnabledLocked = false,
             system = null,
