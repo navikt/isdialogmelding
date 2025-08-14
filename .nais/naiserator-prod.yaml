@@ -52,7 +52,7 @@ spec:
         - application: lps-oppfolgingsplan-mottak
           namespace: team-esyfo
           cluster: prod-gcp
-        - application: followupplan-backend
+        - application: syfo-oppfolgingsplan-backend
           namespace: team-esyfo
           cluster: prod-gcp
         - application: oppslag
