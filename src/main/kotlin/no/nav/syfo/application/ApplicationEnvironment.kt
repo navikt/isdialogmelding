@@ -19,10 +19,10 @@ data class Environment(
         aapOppslagClientId,
     ),
     val syfooppfolgingsplanserviceClientId: String = getEnvVar("SYFOOPPFOLGINGSPLANSERVICE_CLIENT_ID"),
-    val followupplanBackendClientId: String = getEnvVar("FOLLOWUPPLAN_BACKEND_CLIENT_ID"),
+    val oppfolgingsplanBackendClientId: String = getEnvVar("SYFO_OPPFOLGINGSPLAN_BACKEND_CLIENT_ID"),
     val oppfolgingsplanAPIAuthorizedConsumerClientIdList: List<String> = listOf(
         syfooppfolgingsplanserviceClientId,
-        followupplanBackendClientId,
+        oppfolgingsplanBackendClientId,
     ),
     private val syfooppfolgingsplanserviceApplicationName: String = "syfooppfolgingsplanservice",
     private val lpsOppfolgingsplanMottakApplicationName: String = "lps-oppfolgingsplan-mottak",
