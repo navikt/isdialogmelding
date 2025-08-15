@@ -39,6 +39,7 @@ import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestilli
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingNotatFriskmeldingTilArbeidsformidlingDTO
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingNotatReturLegeerklaringDTO
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingReferatDTO
+import org.slf4j.LoggerFactory
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.util.UUID
@@ -365,7 +366,7 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val meldingsTekst = "Dette er en generell henvendelse fra NAV som ikke utløser takst"
+            val meldingsTekst = "Dette er en generell henvendelse per epost fra NAV som ikke utløser takst"
             val melding = generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
@@ -394,8 +395,8 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val meldingsTekstMedMystiskTegn = "Dette er en generell henvendelse fra NAV \u0AAEsom ikke utløser takst"
-            val meldingsTekstVasket = "Dette er en generell henvendelse fra NAV som ikke utløser takst"
+            val meldingsTekstMedMystiskTegn = "Dette er en generell henvendelse per e\u0002post fra NAV \u0AAEsom ikke utløser takst"
+            val meldingsTekstVasket = "Dette er en generell henvendelse per epost fra NAV som ikke utløser takst"
             val melding = generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
