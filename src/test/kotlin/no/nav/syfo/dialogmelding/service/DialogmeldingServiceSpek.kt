@@ -365,7 +365,7 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val meldingsTekst = "Dette er en generell henvendelse fra NAV som ikke utløser takst"
+            val meldingsTekst = "Dette er en generell henvendelse per epost fra NAV som ikke utløser takst"
             val melding = generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
@@ -394,8 +394,8 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val meldingsTekstMedMystiskTegn = "Dette er en generell henvendelse fra NAV \u0AAEsom ikke utløser takst"
-            val meldingsTekstVasket = "Dette er en generell henvendelse fra NAV som ikke utløser takst"
+            val meldingsTekstMedMystiskTegn = "Dette er en generell henvendelse per e\u0002post fra NAV \u0AAEsom ikke utløser takst"
+            val meldingsTekstVasket = "Dette er en generell henvendelse per epost fra NAV som ikke utløser takst"
             val melding = generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
