@@ -97,9 +97,6 @@ spec:
         - id: elastic
   envFrom:
     - secret: isdialogmelding-serviceuser
-  filesFrom:
-    - mountPath: /var/run/keystore
-      secret: isdialogmelding-keystore
   kafka:
     pool: nav-prod
   env:
