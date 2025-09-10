@@ -45,7 +45,6 @@ fun main() {
     )
     val logger = LoggerFactory.getLogger("ktor.application")
     val environment = Environment()
-    setMQTlsProperties(environment)
     val mqSender = MQSender(environment)
     val wellKnownInternalAzureAD = getWellKnown(environment.azureAppWellKnownUrl)
     val wellKnownInternalIdportenTokenX = getWellKnown(environment.idportenTokenXWellKnownUrl)
@@ -220,10 +219,4 @@ fun main() {
     )
 
     server.start(wait = true)
-}
-
-private fun setMQTlsProperties(env: Environment) {
-    System.setProperty("javax.net.ssl.keyStore", env.mqKeystorePath)
-    System.setProperty("javax.net.ssl.keyStorePassword", env.mqKeystorePassword)
-    System.setProperty("javax.net.ssl.keyStoreType", "jks")
 }

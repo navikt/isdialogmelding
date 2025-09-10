@@ -97,7 +97,6 @@ spec:
         - id: elastic
   envFrom:
     - secret: isdialogmelding-serviceuser
-    - secret: isdialogmelding-keystore-pwd
   filesFrom:
     - mountPath: /var/run/keystore
       secret: isdialogmelding-keystore
@@ -114,8 +113,6 @@ spec:
       value: "1413"
     - name: MQGATEWAY_CHANNEL_NAME
       value: "Q1_ISDIALOGMELDING"
-    - name: MQ_KEYSTORE_PATH
-      value: "/var/run/keystore/isdialogmelding-keystore.jks"
     - name: APPREC_QUEUE
       value: "QA.Q1_ISDIALOGMELDING.IU03_UTSENDING_REPLY"
     - name: MOTTAK_QUEUE_UTSENDING_QUEUENAME
