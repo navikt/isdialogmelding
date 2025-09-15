@@ -2,7 +2,7 @@
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val confluentVersion = "7.8.0"
+val confluentVersion = "8.0.0"
 val dialogmeldingVersion = "1.5d21db9"
 val fellesformat2Version = "1.0329dd1"
 val flywayVersion = "11.11.2"
