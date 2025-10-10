@@ -31,7 +31,7 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                             .withS(kodeverk.kodeverkId)
                             .withV(kode.toString())
                     )
-                    .withTekstNotatInnhold(melding.getTekstRemoveNonAsciiCharacters())
+                    .withTekstNotatInnhold(melding.getTekstRemoveInvalidCharacters())
                     .withDokIdNotat(UUID.randomUUID().toString())
             )
     } else if (melding.type == DialogmeldingType.OPPFOLGINGSPLAN) {
@@ -74,7 +74,7 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                             .withS(kodeverk.kodeverkId)
                             .withV(kode.toString())
                     )
-                    .withSporsmal(melding.getTekstRemoveNonAsciiCharacters())
+                    .withSporsmal(melding.getTekstRemoveInvalidCharacters())
                     .withDokIdForesp(UUID.randomUUID().toString())
             )
     } else {

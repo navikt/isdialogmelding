@@ -20,10 +20,15 @@ data class DialogmeldingToBehandlerBestilling(
     val vedlegg: ByteArray? = null,
     val kilde: String?,
 ) {
-    fun getTekstRemoveNonAsciiCharacters(): String? {
-        val vasket = tekst?.replace(Regex("[^\\x20-\\xFF]"), "")
+    fun getTekstRemoveInvalidCharacters(): String? {
+        // Allow: TAB, CR, LF, printable ASCII (U+0020..U+007E), and all bytes U+0080..U+00FF (including C1 range) per request.
+        // Excludes only DEL (0x7F) and any codepoints > U+00FF. Still normalizes NBSP to space and removes soft hyphen.
+        val vasket = tekst
+            ?.replace(Regex("[^\\t\\r\\n\\x20-\\x7E\\x80-\\xFF]"), "")
+            ?.replace("\u00A0", " ")
+            ?.replace("\u00AD", "")
         if (tekst != null && tekst != vasket) {
-            log.warn("Fjernet ikke-ASCII-tegn fra tekst i dialogmeldingbestilling med uuid: $uuid")
+            log.warn("Fjernet tegn utenfor tillatt byte-område (eller spesialtegn) fra tekst i dialogmeldingbestilling med uuid: $uuid\")")
         }
         return vasket
     }

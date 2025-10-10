@@ -17,32 +17,16 @@ import no.nav.syfo.testhelper.ExternalMockEnvironment
 import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.createBehandlerForArbeidstaker
 import no.nav.syfo.testhelper.dropData
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingAvlysningXmlRegex
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingEndreTidStedXmlRegex
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingForesporselLegeerklaringXmlRegex
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingForesporselPurringXmlRegex
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingForesporselXmlRegex
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingFriskmeldingTilArbeidsformidlingXmlRegex
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingHenvendelseMeldingFraNavXmlRegex
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingReferatXmlRegex
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingReturLegeerklaringXmlRegex
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingXmlDNRRegex
-import no.nav.syfo.testhelper.generator.defaultFellesformatDialogmeldingXmlRegex
-import no.nav.syfo.testhelper.generator.generateBehandler
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingAvlysningDTO
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingDTO
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingEndreTidStedDTO
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingForesporselDTO
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingForesporselLegeerklaringDTO
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingForesporselPurringDTO
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingNotatFriskmeldingTilArbeidsformidlingDTO
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingNotatReturLegeerklaringDTO
-import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingReferatDTO
+import no.nav.syfo.testhelper.generator.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.util.UUID
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingType
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingKode
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingKodeverk
 
 object DialogmeldingServiceSpek : Spek({
 
@@ -365,7 +349,7 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val meldingsTekst = "Dette er en generell henvendelse per epost fra NAV som ikke utløser takst"
+            val meldingsTekst = "Dette er en generell henvendelse med tekst med Æ per epost fra NAV som ikke utløser takst"
             val melding = generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
@@ -394,8 +378,8 @@ object DialogmeldingServiceSpek : Spek({
             val messageSlot = slot<String>()
             justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-            val meldingsTekstMedMystiskTegn = "Dette er en generell henvendelse per e\u0002post fra NAV \u0AAEsom ikke utløser takst"
-            val meldingsTekstVasket = "Dette er en generell henvendelse per epost fra NAV som ikke utløser takst"
+            val meldingsTekstMedMystiskTegn = "Dette er en generell henvendelse med tekst med Æ per e\u0002post fra NAV \u0AAEsom ikke utløser takst"
+            val meldingsTekstVasket = "Dette er en generell henvendelse med tekst med Æ per epost fra NAV som ikke utløser takst"
             val melding = generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
                 behandlerRef = behandlerRef,
                 uuid = uuid,
@@ -418,6 +402,59 @@ object DialogmeldingServiceSpek : Spek({
             assertTrue(
                 actualFellesformatMessage.contains(meldingsTekstVasket),
             )
+        }
+        it("keeps tab, CR and LF and removes other control characters in tekst sanitization") {
+            val original = "Hello\tWorld\r\nLine2" + "\u0001" + "\u0002" + "End" + "\u0007"
+            val melding = DialogmeldingToBehandlerBestilling(
+                uuid = UUID.randomUUID(),
+                behandler = behandler,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+                parentRef = null,
+                conversationUuid = UUID.randomUUID(),
+                type = DialogmeldingType.DIALOG_NOTAT,
+                kodeverk = DialogmeldingKodeverk.DIALOGMOTE,
+                kode = DialogmeldingKode.KODE1,
+                tekst = original,
+                vedlegg = null,
+                kilde = "test",
+            )
+            val sanitized = melding.getTekstRemoveInvalidCharacters()
+            assertEquals("Hello\tWorld\r\nLine2End", sanitized)
+        }
+        it("returns null when tekst is null in sanitization") {
+            val melding = DialogmeldingToBehandlerBestilling(
+                uuid = UUID.randomUUID(),
+                behandler = behandler,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+                parentRef = null,
+                conversationUuid = UUID.randomUUID(),
+                type = DialogmeldingType.DIALOG_NOTAT,
+                kodeverk = DialogmeldingKodeverk.DIALOGMOTE,
+                kode = DialogmeldingKode.KODE1,
+                tekst = null,
+                vedlegg = null,
+                kilde = "test",
+            )
+            val sanitized = melding.getTekstRemoveInvalidCharacters()
+            assertEquals(null, sanitized)
+        }
+        it("sanitization removes C1 controls, converts NBSP to space and removes soft hyphen") {
+            val original = "Tekst\u00A0med\u00ADmystiske tegn"
+            val melding = DialogmeldingToBehandlerBestilling(
+                uuid = UUID.randomUUID(),
+                behandler = behandler,
+                arbeidstakerPersonident = arbeidstakerPersonident,
+                parentRef = null,
+                conversationUuid = UUID.randomUUID(),
+                type = DialogmeldingType.DIALOG_NOTAT,
+                kodeverk = DialogmeldingKodeverk.DIALOGMOTE,
+                kode = DialogmeldingKode.KODE1,
+                tekst = original,
+                vedlegg = null,
+                kilde = "test",
+            )
+            val sanitized = melding.getTekstRemoveInvalidCharacters()
+            assertEquals("Tekst medmystiske tegn", sanitized)
         }
     }
 })
