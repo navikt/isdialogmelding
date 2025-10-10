@@ -28,7 +28,7 @@ data class DialogmeldingToBehandlerBestilling(
             ?.replace("\u00A0", " ")
             ?.replace("\u00AD", "")
         if (tekst != null && tekst != vasket) {
-            log.warn("Fjernet tegn utenfor tillatt byte-område (eller spesialtegn) fra tekst i dialogmeldingbestilling med uuid: $uuid\")")
+            log.warn("Fjernet tegn utenfor tillatt byte-område (eller spesialtegn) fra tekst i dialogmeldingbestilling med uuid: $uuid")
         }
         return vasket
     }
