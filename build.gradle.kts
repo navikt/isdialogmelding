@@ -30,7 +30,7 @@ val syfotjenesterVersion = "1.2022.09.09-14.42-5356e2174b6c"
 
 plugins {
     kotlin("jvm") version "2.2.20"
-    id("com.gradleup.shadow") version "8.3.5"
+    id("com.gradleup.shadow") version "9.2.2"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 }
 
