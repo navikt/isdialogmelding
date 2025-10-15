@@ -88,6 +88,18 @@ class OppfolgingsplanSystemApiSpek : Spek({
                         database.getDialogmeldingToBehandlerBestillingNotSendt().firstOrNull() shouldBe null
                     }
                 }
+                it("should return InternalServerError when storing oppfolgingsplan fails") {
+                    testApplication {
+                        val client = setupApiAndClient(database = TestDatabaseNotResponding())
+                        val response = client.post(url) {
+                            bearerAuth(validToken)
+                            contentType(ContentType.Application.Json)
+                            setBody(generateRSOppfolgingsplan())
+                        }
+
+                        response.status shouldBeEqualTo HttpStatusCode.InternalServerError
+                    }
+                }
 
                 it("should return status Unauthorized if no token is supplied") {
                     testApplication {
