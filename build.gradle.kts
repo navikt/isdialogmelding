@@ -2,25 +2,24 @@
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val confluentVersion = "8.0.0"
+val confluentVersion = "8.1.0"
 val dialogmeldingVersion = "1.5d21db9"
 val fellesformat2Version = "1.0329dd1"
-val flywayVersion = "11.13.2"
-val hikariVersion = "6.2.1"
-val jacksonVersion = "2.20.0"
+val flywayVersion = "11.15.0"
+val hikariVersion = "7.0.2"
+val jacksonVersion = "2.20.1"
 val jaxbVersion = "2.3.1"
 val jsonVersion = "20250517"
-val kafkaVersion = "3.9.0"
+val kafkaVersion = "4.1.0"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val kluentVersion = "1.73"
 val ktorVersion = "3.3.1"
-val logbackVersion = "1.5.19"
-val logstashEncoderVersion = "8.1"
+val logbackVersion = "1.5.20"
+val logstashEncoderVersion = "9.0"
 val micrometerRegistryVersion = "1.12.13"
 val mockkVersion = "1.14.6"
-val mqVersion = "9.4.3.1"
-val nettyCodecVersion = "4.2.6.Final"
+val mqVersion = "9.4.4.0"
 val nimbusjosejwtVersion = "10.5"
 val postgresVersion = "42.7.8"
 val postgresEmbeddedVersion = "2.1.1"
@@ -29,8 +28,8 @@ val spekVersion = "2.0.19"
 val syfotjenesterVersion = "1.2022.09.09-14.42-5356e2174b6c"
 
 plugins {
-    kotlin("jvm") version "2.2.20"
-    id("com.gradleup.shadow") version "8.3.5"
+    kotlin("jvm") version "2.2.21"
+    id("com.gradleup.shadow") version "8.3.6"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 }
 
@@ -55,7 +54,6 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-    implementation("io.netty:netty-codec-http2:$nettyCodecVersion") // TODO: Remove when Ktor upgrades Netty Codec
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
@@ -85,13 +83,14 @@ dependencies {
     // Kafka
     val excludeLog4j = fun ExternalModuleDependency.() {
         exclude(group = "log4j")
+        exclude(group = "org.apache.logging.log4j")
     }
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion", excludeLog4j)
     constraints {
-        implementation("org.apache.zookeeper:zookeeper") {
-            because("org.apache.kafka:kafka_2.13:$kafkaVersion -> https://www.cve.org/CVERecord?id=CVE-2023-44981")
+        implementation("commons-beanutils:commons-beanutils") {
+            because("org.apache.kafka:kafka_2.13:$kafkaVersion -> https://www.cve.org/CVERecord?id=CVE-2025-48734")
             version {
-                require("3.9.3")
+                require("1.11.0")
             }
         }
     }
@@ -106,7 +105,7 @@ dependencies {
         implementation("org.apache.commons:commons-compress") {
             because("org.apache.commons:commons-compress:1.22 -> https://www.cve.org/CVERecord?id=CVE-2012-2098")
             version {
-                require("1.27.1")
+                require("1.28.0")
             }
         }
         implementation("com.google.guava:guava") {
