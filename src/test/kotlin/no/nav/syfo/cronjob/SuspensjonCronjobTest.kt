@@ -1,0 +1,113 @@
+package no.nav.syfo.cronjob
+
+import kotlinx.coroutines.runBlocking
+import no.nav.syfo.behandler.BehandlerService
+import no.nav.syfo.behandler.database.getBehandlerByBehandlerRef
+import no.nav.syfo.behandler.fastlege.FastlegeClient
+import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
+import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.btsys.LegeSuspensjonClient
+import no.nav.syfo.testhelper.*
+import no.nav.syfo.testhelper.UserConstants.PARTNERID
+import no.nav.syfo.testhelper.generator.generateBehandler
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import java.util.*
+
+class SuspensjonCronjobTest {
+    private val externalMockEnvironment = ExternalMockEnvironment.instance
+    private val database = externalMockEnvironment.database
+    private val environment = externalMockEnvironment.environment
+    private val azureAdClient = AzureAdClient(
+        azureAppClientId = environment.aadAppClient,
+        azureAppClientSecret = environment.azureAppClientSecret,
+        azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+        httpClient = externalMockEnvironment.mockHttpClient,
+    )
+    private val behandlerService = BehandlerService(
+        fastlegeClient = FastlegeClient(
+            azureAdClient = azureAdClient,
+            fastlegeRestClientId = environment.fastlegeRestClientId,
+            fastlegeRestUrl = environment.fastlegeRestUrl,
+            httpClient = externalMockEnvironment.mockHttpClient,
+        ),
+        partnerinfoClient = PartnerinfoClient(
+            azureAdClient = azureAdClient,
+            syfoPartnerinfoClientId = environment.syfoPartnerinfoClientId,
+            syfoPartnerinfoUrl = environment.syfoPartnerinfoUrl,
+            httpClient = externalMockEnvironment.mockHttpClient,
+        ),
+        database = database,
+    )
+    private val cronJob = SuspensjonCronjob(
+        behandlerService = behandlerService,
+        legeSuspensjonClient = LegeSuspensjonClient(
+            azureAdClient = azureAdClient,
+            endpointClientId = environment.btsysClientId,
+            endpointUrl = environment.btsysUrl,
+            httpClient = externalMockEnvironment.mockHttpClient,
+        ),
+    )
+
+    @AfterEach
+    fun afterEach() {
+        database.dropData()
+    }
+
+    @Test
+    fun `Cronjob virker selv om ingen behandlere`() {
+        runBlocking {
+            cronJob.checkLegeSuspensjonJob()
+        }
+    }
+
+    @Test
+    fun `Cronjob bevarer suspendert=false for eksisterende behandler`() {
+        val behandlerUUID = database.createBehandlerForArbeidstaker(
+            behandler = generateBehandler(
+                behandlerRef = UUID.randomUUID(),
+                partnerId = PARTNERID,
+            ),
+            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+        )
+        runBlocking {
+            cronJob.checkLegeSuspensjonJob()
+        }
+        assertEquals(false, database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
+    }
+
+    @Test
+    fun `Cronjob setter suspendert=true for suspendert behandler`() {
+        val behandlerUUID = database.createBehandlerForArbeidstaker(
+            behandler = generateBehandler(
+                behandlerRef = UUID.randomUUID(),
+                partnerId = PARTNERID,
+                personident = UserConstants.FASTLEGE_FNR_SUSPENDERT,
+            ),
+            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+        )
+        assertEquals(false, database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
+        runBlocking {
+            cronJob.checkLegeSuspensjonJob()
+        }
+        assertEquals(true, database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
+    }
+
+    @Test
+    fun `Cronjob setter suspendert=false for behandler som ikke lengre er suspendert`() {
+        val behandlerUUID = database.createBehandlerForArbeidstaker(
+            behandler = generateBehandler(
+                behandlerRef = UUID.randomUUID(),
+                partnerId = PARTNERID,
+            ),
+            arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
+        )
+        database.setSuspendert(behandlerUUID.toString())
+        assertEquals(true, database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
+        runBlocking {
+            cronJob.checkLegeSuspensjonJob()
+        }
+        assertEquals(false, database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
+    }
+}
