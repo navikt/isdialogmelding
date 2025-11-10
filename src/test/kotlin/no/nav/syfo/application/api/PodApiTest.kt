@@ -7,6 +7,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.testhelper.ExternalMockEnvironment
 import no.nav.syfo.testhelper.TestDatabase
 import no.nav.syfo.testhelper.TestDatabaseNotResponding
 import org.junit.jupiter.api.Assertions.*
@@ -30,7 +31,7 @@ class PodApiTest {
     @Nested
     @DisplayName("Successful liveness and readiness checks")
     inner class SuccessfulLivenessAndReadinessChecks {
-        private val database = TestDatabase()
+        private val database = ExternalMockEnvironment.instance.database
 
         @Test
         fun `Returns ok on is_alive`() {
@@ -62,7 +63,7 @@ class PodApiTest {
     @Nested
     @DisplayName("Unsuccessful liveness and readiness checks")
     inner class UnsuccessfulLivenessAndReadinessChecks {
-        private val database = TestDatabase()
+        private val database = ExternalMockEnvironment.instance.database
 
         @Test
         fun `Returns internal server error when liveness check fails`() {
