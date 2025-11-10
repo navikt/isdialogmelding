@@ -13,7 +13,6 @@ import no.nav.syfo.testhelper.testdata.lagreDialogmeldingStatusBestiltOgSendt
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.clients.producer.RecordMetadata
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -43,11 +42,6 @@ class DialogmeldingStatusCronjobTest {
         coEvery {
             kafkaProducer.send(any())
         } returns mockk<Future<RecordMetadata>>(relaxed = true)
-    }
-
-    @AfterEach
-    fun afterEach() {
-        database.dropData()
     }
 
     @Test

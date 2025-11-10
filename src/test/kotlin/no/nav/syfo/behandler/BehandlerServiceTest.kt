@@ -84,13 +84,13 @@ class BehandlerServiceTest {
         val pBehandler = pBehandlerList[0]
         val behandlerFromDB = pBehandler.toBehandler(database.getBehandlerKontorById(pBehandler.kontorId))
         assertEquals(behandler.behandlerRef, behandlerFromDB.behandlerRef)
-        assertEquals(false, behandlerFromDB.kontor.dialogmeldingEnabled)
+        assertFalse(behandlerFromDB.kontor.dialogmeldingEnabled)
 
         database.updateBehandlerKontorDialogmeldingEnabled(behandlerFromDB.kontor.partnerId)
 
         val behandlerFromDBUpdated = pBehandler.toBehandler(database.getBehandlerKontorById(pBehandler.kontorId))
         assertEquals(behandler.behandlerRef, behandlerFromDBUpdated.behandlerRef)
-        assertEquals(true, behandlerFromDBUpdated.kontor.dialogmeldingEnabled)
+        assertTrue(behandlerFromDBUpdated.kontor.dialogmeldingEnabled)
     }
 
     @Test
@@ -270,7 +270,11 @@ class BehandlerServiceTest {
     @Test
     fun `lagrer behandler uten fnr`() {
         val behandler =
-            generateFastlegeResponse(null, UserConstants.HERID, UserConstants.HPRID).toBehandler(UserConstants.PARTNERID)
+            generateFastlegeResponse(
+                null,
+                UserConstants.HERID,
+                UserConstants.HPRID
+            ).toBehandler(UserConstants.PARTNERID)
         behandlerService.createOrGetBehandler(
             behandler,
             Arbeidstaker(
@@ -280,9 +284,11 @@ class BehandlerServiceTest {
             relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
         )
 
-        assertEquals(1, database.getBehandlerByArbeidstaker(
-            UserConstants.ARBEIDSTAKER_FNR,
-        ).size)
+        assertEquals(
+            1, database.getBehandlerByArbeidstaker(
+                UserConstants.ARBEIDSTAKER_FNR,
+            ).size
+        )
     }
 
     @Test
@@ -302,9 +308,11 @@ class BehandlerServiceTest {
             relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
         )
 
-        assertEquals(1, database.getBehandlerByArbeidstaker(
-            UserConstants.ARBEIDSTAKER_FNR,
-        ).size)
+        assertEquals(
+            1, database.getBehandlerByArbeidstaker(
+                UserConstants.ARBEIDSTAKER_FNR,
+            ).size
+        )
     }
 
     @Test
@@ -324,9 +332,11 @@ class BehandlerServiceTest {
             relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
         )
 
-        assertEquals(1, database.getBehandlerByArbeidstaker(
-            UserConstants.ARBEIDSTAKER_FNR,
-        ).size)
+        assertEquals(
+            1, database.getBehandlerByArbeidstaker(
+                UserConstants.ARBEIDSTAKER_FNR,
+            ).size
+        )
     }
 
     @Test
@@ -344,9 +354,11 @@ class BehandlerServiceTest {
                 relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
             )
         }
-        assertEquals(0, database.getBehandlerByArbeidstaker(
-            UserConstants.ARBEIDSTAKER_FNR,
-        ).size)
+        assertEquals(
+            0, database.getBehandlerByArbeidstaker(
+                UserConstants.ARBEIDSTAKER_FNR,
+            ).size
+        )
     }
 
     @Test

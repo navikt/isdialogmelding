@@ -21,12 +21,8 @@ import no.nav.syfo.testhelper.generator.generateBehandler
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingDTO
 import no.nav.syfo.testhelper.generator.generateKafkaIdenthendelseDTO
 import no.nav.syfo.testhelper.getBehandlerArbeidstakerRelasjoner
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -52,8 +48,8 @@ class IdenthendelseServiceTest {
         pdlClient = pdlClient,
     )
 
-    @AfterEach
-    fun afterEach() {
+    @BeforeEach
+    fun beforeEach() {
         database.dropData()
     }
 
@@ -168,7 +164,8 @@ fun populateDatabase(oldIdent: Personident, database: DatabaseInterface, updateI
                 behandlerRef = behandlerRef,
                 arbeidstakerPersonident = oldIdent,
             )
-            val dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(behandler)
+            val dialogmeldingToBehandlerBestilling =
+                dialogmeldingToBehandlerBestillingDTO.toDialogmeldingToBehandlerBestilling(behandler)
 
             connection.createBehandlerDialogmeldingBestilling(
                 dialogmeldingToBehandlerBestilling = dialogmeldingToBehandlerBestilling,

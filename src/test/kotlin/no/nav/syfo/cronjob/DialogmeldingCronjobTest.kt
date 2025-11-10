@@ -24,7 +24,6 @@ import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestilli
 import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestillingOppfolgingsplanDTO
 import no.nav.syfo.testhelper.testdata.lagreDialogmeldingBestilling
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -75,11 +74,6 @@ class DialogmeldingCronjobTest {
         database.dropData()
         clearAllMocks()
         justRun { mqSenderMock.sendMessageToEmottak(any()) }
-    }
-
-    @AfterEach
-    fun afterEach() {
-        database.dropData()
     }
 
     @Test

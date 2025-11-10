@@ -1,15 +1,15 @@
 package no.nav.syfo.dialogmelding.service
 
-import io.mockk.clearAllMocks
-import io.mockk.justRun
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingKode
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingKodeverk
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingType
 import no.nav.syfo.dialogmelding.bestilling.kafka.toDialogmeldingToBehandlerBestilling
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.Personident
@@ -18,16 +18,13 @@ import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.createBehandlerForArbeidstaker
 import no.nav.syfo.testhelper.dropData
 import no.nav.syfo.testhelper.generator.*
-import java.util.UUID
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
-import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingType
-import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingKode
-import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingKodeverk
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
+import java.util.*
 
 class DialogmeldingServiceTest {
     private val externalMockEnvironment = ExternalMockEnvironment.instance
@@ -406,8 +403,10 @@ class DialogmeldingServiceTest {
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-        val meldingsTekstMedMystiskTegn = "Dette er en generell henvendelse med tekst med Æ per e\u0002post fra NAV \u0AAEsom ikke utløser takst"
-        val meldingsTekstVasket = "Dette er en generell henvendelse med tekst med Æ per epost fra NAV som ikke utløser takst"
+        val meldingsTekstMedMystiskTegn =
+            "Dette er en generell henvendelse med tekst med Æ per e\u0002post fra NAV \u0AAEsom ikke utløser takst"
+        val meldingsTekstVasket =
+            "Dette er en generell henvendelse med tekst med Æ per epost fra NAV som ikke utløser takst"
         val melding = generateDialogmeldingToBehandlerBestillingHenvendelseMeldingFraNavDTO(
             behandlerRef = behandlerRef,
             uuid = uuid,
@@ -468,7 +467,7 @@ class DialogmeldingServiceTest {
             kilde = "test",
         )
         val sanitized = melding.getTekstRemoveInvalidCharacters()
-        assertEquals(null, sanitized)
+        assertNull(sanitized)
     }
 
     @Test

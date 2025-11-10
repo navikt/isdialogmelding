@@ -14,8 +14,8 @@ import no.nav.syfo.testhelper.UserConstants.OTHER_PARTNERID
 import no.nav.syfo.testhelper.UserConstants.PARTNERID
 import no.nav.syfo.testhelper.createKontor
 import no.nav.syfo.testhelper.dropData
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -59,11 +59,6 @@ class VerifyPartnerIdCronjobTest {
     fun beforeEach() {
         database.dropData()
         clearAllMocks()
-    }
-
-    @AfterEach
-    fun afterEach() {
-        database.dropData()
     }
 
     @Test

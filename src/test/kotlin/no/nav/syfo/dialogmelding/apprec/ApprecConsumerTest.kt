@@ -14,7 +14,6 @@ import no.nav.syfo.testhelper.ExternalMockEnvironment
 import no.nav.syfo.testhelper.dropData
 import no.nav.syfo.testhelper.getFileAsString
 import no.nav.syfo.testhelper.testdata.lagreDialogmeldingBestillingOgBehandler
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,11 +46,6 @@ class ApprecConsumerTest {
     fun beforeEach() {
         database.dropData()
         clearAllMocks()
-    }
-
-    @AfterEach
-    fun afterEach() {
-        database.dropData()
     }
 
     @Test

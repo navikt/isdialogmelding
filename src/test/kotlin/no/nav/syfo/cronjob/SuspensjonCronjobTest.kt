@@ -11,7 +11,8 @@ import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.PARTNERID
 import no.nav.syfo.testhelper.generator.generateBehandler
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -74,7 +75,7 @@ class SuspensjonCronjobTest {
         runBlocking {
             cronJob.checkLegeSuspensjonJob()
         }
-        assertEquals(false, database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
+        assertFalse(database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
     }
 
     @Test
@@ -87,11 +88,11 @@ class SuspensjonCronjobTest {
             ),
             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
         )
-        assertEquals(false, database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
+        assertFalse(database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
         runBlocking {
             cronJob.checkLegeSuspensjonJob()
         }
-        assertEquals(true, database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
+        assertTrue(database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
     }
 
     @Test
@@ -104,10 +105,10 @@ class SuspensjonCronjobTest {
             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
         )
         database.setSuspendert(behandlerUUID.toString())
-        assertEquals(true, database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
+        assertTrue(database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
         runBlocking {
             cronJob.checkLegeSuspensjonJob()
         }
-        assertEquals(false, database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
+        assertFalse(database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
     }
 }

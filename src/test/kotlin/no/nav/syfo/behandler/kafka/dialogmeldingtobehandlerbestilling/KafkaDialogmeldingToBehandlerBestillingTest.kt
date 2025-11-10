@@ -48,6 +48,11 @@ class KafkaDialogmeldingToBehandlerBestillingTest {
         database = database,
         pdlClient = pdlClient,
     )
+    private val partition = 0
+    private val dialogmeldingToBehandlerBestillingTopicPartition = TopicPartition(
+        DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
+        partition,
+    )
 
     @AfterEach
     fun afterEach() {
@@ -55,243 +60,233 @@ class KafkaDialogmeldingToBehandlerBestillingTest {
     }
 
     @Nested
-    @DisplayName("Motta dialogmelding bestillinger")
-    inner class MottaDialogmeldingBestillinger {
-        private val partition = 0
-        private val dialogmeldingToBehandlerBestillingTopicPartition = TopicPartition(
-            DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
-            partition,
-        )
-
-        @Nested
-        @DisplayName("Happy path")
-        inner class HappyPath {
-            @Test
-            fun `should persist incoming bestillinger`() {
-                val behandler = lagreBehandler(database)
-                val dialogmeldingBestillingUuid = UUID.randomUUID()
-                val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
-                    uuid = dialogmeldingBestillingUuid,
-                    behandlerRef = behandler.behandlerRef,
-                )
-                val dialogmeldingBestillingRecord = ConsumerRecord(
-                    DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
-                    partition,
-                    1,
-                    dialogmeldingBestilling.dialogmeldingUuid,
-                    dialogmeldingBestilling,
-                )
-                val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
-                every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                    mapOf(
-                        dialogmeldingToBehandlerBestillingTopicPartition to listOf(
-                            dialogmeldingBestillingRecord,
-                        )
+    @DisplayName("Happy path")
+    inner class HappyPath {
+        @Test
+        fun `should persist incoming bestillinger`() {
+            val behandler = lagreBehandler(database)
+            val dialogmeldingBestillingUuid = UUID.randomUUID()
+            val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
+                uuid = dialogmeldingBestillingUuid,
+                behandlerRef = behandler.behandlerRef,
+            )
+            val dialogmeldingBestillingRecord = ConsumerRecord(
+                DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
+                partition,
+                1,
+                dialogmeldingBestilling.dialogmeldingUuid,
+                dialogmeldingBestilling,
+            )
+            val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
+            every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                mapOf(
+                    dialogmeldingToBehandlerBestillingTopicPartition to listOf(
+                        dialogmeldingBestillingRecord,
                     )
                 )
-                every { mockConsumer.commitSync() } returns Unit
+            )
+            every { mockConsumer.commitSync() } returns Unit
 
-                runBlocking {
-                    pollAndProcessDialogmeldingBestilling(
-                        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-                        kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
-                    )
-                }
-
-                verify(exactly = 1) { mockConsumer.commitSync() }
-
-                val pBehandlerDialogmeldingBestilling =
-                    database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
-                assertNotNull(pBehandlerDialogmeldingBestilling)
-                assertEquals(dialogmeldingBestillingUuid, pBehandlerDialogmeldingBestilling!!.uuid)
-                assertEquals(dialogmeldingBestilling.dialogmeldingTekst, pBehandlerDialogmeldingBestilling.tekst)
-                assertEquals("SYFO", pBehandlerDialogmeldingBestilling.kilde)
+            runBlocking {
+                pollAndProcessDialogmeldingBestilling(
+                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                    kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+                )
             }
 
-            @Test
-            fun `should persist incoming bestilling with no kilde`() {
-                val behandler = lagreBehandler(database)
-                val dialogmeldingBestillingUuid = UUID.randomUUID()
-                val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
-                    uuid = dialogmeldingBestillingUuid,
-                    behandlerRef = behandler.behandlerRef,
-                ).copy(
-                    kilde = null,
-                )
-                val dialogmeldingBestillingRecord = ConsumerRecord(
-                    DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
-                    partition,
-                    1,
-                    dialogmeldingBestilling.dialogmeldingUuid,
-                    dialogmeldingBestilling,
-                )
-                val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
-                every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                    mapOf(
-                        dialogmeldingToBehandlerBestillingTopicPartition to listOf(
-                            dialogmeldingBestillingRecord,
-                        )
-                    )
-                )
-                every { mockConsumer.commitSync() } returns Unit
+            verify(exactly = 1) { mockConsumer.commitSync() }
 
-                runBlocking {
-                    pollAndProcessDialogmeldingBestilling(
-                        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-                        kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
-                    )
-                }
-
-                verify(exactly = 1) { mockConsumer.commitSync() }
-
-                val pBehandlerDialogmeldingBestilling =
-                    database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
-                assertNotNull(pBehandlerDialogmeldingBestilling)
-                assertEquals(dialogmeldingBestillingUuid, pBehandlerDialogmeldingBestilling!!.uuid)
-                assertEquals(dialogmeldingBestilling.dialogmeldingTekst, pBehandlerDialogmeldingBestilling.tekst)
-                assertNull(pBehandlerDialogmeldingBestilling.kilde)
-            }
-
-            @Test
-            fun `persists dialogmelding-status BESTILT when incoming bestilling`() {
-                val behandler = lagreBehandler(database)
-                val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
-                    uuid = UUID.randomUUID(),
-                    behandlerRef = behandler.behandlerRef,
-                )
-                val dialogmeldingBestillingRecord = ConsumerRecord(
-                    DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
-                    partition,
-                    1,
-                    dialogmeldingBestilling.dialogmeldingUuid,
-                    dialogmeldingBestilling,
-                )
-                val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
-                every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                    mapOf(
-                        dialogmeldingToBehandlerBestillingTopicPartition to listOf(
-                            dialogmeldingBestillingRecord,
-                        )
-                    )
-                )
-                every { mockConsumer.commitSync() } returns Unit
-
-                runBlocking {
-                    pollAndProcessDialogmeldingBestilling(
-                        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-                        kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
-                    )
-                }
-
-                val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
-                assertEquals(1, dialogmeldingStatusNotPublished.size)
-
-                val pDialogmeldingStatus = dialogmeldingStatusNotPublished.first()
-                val pBehandlerDialogmeldingBestilling =
-                    database.getBestilling(
-                        uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
-                    )
-                assertEquals(DialogmeldingStatusType.BESTILT.name, pDialogmeldingStatus.status)
-                assertNull(pDialogmeldingStatus.tekst)
-                assertEquals(pBehandlerDialogmeldingBestilling?.id, pDialogmeldingStatus.bestillingId)
-                assertNotNull(pDialogmeldingStatus.createdAt)
-                assertNotNull(pDialogmeldingStatus.updatedAt)
-                assertNull(pDialogmeldingStatus.publishedAt)
-            }
+            val pBehandlerDialogmeldingBestilling =
+                database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
+            assertNotNull(pBehandlerDialogmeldingBestilling)
+            assertEquals(dialogmeldingBestillingUuid, pBehandlerDialogmeldingBestilling!!.uuid)
+            assertEquals(dialogmeldingBestilling.dialogmeldingTekst, pBehandlerDialogmeldingBestilling.tekst)
+            assertEquals("SYFO", pBehandlerDialogmeldingBestilling.kilde)
         }
 
-        @Nested
-        @DisplayName("Should only persist once when duplicates")
-        inner class ShouldOnlyPersistOnceWhenDuplicates {
-            @Test
-            fun `Should only persist once when duplicates`() {
-                val behandler = lagreBehandler(database)
-                val dialogmeldingBestillingUuid = UUID.randomUUID()
-                val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
-                    uuid = dialogmeldingBestillingUuid,
-                    behandlerRef = behandler.behandlerRef,
-                )
-                val dialogmeldingBestillingRecord = ConsumerRecord(
-                    DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
-                    partition,
-                    2,
-                    dialogmeldingBestilling.dialogmeldingUuid,
-                    dialogmeldingBestilling,
-                )
-                val dialogmeldingBestillingRecordDuplicate = ConsumerRecord(
-                    DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
-                    partition,
-                    3,
-                    dialogmeldingBestilling.dialogmeldingUuid,
-                    dialogmeldingBestilling,
-                )
-                val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
-                every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                    mapOf(
-                        dialogmeldingToBehandlerBestillingTopicPartition to listOf(
-                            dialogmeldingBestillingRecord,
-                            dialogmeldingBestillingRecordDuplicate,
-                        )
+        @Test
+        fun `should persist incoming bestilling with no kilde`() {
+            val behandler = lagreBehandler(database)
+            val dialogmeldingBestillingUuid = UUID.randomUUID()
+            val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
+                uuid = dialogmeldingBestillingUuid,
+                behandlerRef = behandler.behandlerRef,
+            ).copy(
+                kilde = null,
+            )
+            val dialogmeldingBestillingRecord = ConsumerRecord(
+                DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
+                partition,
+                1,
+                dialogmeldingBestilling.dialogmeldingUuid,
+                dialogmeldingBestilling,
+            )
+            val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
+            every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                mapOf(
+                    dialogmeldingToBehandlerBestillingTopicPartition to listOf(
+                        dialogmeldingBestillingRecord,
                     )
                 )
-                every { mockConsumer.commitSync() } returns Unit
+            )
+            every { mockConsumer.commitSync() } returns Unit
 
-                runBlocking {
-                    pollAndProcessDialogmeldingBestilling(
-                        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-                        kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
-                    )
-                }
-
-                verify(exactly = 1) { mockConsumer.commitSync() }
-
-                val pBehandlerDialogmeldingBestilling =
-                    database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
-
-                assertNotNull(pBehandlerDialogmeldingBestilling)
-                assertEquals(dialogmeldingBestillingUuid, pBehandlerDialogmeldingBestilling!!.uuid)
+            runBlocking {
+                pollAndProcessDialogmeldingBestilling(
+                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                    kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+                )
             }
+
+            verify(exactly = 1) { mockConsumer.commitSync() }
+
+            val pBehandlerDialogmeldingBestilling =
+                database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
+            assertNotNull(pBehandlerDialogmeldingBestilling)
+            assertEquals(dialogmeldingBestillingUuid, pBehandlerDialogmeldingBestilling!!.uuid)
+            assertEquals(dialogmeldingBestilling.dialogmeldingTekst, pBehandlerDialogmeldingBestilling.tekst)
+            assertNull(pBehandlerDialogmeldingBestilling.kilde)
         }
 
-        @Nested
-        @DisplayName("Does not persist when behandlerRef not valid")
-        inner class DoesNotPersistWhenBehandlerRefNotValid {
-            @Test
-            fun `should not persist incoming bestillinger when behandlerRef is invalid`() {
-                val dialogmeldingBestillingUuid = UUID.randomUUID()
-                val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
-                    uuid = dialogmeldingBestillingUuid,
-                    behandlerRef = UUID.randomUUID(),
-                )
-                val dialogmeldingBestillingRecord = ConsumerRecord(
-                    DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
-                    partition,
-                    1,
-                    dialogmeldingBestilling.dialogmeldingUuid,
-                    dialogmeldingBestilling,
-                )
-                val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
-                every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
-                    mapOf(
-                        dialogmeldingToBehandlerBestillingTopicPartition to listOf(
-                            dialogmeldingBestillingRecord,
-                        )
+        @Test
+        fun `persists dialogmelding-status BESTILT when incoming bestilling`() {
+            val behandler = lagreBehandler(database)
+            val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
+                uuid = UUID.randomUUID(),
+                behandlerRef = behandler.behandlerRef,
+            )
+            val dialogmeldingBestillingRecord = ConsumerRecord(
+                DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
+                partition,
+                1,
+                dialogmeldingBestilling.dialogmeldingUuid,
+                dialogmeldingBestilling,
+            )
+            val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
+            every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                mapOf(
+                    dialogmeldingToBehandlerBestillingTopicPartition to listOf(
+                        dialogmeldingBestillingRecord,
                     )
                 )
-                every { mockConsumer.commitSync() } returns Unit
+            )
+            every { mockConsumer.commitSync() } returns Unit
 
-                runBlocking {
-                    pollAndProcessDialogmeldingBestilling(
-                        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-                        kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
-                    )
-                }
-
-                verify(exactly = 1) { mockConsumer.commitSync() }
-                val pBehandlerDialogmeldingBestilling =
-                    database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
-                assertNull(pBehandlerDialogmeldingBestilling)
+            runBlocking {
+                pollAndProcessDialogmeldingBestilling(
+                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                    kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+                )
             }
+
+            val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
+            assertEquals(1, dialogmeldingStatusNotPublished.size)
+
+            val pDialogmeldingStatus = dialogmeldingStatusNotPublished.first()
+            val pBehandlerDialogmeldingBestilling =
+                database.getBestilling(
+                    uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid)
+                )
+            assertEquals(DialogmeldingStatusType.BESTILT.name, pDialogmeldingStatus.status)
+            assertNull(pDialogmeldingStatus.tekst)
+            assertEquals(pBehandlerDialogmeldingBestilling?.id, pDialogmeldingStatus.bestillingId)
+            assertNotNull(pDialogmeldingStatus.createdAt)
+            assertNotNull(pDialogmeldingStatus.updatedAt)
+            assertNull(pDialogmeldingStatus.publishedAt)
+        }
+    }
+
+    @Nested
+    @DisplayName("Should only persist once when duplicates")
+    inner class ShouldOnlyPersistOnceWhenDuplicates {
+        @Test
+        fun `Should only persist once when duplicates`() {
+            val behandler = lagreBehandler(database)
+            val dialogmeldingBestillingUuid = UUID.randomUUID()
+            val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
+                uuid = dialogmeldingBestillingUuid,
+                behandlerRef = behandler.behandlerRef,
+            )
+            val dialogmeldingBestillingRecord = ConsumerRecord(
+                DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
+                partition,
+                2,
+                dialogmeldingBestilling.dialogmeldingUuid,
+                dialogmeldingBestilling,
+            )
+            val dialogmeldingBestillingRecordDuplicate = ConsumerRecord(
+                DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
+                partition,
+                3,
+                dialogmeldingBestilling.dialogmeldingUuid,
+                dialogmeldingBestilling,
+            )
+            val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
+            every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                mapOf(
+                    dialogmeldingToBehandlerBestillingTopicPartition to listOf(
+                        dialogmeldingBestillingRecord,
+                        dialogmeldingBestillingRecordDuplicate,
+                    )
+                )
+            )
+            every { mockConsumer.commitSync() } returns Unit
+
+            runBlocking {
+                pollAndProcessDialogmeldingBestilling(
+                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                    kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+                )
+            }
+
+            verify(exactly = 1) { mockConsumer.commitSync() }
+
+            val pBehandlerDialogmeldingBestilling =
+                database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
+
+            assertNotNull(pBehandlerDialogmeldingBestilling)
+            assertEquals(dialogmeldingBestillingUuid, pBehandlerDialogmeldingBestilling!!.uuid)
+        }
+    }
+
+    @Nested
+    @DisplayName("Does not persist when behandlerRef not valid")
+    inner class DoesNotPersistWhenBehandlerRefNotValid {
+        @Test
+        fun `should not persist incoming bestillinger when behandlerRef is invalid`() {
+            val dialogmeldingBestillingUuid = UUID.randomUUID()
+            val dialogmeldingBestilling = generateDialogmeldingToBehandlerBestillingDTO(
+                uuid = dialogmeldingBestillingUuid,
+                behandlerRef = UUID.randomUUID(),
+            )
+            val dialogmeldingBestillingRecord = ConsumerRecord(
+                DIALOGMELDING_TO_BEHANDLER_BESTILLING_TOPIC,
+                partition,
+                1,
+                dialogmeldingBestilling.dialogmeldingUuid,
+                dialogmeldingBestilling,
+            )
+            val mockConsumer = mockk<KafkaConsumer<String, DialogmeldingToBehandlerBestillingDTO>>()
+            every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                mapOf(
+                    dialogmeldingToBehandlerBestillingTopicPartition to listOf(
+                        dialogmeldingBestillingRecord,
+                    )
+                )
+            )
+            every { mockConsumer.commitSync() } returns Unit
+
+            runBlocking {
+                pollAndProcessDialogmeldingBestilling(
+                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                    kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+                )
+            }
+
+            verify(exactly = 1) { mockConsumer.commitSync() }
+            val pBehandlerDialogmeldingBestilling =
+                database.getBestilling(uuid = UUID.fromString(dialogmeldingBestilling.dialogmeldingUuid))
+            assertNull(pBehandlerDialogmeldingBestilling)
         }
     }
 }
