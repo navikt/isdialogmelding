@@ -1,3 +1,4 @@
+import com.adarshr.gradle.testlogger.theme.ThemeType
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -29,6 +30,7 @@ plugins {
     kotlin("jvm") version "2.2.21"
     id("com.gradleup.shadow") version "8.3.6"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
+    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 repositories {
@@ -152,6 +154,10 @@ tasks {
 
     test {
         useJUnitPlatform()
-        testLogging.showStandardStreams = true
+        testlogger {
+            theme = ThemeType.STANDARD_PARALLEL
+            showFullStackTraces = true
+            showPassed = false
+        }
     }
 }
