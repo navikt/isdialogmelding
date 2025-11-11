@@ -3,7 +3,6 @@ package no.nav.syfo.behandler.kafka.dialogmeldingtobehandlerbestilling
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.runBlocking
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
@@ -87,12 +86,10 @@ class KafkaDialogmeldingToBehandlerBestillingTest {
             )
             every { mockConsumer.commitSync() } returns Unit
 
-            runBlocking {
-                pollAndProcessDialogmeldingBestilling(
-                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-                    kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
-                )
-            }
+            pollAndProcessDialogmeldingBestilling(
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+            )
 
             verify(exactly = 1) { mockConsumer.commitSync() }
 
@@ -131,12 +128,10 @@ class KafkaDialogmeldingToBehandlerBestillingTest {
             )
             every { mockConsumer.commitSync() } returns Unit
 
-            runBlocking {
-                pollAndProcessDialogmeldingBestilling(
-                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-                    kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
-                )
-            }
+            pollAndProcessDialogmeldingBestilling(
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+            )
 
             verify(exactly = 1) { mockConsumer.commitSync() }
 
@@ -172,12 +167,10 @@ class KafkaDialogmeldingToBehandlerBestillingTest {
             )
             every { mockConsumer.commitSync() } returns Unit
 
-            runBlocking {
-                pollAndProcessDialogmeldingBestilling(
-                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-                    kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
-                )
-            }
+            pollAndProcessDialogmeldingBestilling(
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+            )
 
             val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
             assertEquals(1, dialogmeldingStatusNotPublished.size)
@@ -232,12 +225,10 @@ class KafkaDialogmeldingToBehandlerBestillingTest {
             )
             every { mockConsumer.commitSync() } returns Unit
 
-            runBlocking {
-                pollAndProcessDialogmeldingBestilling(
-                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-                    kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
-                )
-            }
+            pollAndProcessDialogmeldingBestilling(
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+            )
 
             verify(exactly = 1) { mockConsumer.commitSync() }
 
@@ -276,12 +267,10 @@ class KafkaDialogmeldingToBehandlerBestillingTest {
             )
             every { mockConsumer.commitSync() } returns Unit
 
-            runBlocking {
-                pollAndProcessDialogmeldingBestilling(
-                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
-                    kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
-                )
-            }
+            pollAndProcessDialogmeldingBestilling(
+                dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                kafkaConsumerDialogmeldingToBehandlerBestilling = mockConsumer,
+            )
 
             verify(exactly = 1) { mockConsumer.commitSync() }
             val pBehandlerDialogmeldingBestilling =

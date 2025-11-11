@@ -1,7 +1,7 @@
 package no.nav.syfo.cronjob
 
 import io.mockk.clearAllMocks
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.getBehandlerKontorById
 import no.nav.syfo.behandler.fastlege.FastlegeClient
@@ -62,14 +62,12 @@ class VerifyPartnerIdCronjobTest {
     }
 
     @Test
-    fun `Cronjob virker selv om ingen kontor`() {
-        runBlocking {
-            cronJob.verifyPartnerIdJob()
-        }
+    fun `Cronjob virker selv om ingen kontor`() = runTest {
+        cronJob.verifyPartnerIdJob()
     }
 
     @Test
-    fun `Cronjob disabler duplikat kontor med udatert partnerID`() {
+    fun `Cronjob disabler duplikat kontor med udatert partnerID`() = runTest {
         val kontorId1 = database.createKontor(
             partnerId = PARTNERID,
             herId = OTHER_HERID,
@@ -80,9 +78,7 @@ class VerifyPartnerIdCronjobTest {
             herId = OTHER_HERID,
             navn = KONTOR_NAVN,
         )
-        runBlocking {
-            cronJob.verifyPartnerIdJob()
-        }
+        cronJob.verifyPartnerIdJob()
         val kontor1 = database.getBehandlerKontorById(kontorId1)
         assertNull(kontor1.dialogmeldingEnabled)
         val kontor2 = database.getBehandlerKontorById(kontorId2)
@@ -90,7 +86,7 @@ class VerifyPartnerIdCronjobTest {
     }
 
     @Test
-    fun `Cronjob gjør ingenting med duplikat kontor med udatert partnerID hvis allerede disabled`() {
+    fun `Cronjob gjør ingenting med duplikat kontor med udatert partnerID hvis allerede disabled`() = runTest {
         val kontorId1 = database.createKontor(
             partnerId = PARTNERID,
             herId = OTHER_HERID,
@@ -102,9 +98,7 @@ class VerifyPartnerIdCronjobTest {
             herId = OTHER_HERID,
             navn = KONTOR_NAVN,
         )
-        runBlocking {
-            cronJob.verifyPartnerIdJob()
-        }
+        cronJob.verifyPartnerIdJob()
         val kontor1 = database.getBehandlerKontorById(kontorId1)
         assertNull(kontor1.dialogmeldingEnabled)
         val kontor2 = database.getBehandlerKontorById(kontorId2)
@@ -112,16 +106,15 @@ class VerifyPartnerIdCronjobTest {
     }
 
     @Test
-    fun `Cronjob gjør ingenting med kontor med udatert partnerID hvis det ikke finnes et annet kontor med samme herId`() {
-        val kontorId = database.createKontor(
-            partnerId = PARTNERID,
-            herId = OTHER_HERID,
-            navn = KONTOR_NAVN,
-        )
-        runBlocking {
+    fun `Cronjob gjør ingenting med kontor med udatert partnerID hvis det ikke finnes et annet kontor med samme herId`() =
+        runTest {
+            val kontorId = database.createKontor(
+                partnerId = PARTNERID,
+                herId = OTHER_HERID,
+                navn = KONTOR_NAVN,
+            )
             cronJob.verifyPartnerIdJob()
+            val kontor = database.getBehandlerKontorById(kontorId)
+            assertNotNull(kontor.dialogmeldingEnabled)
         }
-        val kontor = database.getBehandlerKontorById(kontorId)
-        assertNotNull(kontor.dialogmeldingEnabled)
-    }
 }

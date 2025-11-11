@@ -1,7 +1,7 @@
 package no.nav.syfo.cronjob
 
 import io.mockk.clearAllMocks
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.toBehandlerKontor
@@ -90,44 +90,36 @@ class VerifyBehandlereForKontorCronjobTest {
     }
 
     @Test
-    fun `Cronjob virker selv om ingen kontor`() {
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+    fun `Cronjob virker selv om ingen kontor`() = runTest {
+        cronJob.verifyBehandlereForKontorJob()
     }
 
     @Test
-    fun `Cronjob disabler kontor som ikke lengre er aktivt`() {
+    fun `Cronjob disabler kontor som ikke lengre er aktivt`() = runTest {
         val kontorId = createKontor(HERID_NOT_ACTIVE)
         val kontorBefore = database.getBehandlerKontorById(kontorId)
         assertNotNull(kontorBefore.dialogmeldingEnabled)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val kontorAfter = database.getBehandlerKontorById(kontorId)
         assertNull(kontorAfter.dialogmeldingEnabled)
     }
 
     @Test
-    fun `Cronjob endrer ikke kontorets aktivflagg hvis fortsatt aktivt`() {
+    fun `Cronjob endrer ikke kontorets aktivflagg hvis fortsatt aktivt`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val kontorAfter = database.getBehandlerKontorById(kontorId)
         assertNotNull(kontorAfter.dialogmeldingEnabled)
     }
 
     @Test
-    fun `Cronjob oppdaterer adresse`() {
+    fun `Cronjob oppdaterer adresse`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val kontorBefore = database.getBehandlerKontorById(kontorId)
         assertNull(kontorBefore.adresse)
         assertNull(kontorBefore.postnummer)
         assertNull(kontorBefore.poststed)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val kontorAfter = database.getBehandlerKontorById(kontorId)
         assertNotNull(kontorAfter.adresse)
         assertNotNull(kontorAfter.postnummer)
@@ -135,80 +127,68 @@ class VerifyBehandlereForKontorCronjobTest {
     }
 
     @Test
-    fun `Cronjob setter hprId på behandlere som mangler det`() {
+    fun `Cronjob setter hprId på behandlere som mangler det`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler = createBehandler(
             kontorId = kontorId,
             hprId = null,
             personident = FASTLEGE_FNR,
         )
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlerById(pBehandler.id)
         assertEquals(HPRID.toString(), behandlerAfter!!.hprId)
     }
 
     @Test
-    fun `Cronjob invaliderer behandler som ikke finnes for kontor i Adresseregisteret`() {
+    fun `Cronjob invaliderer behandler som ikke finnes for kontor i Adresseregisteret`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler = createBehandler(kontorId, HPRID_UNKNOWN)
         val behandlerBefore = database.getBehandlerById(pBehandler.id)
         assertNull(behandlerBefore!!.invalidated)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlerById(pBehandler.id)
         assertNotNull(behandlerAfter!!.invalidated)
     }
 
     @Test
-    fun `Cronjob invaliderer ikke behandler knyttet til Aleris`() {
+    fun `Cronjob invaliderer ikke behandler knyttet til Aleris`() = runTest {
         val kontorId = createKontor(ALERIS_HER_ID.toInt())
         val pBehandler = createBehandler(kontorId, HPRID_UNKNOWN)
         val behandlerBefore = database.getBehandlerById(pBehandler.id)
         assertNull(behandlerBefore!!.invalidated)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlerById(pBehandler.id)
         assertNull(behandlerAfter!!.invalidated)
     }
 
     @Test
-    fun `Cronjob invaliderer behandler som er inaktiv i Adresseregisteret`() {
+    fun `Cronjob invaliderer behandler som er inaktiv i Adresseregisteret`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler = createBehandler(kontorId)
         val behandlerBefore = database.getBehandlerById(pBehandler.id)
         assertNull(behandlerBefore!!.invalidated)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlerById(pBehandler.id)
         assertNotNull(behandlerAfter!!.invalidated)
     }
 
     @Test
-    fun `Cronjob revaliderer behandler som er aktiv i Adresseregisteret`() {
+    fun `Cronjob revaliderer behandler som er aktiv i Adresseregisteret`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler = createBehandler(kontorId, HPRID)
         database.invalidateBehandler(pBehandler.behandlerRef)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlerById(pBehandler.id)
         assertNull(behandlerAfter!!.invalidated)
     }
 
     @Test
-    fun `Cronjob revaliderer ikke duplikat`() {
+    fun `Cronjob revaliderer ikke duplikat`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandlerInaktiv = createBehandler(kontorId, HPRID)
         database.invalidateBehandler(pBehandlerInaktiv.behandlerRef)
         val pBehandlerAktiv = createBehandler(kontorId, HPRID)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerInaktivAfter = database.getBehandlerById(pBehandlerInaktiv.id)
         assertNotNull(behandlerInaktivAfter!!.invalidated)
         val behandlerAktivAfter = database.getBehandlerById(pBehandlerAktiv.id)
@@ -216,31 +196,27 @@ class VerifyBehandlereForKontorCronjobTest {
     }
 
     @Test
-    fun `Cronjob legger til ny behandlere`() {
+    fun `Cronjob legger til ny behandlere`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val behandlerBefore = database.getBehandlereForKontor(kontorId)
         assertEquals(0, behandlerBefore.size)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlereForKontor(kontorId)
         assertEquals(2, behandlerAfter.size)
     }
 
     @Test
-    fun `Cronjob legger til ny behandlere (psykolog)`() {
+    fun `Cronjob legger til ny behandlere (psykolog)`() = runTest {
         val kontorId = createKontor(HERID_PSYKOLOG_KONTOR_OK)
         val behandlerBefore = database.getBehandlereForKontor(kontorId)
         assertEquals(0, behandlerBefore.size)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlereForKontor(kontorId)
         assertEquals(2, behandlerAfter.size)
     }
 
     @Test
-    fun `Cronjob oppdaterer eksisterende behandler`() {
+    fun `Cronjob oppdaterer eksisterende behandler`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler = createBehandler(
             kontorId = kontorId,
@@ -250,9 +226,7 @@ class VerifyBehandlereForKontorCronjobTest {
             etternavn = "etter",
             kategori = BehandlerKategori.TANNLEGE,
         )
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlereForKontor(kontorId)
         assertEquals(2, behandlerAfter.size)
         val pBehandlerAfter = behandlerAfter.first { it.hprId == HPRID.toString() }
@@ -265,7 +239,7 @@ class VerifyBehandlereForKontorCronjobTest {
     }
 
     @Test
-    fun `Cronjob oppdaterer eksisterende behandler selv om kategori mangler i Adresseregisteret`() {
+    fun `Cronjob oppdaterer eksisterende behandler selv om kategori mangler i Adresseregisteret`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler = createBehandler(
             kontorId = kontorId,
@@ -275,9 +249,7 @@ class VerifyBehandlereForKontorCronjobTest {
             etternavn = "etter",
             kategori = BehandlerKategori.TANNLEGE,
         )
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlereForKontor(kontorId)
         assertEquals(2, behandlerAfter.size)
         val pBehandlerAfter = behandlerAfter.first { it.hprId == HPRID_UTEN_KATEGORI.toString() }
@@ -290,7 +262,7 @@ class VerifyBehandlereForKontorCronjobTest {
     }
 
     @Test
-    fun `Cronjob oppdaterer eksisterende behandler med DNR der forekomsten i Adresseregisteret har FNR`() {
+    fun `Cronjob oppdaterer eksisterende behandler med DNR der forekomsten i Adresseregisteret har FNR`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler = createBehandler(
             kontorId = kontorId,
@@ -300,9 +272,7 @@ class VerifyBehandlereForKontorCronjobTest {
             etternavn = "etter",
             kategori = BehandlerKategori.LEGE,
         )
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlereForKontor(kontorId)
         assertEquals(2, behandlerAfter.size)
         val pBehandlerAfter = behandlerAfter.first { it.hprId == HPRID.toString() }
@@ -316,7 +286,7 @@ class VerifyBehandlereForKontorCronjobTest {
     }
 
     @Test
-    fun `Cronjob oppdaterer spesifikk behandler`() {
+    fun `Cronjob oppdaterer spesifikk behandler`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler = createBehandler(
             behandlerRef = behandlerToBeUpdated,
@@ -327,9 +297,7 @@ class VerifyBehandlereForKontorCronjobTest {
             etternavn = "etter",
             kategori = BehandlerKategori.LEGE,
         )
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerAfter = database.getBehandlereForKontor(kontorId)
         assertEquals(2, behandlerAfter.size)
         val pBehandlerAfter = behandlerAfter.first { it.hprId == HPRID.toString() }
@@ -343,12 +311,10 @@ class VerifyBehandlereForKontorCronjobTest {
     }
 
     @Test
-    fun `Cronjob legger til ny behandler og invaliderer eksisterende`() {
+    fun `Cronjob legger til ny behandler og invaliderer eksisterende`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler = createBehandler(kontorId)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerForKontorAfter = database.getBehandlereForKontor(kontorId)
         assertEquals(3, behandlerForKontorAfter.size)
         val behandlerAfter = database.getBehandlerById(pBehandler.id)
@@ -356,13 +322,11 @@ class VerifyBehandlereForKontorCronjobTest {
     }
 
     @Test
-    fun `Cronjob invaliderer duplikater`() {
+    fun `Cronjob invaliderer duplikater`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler1 = createBehandler(kontorId = kontorId, hprId = HPRID, personident = FASTLEGE_FNR)
         val pBehandler2 = createBehandler(kontorId, HPRID)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerForKontorAfter = database.getBehandlereForKontor(kontorId)
         assertEquals(3, behandlerForKontorAfter.size)
         val behandler1After = database.getBehandlerById(pBehandler1.id)
@@ -372,13 +336,11 @@ class VerifyBehandlereForKontorCronjobTest {
     }
 
     @Test
-    fun `Cronjob invaliderer duplikat med D-nummer`() {
+    fun `Cronjob invaliderer duplikat med D-nummer`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler1 = createBehandler(kontorId = kontorId, hprId = HPRID, personident = FASTLEGE_DNR)
         val pBehandler2 = createBehandler(kontorId = kontorId, hprId = HPRID, personident = FASTLEGE_FNR)
-        runBlocking {
-            cronJob.verifyBehandlereForKontorJob()
-        }
+        cronJob.verifyBehandlereForKontorJob()
         val behandlerForKontorAfter = database.getBehandlereForKontor(kontorId)
         assertEquals(3, behandlerForKontorAfter.size)
         val behandler1After = database.getBehandlerById(pBehandler1.id)

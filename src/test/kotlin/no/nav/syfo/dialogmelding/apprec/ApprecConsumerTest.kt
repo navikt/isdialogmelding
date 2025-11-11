@@ -3,7 +3,6 @@ package no.nav.syfo.dialogmelding.apprec
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.database.getBehandlerByBehandlerRef
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
 import no.nav.syfo.dialogmelding.apprec.database.getApprec
@@ -58,9 +57,7 @@ class ApprecConsumerTest {
                 .replace("FiktivTestdata0001", apprecId.toString())
                 .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
         every { incomingMessage.text } returns (apprecXml)
-        runBlocking {
-            apprecConsumer.processApprecMessage(incomingMessage)
-        }
+        apprecConsumer.processApprecMessage(incomingMessage)
 
         val pApprec = database.getApprec(apprecId)
 
@@ -83,18 +80,14 @@ class ApprecConsumerTest {
                 .replace("FiktivTestdata0001", apprecId.toString())
                 .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
         every { incomingMessage.text } returns (apprecXml)
-        runBlocking {
-            apprecConsumer.processApprecMessage(incomingMessage)
-        }
+        apprecConsumer.processApprecMessage(incomingMessage)
 
         val pApprec = database.getApprec(apprecId)
 
         assertNotNull(pApprec)
         assertEquals(apprecId, pApprec!!.uuid)
 
-        runBlocking {
-            apprecConsumer.processApprecMessage(incomingMessage)
-        }
+        apprecConsumer.processApprecMessage(incomingMessage)
     }
 
     @Test
@@ -111,9 +104,7 @@ class ApprecConsumerTest {
                     ukjentDialogmeldingBestillingUuid.toString()
                 )
         every { incomingMessage.text } returns (apprecXml)
-        runBlocking {
-            apprecConsumer.processApprecMessage(incomingMessage)
-        }
+        apprecConsumer.processApprecMessage(incomingMessage)
 
         val pApprec = database.getApprec(apprecId)
 
@@ -130,9 +121,7 @@ class ApprecConsumerTest {
                 .replace("FiktivTestdata0001", apprecId.toString())
                 .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
         every { incomingMessage.text } returns (apprecXml)
-        runBlocking {
-            apprecConsumer.processApprecMessage(incomingMessage)
-        }
+        apprecConsumer.processApprecMessage(incomingMessage)
 
         val pApprec = database.getApprec(apprecId)
 
@@ -158,9 +147,7 @@ class ApprecConsumerTest {
                 .replace("FiktivTestdata0001", apprecId.toString())
                 .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
         every { incomingMessage.text } returns (apprecXml)
-        runBlocking {
-            apprecConsumer.processApprecMessage(incomingMessage)
-        }
+        apprecConsumer.processApprecMessage(incomingMessage)
 
         val pApprec = database.getApprec(apprecId)
 
@@ -180,9 +167,7 @@ class ApprecConsumerTest {
     fun `Prosesserer innkommet feilformattert melding`() {
         val apprecXml = "Ikke noen apprec"
         every { incomingMessage.text } returns (apprecXml)
-        runBlocking {
-            apprecConsumer.processApprecMessage(incomingMessage)
-        }
+        apprecConsumer.processApprecMessage(incomingMessage)
         // should not get an exception
     }
 
@@ -195,9 +180,7 @@ class ApprecConsumerTest {
                 .replace("FiktivTestdata0001", UUID.randomUUID().toString())
                 .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
         every { incomingMessage.text } returns (apprecXml)
-        runBlocking {
-            apprecConsumer.processApprecMessage(incomingMessage)
-        }
+        apprecConsumer.processApprecMessage(incomingMessage)
 
         val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
         assertEquals(1, dialogmeldingStatusNotPublished.size)
@@ -220,9 +203,7 @@ class ApprecConsumerTest {
                 .replace("FiktivTestdata0001", UUID.randomUUID().toString())
                 .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
         every { incomingMessage.text } returns (apprecXml)
-        runBlocking {
-            apprecConsumer.processApprecMessage(incomingMessage)
-        }
+        apprecConsumer.processApprecMessage(incomingMessage)
 
         val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
         assertEquals(1, dialogmeldingStatusNotPublished.size)

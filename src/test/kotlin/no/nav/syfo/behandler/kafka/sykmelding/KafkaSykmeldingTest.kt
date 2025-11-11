@@ -8,7 +8,6 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.BehandlerDTO
 import no.nav.syfo.behandler.api.behandlerPath
@@ -98,12 +97,10 @@ class KafkaSykmeldingTest {
             assertNull(kontorBefore)
             assertEquals(0, behandlereBefore.size)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
             val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
             assertEquals(sykmelding.partnerreferanse, kontorAfter!!.partnerId)
@@ -143,12 +140,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
             val kontorAfter = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
             assertEquals(sykmelding.partnerreferanse, kontorAfter!!.partnerId)
@@ -203,12 +198,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
 
             val behandler = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
@@ -241,12 +234,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
             val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
             assertEquals(sykmelding.partnerreferanse, kontor!!.partnerId)
@@ -258,12 +249,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 2) { mockConsumer.commitSync() }
 
             val kontorAfterSecondMessage =
@@ -281,12 +270,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
             val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
             assertEquals(sykmelding.partnerreferanse, kontor!!.partnerId)
@@ -300,12 +287,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 2) { mockConsumer.commitSync() }
 
             val kontorAfterSecondMessage =
@@ -332,12 +317,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
 
             val kontor = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
@@ -375,12 +358,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
             val kontor =
                 database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
@@ -399,12 +380,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
             val kontor =
                 database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
@@ -423,12 +402,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
             val behandlerKontor = database.getAllBehandlerKontor()
             assertEquals(0, behandlerKontor.size)
@@ -443,12 +420,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
             val behandlerKontor = database.getAllBehandlerKontor()
             assertEquals(0, behandlerKontor.size)
@@ -463,12 +438,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
             val behandlerKontor = database.getAllBehandlerKontor()
             assertEquals(0, behandlerKontor.size)
@@ -483,12 +456,10 @@ class KafkaSykmeldingTest {
             every { mockConsumer.poll(any<Duration>()) } returns
                 consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
-            runBlocking {
-                pollAndProcessSykmelding(
-                    kafkaConsumerSykmelding = mockConsumer,
-                    behandlerService = behandlerService,
-                )
-            }
+            pollAndProcessSykmelding(
+                kafkaConsumerSykmelding = mockConsumer,
+                behandlerService = behandlerService,
+            )
             verify(exactly = 1) { mockConsumer.commitSync() }
             val kontor =
                 database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))

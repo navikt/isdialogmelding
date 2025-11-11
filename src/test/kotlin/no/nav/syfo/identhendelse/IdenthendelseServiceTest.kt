@@ -1,6 +1,5 @@
 package no.nav.syfo.identhendelse
 
-import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.database.createBehandler
 import no.nav.syfo.behandler.database.createBehandlerArbeidstakerRelasjon
@@ -22,7 +21,8 @@ import no.nav.syfo.testhelper.generator.generateDialogmeldingToBehandlerBestilli
 import no.nav.syfo.testhelper.generator.generateKafkaIdenthendelseDTO
 import no.nav.syfo.testhelper.getBehandlerArbeidstakerRelasjoner
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -67,9 +67,7 @@ class IdenthendelseServiceTest {
             val oldBehandlerArbeidstaker = database.getBehandlerArbeidstakerRelasjoner(oldIdenter.first())
             val oldIdentUpdatedAt = oldBehandlerArbeidstaker.first().updatedAt
 
-            runBlocking {
-                identhendelseService.handleIdenthendelse(kafkaIdenthendelseDTO)
-            }
+            identhendelseService.handleIdenthendelse(kafkaIdenthendelseDTO)
 
             val newIdentOccurrences = database.getIdentCount(listOf(newIdent))
             assertEquals(2, newIdentOccurrences)
@@ -92,9 +90,7 @@ class IdenthendelseServiceTest {
             val oldBehandlerArbeidstaker = database.getBehandlerArbeidstakerRelasjoner(oldIdenter.first())
             val oldIdentUpdatedAt = oldBehandlerArbeidstaker.first().updatedAt
 
-            runBlocking {
-                identhendelseService.handleIdenthendelse(kafkaIdenthendelseDTO)
-            }
+            identhendelseService.handleIdenthendelse(kafkaIdenthendelseDTO)
 
             val newIdentOccurrences = database.getIdentCount(listOf(newIdent))
             assertEquals(1, newIdentOccurrences)

@@ -1,7 +1,7 @@
 package no.nav.syfo.cronjob
 
 import io.mockk.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
@@ -77,7 +77,7 @@ class DialogmeldingCronjobTest {
     }
 
     @Test
-    fun `Sender bestilt dialogmelding`() {
+    fun `Sender bestilt dialogmelding`() = runTest {
         val behandlerRef = UUID.randomUUID()
         val partnerId = PartnerId(random.nextInt())
         val behandler = generateBehandler(behandlerRef, partnerId)
@@ -104,11 +104,9 @@ class DialogmeldingCronjobTest {
         assertNull(pBehandlerDialogmeldingBestillingBefore!!.sendt)
         assertEquals(0, pBehandlerDialogmeldingBestillingBefore.sendtTries)
 
-        runBlocking {
-            val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
-            assertEquals(0, result.failed)
-            assertEquals(1, result.updated)
-        }
+        val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
+        assertEquals(0, result.failed)
+        assertEquals(1, result.updated)
         verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
 
         val pBehandlerDialogmeldingBestillingAfter =
@@ -117,16 +115,14 @@ class DialogmeldingCronjobTest {
         assertEquals(1, pBehandlerDialogmeldingBestillingAfter.sendtTries)
 
         clearMocks(mqSenderMock)
-        runBlocking {
-            val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
-            assertEquals(0, result.failed)
-            assertEquals(0, result.updated)
-        }
+        val result2 = dialogmeldingSendCronjob.dialogmeldingSendJob()
+        assertEquals(0, result2.failed)
+        assertEquals(0, result2.updated)
         verify(exactly = 0) { mqSenderMock.sendMessageToEmottak(any()) }
     }
 
     @Test
-    fun `Sender bestilt dialogmelding uten relasjon mellom arbeidstaker og behandler`() {
+    fun `Sender bestilt dialogmelding uten relasjon mellom arbeidstaker og behandler`() = runTest {
         val behandlerRef = UUID.randomUUID()
         val partnerId = PartnerId(random.nextInt())
         val behandler = generateBehandler(behandlerRef, partnerId)
@@ -154,11 +150,9 @@ class DialogmeldingCronjobTest {
         assertNull(pBehandlerDialogmeldingBestillingBefore!!.sendt)
         assertEquals(0, pBehandlerDialogmeldingBestillingBefore.sendtTries)
 
-        runBlocking {
-            val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
-            assertEquals(0, result.failed)
-            assertEquals(1, result.updated)
-        }
+        val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
+        assertEquals(0, result.failed)
+        assertEquals(1, result.updated)
         verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
 
         val pBehandlerDialogmeldingBestillingAfter =
@@ -168,7 +162,7 @@ class DialogmeldingCronjobTest {
     }
 
     @Test
-    fun `Sender bestilt oppfølgingsplan`() {
+    fun `Sender bestilt oppfølgingsplan`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSenderMock.sendMessageToEmottak(capture(messageSlot)) }
@@ -203,11 +197,9 @@ class DialogmeldingCronjobTest {
         assertNull(pBehandlerDialogmeldingBestillingBefore!!.sendt)
         assertEquals(0, pBehandlerDialogmeldingBestillingBefore.sendtTries)
 
-        runBlocking {
-            val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
-            assertEquals(0, result.failed)
-            assertEquals(1, result.updated)
-        }
+        val result = dialogmeldingSendCronjob.dialogmeldingSendJob()
+        assertEquals(0, result.failed)
+        assertEquals(1, result.updated)
         verify(exactly = 1) { mqSenderMock.sendMessageToEmottak(any()) }
         val expectedFellesformatMessageAsRegex = defaultFellesformatMessageXmlRegex()
         val actualFellesformatMessage = messageSlot.captured
@@ -223,7 +215,7 @@ class DialogmeldingCronjobTest {
     }
 
     @Test
-    fun `Sending av bestilt dialogmelding lagrer dialogmelding-status SENDT`() {
+    fun `Sending av bestilt dialogmelding lagrer dialogmelding-status SENDT`() = runTest {
         val behandlerRef = UUID.randomUUID()
         val partnerId = PartnerId(random.nextInt())
         val behandler = generateBehandler(behandlerRef, partnerId)
@@ -245,9 +237,7 @@ class DialogmeldingCronjobTest {
         )
         val pBehandlerDialogmeldingBestilling = database.getBestilling(uuid = dialogmeldingBestillingUuid)
 
-        runBlocking {
-            dialogmeldingSendCronjob.dialogmeldingSendJob()
-        }
+        dialogmeldingSendCronjob.dialogmeldingSendJob()
 
         val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
         assertEquals(1, dialogmeldingStatusNotPublished.size)

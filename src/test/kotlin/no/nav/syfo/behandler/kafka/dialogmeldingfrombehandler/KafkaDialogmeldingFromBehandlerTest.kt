@@ -3,7 +3,6 @@ package no.nav.syfo.behandler.kafka.dialogmeldingfrombehandler
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.runBlocking
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.getBehandlerByBehandlerRef
 import no.nav.syfo.behandler.database.getBehandlerKontor
@@ -50,12 +49,10 @@ class KafkaDialogmeldingFromBehandlerTest {
                 val dialogmelding = generateDialogmeldingFromBehandlerDTO(UUID.randomUUID())
                 val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
 
-                runBlocking {
-                    pollAndProcessDialogmeldingFromBehandler(
-                        kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                        database = database,
-                    )
-                }
+                pollAndProcessDialogmeldingFromBehandler(
+                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                    database = database,
+                )
 
                 verify(exactly = 1) { mockConsumer.commitSync() }
                 val kontor = database.connection.use { it.getBehandlerKontor(UserConstants.PARTNERID) }
@@ -69,12 +66,10 @@ class KafkaDialogmeldingFromBehandlerTest {
                 val dialogmelding = generateDialogmeldingFromBehandlerDTO(UUID.randomUUID())
                 val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
 
-                runBlocking {
-                    pollAndProcessDialogmeldingFromBehandler(
-                        kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                        database = database,
-                    )
-                }
+                pollAndProcessDialogmeldingFromBehandler(
+                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                    database = database,
+                )
 
                 verify(exactly = 1) { mockConsumer.commitSync() }
                 val kontor = database.connection.use { it.getBehandlerKontor(UserConstants.PARTNERID) }
@@ -88,12 +83,10 @@ class KafkaDialogmeldingFromBehandlerTest {
                 val dialogmelding = generateDialogmeldingFromBehandlerDTO(UUID.randomUUID())
                 val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
 
-                runBlocking {
-                    pollAndProcessDialogmeldingFromBehandler(
-                        kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                        database = database,
-                    )
-                }
+                pollAndProcessDialogmeldingFromBehandler(
+                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                    database = database,
+                )
 
                 verify(exactly = 1) { mockConsumer.commitSync() }
                 val kontor = database.connection.use { it.getBehandlerKontor(UserConstants.PARTNERID) }
@@ -115,12 +108,10 @@ class KafkaDialogmeldingFromBehandlerTest {
                 val dialogmelding = generateDialogmeldingFromBehandlerDTO(fellesformatXMLHealthcareProfessional)
                 val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
 
-                runBlocking {
-                    pollAndProcessDialogmeldingFromBehandler(
-                        kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                        database = database,
-                    )
-                }
+                pollAndProcessDialogmeldingFromBehandler(
+                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                    database = database,
+                )
 
                 verify(exactly = 1) { mockConsumer.commitSync() }
                 val behandler = database.getBehandlerByBehandlerRef(behandlerRef)
@@ -145,12 +136,10 @@ class KafkaDialogmeldingFromBehandlerTest {
                     generateDialogmeldingFromBehandlerDTO(fellesformatXMLHealthcareProfessionalMedIdenttypeAnnen)
                 val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
 
-                runBlocking {
-                    pollAndProcessDialogmeldingFromBehandler(
-                        kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                        database = database,
-                    )
-                }
+                pollAndProcessDialogmeldingFromBehandler(
+                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                    database = database,
+                )
 
                 verify(exactly = 1) { mockConsumer.commitSync() }
                 val behandler = database.getBehandlerByBehandlerRef(behandlerRef)
@@ -169,12 +158,10 @@ class KafkaDialogmeldingFromBehandlerTest {
                 val dialogmelding = generateDialogmeldingFromBehandlerDTOWithInvalidXml(UUID.randomUUID())
                 val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
 
-                runBlocking {
-                    pollAndProcessDialogmeldingFromBehandler(
-                        kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                        database = database,
-                    )
-                }
+                pollAndProcessDialogmeldingFromBehandler(
+                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                    database = database,
+                )
 
                 verify(exactly = 1) { mockConsumer.commitSync() }
                 val kontor = database.connection.use { it.getBehandlerKontor(UserConstants.PARTNERID) }
@@ -189,12 +176,10 @@ class KafkaDialogmeldingFromBehandlerTest {
                 )
                 val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
 
-                runBlocking {
-                    pollAndProcessDialogmeldingFromBehandler(
-                        kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                        database = database,
-                    )
-                }
+                pollAndProcessDialogmeldingFromBehandler(
+                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                    database = database,
+                )
 
                 verify(exactly = 1) { mockConsumer.commitSync() }
             }
@@ -207,12 +192,10 @@ class KafkaDialogmeldingFromBehandlerTest {
                 val mockConsumer =
                     mockKafkaConsumerWithDialogmelding(dialogmeldingWithoutValidPartnerIdWithHealthcareProfessional)
 
-                runBlocking {
-                    pollAndProcessDialogmeldingFromBehandler(
-                        kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                        database = database,
-                    )
-                }
+                pollAndProcessDialogmeldingFromBehandler(
+                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                    database = database,
+                )
 
                 verify(exactly = 1) { mockConsumer.commitSync() }
                 val behandler = database.getBehandlerByBehandlerRef(behandlerRef)
@@ -227,12 +210,10 @@ class KafkaDialogmeldingFromBehandlerTest {
                 val behandlerRef = addExistingBehandlerToDatabase(database)
                 val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmeldingWithoutHealthcareProfessional)
 
-                runBlocking {
-                    pollAndProcessDialogmeldingFromBehandler(
-                        kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                        database = database,
-                    )
-                }
+                pollAndProcessDialogmeldingFromBehandler(
+                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
+                    database = database,
+                )
 
                 verify(exactly = 1) { mockConsumer.commitSync() }
                 val behandler = database.getBehandlerByBehandlerRef(behandlerRef)

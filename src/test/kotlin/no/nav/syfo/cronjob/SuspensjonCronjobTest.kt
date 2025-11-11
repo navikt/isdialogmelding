@@ -1,6 +1,6 @@
 package no.nav.syfo.cronjob
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.getBehandlerByBehandlerRef
 import no.nav.syfo.behandler.fastlege.FastlegeClient
@@ -57,14 +57,12 @@ class SuspensjonCronjobTest {
     }
 
     @Test
-    fun `Cronjob virker selv om ingen behandlere`() {
-        runBlocking {
-            cronJob.checkLegeSuspensjonJob()
-        }
+    fun `Cronjob virker selv om ingen behandlere`() = runTest {
+        cronJob.checkLegeSuspensjonJob()
     }
 
     @Test
-    fun `Cronjob bevarer suspendert=false for eksisterende behandler`() {
+    fun `Cronjob bevarer suspendert=false for eksisterende behandler`() = runTest {
         val behandlerUUID = database.createBehandlerForArbeidstaker(
             behandler = generateBehandler(
                 behandlerRef = UUID.randomUUID(),
@@ -72,14 +70,12 @@ class SuspensjonCronjobTest {
             ),
             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
         )
-        runBlocking {
-            cronJob.checkLegeSuspensjonJob()
-        }
+        cronJob.checkLegeSuspensjonJob()
         assertFalse(database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
     }
 
     @Test
-    fun `Cronjob setter suspendert=true for suspendert behandler`() {
+    fun `Cronjob setter suspendert=true for suspendert behandler`() = runTest {
         val behandlerUUID = database.createBehandlerForArbeidstaker(
             behandler = generateBehandler(
                 behandlerRef = UUID.randomUUID(),
@@ -89,14 +85,12 @@ class SuspensjonCronjobTest {
             arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
         )
         assertFalse(database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
-        runBlocking {
-            cronJob.checkLegeSuspensjonJob()
-        }
+        cronJob.checkLegeSuspensjonJob()
         assertTrue(database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
     }
 
     @Test
-    fun `Cronjob setter suspendert=false for behandler som ikke lengre er suspendert`() {
+    fun `Cronjob setter suspendert=false for behandler som ikke lengre er suspendert`() = runTest {
         val behandlerUUID = database.createBehandlerForArbeidstaker(
             behandler = generateBehandler(
                 behandlerRef = UUID.randomUUID(),
@@ -106,9 +100,7 @@ class SuspensjonCronjobTest {
         )
         database.setSuspendert(behandlerUUID.toString())
         assertTrue(database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
-        runBlocking {
-            cronJob.checkLegeSuspensjonJob()
-        }
+        cronJob.checkLegeSuspensjonJob()
         assertFalse(database.getBehandlerByBehandlerRef(behandlerUUID)!!.suspendert)
     }
 }

@@ -1,7 +1,7 @@
 package no.nav.syfo.dialogmelding.service
 
 import io.mockk.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import no.nav.syfo.application.mq.MQSender
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
@@ -82,7 +82,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when foresporsel dialogmote-innkalling`() {
+    fun `Sends correct message on MQ when foresporsel dialogmote-innkalling`() = runTest {
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
@@ -94,9 +94,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlRegex()
@@ -108,34 +106,33 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when foresporsel dialogmote-innkalling for behandler and arbeidstaker with dnr`() {
-        clearAllMocks()
-        val messageSlot = slot<String>()
-        justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
+    fun `Sends correct message on MQ when foresporsel dialogmote-innkalling for behandler and arbeidstaker with dnr`() =
+        runTest {
+            clearAllMocks()
+            val messageSlot = slot<String>()
+            justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
 
-        val melding = generateDialogmeldingToBehandlerBestillingDTO(
-            behandlerRef = behandlerRefWithDNR,
-            uuid = uuid,
-            arbeidstakerPersonident = arbeidstakerPersonidentDNR,
-        ).toDialogmeldingToBehandlerBestilling(
-            behandler = behandlerWithDNR,
-        )
+            val melding = generateDialogmeldingToBehandlerBestillingDTO(
+                behandlerRef = behandlerRefWithDNR,
+                uuid = uuid,
+                arbeidstakerPersonident = arbeidstakerPersonidentDNR,
+            ).toDialogmeldingToBehandlerBestilling(
+                behandler = behandlerWithDNR,
+            )
 
-        runBlocking {
             dialogmeldingService.sendMelding(melding)
+            verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
+
+            val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlDNRRegex()
+            val actualFellesformatMessage = messageSlot.captured
+
+            assertTrue(
+                expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
+            )
         }
-        verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
-
-        val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingXmlDNRRegex()
-        val actualFellesformatMessage = messageSlot.captured
-
-        assertTrue(
-            expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
-        )
-    }
 
     @Test
-    fun `Sends correct message on MQ when foresporsel dialogmote-innkalling to behandler without orgnr`() {
+    fun `Sends correct message on MQ when foresporsel dialogmote-innkalling to behandler without orgnr`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -148,14 +145,12 @@ class DialogmeldingServiceTest {
             behandler = behandlerWithoutOrgnr,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
     }
 
     @Test
-    fun `Sends correct message on MQ when foresporsel endre tid-sted`() {
+    fun `Sends correct message on MQ when foresporsel endre tid-sted`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -168,9 +163,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingEndreTidStedXmlRegex()
@@ -182,7 +175,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when referat`() {
+    fun `Sends correct message on MQ when referat`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -195,9 +188,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingReferatXmlRegex()
@@ -209,7 +200,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when avlysning`() {
+    fun `Sends correct message on MQ when avlysning`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -222,9 +213,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingAvlysningXmlRegex()
@@ -236,7 +225,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when foresporsel`() {
+    fun `Sends correct message on MQ when foresporsel`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -249,9 +238,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselXmlRegex()
@@ -262,7 +249,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when purring foresporsel`() {
+    fun `Sends correct message on MQ when purring foresporsel`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -275,9 +262,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselPurringXmlRegex()
@@ -288,7 +273,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when foresporsel om legeerklæring`() {
+    fun `Sends correct message on MQ when foresporsel om legeerklæring`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -301,9 +286,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingForesporselLegeerklaringXmlRegex()
@@ -314,7 +297,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when retur av legeerklæring`() {
+    fun `Sends correct message on MQ when retur av legeerklæring`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -327,9 +310,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingReturLegeerklaringXmlRegex()
@@ -340,7 +321,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when friskmelding til arbeidsformidling`() {
+    fun `Sends correct message on MQ when friskmelding til arbeidsformidling`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -353,9 +334,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex =
@@ -367,7 +346,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when melding fra NAV`() {
+    fun `Sends correct message on MQ when melding fra NAV`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -382,9 +361,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingHenvendelseMeldingFraNavXmlRegex()
@@ -398,7 +375,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `Sends correct message on MQ when melding fra NAV after removing non ascii characters`() {
+    fun `Sends correct message on MQ when melding fra NAV after removing non ascii characters`() = runTest {
         clearAllMocks()
         val messageSlot = slot<String>()
         justRun { mqSender.sendMessageToEmottak(capture(messageSlot)) }
@@ -416,9 +393,7 @@ class DialogmeldingServiceTest {
             behandler = behandler,
         )
 
-        runBlocking {
-            dialogmeldingService.sendMelding(melding)
-        }
+        dialogmeldingService.sendMelding(melding)
         verify(exactly = 1) { mqSender.sendMessageToEmottak(any()) }
 
         val expectedFellesformatMessageAsRegex = defaultFellesformatDialogmeldingHenvendelseMeldingFraNavXmlRegex()
@@ -432,7 +407,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `keeps tab, CR and LF and removes other control characters in tekst sanitization`() {
+    fun `keeps tab, CR and LF and removes other control characters in tekst sanitization`() = runTest {
         val original = "Hello\tWorld\r\nLine2" + "\u0001" + "\u0002" + "End" + "\u0007"
         val melding = DialogmeldingToBehandlerBestilling(
             uuid = UUID.randomUUID(),
@@ -452,7 +427,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `returns null when tekst is null in sanitization`() {
+    fun `returns null when tekst is null in sanitization`() = runTest {
         val melding = DialogmeldingToBehandlerBestilling(
             uuid = UUID.randomUUID(),
             behandler = behandler,
@@ -471,7 +446,7 @@ class DialogmeldingServiceTest {
     }
 
     @Test
-    fun `sanitization removes C1 controls, converts NBSP to space and removes soft hyphen`() {
+    fun `sanitization removes C1 controls, converts NBSP to space and removes soft hyphen`() = runTest {
         val original = "Tekst\u00A0med\u00ADmystiske tegn"
         val melding = DialogmeldingToBehandlerBestilling(
             uuid = UUID.randomUUID(),

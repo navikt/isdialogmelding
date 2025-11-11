@@ -1,6 +1,6 @@
 package no.nav.syfo.behandler
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerArbeidstakerRelasjonstype
 import no.nav.syfo.behandler.fastlege.FastlegeClient
@@ -51,7 +51,7 @@ class GetBehandlereTest {
     }
 
     @Test
-    fun `find fastlege and sykmeldingbehandler for arbeidstaker`() {
+    fun `find fastlege and sykmeldingbehandler for arbeidstaker`() = runTest {
         database.createBehandlerAndTwoArbeidstakerRelasjoner(
             behandler = generateBehandler(
                 behandlerRef = behandlerRef,
@@ -64,13 +64,11 @@ class GetBehandlereTest {
         )
 
         var behandlere: List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>
-        runBlocking {
-            behandlere = behandlerService.getBehandlere(
-                UserConstants.ARBEIDSTAKER_FNR,
-                "token",
-                "callId"
-            )
-        }
+        behandlere = behandlerService.getBehandlere(
+            UserConstants.ARBEIDSTAKER_FNR,
+            "token",
+            "callId"
+        )
 
         assertEquals(2, behandlere.size)
         assertEquals(BehandlerArbeidstakerRelasjonstype.FASTLEGE, behandlere[0].second)
@@ -78,7 +76,7 @@ class GetBehandlereTest {
     }
 
     @Test
-    fun `exclude behandlere without electronic communication enabled`() {
+    fun `exclude behandlere without electronic communication enabled`() = runTest {
         database.createBehandlerForArbeidstaker(
             behandler = generateBehandler(
                 behandlerRef = behandlerRef,
@@ -90,15 +88,13 @@ class GetBehandlereTest {
         )
 
         var behandlere: List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>
-        runBlocking {
-            behandlere = behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR, "token", "callId")
-        }
+        behandlere = behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR, "token", "callId")
 
         assertEquals(0, behandlere.size)
     }
 
     @Test
-    fun `return behandler as fastlege if behandler is also registered as sykmelder for innbygger`() {
+    fun `return behandler as fastlege if behandler is also registered as sykmelder for innbygger`() = runTest {
         val behandler = generateBehandler(
             behandlerRef = behandlerRef,
             partnerId = UserConstants.PARTNERID,
@@ -111,9 +107,7 @@ class GetBehandlereTest {
         )
 
         var behandlere: List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>
-        runBlocking {
-            behandlere = behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, "token", "callId")
-        }
+        behandlere = behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, "token", "callId")
         val relasjoner = database.getBehandlerArbeidstakerRelasjoner(UserConstants.ARBEIDSTAKER_FNR)
 
         assertEquals(1, behandlere.size)
@@ -124,7 +118,7 @@ class GetBehandlereTest {
     }
 
     @Test
-    fun `return newest fastlege if more than one`() {
+    fun `return newest fastlege if more than one`() = runTest {
         val fastlege = generateBehandler(
             personident = UserConstants.FASTLEGE_ANNEN_FNR,
             behandlerRef = behandlerRef,
@@ -138,9 +132,7 @@ class GetBehandlereTest {
         )
 
         var behandlere: List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>
-        runBlocking {
-            behandlere = behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, "token", "callId")
-        }
+        behandlere = behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, "token", "callId")
 
         assertEquals(1, behandlere.size)
         assertEquals(BehandlerArbeidstakerRelasjonstype.FASTLEGE, behandlere[0].second)
@@ -148,7 +140,7 @@ class GetBehandlereTest {
     }
 
     @Test
-    fun `return old fastlege as sykmelder`() {
+    fun `return old fastlege as sykmelder`() = runTest {
         val fastlegeAndSykmelder = generateBehandler(
             personident = UserConstants.FASTLEGE_ANNEN_FNR,
             behandlerRef = behandlerRef,
@@ -164,9 +156,7 @@ class GetBehandlereTest {
         )
 
         var behandlere: List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>
-        runBlocking {
-            behandlere = behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, "token", "callId")
-        }
+        behandlere = behandlerService.getBehandlere(UserConstants.ARBEIDSTAKER_FNR, "token", "callId")
 
         assertEquals(2, behandlere.size)
         val fastlege = behandlere.firstOrNull { it.second == BehandlerArbeidstakerRelasjonstype.FASTLEGE }
