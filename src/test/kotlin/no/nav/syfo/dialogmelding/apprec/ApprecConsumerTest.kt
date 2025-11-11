@@ -204,7 +204,7 @@ class ApprecConsumerTest {
 
         val pDialogmeldingStatus = dialogmeldingStatusNotPublished.first()
         assertEquals(DialogmeldingStatusType.OK.name, pDialogmeldingStatus.status)
-        assertTrue(pDialogmeldingStatus.tekst!!.isEmpty())
+        assertNull(pDialogmeldingStatus.tekst)
         assertEquals(bestillingId, pDialogmeldingStatus.bestillingId)
         assertNotNull(pDialogmeldingStatus.createdAt)
         assertNotNull(pDialogmeldingStatus.updatedAt)
