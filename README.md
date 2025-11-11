@@ -34,7 +34,9 @@ Run `./gradlew clean shadowJar`
 
 ### Lint
 
-Run `./gradlew --continue ktlintCheck`
+Run checking `./gradlew --continue ktlintCheck`
+
+Run formatting: `./gradlew ktlintFormat`
 
 ### Test
 

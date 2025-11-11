@@ -285,7 +285,8 @@ class BehandlerServiceTest {
         )
 
         assertEquals(
-            1, database.getBehandlerByArbeidstaker(
+            1,
+            database.getBehandlerByArbeidstaker(
                 UserConstants.ARBEIDSTAKER_FNR,
             ).size
         )
@@ -309,7 +310,8 @@ class BehandlerServiceTest {
         )
 
         assertEquals(
-            1, database.getBehandlerByArbeidstaker(
+            1,
+            database.getBehandlerByArbeidstaker(
                 UserConstants.ARBEIDSTAKER_FNR,
             ).size
         )
@@ -333,7 +335,8 @@ class BehandlerServiceTest {
         )
 
         assertEquals(
-            1, database.getBehandlerByArbeidstaker(
+            1,
+            database.getBehandlerByArbeidstaker(
                 UserConstants.ARBEIDSTAKER_FNR,
             ).size
         )
@@ -355,7 +358,8 @@ class BehandlerServiceTest {
             )
         }
         assertEquals(
-            0, database.getBehandlerByArbeidstaker(
+            0,
+            database.getBehandlerByArbeidstaker(
                 UserConstants.ARBEIDSTAKER_FNR,
             ).size
         )

@@ -367,7 +367,8 @@ class BehandlerApiTest {
                     assertEquals(0, behandlerList.size)
 
                     assertEquals(
-                        0, database.getBehandlerByArbeidstaker(
+                        0,
+                        database.getBehandlerByArbeidstaker(
                             UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR,
                         ).size
                     )
@@ -389,7 +390,8 @@ class BehandlerApiTest {
                     assertEquals(0, behandlerList.size)
 
                     assertEquals(
-                        0, database.getBehandlerByArbeidstaker(
+                        0,
+                        database.getBehandlerByArbeidstaker(
                             UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET,
                         ).size
                     )
@@ -410,7 +412,8 @@ class BehandlerApiTest {
 
                     assertEquals(0, behandlerList.size)
                     assertEquals(
-                        0, database.getBehandlerByArbeidstaker(
+                        0,
+                        database.getBehandlerByArbeidstaker(
                             UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO,
                         ).size
                     )
@@ -455,7 +458,8 @@ class BehandlerApiTest {
                     assertEquals(0, behandlerList.size)
 
                     assertEquals(
-                        0, database.getBehandlerByArbeidstaker(
+                        0,
+                        database.getBehandlerByArbeidstaker(
                             UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID,
                         ).size
                     )

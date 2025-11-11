@@ -8,7 +8,6 @@ import io.ktor.server.testing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.testhelper.ExternalMockEnvironment
-import no.nav.syfo.testhelper.TestDatabase
 import no.nav.syfo.testhelper.TestDatabaseNotResponding
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName

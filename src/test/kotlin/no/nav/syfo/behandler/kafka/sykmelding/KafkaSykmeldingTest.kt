@@ -91,7 +91,7 @@ class KafkaSykmeldingTest {
                 uuid = UUID.randomUUID(),
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             val kontorBefore = database.connection.getBehandlerKontor(PartnerId(sykmelding.partnerreferanse!!.toInt()))
             val behandlereBefore = database.getBehandlerByArbeidstaker(Personident(sykmelding.personNrPasient))
@@ -141,7 +141,7 @@ class KafkaSykmeldingTest {
                 kontorHerId = UserConstants.HERID.toString(),
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -201,7 +201,7 @@ class KafkaSykmeldingTest {
                 personNrPasient = UserConstants.ARBEIDSTAKER_FNR.value,
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -239,7 +239,7 @@ class KafkaSykmeldingTest {
                 uuid = UUID.randomUUID(),
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -256,7 +256,7 @@ class KafkaSykmeldingTest {
                 avsenderSystemNavn = "Nytt systemnavn",
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -279,7 +279,7 @@ class KafkaSykmeldingTest {
                 avsenderSystemNavn = "Systemnavnet"
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -298,7 +298,7 @@ class KafkaSykmeldingTest {
                 behandletTidspunkt = LocalDateTime.now().minusDays(1),
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, newSykmelding, 2)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -330,7 +330,7 @@ class KafkaSykmeldingTest {
                 behandletTidspunkt = LocalDateTime.now().minusMinutes(1),
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -373,7 +373,7 @@ class KafkaSykmeldingTest {
                 behandlerFnr = "01010112346",
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -397,7 +397,7 @@ class KafkaSykmeldingTest {
                 legeHelsepersonellkategori = "XX",
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -421,7 +421,7 @@ class KafkaSykmeldingTest {
                 kontorHerId = null,
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -441,7 +441,7 @@ class KafkaSykmeldingTest {
                 partnerreferanse = "",
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -461,7 +461,7 @@ class KafkaSykmeldingTest {
                 partnerreferanse = "x",
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(
@@ -481,7 +481,7 @@ class KafkaSykmeldingTest {
                 mottattTidspunkt = LocalDateTime.of(LocalDate.of(2021, Month.SEPTEMBER, 1), LocalTime.of(0, 0))
             )
             every { mockConsumer.poll(any<Duration>()) } returns
-                    consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
+                consumerRecords(sykmeldingTopicPartition, kafkaPartition, sykmelding)
 
             runBlocking {
                 pollAndProcessSykmelding(

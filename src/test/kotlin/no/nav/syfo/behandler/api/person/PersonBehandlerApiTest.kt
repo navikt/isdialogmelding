@@ -72,7 +72,8 @@ class PersonBehandlerApiTest {
                 assertEquals(fastlegeResponse.fnr, personBehandlerDTO.fnr)
 
                 assertEquals(
-                    1, database.getBehandlerByArbeidstaker(
+                    1,
+                    database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_FNR,
                     ).size
                 )
@@ -99,7 +100,8 @@ class PersonBehandlerApiTest {
                 val personBehandlerList = response.body<List<PersonBehandlerDTO>>()
                 assertEquals(0, personBehandlerList.size)
                 assertEquals(
-                    0, database.getBehandlerByArbeidstaker(
+                    0,
+                    database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_UTEN_FASTLEGE_FNR,
                     ).size
                 )
@@ -126,7 +128,8 @@ class PersonBehandlerApiTest {
                 val personBehandlerList = response.body<List<PersonBehandlerDTO>>()
                 assertEquals(0, personBehandlerList.size)
                 assertEquals(
-                    0, database.getBehandlerByArbeidstaker(
+                    0,
+                    database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FORELDREENHET,
                     ).size
                 )
@@ -154,7 +157,8 @@ class PersonBehandlerApiTest {
                 assertEquals(0, personBehandlerList.size)
 
                 assertEquals(
-                    0, database.getBehandlerByArbeidstaker(
+                    0,
+                    database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_PARTNERINFO,
                     ).size
                 )
@@ -182,7 +186,8 @@ class PersonBehandlerApiTest {
                 assertEquals(0, personBehandlerList.size)
 
                 assertEquals(
-                    0, database.getBehandlerByArbeidstaker(
+                    0,
+                    database.getBehandlerByArbeidstaker(
                         UserConstants.ARBEIDSTAKER_MED_FASTLEGE_UTEN_FNR_HPRID_HERID,
                     ).size
                 )
