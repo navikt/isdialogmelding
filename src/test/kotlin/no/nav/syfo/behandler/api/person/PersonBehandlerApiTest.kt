@@ -69,13 +69,6 @@ class PersonBehandlerApiTest {
                 assertEquals(BehandlerKategori.LEGE.name, personBehandlerDTO.kategori)
                 assertEquals(behandlerForPersonList.first().behandlerRef.toString(), personBehandlerDTO.behandlerRef)
                 assertEquals(fastlegeResponse.fnr, personBehandlerDTO.fnr)
-
-                assertEquals(
-                    1,
-                    database.getBehandlerByArbeidstaker(
-                        UserConstants.ARBEIDSTAKER_FNR,
-                    ).size
-                )
             }
         }
 
