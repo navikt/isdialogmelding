@@ -21,9 +21,8 @@ Applikasjon for håndtering av dialogmeldinger i SYFO-domenet. Funksjonalitet:
 
 ##### Test Libraries:
 
-* Kluent
+* JUnit
 * Mockk
-* Spek
 
 #### Requirements
 
@@ -35,7 +34,9 @@ Run `./gradlew clean shadowJar`
 
 ### Lint
 
-Run `./gradlew --continue ktlintCheck`
+Run checking `./gradlew --continue ktlintCheck`
+
+Run formatting: `./gradlew ktlintFormat`
 
 ### Test
 
