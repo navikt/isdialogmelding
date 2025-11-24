@@ -13,3 +13,5 @@ data class Apprec(
 )
 
 fun Apprec.isUkjentMottaker(): Boolean = this.statusKode == ApprecStatus.AVVIST && this.feilKode == "E21"
+
+fun Apprec.isOK(): Boolean = this.statusKode == ApprecStatus.OK

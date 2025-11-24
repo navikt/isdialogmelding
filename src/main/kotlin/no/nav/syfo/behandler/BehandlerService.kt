@@ -329,6 +329,10 @@ class BehandlerService(
         } ?: false
     }
 
+    fun enableDialogmeldingerForKontor(behandlerKontor: BehandlerKontor) {
+        database.updateBehandlerKontorDialogmeldingEnabled(behandlerKontor.partnerId)
+    }
+
     fun disableDialogmeldingerForKontor(behandlerKontor: PBehandlerKontor) {
         database.updateBehandlerKontorDialogmeldingDisabled(PartnerId(behandlerKontor.partnerId.toInt()))
     }
