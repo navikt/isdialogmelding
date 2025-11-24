@@ -1,7 +1,6 @@
 package no.nav.syfo.behandler
 
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.behandler.api.behandlerPersonident
 import no.nav.syfo.behandler.database.*
 import no.nav.syfo.behandler.database.domain.*
 import no.nav.syfo.behandler.domain.*
