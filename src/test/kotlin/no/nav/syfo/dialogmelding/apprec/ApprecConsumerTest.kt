@@ -204,7 +204,7 @@ class ApprecConsumerTest {
     }
 
     @Test
-    fun `Prosessering av innkommet melding OK lagrer setter dialogmeldingEnabled for kontor`() {
+    fun `Prosessering av innkommet melding OK setter dialogmeldingEnabled for kontor`() {
         val dialogmeldingBestillingUuid = UUID.randomUUID()
         val (_, behandler) = lagreDialogmeldingBestillingOgBehandler(
             database = database,
@@ -232,7 +232,7 @@ class ApprecConsumerTest {
     }
 
     @Test
-    fun `Prosessering av innkommet melding OK lagrer setter ikke dialogmeldingEnabled for kontor som er locked`() {
+    fun `Prosessering av innkommet melding OK setter ikke dialogmeldingEnabled for kontor som er locked`() {
         val dialogmeldingBestillingUuid = UUID.randomUUID()
         val (_, behandler) = lagreDialogmeldingBestillingOgBehandler(
             database = database,
