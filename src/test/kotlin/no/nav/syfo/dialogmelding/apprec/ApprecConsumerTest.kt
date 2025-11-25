@@ -3,7 +3,10 @@ package no.nav.syfo.dialogmelding.apprec
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.getBehandlerByBehandlerRef
+import no.nav.syfo.behandler.fastlege.FastlegeClient
+import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
 import no.nav.syfo.dialogmelding.apprec.database.getApprec
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
@@ -33,12 +36,18 @@ class ApprecConsumerTest {
             database = database,
             pdlClient = mockk(),
         )
+    private val behandlerService = BehandlerService(
+        database = database,
+        fastlegeClient = mockk<FastlegeClient>(relaxed = true),
+        partnerinfoClient = mockk<PartnerinfoClient>(relaxed = true),
+    )
     private val apprecConsumer = ApprecConsumer(
         applicationState = externalMockEnvironment.applicationState,
         database = database,
         inputconsumer = mockk(),
         apprecService = apprecService,
-        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService
+        dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+        behandlerService = behandlerService,
     )
 
     @BeforeEach
@@ -192,6 +201,63 @@ class ApprecConsumerTest {
         assertNotNull(pDialogmeldingStatus.createdAt)
         assertNotNull(pDialogmeldingStatus.updatedAt)
         assertNull(pDialogmeldingStatus.publishedAt)
+    }
+
+    @Test
+    fun `Prosessering av innkommet melding OK setter dialogmeldingEnabled for kontor`() {
+        val dialogmeldingBestillingUuid = UUID.randomUUID()
+        val (_, behandler) = lagreDialogmeldingBestillingOgBehandler(
+            database = database,
+            dialogmeldingBestillingUuid = dialogmeldingBestillingUuid,
+            behandlerKontorEnabled = false,
+            behandlerKontorLocked = false,
+        )
+        assertFalse(behandler.kontor.dialogmeldingEnabled)
+
+        val apprecXml =
+            getFileAsString("src/test/resources/apprecOK.xml")
+                .replace("FiktivTestdata0001", UUID.randomUUID().toString())
+                .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
+        every { incomingMessage.text } returns (apprecXml)
+        apprecConsumer.processApprecMessage(incomingMessage)
+
+        val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
+        assertEquals(1, dialogmeldingStatusNotPublished.size)
+
+        val pDialogmeldingStatus = dialogmeldingStatusNotPublished.first()
+        assertEquals(DialogmeldingStatusType.OK.name, pDialogmeldingStatus.status)
+
+        val oppdatertBehandler = behandlerService.getBehandler(behandler.behandlerRef)
+        assertTrue(oppdatertBehandler!!.kontor.dialogmeldingEnabled)
+    }
+
+    @Test
+    fun `Prosessering av innkommet melding OK setter ikke dialogmeldingEnabled for kontor som er locked`() {
+        val dialogmeldingBestillingUuid = UUID.randomUUID()
+        val (_, behandler) = lagreDialogmeldingBestillingOgBehandler(
+            database = database,
+            dialogmeldingBestillingUuid = dialogmeldingBestillingUuid,
+            behandlerKontorEnabled = false,
+            behandlerKontorLocked = true,
+        )
+        assertFalse(behandler.kontor.dialogmeldingEnabled)
+        assertTrue(behandler.kontor.dialogmeldingEnabledLocked)
+
+        val apprecXml =
+            getFileAsString("src/test/resources/apprecOK.xml")
+                .replace("FiktivTestdata0001", UUID.randomUUID().toString())
+                .replace("b62016eb-6c2d-417a-8ecc-157b3c5ee2ca", dialogmeldingBestillingUuid.toString())
+        every { incomingMessage.text } returns (apprecXml)
+        apprecConsumer.processApprecMessage(incomingMessage)
+
+        val dialogmeldingStatusNotPublished = database.getDialogmeldingStatusNotPublished()
+        assertEquals(1, dialogmeldingStatusNotPublished.size)
+
+        val pDialogmeldingStatus = dialogmeldingStatusNotPublished.first()
+        assertEquals(DialogmeldingStatusType.OK.name, pDialogmeldingStatus.status)
+
+        val oppdatertBehandler = behandlerService.getBehandler(behandler.behandlerRef)
+        assertFalse(oppdatertBehandler!!.kontor.dialogmeldingEnabled)
     }
 
     @Test
