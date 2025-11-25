@@ -1,13 +1,11 @@
 package no.nav.syfo.behandler.api
 
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.api.access.validateVeilederAccess
-import no.nav.syfo.behandler.api.SearchRequest
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.domain.Personident

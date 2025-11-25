@@ -4,7 +4,6 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import no.nav.syfo.behandler.api.SearchRequest
 import no.nav.syfo.behandler.database.getBehandlerByArbeidstaker
 import no.nav.syfo.behandler.database.getBehandlerKontorById
 import no.nav.syfo.behandler.database.invalidateBehandler
@@ -235,7 +234,7 @@ class BehandlerApiTest {
                     val response = client.post(searchUrl) {
                         bearerAuth(validToken)
                         contentType(ContentType.Application.Json)
-                        setBody(SearchRequest(searchstring ="Scully"))
+                        setBody(SearchRequest(searchstring = "Scully"))
                     }
 
                     assertEquals(HttpStatusCode.OK, response.status)
