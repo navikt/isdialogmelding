@@ -112,6 +112,7 @@ class ApprecConsumer(
                         bestillingId = dialogmeldingBestillingId,
                     )
                     if (apprec.isOK() && !dialogmeldingBestilling.behandler.kontor.dialogmeldingEnabled) {
+                        log.info("Enabling dialogmeldinger for behandlerkontor med partnerId ${dialogmeldingBestilling.behandler.kontor.partnerId} siden ok-apprec mottatt")
                         behandlerService.enableDialogmeldingerForKontor(
                             behandlerKontor = dialogmeldingBestilling.behandler.kontor,
                         )
