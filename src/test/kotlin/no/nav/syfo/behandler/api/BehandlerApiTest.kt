@@ -4,6 +4,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import no.nav.syfo.behandler.api.SearchRequest
 import no.nav.syfo.behandler.database.getBehandlerByArbeidstaker
 import no.nav.syfo.behandler.database.getBehandlerKontorById
 import no.nav.syfo.behandler.database.invalidateBehandler
@@ -212,6 +213,29 @@ class BehandlerApiTest {
                     val response = client.get(searchUrl) {
                         bearerAuth(validToken)
                         header("searchstring", "Scully")
+                    }
+
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    val behandlerList = response.body<List<BehandlerDTO>>()
+                    assertEquals(1, behandlerList.size)
+                }
+            }
+
+            @Test
+            fun `search using post-endpoint should return list of Behandler`() {
+                testApplication {
+                    val client = setupApiAndClient()
+                    client.get(url) {
+                        bearerAuth(validToken)
+                        header(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
+                    }.apply {
+                        assertEquals(HttpStatusCode.OK, status)
+                    }
+
+                    val response = client.post(searchUrl) {
+                        bearerAuth(validToken)
+                        contentType(ContentType.Application.Json)
+                        setBody(SearchRequest(searchstring ="Scully"))
                     }
 
                     assertEquals(HttpStatusCode.OK, response.status)
