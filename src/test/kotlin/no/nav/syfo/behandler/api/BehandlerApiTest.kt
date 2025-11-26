@@ -221,6 +221,29 @@ class BehandlerApiTest {
             }
 
             @Test
+            fun `search using post-endpoint should return list of Behandler`() {
+                testApplication {
+                    val client = setupApiAndClient()
+                    client.get(url) {
+                        bearerAuth(validToken)
+                        header(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
+                    }.apply {
+                        assertEquals(HttpStatusCode.OK, status)
+                    }
+
+                    val response = client.post(searchUrl) {
+                        bearerAuth(validToken)
+                        contentType(ContentType.Application.Json)
+                        setBody(SearchRequest(searchstring = "Scully"))
+                    }
+
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    val behandlerList = response.body<List<BehandlerDTO>>()
+                    assertEquals(1, behandlerList.size)
+                }
+            }
+
+            @Test
             fun `search should exclude invalidated Behandler`() {
                 testApplication {
                     val client = setupApiAndClient()
