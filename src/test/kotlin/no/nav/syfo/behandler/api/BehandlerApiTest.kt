@@ -224,7 +224,7 @@ class BehandlerApiTest {
             fun `search using post-endpoint should return list of Behandler`() {
                 testApplication {
                     val client = setupApiAndClient()
-                    client.post(url) {
+                    client.get(url) {
                         bearerAuth(validToken)
                         header(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                     }.apply {
