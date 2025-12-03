@@ -118,10 +118,8 @@ class VerifyBehandlereForKontorCronjob(
     ): Pair<List<BehandlerFraAdresseregisteretDTO>, List<BehandlerFraAdresseregisteretDTO>> {
         val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = behandlerKontorFraAdresseregisteret.behandlere.partition { it.aktiv }
         val aktiveBehandlereForKontorHprIdList = aktiveBehandlereForKontor.mapNotNull { it.hprId }
-        val inaktiveBehandlereForKontorNoAktivDuplicate = inaktiveBehandlereForKontor.toMutableList().also {
-            it.removeAll { inaktivBehandler ->
-                inaktivBehandler.hprId in aktiveBehandlereForKontorHprIdList
-            }
+        val inaktiveBehandlereForKontorNoAktivDuplicate = inaktiveBehandlereForKontor.filterNot {
+            it.hprId in aktiveBehandlereForKontorHprIdList
         }
         return Pair(aktiveBehandlereForKontor, inaktiveBehandlereForKontorNoAktivDuplicate)
     }
