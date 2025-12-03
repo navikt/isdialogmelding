@@ -59,6 +59,12 @@ class VerifyBehandlereForKontorCronjob(
                         behandlerService.updateBehandlerKontorSystemAndAdresse(behandlerKontorFraAdresseregisteret.toBehandlerKontor(behandlerKontor.partnerId))
 
                         val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = behandlerKontorFraAdresseregisteret.behandlere.partition { it.aktiv }
+                        val aktiveBehandlereForKontorHprIdList = aktiveBehandlereForKontor.mapNotNull { it.hprId }
+                        val inaktiveBehandlereForKontorNoAktivDuplicate = inaktiveBehandlereForKontor.toMutableList().also {
+                            it.removeAll { inaktivBehandler ->
+                                inaktivBehandler.hprId in aktiveBehandlereForKontorHprIdList
+                            }
+                        }
                         val existingBehandlereForKontorWithoutHPR = behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.hprId.isNullOrEmpty() }
                         if (existingBehandlereForKontorWithoutHPR.isNotEmpty()) {
                             repairMissingHPR(existingBehandlereForKontorWithoutHPR, behandlerKontorFraAdresseregisteret.behandlere)
@@ -66,11 +72,11 @@ class VerifyBehandlereForKontorCronjob(
 
                         val (existingBehandlereForKontor, existingInvalidatedBehandlereForKontor) = behandlerService.getBehandlereForKontor(behandlerKontor).partition { it.invalidated == null }
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${aktiveBehandlereForKontor.size} aktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
-                        log.info("VerifyBehandlereForKontorCronjob: Fant ${inaktiveBehandlereForKontor.size} inaktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
+                        log.info("VerifyBehandlereForKontorCronjob: Fant ${inaktiveBehandlereForKontorNoAktivDuplicate.size} inaktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${existingBehandlereForKontor.size} behandlere for kontor ${behandlerKontor.herId} i Modia")
 
                         invalidateUnknownBehandlere(behandlerKontorFraAdresseregisteret.behandlere, existingBehandlereForKontor)
-                        invalidateInactiveBehandlere(inaktiveBehandlereForKontor, existingBehandlereForKontor)
+                        invalidateInactiveBehandlere(inaktiveBehandlereForKontorNoAktivDuplicate, existingBehandlereForKontor)
 
                         val revalidated = revalidateBehandlere(
                             aktiveBehandlereForKontor,
