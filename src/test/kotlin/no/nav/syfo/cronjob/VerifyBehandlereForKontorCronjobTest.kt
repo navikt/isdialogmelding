@@ -21,6 +21,7 @@ import no.nav.syfo.testhelper.UserConstants.FASTLEGE_FNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_TREDJE_FNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_UTEN_KATEGORI_FNR
 import no.nav.syfo.testhelper.UserConstants.HERID
+import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_MED_SAMME_BEHANDLER_AKTIV_OG_INAKTIV
 import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_OK
 import no.nav.syfo.testhelper.UserConstants.HERID_NOT_ACTIVE
 import no.nav.syfo.testhelper.UserConstants.HERID_PSYKOLOG_KONTOR_OK
@@ -319,6 +320,15 @@ class VerifyBehandlereForKontorCronjobTest {
         assertEquals(3, behandlerForKontorAfter.size)
         val behandlerAfter = database.getBehandlerById(pBehandler.id)
         assertNotNull(behandlerAfter!!.invalidated)
+    }
+
+    @Test
+    fun `Cronjob invaliderer ikke eksisterende hvis fortsatt aktiv med ny herId`() = runTest {
+        val kontorId = createKontor(HERID_KONTOR_MED_SAMME_BEHANDLER_AKTIV_OG_INAKTIV)
+        val pBehandler = createBehandler(kontorId = kontorId, hprId = HPRID, personident = FASTLEGE_FNR)
+        cronJob.verifyBehandlereForKontorJob()
+        val behandlerAfter = database.getBehandlerById(pBehandler.id)
+        assertNull(behandlerAfter!!.invalidated)
     }
 
     @Test
