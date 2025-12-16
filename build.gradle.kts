@@ -17,7 +17,7 @@ val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e446
 val ktorVersion = "3.3.3"
 val logbackVersion = "1.5.22"
 val logstashEncoderVersion = "9.0"
-val micrometerRegistryVersion = "1.16.1"
+val micrometerRegistryVersion = "1.12.13"
 val mockkVersion = "1.14.7"
 val mqVersion = "9.4.4.0"
 val nimbusjosejwtVersion = "10.6"
@@ -28,7 +28,7 @@ val syfotjenesterVersion = "1.2022.09.09-14.42-5356e2174b6c"
 
 plugins {
     kotlin("jvm") version "2.2.21"
-    id("com.gradleup.shadow") version "8.3.6"
+    id("com.gradleup.shadow") version "8.3.8"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
     id("com.adarshr.test-logger") version "4.0.0"
 }
