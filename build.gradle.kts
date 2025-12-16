@@ -15,7 +15,7 @@ val kafkaVersion = "4.1.0"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
 val ktorVersion = "3.3.3"
-val logbackVersion = "1.5.21"
+val logbackVersion = "1.5.22"
 val logstashEncoderVersion = "9.0"
 val micrometerRegistryVersion = "1.12.13"
 val mockkVersion = "1.14.7"
@@ -28,7 +28,7 @@ val syfotjenesterVersion = "1.2022.09.09-14.42-5356e2174b6c"
 
 plugins {
     kotlin("jvm") version "2.2.21"
-    id("com.gradleup.shadow") version "8.3.6"
+    id("com.gradleup.shadow") version "8.3.8"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
     id("com.adarshr.test-logger") version "4.0.0"
 }
