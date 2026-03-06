@@ -9,6 +9,7 @@ import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerKategori
 import no.nav.syfo.behandler.domain.BehandleridentType
 import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO
+import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandlerKontor
 import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
@@ -58,7 +59,8 @@ class VerifyBehandlereForKontorCronjob(
                     } else {
                         behandlerService.updateBehandlerKontorSystemAndAdresse(behandlerKontorFraAdresseregisteret.toBehandlerKontor(behandlerKontor.partnerId))
 
-                        val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = behandlerKontorFraAdresseregisteret.behandlere.partition { it.aktiv }
+                        val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = getBehandlereFraAdresseregisteret(behandlerKontorFraAdresseregisteret)
+
                         val existingBehandlereForKontorWithoutHPR = behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.hprId.isNullOrEmpty() }
                         if (existingBehandlereForKontorWithoutHPR.isNotEmpty()) {
                             repairMissingHPR(existingBehandlereForKontorWithoutHPR, behandlerKontorFraAdresseregisteret.behandlere)
@@ -109,6 +111,17 @@ class VerifyBehandlereForKontorCronjob(
             StructuredArguments.keyValue("failed", verifyResult.failed),
             StructuredArguments.keyValue("updated", verifyResult.updated),
         )
+    }
+
+    private fun getBehandlereFraAdresseregisteret(
+        behandlerKontorFraAdresseregisteret: BehandlerKontorFraAdresseregisteretDTO,
+    ): Pair<List<BehandlerFraAdresseregisteretDTO>, List<BehandlerFraAdresseregisteretDTO>> {
+        val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = behandlerKontorFraAdresseregisteret.behandlere.partition { it.aktiv }
+        val aktiveBehandlereForKontorHprIdList = aktiveBehandlereForKontor.mapNotNull { it.hprId }
+        val inaktiveBehandlereForKontorNoAktivDuplicate = inaktiveBehandlereForKontor.filterNot {
+            it.hprId in aktiveBehandlereForKontorHprIdList
+        }
+        return Pair(aktiveBehandlereForKontor, inaktiveBehandlereForKontorNoAktivDuplicate)
     }
 
     private suspend fun repairMissingHPR(

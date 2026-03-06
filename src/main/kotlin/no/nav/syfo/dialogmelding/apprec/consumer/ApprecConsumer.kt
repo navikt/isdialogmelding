@@ -4,9 +4,11 @@ import kotlinx.coroutines.delay
 import no.nav.helse.apprecV1.XMLAppRec
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.dialogmelding.apprec.ApprecService
 import no.nav.syfo.dialogmelding.apprec.domain.Apprec
 import no.nav.syfo.dialogmelding.apprec.domain.ApprecStatus
+import no.nav.syfo.dialogmelding.apprec.domain.isOK
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.metric.RECEIVED_APPREC_COUNTER
 import no.nav.syfo.metric.RECEIVED_APPREC_MESSAGE_COUNTER
@@ -31,6 +33,7 @@ class ApprecConsumer(
     val inputconsumer: MessageConsumer,
     private val apprecService: ApprecService,
     private val dialogmeldingToBehandlerService: DialogmeldingToBehandlerService,
+    private val behandlerService: BehandlerService,
 ) {
 
     suspend fun run() {
@@ -108,6 +111,12 @@ class ApprecConsumer(
                         apprec = apprec,
                         bestillingId = dialogmeldingBestillingId,
                     )
+                    if (apprec.isOK() && !dialogmeldingBestilling.behandler.kontor.dialogmeldingEnabled) {
+                        log.info("Enabling dialogmeldinger for behandlerkontor med partnerId ${dialogmeldingBestilling.behandler.kontor.partnerId} siden ok-apprec mottatt")
+                        behandlerService.enableDialogmeldingerForKontor(
+                            behandlerKontor = dialogmeldingBestilling.behandler.kontor,
+                        )
+                    }
                     STORED_APPREC_COUNTER.increment()
                 } else {
                     log.info("Received but skipped apprec with id $apprecId because unknown dialogmelding $bestillingId")

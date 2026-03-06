@@ -40,6 +40,7 @@ object UserConstants {
     const val HERID_NOT_ACTIVE = 175469
     const val HERID_KONTOR_OK = 1841
     const val HERID_PSYKOLOG_KONTOR_OK = 1842
+    const val HERID_KONTOR_MED_SAMME_BEHANDLER_AKTIV_OG_INAKTIV = 1843
     const val ORGNR_KONTOR_OK = "987654321"
 
     const val VEILEDER_IDENT = "Z999999"

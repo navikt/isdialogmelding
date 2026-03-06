@@ -53,12 +53,11 @@ class OppfolgingsplanService(
                 oppfolgingsplan = oppfolgingsplan,
                 behandlerRef = behandlerRef,
                 arbeidstakerPersonIdent = arbeidstaker.arbeidstakerPersonident,
-            )
-            if (dialogmeldingToBehandlerBestilling != null) {
-                COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS.increment()
-                val vikar = (fastlegeBehandler == null && vikarBehandler != null)
-                log.info("Lagret bestilling for oppfølgingsplan til ${if (vikar) "fastlegevikar" else "fastlege"}, bestillingid: ${dialogmeldingToBehandlerBestilling.uuid}")
-            } else throw FastlegeNotFoundException("Sending av oppfølgingsplan feilet")
+            ) ?: throw RuntimeException("Lagring av bestilling for oppfølgingsplan feilet")
+
+            COUNT_SEND_OPPFOLGINGSPLAN_SUCCESS.increment()
+            val vikar = (fastlegeBehandler == null && vikarBehandler != null)
+            log.info("Lagret bestilling for oppfølgingsplan til ${if (vikar) "fastlegevikar" else "fastlege"}, bestillingid: ${dialogmeldingToBehandlerBestilling.uuid}")
         } catch (exc: Exception) {
             COUNT_SEND_OPPFOLGINGSPLAN_FAILED.increment()
             throw exc

@@ -14,8 +14,10 @@ import java.util.*
 fun lagreDialogmeldingBestillingOgBehandler(
     database: TestDatabase,
     dialogmeldingBestillingUuid: UUID,
+    behandlerKontorEnabled: Boolean = true,
+    behandlerKontorLocked: Boolean = false,
 ): Pair<Int, Behandler> {
-    val behandler = lagreBehandler(database)
+    val behandler = lagreBehandler(database, behandlerKontorEnabled, behandlerKontorLocked)
     val dialogmeldingToBehandlerBestillingDTO = generateDialogmeldingToBehandlerBestillingDTO(
         uuid = dialogmeldingBestillingUuid,
         behandlerRef = behandler.behandlerRef,
@@ -23,11 +25,20 @@ fun lagreDialogmeldingBestillingOgBehandler(
     return Pair(lagreDialogmeldingBestilling(database, behandler, dialogmeldingToBehandlerBestillingDTO), behandler)
 }
 
-fun lagreBehandler(database: TestDatabase): Behandler {
+fun lagreBehandler(
+    database: TestDatabase,
+    behandlerKontorEnabled: Boolean = true,
+    behandlerKontorLocked: Boolean = false,
+): Behandler {
     val random = Random()
     val behandlerRef = UUID.randomUUID()
     val partnerId = PartnerId(random.nextInt())
-    return generateBehandler(behandlerRef, partnerId).also { behandler ->
+    return generateBehandler(
+        behandlerRef = behandlerRef,
+        partnerId = partnerId,
+        dialogmeldingEnabled = behandlerKontorEnabled,
+        dialogmeldingEnabledLocked = behandlerKontorLocked,
+    ).also { behandler ->
         database.connection.use { connection ->
             val kontorId = connection.createBehandlerKontor(behandler.kontor)
             connection.createBehandler(behandler, kontorId).id.also {

@@ -2,6 +2,7 @@ package no.nav.syfo.testhelper
 
 import io.ktor.server.application.*
 import no.nav.syfo.application.api.apiModule
+import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.fastlege.FastlegeClient
@@ -12,6 +13,7 @@ import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 
 fun Application.testApiModule(
     externalMockEnvironment: ExternalMockEnvironment,
+    database: DatabaseInterface = externalMockEnvironment.database,
 ) {
     val mockHttpClient = externalMockEnvironment.mockHttpClient
     val azureAdClient = AzureAdClient(
@@ -28,7 +30,7 @@ fun Application.testApiModule(
     )
     this.apiModule(
         applicationState = externalMockEnvironment.applicationState,
-        database = externalMockEnvironment.database,
+        database = database,
         environment = externalMockEnvironment.environment,
         wellKnownInternalAzureAD = externalMockEnvironment.wellKnownInternalAzureAD,
         wellKnownInternalIdportenTokenX = externalMockEnvironment.wellKnownInternalIdportenTokenX,
@@ -46,10 +48,10 @@ fun Application.testApiModule(
                 syfoPartnerinfoUrl = externalMockEnvironment.environment.syfoPartnerinfoUrl,
                 httpClient = mockHttpClient,
             ),
-            database = externalMockEnvironment.database,
+            database = database,
         ),
         dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
-            database = externalMockEnvironment.database,
+            database = database,
             pdlClient = PdlClient(
                 azureAdClient = azureAdClient,
                 pdlClientId = externalMockEnvironment.environment.pdlClientId,

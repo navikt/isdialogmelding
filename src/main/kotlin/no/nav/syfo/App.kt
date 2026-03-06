@@ -191,6 +191,7 @@ fun main() {
                             inputconsumer = inputconsumer,
                             apprecService = apprecService,
                             dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                            behandlerService = behandlerService,
                         )
                         blockingApplicationRunner.run()
                     }

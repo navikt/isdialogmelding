@@ -24,11 +24,23 @@ fun generateBehandlerKontorResponse(
     telefon = "",
     epost = "",
     orgnummer = null,
-    behandlere = listOf(
+    behandlere = mutableListOf(
         generateBehandlerFraAdresseregisteret(HPRID_INACTIVE),
-        if (kontorHerId == UserConstants.HERID_PSYKOLOG_KONTOR_OK) generatePsykologBehandlerFraAdresseregisteret(HPRID) else generateBehandlerFraAdresseregisteret(HPRID),
+        if (kontorHerId == UserConstants.HERID_PSYKOLOG_KONTOR_OK) {
+            generatePsykologBehandlerFraAdresseregisteret(HPRID)
+        } else {
+            generateBehandlerFraAdresseregisteret(HPRID)
+        },
         generateBehandlerFraAdresseregisteret(HPRID_UTEN_KATEGORI),
-    ),
+    ).also {
+        it.addAll(
+            if (kontorHerId == UserConstants.HERID_KONTOR_MED_SAMME_BEHANDLER_AKTIV_OG_INAKTIV) {
+                listOf(generateBehandlerFraAdresseregisteret(HPRID).copy(aktiv = false, herId = OTHER_HERID))
+            } else {
+                emptyList()
+            }
+        )
+    },
 )
 
 fun generateBehandlerKontorAdresse() = BehandlerKontorFraAdresseregisteretDTO.Adresse(

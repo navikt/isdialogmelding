@@ -126,10 +126,8 @@ class PdlClient(
         private val logger = LoggerFactory.getLogger(PdlClient::class.java)
         const val IDENTER_HEADER = "identer"
 
-        // Se behandlingskatalog https://behandlingskatalog.intern.nav.no/
-        // Behandling: Sende, innhente og videreformidle informasjon mellom behandler og NAV. I sykefraværsoppfølgingen
-        // mottar NAV helseopplysninger fra behandler.
+        // Se behandlingskatalog https://behandlingskatalog.intern.nav.no/process/purpose/SYFO/60868e2d-b151-47a3-a1a6-1d896fc3a88d
         private const val BEHANDLINGSNUMMER_HEADER_KEY = "behandlingsnummer"
-        private const val BEHANDLINGSNUMMER_HEADER_VALUE = "B389"
+        private const val BEHANDLINGSNUMMER_HEADER_VALUE = "B426"
     }
 }
