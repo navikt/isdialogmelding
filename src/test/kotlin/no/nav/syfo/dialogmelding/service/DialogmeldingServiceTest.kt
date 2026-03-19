@@ -20,9 +20,9 @@ import no.nav.syfo.testhelper.dropData
 import no.nav.syfo.testhelper.generator.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertNull
 import java.util.*
 
 class DialogmeldingServiceTest {
