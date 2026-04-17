@@ -128,6 +128,16 @@ class VerifyBehandlereForKontorCronjobTest {
     }
 
     @Test
+    fun `Cronjob oppdaterer navn om det er endret`() = runTest {
+        val kontorId = createKontor(HERID_KONTOR_OK)
+        val kontorBefore = database.getBehandlerKontorById(kontorId)
+        assertEquals(kontorBefore.navn, "Legekontoret")
+        cronJob.verifyBehandlereForKontorJob()
+        val kontorAfter = database.getBehandlerKontorById(kontorId)
+        assertEquals(kontorAfter.navn, "Fastlegens kontor")
+    }
+
+    @Test
     fun `Cronjob setter hprId på behandlere som mangler det`() = runTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val pBehandler = createBehandler(
