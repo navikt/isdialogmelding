@@ -148,16 +148,17 @@ fun Connection.updateBehandlerKontorAddress(partnerId: PartnerId, kontor: Behand
 
 const val queryUpdateBehandlerKontorNavn =
     """
-        UPDATE BEHANDLER_KONTOR SET navn=?,mottatt=?,updated_at=? WHERE partner_id=?
+        UPDATE BEHANDLER_KONTOR SET navn=?,orgnummer=COALESCE(?, orgnummer),mottatt=?,updated_at=? WHERE partner_id=?
     """
 
 fun Connection.updateBehandlerKontorNavn(partnerId: PartnerId, kontor: BehandlerKontor) {
     val rowCount = prepareStatement(queryUpdateBehandlerKontorNavn)
         .use {
             it.setString(1, kontor.navn)
-            it.setObject(2, kontor.mottatt)
-            it.setObject(3, OffsetDateTime.now())
-            it.setString(4, partnerId.toString())
+            it.setString(2, kontor.orgnummer?.value)
+            it.setObject(3, kontor.mottatt)
+            it.setObject(4, OffsetDateTime.now())
+            it.setString(5, partnerId.toString())
             it.executeUpdate()
         }
     if (rowCount != 1) {

@@ -132,9 +132,11 @@ class VerifyBehandlereForKontorCronjobTest {
         val kontorId = createKontor(HERID_KONTOR_OK)
         val kontorBefore = database.getBehandlerKontorById(kontorId)
         assertEquals(kontorBefore.navn, "Legekontoret")
+        assertNull(kontorBefore.orgnummer)
         cronJob.verifyBehandlereForKontorJob()
         val kontorAfter = database.getBehandlerKontorById(kontorId)
         assertEquals(kontorAfter.navn, "Fastlegens kontor")
+        assertEquals(kontorAfter.orgnummer, "987654321")
     }
 
     @Test
