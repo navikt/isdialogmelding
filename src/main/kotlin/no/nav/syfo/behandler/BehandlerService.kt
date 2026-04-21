@@ -438,6 +438,7 @@ class BehandlerService(
             updateBehandlerKontorAddress(behandlerKontor.partnerId, behandlerKontor)
         }
         if (shouldUpdateKontorNavn && kontorNavnChanged(behandlerKontor, existingBehandlerKontor)) {
+            log.info("Oppdaterer kontornavn for partnerId ${behandlerKontor.partnerId}: ${existingBehandlerKontor.navn} -> ${behandlerKontor.navn}")
             updateBehandlerKontorNavn(behandlerKontor.partnerId, behandlerKontor)
         }
         if (
