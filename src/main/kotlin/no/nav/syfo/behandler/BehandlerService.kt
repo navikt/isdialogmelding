@@ -188,7 +188,7 @@ class BehandlerService(
             if (pBehandlerKontor == null) {
                 connection.createBehandlerKontor(behandlerKontor)
             } else {
-                connection.updateBehandlerKontorSystemAndAdresse(behandlerKontor, pBehandlerKontor)
+                connection.updateBehandlerKontorSystemAndAdresseAndNavn(behandlerKontor, pBehandlerKontor)
             }
             connection.commit()
         }
@@ -362,7 +362,7 @@ class BehandlerService(
         database.connection.use { connection ->
             val pBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)
             val kontorId = if (pBehandlerKontor != null) {
-                connection.updateBehandlerKontorSystemAndAdresse(
+                connection.updateBehandlerKontorSystemAndAdresseAndNavn(
                     behandlerKontor = behandler.kontor,
                     existingBehandlerKontor = pBehandlerKontor,
                 )
@@ -400,7 +400,7 @@ class BehandlerService(
                 COUNT_BEHANDLER_UPDATED.increment()
             }
             val existingBehandlerKontor = connection.getBehandlerKontor(behandler.kontor.partnerId)!!
-            connection.updateBehandlerKontorSystemAndAdresse(
+            connection.updateBehandlerKontorSystemAndAdresseAndNavn(
                 behandlerKontor = behandler.kontor,
                 existingBehandlerKontor = existingBehandlerKontor,
                 existingBehandler = existingBehandler,
@@ -409,28 +409,37 @@ class BehandlerService(
         }
     }
 
-    fun updateBehandlerKontorSystemAndAdresse(
+    fun updateBehandlerKontorSystemAndAdresseAndNavn(
         behandlerKontor: BehandlerKontor,
+        shouldUpdateKontorNavn: Boolean = false,
     ) {
         database.connection.use { connection ->
             connection.getBehandlerKontor(behandlerKontor.partnerId)?.let { existingBehandlerKontor ->
-                connection.updateBehandlerKontorSystemAndAdresse(behandlerKontor, existingBehandlerKontor)
+                connection.updateBehandlerKontorSystemAndAdresseAndNavn(
+                    behandlerKontor = behandlerKontor,
+                    existingBehandlerKontor = existingBehandlerKontor,
+                    shouldUpdateKontorNavn = shouldUpdateKontorNavn,
+                )
             }
             connection.commit()
         }
     }
 
-    private fun Connection.updateBehandlerKontorSystemAndAdresse(
+    private fun Connection.updateBehandlerKontorSystemAndAdresseAndNavn(
         behandlerKontor: BehandlerKontor,
         existingBehandlerKontor: PBehandlerKontor,
         existingBehandler: PBehandler? = null,
-
+        shouldUpdateKontorNavn: Boolean = false,
     ) {
         if (shouldUpdateKontorSystem(behandlerKontor, existingBehandlerKontor)) {
             updateBehandlerKontorSystem(behandlerKontor.partnerId, behandlerKontor)
         }
         if (shouldUpdateKontorAdresse(behandlerKontor, existingBehandlerKontor)) {
             updateBehandlerKontorAddress(behandlerKontor.partnerId, behandlerKontor)
+        }
+        if (shouldUpdateKontorNavn && kontorNavnChanged(behandlerKontor, existingBehandlerKontor)) {
+            log.info("Oppdaterer kontornavn for partnerId ${behandlerKontor.partnerId}: ${existingBehandlerKontor.navn} -> ${behandlerKontor.navn}")
+            updateBehandlerKontorNavn(behandlerKontor.partnerId, behandlerKontor)
         }
         if (
             behandlerKontor.herId != null &&
@@ -459,6 +468,13 @@ class BehandlerService(
         existingBehandlerKontor: PBehandlerKontor,
     ): Boolean =
         behandlerKontor.harKomplettAdresse() && behandlerKontor.mottatt.isAfter(existingBehandlerKontor.mottatt)
+
+    private fun kontorNavnChanged(
+        behandlerKontor: BehandlerKontor,
+        existingBehandlerKontor: PBehandlerKontor,
+    ) = !behandlerKontor.navn.isNullOrBlank() &&
+        behandlerKontor.navn != existingBehandlerKontor.navn &&
+        behandlerKontor.mottatt.isAfter(existingBehandlerKontor.mottatt)
 
     private fun addBehandlerToArbeidstaker(
         arbeidstaker: Arbeidstaker,

@@ -57,7 +57,10 @@ class VerifyBehandlereForKontorCronjob(
                         log.info("VerifyBehandlereForKontorCronjob: Disable dialogmelding for kontor siden inaktiv i Adresseregisteret: herId ${behandlerKontor.herId} partnerId ${behandlerKontor.partnerId}")
                         behandlerService.disableDialogmeldingerForKontor(behandlerKontor)
                     } else {
-                        behandlerService.updateBehandlerKontorSystemAndAdresse(behandlerKontorFraAdresseregisteret.toBehandlerKontor(behandlerKontor.partnerId))
+                        behandlerService.updateBehandlerKontorSystemAndAdresseAndNavn(
+                            behandlerKontor = behandlerKontorFraAdresseregisteret.toBehandlerKontor(behandlerKontor.partnerId),
+                            shouldUpdateKontorNavn = true,
+                        )
 
                         val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = getBehandlereFraAdresseregisteret(behandlerKontorFraAdresseregisteret)
 
