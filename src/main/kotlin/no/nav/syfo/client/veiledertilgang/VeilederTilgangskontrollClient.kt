@@ -4,16 +4,13 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
-import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
-import no.nav.syfo.util.callIdArgument
 import org.slf4j.LoggerFactory
 
 class VeilederTilgangskontrollClient(
@@ -24,11 +21,15 @@ class VeilederTilgangskontrollClient(
 ) {
     private val tilgangskontrollPersonUrl = "$tilgangskontrollBaseUrl$TILGANGSKONTROLL_PERSON_PATH"
 
-    suspend fun hasAccess(
-        callId: String,
-        personident: Personident,
-        token: String,
-    ): Boolean {
+    suspend fun hasAccess(callId: String, personident: Personident, token: String): Boolean =
+        getTilgang(callId, personident, token)?.erGodkjent ?: false
+
+    suspend fun hasWriteAccess(callId: String, personident: Personident, token: String): Boolean =
+        getTilgang(callId, personident, token)?.let {
+            it.erGodkjent && it.fullTilgang
+        } ?: false
+
+    private suspend fun getTilgang(callId: String, personident: Personident, token: String): Tilgang? {
         val onBehalfOfToken = azureAdClient.getOnBehalfOfToken(
             scopeClientId = istilgangskontrollClientId,
             token = token,
@@ -42,30 +43,20 @@ class VeilederTilgangskontrollClient(
                 accept(ContentType.Application.Json)
             }
             COUNT_CALL_TILGANGSKONTROLL_PERSON_SUCCESS.increment()
-            response.body<Tilgang>().erGodkjent
+            response.body<Tilgang>()
         } catch (e: ClientRequestException) {
             if (e.response.status == HttpStatusCode.Forbidden) {
                 COUNT_CALL_TILGANGSKONTROLL_PERSON_FORBIDDEN.increment()
             } else {
-                handleUnexpectedResponseException(e.response, callId)
+                log.error("Error while requesting access to person from istilgangskontroll with statuscode: ${e.response.status.value}, callId: $callId")
+                COUNT_CALL_TILGANGSKONTROLL_PERSON_FAIL.increment()
             }
-            false
+            null
         } catch (e: ServerResponseException) {
-            handleUnexpectedResponseException(e.response, callId)
-            false
+            log.error("Error while requesting access to person from istilgangskontroll with statuscode: ${e.response.status.value}, callId: $callId")
+            COUNT_CALL_TILGANGSKONTROLL_PERSON_FAIL.increment()
+            null
         }
-    }
-
-    private fun handleUnexpectedResponseException(
-        response: HttpResponse,
-        callId: String,
-    ) {
-        log.error(
-            "Error while requesting access to person from istilgangskontroll with {}, {}",
-            StructuredArguments.keyValue("statusCode", response.status.value.toString()),
-            callIdArgument(callId)
-        )
-        COUNT_CALL_TILGANGSKONTROLL_PERSON_FAIL.increment()
     }
 
     companion object {

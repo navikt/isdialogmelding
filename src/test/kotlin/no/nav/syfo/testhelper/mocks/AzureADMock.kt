@@ -2,6 +2,7 @@ package no.nav.syfo.testhelper.mocks
 
 import io.ktor.client.engine.mock.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import no.nav.syfo.application.api.authentication.WellKnown
 import no.nav.syfo.client.azuread.AzureAdTokenResponse
 import java.nio.file.Paths
@@ -17,10 +18,13 @@ fun wellKnownInternalAzureAD(): WellKnown {
     )
 }
 
-fun MockRequestHandleScope.azureAdMockResponse(): HttpResponseData = respondOk(
-    AzureAdTokenResponse(
-        access_token = "token",
-        expires_in = 3600,
-        token_type = "type",
+fun MockRequestHandleScope.azureAdMockResponse(request: HttpRequestData): HttpResponseData {
+    val assertionToken = (request.body as? FormDataContent)?.formData?.get("assertion")
+    return respondOk(
+        AzureAdTokenResponse(
+            access_token = assertionToken ?: "token",
+            expires_in = 3600,
+            token_type = "type",
+        )
     )
-)
+}

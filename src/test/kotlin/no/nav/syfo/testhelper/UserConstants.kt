@@ -44,6 +44,7 @@ object UserConstants {
     const val ORGNR_KONTOR_OK = "987654321"
 
     const val VEILEDER_IDENT = "Z999999"
+    const val VEILEDER_IDENT_NO_WRITE_ACCESS = "Z888888"
 
     val FASTLEGE_FNR = Personident("12125678911")
     val FASTLEGE_FNR_SUSPENDERT = Personident("12125678912")
