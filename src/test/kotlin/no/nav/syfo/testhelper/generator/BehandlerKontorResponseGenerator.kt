@@ -23,7 +23,7 @@ fun generateBehandlerKontorResponse(
     postadresse = generateBehandlerKontorAdresse(),
     telefon = "",
     epost = "",
-    orgnummer = null,
+    orgnummer = UserConstants.ORGNR_KONTOR_OK,
     behandlere = mutableListOf(
         generateBehandlerFraAdresseregisteret(HPRID_INACTIVE),
         if (kontorHerId == UserConstants.HERID_PSYKOLOG_KONTOR_OK) {
