@@ -1,18 +1,12 @@
 package no.nav.syfo.util
 
-import com.auth0.jwt.JWT
 import io.ktor.server.application.*
 import io.ktor.http.*
 import io.ktor.server.routing.*
-import io.ktor.util.pipeline.*
 import net.logstash.logback.argument.StructuredArguments
 
 const val NAV_CALL_ID_HEADER = "Nav-Call-Id"
 const val NAV_PERSONIDENT_HEADER = "nav-personident"
-const val JWT_CLAIM_NAVIDENT = "NAVident"
-
-fun getNavIdentFromToken(token: String): String? =
-    runCatching { JWT.decode(token).claims[JWT_CLAIM_NAVIDENT]?.asString() }.getOrNull()
 
 fun RoutingContext.getCallId(): String {
     return this.call.getCallId()
