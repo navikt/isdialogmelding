@@ -19,6 +19,7 @@ fun generateBehandlerKontorResponse(
     aktiv = aktiv,
     herId = kontorHerId,
     navn = "Fastlegens kontor",
+    visningsnavn = "Fastlegens kontor",
     besoksadresse = null,
     postadresse = generateBehandlerKontorAdresse(),
     telefon = "",

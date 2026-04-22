@@ -9,6 +9,7 @@ data class BehandlerKontorFraAdresseregisteretDTO(
     val aktiv: Boolean,
     val herId: Int,
     val navn: String,
+    val visningsnavn: String,
     val besoksadresse: Adresse?,
     val postadresse: Adresse?,
     val telefon: String?,
@@ -38,7 +39,7 @@ fun BehandlerKontorFraAdresseregisteretDTO.toBehandlerKontor(partnerId: String) 
     BehandlerKontor(
         partnerId = PartnerId(partnerId.toInt()),
         herId = this.herId,
-        navn = this.navn,
+        navn = this.visningsnavn,
         adresse = this.besoksadresse?.adresse ?: this.postadresse?.adresse,
         postnummer = this.besoksadresse?.postnummer ?: this.postadresse?.postnummer,
         poststed = this.besoksadresse?.poststed ?: this.postadresse?.poststed,
