@@ -34,3 +34,6 @@ spec:
     - team: aap
       application: dokumentinnhenting
       access: write
+    - team: tbd
+      application: sporhund
+      access: write
