@@ -58,6 +58,9 @@ spec:
         - application: oppslag
           namespace: aap
           cluster: dev-gcp
+        - application: speil
+          namespace: tbd
+          cluster: dev-gcp
     outbound:
       external:
         - host: "b27apvl220.preprod.local"
