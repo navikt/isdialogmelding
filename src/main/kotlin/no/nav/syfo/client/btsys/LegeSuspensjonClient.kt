@@ -9,7 +9,6 @@ import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.util.NAV_CALL_ID_HEADER
-import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
 import java.io.IOException
 import java.util.*
@@ -28,12 +27,13 @@ class LegeSuspensjonClient(
         val token = azureAdClient.getSystemToken(endpointClientId)
             ?: throw RuntimeException("Failed to sjekk suspensjon: No token was found")
 
-        val httpResponse: HttpResponse = httpClient.get("$endpointUrl/api/v1/suspensjon/status") {
+        val httpResponse: HttpResponse = httpClient.post("$endpointUrl/api/v1/suspensjon/soek") {
             accept(ContentType.Application.Json)
-            header(NAV_PERSONIDENT_HEADER, behandlerPersonident.value)
+            contentType(ContentType.Application.Json)
             header("Nav-Consumer-Id", APPLICATION_NAME)
             header(NAV_CALL_ID_HEADER, UUID.randomUUID().toString())
             header("Authorization", bearerHeader(token.accessToken))
+            setBody(SuspensjonSoekRequest(personident = behandlerPersonident.value))
         }
         if (httpResponse.status != HttpStatusCode.OK) {
             throw IOException("Btsys svarte med uventet kode ${httpResponse.status}")
@@ -41,5 +41,7 @@ class LegeSuspensjonClient(
         return httpResponse.call.response.body()
     }
 }
+
+data class SuspensjonSoekRequest(val personident: String)
 
 data class Suspendert(val suspendert: Boolean)
