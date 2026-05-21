@@ -24,7 +24,7 @@ val mqVersion = "9.4.5.0"
 val nimbusjosejwtVersion = "10.9"
 val postgresVersion = "42.7.11"
 val postgresEmbeddedVersion = "2.2.2"
-val postgresRuntimeVersion = "17.9.0"
+val postgresRuntimeVersion = "18.3.0"
 val syfotjenesterVersion = "1.2022.09.09-14.42-5356e2174b6c"
 
 plugins {
