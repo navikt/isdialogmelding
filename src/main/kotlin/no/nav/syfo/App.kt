@@ -33,7 +33,6 @@ import no.nav.syfo.identhendelse.kafka.IdenthendelseConsumerService
 import no.nav.syfo.identhendelse.kafka.launchKafkaTaskIdenthendelse
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.LoggerFactory
-import java.util.concurrent.TimeUnit
 import javax.jms.Session
 
 const val applicationPort = 8080
@@ -215,7 +214,7 @@ fun main() {
 
     Runtime.getRuntime().addShutdownHook(
         Thread {
-            server.stop(10, 10, TimeUnit.SECONDS)
+            applicationState.ready = false
         }
     )
 
