@@ -5,7 +5,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.nav.syfo.behandler.BehandlerService
-import no.nav.syfo.behandler.api.access.validateVeilederAccess
+import no.nav.syfo.behandler.api.access.validateVeilederInnbyggerAccess
 import no.nav.syfo.behandler.domain.*
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.domain.Personident
@@ -30,7 +30,7 @@ fun Route.registerBehandlerApi(
                 Personident(personident)
             } ?: throw IllegalArgumentException("No Personident supplied")
 
-            validateVeilederAccess(
+            validateVeilederInnbyggerAccess(
                 action = "Read BehandlerList of Person with Personident",
                 personidentToAccess = personident,
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,

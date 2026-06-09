@@ -23,6 +23,7 @@ class VeilederTilgangskontrollClient(
     private val httpClient: HttpClient = httpClientDefault(),
 ) {
     private val tilgangskontrollPersonUrl = "$tilgangskontrollBaseUrl$TILGANGSKONTROLL_PERSON_PATH"
+    private val tilgangskontrollInnbyggerUrl = "$tilgangskontrollBaseUrl$TILGANGSKONTROLL_INNBYGGER_PATH"
 
     suspend fun hasAccess(
         callId: String,
@@ -36,6 +37,38 @@ class VeilederTilgangskontrollClient(
 
         return try {
             val response = httpClient.get(tilgangskontrollPersonUrl) {
+                header(HttpHeaders.Authorization, bearerHeader(onBehalfOfToken))
+                header(NAV_PERSONIDENT_HEADER, personident.value)
+                header(NAV_CALL_ID_HEADER, callId)
+                accept(ContentType.Application.Json)
+            }
+            COUNT_CALL_TILGANGSKONTROLL_PERSON_SUCCESS.increment()
+            response.body<Tilgang>().erGodkjent
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.Forbidden) {
+                COUNT_CALL_TILGANGSKONTROLL_PERSON_FORBIDDEN.increment()
+            } else {
+                handleUnexpectedResponseException(e.response, callId)
+            }
+            false
+        } catch (e: ServerResponseException) {
+            handleUnexpectedResponseException(e.response, callId)
+            false
+        }
+    }
+
+    suspend fun hasInnbyggerAccess(
+        callId: String,
+        personident: Personident,
+        token: String,
+    ): Boolean {
+        val onBehalfOfToken = azureAdClient.getOnBehalfOfToken(
+            scopeClientId = istilgangskontrollClientId,
+            token = token,
+        )?.accessToken ?: throw RuntimeException("Failed to request access to innbygger: Failed to get OBO token")
+
+        return try {
+            val response = httpClient.get(tilgangskontrollInnbyggerUrl) {
                 header(HttpHeaders.Authorization, bearerHeader(onBehalfOfToken))
                 header(NAV_PERSONIDENT_HEADER, personident.value)
                 header(NAV_CALL_ID_HEADER, callId)
@@ -72,5 +105,6 @@ class VeilederTilgangskontrollClient(
         private val log = LoggerFactory.getLogger(VeilederTilgangskontrollClient::class.java)
 
         const val TILGANGSKONTROLL_PERSON_PATH = "/api/tilgang/navident/person"
+        const val TILGANGSKONTROLL_INNBYGGER_PATH = "/api/tilgang/navident/innbygger"
     }
 }

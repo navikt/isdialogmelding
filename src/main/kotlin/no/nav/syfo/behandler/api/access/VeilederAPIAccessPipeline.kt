@@ -31,6 +31,31 @@ suspend fun RoutingContext.validateVeilederAccess(
     }
 }
 
+suspend fun RoutingContext.validateVeilederInnbyggerAccess(
+    action: String,
+    personidentToAccess: Personident,
+    veilederTilgangskontrollClient: VeilederTilgangskontrollClient,
+    requestBlock: suspend () -> Unit,
+) {
+    val callId = getCallId()
+
+    val token = getBearerHeader()
+        ?: throw IllegalArgumentException("Failed to complete the following action: $action. No Authorization header supplied")
+
+    val hasVeilederAccess = veilederTilgangskontrollClient.hasInnbyggerAccess(
+        callId = callId,
+        personident = personidentToAccess,
+        token = token,
+    )
+    if (hasVeilederAccess) {
+        requestBlock()
+    } else {
+        throw ForbiddenAccessVeilederException(
+            action = action,
+        )
+    }
+}
+
 class ForbiddenAccessVeilederException(
     action: String,
     message: String = "Denied NAVIdent access to personident: $action",
