@@ -58,6 +58,9 @@ spec:
         - application: oppslag
           namespace: aap
           cluster: prod-gcp
+        - application: speil
+          namespace: tbd
+          cluster: prod-gcp
     outbound:
       external:
         - host: "mpls02.adeo.no"
