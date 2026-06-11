@@ -31,6 +31,3 @@ spec:
     - team: aap
       application: dokumentinnhenting
       access: read
-    - team: tbd
-      application: sporhund
-      access: read
