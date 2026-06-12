@@ -6,7 +6,7 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
 
-suspend fun RoutingContext.validateVeilederInnbyggerAccess(
+suspend fun RoutingContext.validateVeilederPopulasjonAccess(
     action: String,
     personidentToAccess: Personident,
     veilederTilgangskontrollClient: VeilederTilgangskontrollClient,
