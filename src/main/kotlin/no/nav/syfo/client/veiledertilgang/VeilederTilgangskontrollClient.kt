@@ -22,9 +22,9 @@ class VeilederTilgangskontrollClient(
     tilgangskontrollBaseUrl: String,
     private val httpClient: HttpClient = httpClientDefault(),
 ) {
-    private val tilgangskontrollInnbyggerUrl = "$tilgangskontrollBaseUrl$TILGANGSKONTROLL_INNBYGGER_PATH"
+    private val tilgangskontrollPopulasjonUrl = "$tilgangskontrollBaseUrl$TILGANGSKONTROLL_POPULASJON_PATH"
 
-    suspend fun hasInnbyggerAccess(
+    suspend fun hasPopulasjonAccess(
         callId: String,
         personident: Personident,
         token: String,
@@ -35,7 +35,7 @@ class VeilederTilgangskontrollClient(
         )?.accessToken ?: throw RuntimeException("Failed to request access to innbygger: Failed to get OBO token")
 
         return try {
-            val response = httpClient.get(tilgangskontrollInnbyggerUrl) {
+            val response = httpClient.get(tilgangskontrollPopulasjonUrl) {
                 header(HttpHeaders.Authorization, bearerHeader(onBehalfOfToken))
                 header(NAV_PERSONIDENT_HEADER, personident.value)
                 header(NAV_CALL_ID_HEADER, callId)
@@ -61,7 +61,7 @@ class VeilederTilgangskontrollClient(
         callId: String,
     ) {
         log.error(
-            "Error while requesting access to innbygger from istilgangskontroll with {}, {}",
+            "Error while requesting populasjon access from istilgangskontroll with {}, {}",
             StructuredArguments.keyValue("statusCode", response.status.value.toString()),
             callIdArgument(callId)
         )
@@ -71,6 +71,6 @@ class VeilederTilgangskontrollClient(
     companion object {
         private val log = LoggerFactory.getLogger(VeilederTilgangskontrollClient::class.java)
 
-        const val TILGANGSKONTROLL_INNBYGGER_PATH = "/api/tilgang/navident/innbygger"
+        const val TILGANGSKONTROLL_POPULASJON_PATH = "/api/tilgang/navident/populasjon"
     }
 }
