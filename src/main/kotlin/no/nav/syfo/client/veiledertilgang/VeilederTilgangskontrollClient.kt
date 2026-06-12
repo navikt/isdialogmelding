@@ -22,9 +22,9 @@ class VeilederTilgangskontrollClient(
     tilgangskontrollBaseUrl: String,
     private val httpClient: HttpClient = httpClientDefault(),
 ) {
-    private val tilgangskontrollPersonUrl = "$tilgangskontrollBaseUrl$TILGANGSKONTROLL_PERSON_PATH"
+    private val tilgangskontrollPopulasjonUrl = "$tilgangskontrollBaseUrl$TILGANGSKONTROLL_POPULASJON_PATH"
 
-    suspend fun hasAccess(
+    suspend fun hasPopulasjonAccess(
         callId: String,
         personident: Personident,
         token: String,
@@ -32,10 +32,10 @@ class VeilederTilgangskontrollClient(
         val onBehalfOfToken = azureAdClient.getOnBehalfOfToken(
             scopeClientId = istilgangskontrollClientId,
             token = token,
-        )?.accessToken ?: throw RuntimeException("Failed to request access to Person: Failed to get OBO token")
+        )?.accessToken ?: throw RuntimeException("Failed to request populasjon access to person: Failed to get OBO token")
 
         return try {
-            val response = httpClient.get(tilgangskontrollPersonUrl) {
+            val response = httpClient.get(tilgangskontrollPopulasjonUrl) {
                 header(HttpHeaders.Authorization, bearerHeader(onBehalfOfToken))
                 header(NAV_PERSONIDENT_HEADER, personident.value)
                 header(NAV_CALL_ID_HEADER, callId)
@@ -61,7 +61,7 @@ class VeilederTilgangskontrollClient(
         callId: String,
     ) {
         log.error(
-            "Error while requesting access to person from istilgangskontroll with {}, {}",
+            "Error while requesting populasjon access from istilgangskontroll with {}, {}",
             StructuredArguments.keyValue("statusCode", response.status.value.toString()),
             callIdArgument(callId)
         )
@@ -71,6 +71,6 @@ class VeilederTilgangskontrollClient(
     companion object {
         private val log = LoggerFactory.getLogger(VeilederTilgangskontrollClient::class.java)
 
-        const val TILGANGSKONTROLL_PERSON_PATH = "/api/tilgang/navident/person"
+        const val TILGANGSKONTROLL_POPULASJON_PATH = "/api/tilgang/navident/populasjon"
     }
 }

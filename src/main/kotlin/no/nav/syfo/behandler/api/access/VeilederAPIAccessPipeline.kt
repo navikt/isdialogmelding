@@ -6,7 +6,7 @@ import no.nav.syfo.domain.Personident
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
 
-suspend fun RoutingContext.validateVeilederAccess(
+suspend fun RoutingContext.validateVeilederPopulasjonAccess(
     action: String,
     personidentToAccess: Personident,
     veilederTilgangskontrollClient: VeilederTilgangskontrollClient,
@@ -17,7 +17,7 @@ suspend fun RoutingContext.validateVeilederAccess(
     val token = getBearerHeader()
         ?: throw IllegalArgumentException("Failed to complete the following action: $action. No Authorization header supplied")
 
-    val hasVeilederAccess = veilederTilgangskontrollClient.hasAccess(
+    val hasVeilederAccess = veilederTilgangskontrollClient.hasPopulasjonAccess(
         callId = callId,
         personident = personidentToAccess,
         token = token,
