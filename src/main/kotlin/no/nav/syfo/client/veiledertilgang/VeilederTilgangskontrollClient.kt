@@ -32,7 +32,7 @@ class VeilederTilgangskontrollClient(
         val onBehalfOfToken = azureAdClient.getOnBehalfOfToken(
             scopeClientId = istilgangskontrollClientId,
             token = token,
-        )?.accessToken ?: throw RuntimeException("Failed to request access to innbygger: Failed to get OBO token")
+        )?.accessToken ?: throw RuntimeException("Failed to request populasjon access to person: Failed to get OBO token")
 
         return try {
             val response = httpClient.get(tilgangskontrollPopulasjonUrl) {

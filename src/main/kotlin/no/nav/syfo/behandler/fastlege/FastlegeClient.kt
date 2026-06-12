@@ -145,7 +145,7 @@ class FastlegeClient(
     }
 
     companion object {
-        const val FASTLEGE_PATH = "/fastlegerest/api/v2/innbygger/fastlege"
+        const val FASTLEGE_PATH = "/fastlegerest/api/v2/populasjon/fastlege"
         const val FASTLEGE_SYSTEM_PATH = "/fastlegerest/api/system/v1/fastlege/aktiv/personident"
         const val FASTLEGEVIKAR_SYSTEM_PATH = "/fastlegerest/api/system/v1/fastlege/vikar/personident"
         const val BEHANDLERE_SYSTEM_PATH = "/fastlegerest/api/system/v1"
