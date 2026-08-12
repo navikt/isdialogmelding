@@ -61,6 +61,9 @@ spec:
         - application: speil
           namespace: tbd
           cluster: dev-gcp
+        - application: outbound-processing-service
+          namespace: helsemelding
+          cluster: dev-gcp
     outbound:
       external:
         - host: "b27apvl220.preprod.local"
