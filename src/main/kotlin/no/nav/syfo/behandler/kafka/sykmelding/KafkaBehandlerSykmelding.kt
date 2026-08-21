@@ -8,14 +8,10 @@ import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.kafka.kafkaSykmeldingConsumerConfig
 import no.nav.syfo.domain.*
 import org.apache.kafka.clients.consumer.*
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.*
 import java.util.UUID
 
 const val SYKMELDING_TOPIC = "teamsykmelding.ok-sykmelding"
-
-private val log: Logger = LoggerFactory.getLogger("SykmeldingConsumer")
 
 val PROCESS_SYKMELDING_INCOMING_AFTER = LocalDateTime.of(LocalDate.of(2021, Month.OCTOBER, 1), LocalTime.of(0, 0))
 
@@ -69,7 +65,7 @@ fun processSykmelding(
                     COUNT_MOTTATT_SYKMELDING_SUCCESS.increment()
                 }
             }
-        } ?: log.error("Received sykmelding with null value, ignoring record with key ${it.key()} and offset ${it.offset()}")
+        }
     }
 }
 
