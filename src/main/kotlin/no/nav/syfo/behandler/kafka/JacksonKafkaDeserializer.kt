@@ -8,13 +8,8 @@ import org.apache.kafka.common.serialization.Deserializer
 val mapper = configuredJacksonMapper()
 
 class JacksonKafkaDeserializerSykmelding : Deserializer<ReceivedSykmeldingDTO> {
-    override fun deserialize(topic: String, data: ByteArray): ReceivedSykmeldingDTO? {
-        return try {
-            mapper.readValue(data, ReceivedSykmeldingDTO::class.java)
-        } catch (e: NullPointerException) {
-            null
-        }
-    }
+    override fun deserialize(topic: String, data: ByteArray): ReceivedSykmeldingDTO =
+        mapper.readValue(data, ReceivedSykmeldingDTO::class.java)
     override fun close() {}
 }
 
