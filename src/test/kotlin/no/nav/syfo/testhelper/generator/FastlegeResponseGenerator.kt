@@ -21,8 +21,8 @@ fun generateFastlegeResponse() = FastlegeResponse(
     ),
     fastlegekontor = FastlegeResponse.Fastlegekontor(
         navn = "Fastlegens kontor",
-        besoeksadresse = null,
-        postadresse = generateFastlegeResponseAdresse(),
+        besoeksadresse = generateFastlegeResponseBesoksadresse(),
+        postadresse = generateFastlegeResponsePostadresse(),
         telefon = "",
         epost = "",
         orgnummer = null,
@@ -49,8 +49,8 @@ fun generateFastlegeResponse(personident: Personident) = FastlegeResponse(
     ),
     fastlegekontor = FastlegeResponse.Fastlegekontor(
         navn = "Fastlegens kontor",
-        besoeksadresse = null,
-        postadresse = generateFastlegeResponseAdresse(),
+        besoeksadresse = generateFastlegeResponseBesoksadresse(),
+        postadresse = generateFastlegeResponsePostadresse(),
         telefon = "",
         epost = "",
         orgnummer = null,
@@ -77,8 +77,8 @@ fun generateFastlegeResponse(foreldreEnhetHerId: Int?) = FastlegeResponse(
     ),
     fastlegekontor = FastlegeResponse.Fastlegekontor(
         navn = "Fastlegens kontor",
-        besoeksadresse = null,
-        postadresse = generateFastlegeResponseAdresse(),
+        besoeksadresse = generateFastlegeResponseBesoksadresse(),
+        postadresse = generateFastlegeResponsePostadresse(),
         telefon = "",
         epost = "",
         orgnummer = null,
@@ -105,8 +105,8 @@ fun generateFastlegeResponse(personident: Personident?, herId: Int?, hprId: Int?
     ),
     fastlegekontor = FastlegeResponse.Fastlegekontor(
         navn = "Fastlegens kontor",
-        besoeksadresse = null,
-        postadresse = generateFastlegeResponseAdresse(),
+        besoeksadresse = generateFastlegeResponseBesoksadresse(),
+        postadresse = generateFastlegeResponsePostadresse(),
         telefon = "",
         epost = "",
         orgnummer = null,
@@ -117,7 +117,13 @@ fun generateFastlegeResponse(personident: Personident?, herId: Int?, hprId: Int?
     )
 )
 
-fun generateFastlegeResponseAdresse() = FastlegeResponse.Fastlegekontor.Adresse(
+fun generateFastlegeResponsePostadresse() = FastlegeResponse.Fastlegekontor.Adresse(
+    adresse = "Postboks 77",
+    postnummer = "0651",
+    poststed = "Oslo",
+)
+
+fun generateFastlegeResponseBesoksadresse() = FastlegeResponse.Fastlegekontor.Adresse(
     adresse = "Storgata 1",
     postnummer = "0651",
     poststed = "Oslo",
