@@ -13,8 +13,10 @@ data class BehandlerDTO(
     val orgnummer: String?,
     val kontor: String?,
     val kontorHerId: Int?,
+    val kontorDialogmeldingmeldingEnabled: Boolean,
     val adresse: String?,
     val postnummer: String?,
     val poststed: String?,
     val telefon: String?,
+    val invalidated: Boolean,
 )
