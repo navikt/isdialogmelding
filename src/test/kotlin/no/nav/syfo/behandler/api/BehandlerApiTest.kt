@@ -85,6 +85,8 @@ class BehandlerApiTest {
                     assertEquals(fastlegeResponse.fnr, behandlerDTO.fnr)
                     assertEquals(BehandlerKategori.LEGE.name, behandlerDTO.kategori)
                     assertEquals(fastlegeResponse.helsepersonellregisterId, behandlerDTO.hprId)
+                    assertTrue(behandlerDTO.kontorDialogmeldingmeldingEnabled)
+                    assertFalse(behandlerDTO.invalidated)
                 }
             }
 
