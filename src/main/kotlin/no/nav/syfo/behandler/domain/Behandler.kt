@@ -37,7 +37,7 @@ fun Behandler.toBehandlerDTO(
     orgnummer = this.kontor.orgnummer?.value,
     kontor = this.kontor.navn,
     kontorHerId = this.kontor.herId,
-    kontorDialogmeldingmeldingEnabled = this.kontor.dialogmeldingEnabled != null,
+    kontorDialogmeldingmeldingEnabled = this.kontor.dialogmeldingEnabled,
     adresse = this.kontor.adresse,
     postnummer = this.kontor.postnummer,
     poststed = this.kontor.poststed,
