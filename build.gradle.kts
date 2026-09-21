@@ -15,13 +15,12 @@ val jsonVersion = "20260719"
 val kafkaVersion = "4.3.1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
-val ktorVersion = "3.5.2"
+val ktorVersion = "3.6.0"
 val logbackVersion = "1.6.1"
 val logstashEncoderVersion = "9.0"
 val micrometerRegistryVersion = "1.17.0"
 val mockkVersion = "1.14.11"
 val mqVersion = "9.4.5.0"
-val nettyVersion = "4.2.17.Final"
 val nimbusjosejwtVersion = "10.9.1"
 val postgresVersion = "42.7.13"
 val postgresEmbeddedVersion = "2.2.2"
@@ -47,9 +46,6 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
-
-    // Override Netty transitively pulled by Ktor to patch CVE-2026-75595
-    implementation(platform("io.netty:netty-bom:$nettyVersion"))
 
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
