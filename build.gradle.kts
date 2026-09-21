@@ -21,7 +21,6 @@ val logstashEncoderVersion = "9.0"
 val micrometerRegistryVersion = "1.17.0"
 val mockkVersion = "1.14.11"
 val mqVersion = "9.4.5.0"
-val nettyVersion = "4.2.17.Final"
 val nimbusjosejwtVersion = "10.9.1"
 val postgresVersion = "42.7.13"
 val postgresEmbeddedVersion = "2.2.2"
@@ -47,9 +46,6 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
-
-    // Override Netty transitively pulled by Ktor to patch CVE-2026-75595
-    implementation(platform("io.netty:netty-bom:$nettyVersion"))
 
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
