@@ -16,6 +16,7 @@ import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.kafka.*
+import no.nav.syfo.dialogmelding.edi2.OutgoingDialogMessageProducer
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.btsys.LegeSuspensjonClient
@@ -32,6 +33,7 @@ import no.nav.syfo.identhendelse.IdenthendelseService
 import no.nav.syfo.identhendelse.kafka.IdenthendelseConsumerService
 import no.nav.syfo.identhendelse.kafka.launchKafkaTaskIdenthendelse
 import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.LoggerFactory
 import javax.jms.Session
 
@@ -146,6 +148,13 @@ fun main() {
                 val dialogmeldingService = DialogmeldingService(
                     pdlClient = pdlClient,
                     mqSender = mqSender,
+                    outgoingDialogMessageProducer = OutgoingDialogMessageProducer(
+                        kafkaProducer = KafkaProducer(
+                            kafkaProducerConfig<StringSerializer>(kafkaEnvironment = environment.kafka)
+                        ),
+                        sourceSystem = environment.mqApplicationName,
+                    ),
+                    edi2SendEnabledHerIds = environment.edi2SendEnabledHerIds,
                 )
                 cronjobModule(
                     applicationState = applicationState,
