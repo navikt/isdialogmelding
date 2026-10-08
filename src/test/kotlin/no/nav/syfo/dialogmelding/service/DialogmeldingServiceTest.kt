@@ -11,6 +11,7 @@ import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingKodeverk
 import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
 import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingType
 import no.nav.syfo.dialogmelding.bestilling.kafka.toDialogmeldingToBehandlerBestilling
+import no.nav.syfo.dialogmelding.edi2.OutgoingDialogMessageProducer
 import no.nav.syfo.domain.PartnerId
 import no.nav.syfo.domain.Personident
 import no.nav.syfo.testhelper.ExternalMockEnvironment
@@ -41,10 +42,13 @@ class DialogmeldingServiceTest {
         httpClient = externalMockEnvironment.mockHttpClient,
     )
     private val mqSender = mockk<MQSender>()
+    private val outgoingDialogMessageProducer = mockk<OutgoingDialogMessageProducer>()
 
     private val dialogmeldingService = DialogmeldingService(
         pdlClient = pdlClient,
         mqSender = mqSender,
+        outgoingDialogMessageProducer = outgoingDialogMessageProducer,
+        edi2SendEnabledHerIds = emptySet(),
     )
 
     private val arbeidstakerPersonident = Personident("01010112345")
@@ -97,6 +101,32 @@ class DialogmeldingServiceTest {
         assertTrue(
             expectedFellesformatMessageAsRegex.matches(actualFellesformatMessage),
         )
+    }
+
+    @Test
+    fun `Sends message to EDI 2 when kontor HER-id is enabled`() = runTest {
+        clearAllMocks()
+        justRun { outgoingDialogMessageProducer.sendDialogmelding(any()) }
+
+        val edi2DialogmeldingService = DialogmeldingService(
+            pdlClient = pdlClient,
+            mqSender = mqSender,
+            outgoingDialogMessageProducer = outgoingDialogMessageProducer,
+            edi2SendEnabledHerIds = setOf(behandler.kontor.herId!!),
+        )
+
+        val melding = generateDialogmeldingToBehandlerBestillingDTO(
+            behandlerRef = behandlerRef,
+            uuid = uuid,
+            arbeidstakerPersonident = arbeidstakerPersonident,
+        ).toDialogmeldingToBehandlerBestilling(
+            behandler = behandler,
+        )
+
+        edi2DialogmeldingService.sendMelding(melding)
+
+        verify(exactly = 1) { outgoingDialogMessageProducer.sendDialogmelding(any()) }
+        verify(exactly = 0) { mqSender.sendMessageToEmottak(any()) }
     }
 
     @Test
