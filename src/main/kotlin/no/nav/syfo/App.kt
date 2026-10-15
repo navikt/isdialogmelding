@@ -27,6 +27,8 @@ import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.dialogmelding.apprec.ApprecService
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
+import no.nav.syfo.dialogmelding.edi2.status.Edi2DialogmeldingStatusConsumerService
+import no.nav.syfo.dialogmelding.edi2.status.launchKafkaTaskDialogmeldingStatusFromEdi2
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 import no.nav.syfo.dialogmelding.status.kafka.*
 import no.nav.syfo.identhendelse.IdenthendelseService
@@ -93,6 +95,7 @@ fun main() {
     lateinit var behandlerService: BehandlerService
     lateinit var dialogmeldingToBehandlerService: DialogmeldingToBehandlerService
     lateinit var dialogmeldingStatusService: DialogmeldingStatusService
+    lateinit var apprecService: ApprecService
 
     val applicationEngineEnvironment = applicationEnvironment {
         log = logger
@@ -125,6 +128,9 @@ fun main() {
                 database = applicationDatabase,
                 dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                 dialogmeldingStatusProducer = dialogmeldingStatusProducer,
+            )
+            apprecService = ApprecService(
+                database = applicationDatabase,
             )
 
             apiModule(
@@ -178,6 +184,16 @@ fun main() {
                     applicationEnvironmentKafka = environment.kafka,
                     database = applicationDatabase,
                 )
+                val edi2DialogmeldingStatusConsumerService = Edi2DialogmeldingStatusConsumerService(
+                    apprecService = apprecService,
+                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                    behandlerService = behandlerService,
+                )
+                launchKafkaTaskDialogmeldingStatusFromEdi2(
+                    applicationState = applicationState,
+                    applicationEnvironmentKafka = environment.kafka,
+                    edi2DialogmeldingStatusConsumerService = edi2DialogmeldingStatusConsumerService,
+                )
                 launchBackgroundTask(
                     applicationState = applicationState,
                 ) {
@@ -190,9 +206,6 @@ fun main() {
                         connection.start()
                         val session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE)
                         val inputconsumer = session.consumerForQueue(environment.apprecQueueName)
-                        val apprecService = ApprecService(
-                            database = applicationDatabase,
-                        )
                         val blockingApplicationRunner = ApprecConsumer(
                             applicationState = applicationState,
                             database = applicationDatabase,
