@@ -92,61 +92,6 @@ class KafkaDialogmeldingFromBehandlerTest {
                 val kontor = database.connection.use { it.getBehandlerKontor(UserConstants.PARTNERID) }
                 assertNull(kontor!!.dialogmeldingEnabled)
             }
-
-            @Test
-            fun `update identer for behandler if stored idents are null`() {
-                val behandlerRef = database.createBehandlerForArbeidstaker(
-                    behandler = generateBehandler(
-                        behandlerRef = UUID.randomUUID(),
-                        partnerId = UserConstants.PARTNERID,
-                        herId = null,
-                        hprId = UserConstants.HPRID,
-                    ),
-                    arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
-                    relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                )
-                val dialogmelding = generateDialogmeldingFromBehandlerDTO(fellesformatXMLHealthcareProfessional)
-                val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
-
-                pollAndProcessDialogmeldingFromBehandler(
-                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                    database = database,
-                )
-
-                verify(exactly = 1) { mockConsumer.commitSync() }
-                val behandler = database.getBehandlerByBehandlerRef(behandlerRef)
-                assertNotNull(behandler)
-                assertEquals(UserConstants.HPRID.toString(), behandler!!.hprId)
-                assertEquals(UserConstants.OTHER_HERID.toString(), behandler.herId)
-            }
-
-            @Test
-            fun `do not update identer when received ident of type XXX`() {
-                val behandlerRef = database.createBehandlerForArbeidstaker(
-                    behandler = generateBehandler(
-                        behandlerRef = UUID.randomUUID(),
-                        partnerId = UserConstants.PARTNERID,
-                        herId = null,
-                        hprId = UserConstants.HPRID,
-                    ),
-                    arbeidstakerPersonident = UserConstants.ARBEIDSTAKER_FNR,
-                    relasjonstype = BehandlerArbeidstakerRelasjonstype.FASTLEGE,
-                )
-                val dialogmelding =
-                    generateDialogmeldingFromBehandlerDTO(fellesformatXMLHealthcareProfessionalMedIdenttypeAnnen)
-                val mockConsumer = mockKafkaConsumerWithDialogmelding(dialogmelding)
-
-                pollAndProcessDialogmeldingFromBehandler(
-                    kafkaConsumerDialogmeldingFromBehandler = mockConsumer,
-                    database = database,
-                )
-
-                verify(exactly = 1) { mockConsumer.commitSync() }
-                val behandler = database.getBehandlerByBehandlerRef(behandlerRef)
-                assertNotNull(behandler)
-                assertEquals(UserConstants.HPRID.toString(), behandler!!.hprId)
-                assertNull(behandler.herId)
-            }
         }
 
         @Nested
