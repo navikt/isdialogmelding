@@ -62,45 +62,31 @@ fun processConsumerRecords(
         val dialogmeldingFromBehandler = it.value()
         log.info("Received a dialogmelding from behandler: navLogId: ${dialogmeldingFromBehandler.navLogId}, kontorOrgnr: ${dialogmeldingFromBehandler.legekontorOrgNr}, msgId: ${dialogmeldingFromBehandler.msgId}")
 
-        updateKontorAndBehandler(dialogmeldingFromBehandler, database)
+        updateBehandlerkontor(dialogmeldingFromBehandler, database)
     }
 }
 
-private fun updateKontorAndBehandler(
+private fun updateBehandlerkontor(
     dialogmeldingFromBehandler: KafkaDialogmeldingFromBehandlerDTO,
     database: DatabaseInterface,
 ) {
-    val partnerId = dialogmeldingFromBehandler.fellesformatXML?.let {
-        getPartnerId(
-            it,
-            dialogmeldingFromBehandler.navLogId,
-            dialogmeldingFromBehandler.msgId,
-        )
-    }
-
-    partnerId?.let { id ->
-        updateDialogmeldingEnabledForKontor(
-            partnerId = id,
-            database = database,
-        )
-
-        val behandleridenter = getIdenterForBehandler(
+    if (dialogmeldingFromBehandler.fellesformatXML != null) {
+        val partnerId = getPartnerId(
             dialogmeldingFromBehandler.fellesformatXML,
             dialogmeldingFromBehandler.navLogId,
             dialogmeldingFromBehandler.msgId,
         )
-
-        updateIdenterForBehandler(
-            identer = behandleridenter,
-            partnerId = id,
-            database = database,
-        )
-
-        createAndStoreBehandlerKontorFromDialogmeldingIfMissing(
-            dialogmeldingFromBehandler = dialogmeldingFromBehandler,
-            partnerId = partnerId,
-            database = database,
-        )
+        if (partnerId != null) {
+            updateDialogmeldingEnabledForKontor(
+                partnerId = partnerId,
+                database = database,
+            )
+            createAndStoreBehandlerKontorFromDialogmeldingIfMissing(
+                dialogmeldingFromBehandler = dialogmeldingFromBehandler,
+                partnerId = partnerId,
+                database = database,
+            )
+        }
     }
 }
 
