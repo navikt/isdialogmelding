@@ -70,21 +70,24 @@ private fun updateKontorAndBehandler(
     dialogmeldingFromBehandler: KafkaDialogmeldingFromBehandlerDTO,
     database: DatabaseInterface,
 ) {
-    val partnerId = getPartnerId(
-        dialogmeldingFromBehandler.fellesformatXML,
-        dialogmeldingFromBehandler.navLogId,
-        dialogmeldingFromBehandler.msgId,
-    )
-    val behandleridenter = getIdenterForBehandler(
-        dialogmeldingFromBehandler.fellesformatXML,
-        dialogmeldingFromBehandler.navLogId,
-        dialogmeldingFromBehandler.msgId,
-    )
+    val partnerId = dialogmeldingFromBehandler.fellesformatXML?.let {
+        getPartnerId(
+            it,
+            dialogmeldingFromBehandler.navLogId,
+            dialogmeldingFromBehandler.msgId,
+        )
+    }
 
     partnerId?.let { id ->
         updateDialogmeldingEnabledForKontor(
             partnerId = id,
             database = database,
+        )
+
+        val behandleridenter = getIdenterForBehandler(
+            dialogmeldingFromBehandler.fellesformatXML,
+            dialogmeldingFromBehandler.navLogId,
+            dialogmeldingFromBehandler.msgId,
         )
 
         updateIdenterForBehandler(
