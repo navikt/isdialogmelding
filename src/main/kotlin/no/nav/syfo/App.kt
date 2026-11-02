@@ -189,11 +189,13 @@ fun main() {
                     dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                     behandlerService = behandlerService,
                 )
-                launchKafkaTaskDialogmeldingStatusFromEdi2(
-                    applicationState = applicationState,
-                    applicationEnvironmentKafka = environment.kafka,
-                    edi2DialogmeldingStatusConsumerService = edi2DialogmeldingStatusConsumerService,
-                )
+                if (environment.edi2ConsumeStatusTopic) {
+                    launchKafkaTaskDialogmeldingStatusFromEdi2(
+                        applicationState = applicationState,
+                        applicationEnvironmentKafka = environment.kafka,
+                        edi2DialogmeldingStatusConsumerService = edi2DialogmeldingStatusConsumerService,
+                    )
+                }
                 launchBackgroundTask(
                     applicationState = applicationState,
                 ) {

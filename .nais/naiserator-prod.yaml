@@ -128,6 +128,8 @@ spec:
       value: "QA.P414.IU03_UTSENDING"
     - name: EDI2_SEND_ENABLED_HER_IDS
       value: ""
+    - name: EDI2_CONSUME_STATUS_TOPIC
+      value: "false"
     - name: AAP_SOKNAD_API_CLIENT_ID
       value: "prod-gcp:aap:soknad-api"
     - name: AAP_OPPSLAG_CLIENT_ID
