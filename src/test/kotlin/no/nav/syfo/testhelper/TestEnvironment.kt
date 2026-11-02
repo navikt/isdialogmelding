@@ -55,6 +55,7 @@ fun testEnvironment() = Environment(
     syfohelsenettproxyUrl = "syfohelsenettproxyUrl",
     btsysClientId = "btsys-client-id",
     btsysUrl = "btsysUrl",
+    edi2ConsumeStatusTopic = true,
 )
 
 const val testAapSoknadApiClientId = "soknad-api-client-id"
