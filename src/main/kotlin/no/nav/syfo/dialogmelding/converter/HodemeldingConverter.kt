@@ -9,8 +9,11 @@ fun createMsgHead(
     arbeidstaker: Arbeidstaker,
 ): XMLMsgHead {
     val factory = ObjectFactory()
-    return factory.createXMLMsgHead()
+    val msgHead = factory.createXMLMsgHead()
         .withMsgInfo(createMsgInfo(melding, arbeidstaker))
         .withDocument(createDialogmeldingDocument(melding))
-        .withDocument(createVedleggDocument(melding))
+    if (melding.vedlegg?.isNotEmpty() == true) {
+        msgHead.withDocument(createVedleggDocument(melding))
+    }
+    return msgHead
 }

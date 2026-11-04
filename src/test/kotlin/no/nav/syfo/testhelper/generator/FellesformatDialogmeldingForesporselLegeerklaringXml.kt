@@ -90,17 +90,6 @@ fun defaultFellesformatDialogmeldingForesporselLegeerklaringXmlRegex(): Regex {
             "                </ns2:Content>\n" +
             "            </ns2:RefDoc>\n" +
             "        </ns2:Document>\n" +
-            "        <ns2:Document>\n" +
-            "            <ns2:DocumentConnection V=\"V\" DN=\"Vedlegg\"/>\n" +
-            "            <ns2:RefDoc>\n" +
-            "                <ns2:IssueDate V=\"\\d{4}-\\d{2}-\\d{2}\"/>\n" +
-            "                <ns2:MsgType V=\"A\" DN=\"Vedlegg\"/>\n" +
-            "                <ns2:MimeType>application/pdf</ns2:MimeType>\n" +
-            "                <ns2:Content>\n" +
-            "                    <ns6:Base64Container/>\n" +
-            "                </ns2:Content>\n" +
-            "            </ns2:RefDoc>\n" +
-            "        </ns2:Document>\n" +
             "    </ns2:MsgHead>\n" +
             "    <MottakenhetBlokk partnerReferanse=\"1\" ebRole=\"Saksbehandler\" ebService=\"ForesporselFraSaksbehandler\" ebAction=\"Foresporsel\"/>\n" +
             "    <SporinformasjonBlokk programID=\"MODIA SYFO\" programVersjonID=\"1.0\" programResultatKoder=\"0\" tidsstempel=\"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\"/>\n" +
