@@ -3,20 +3,20 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val confluentVersion = "8.3.0"
+val confluentVersion = "8.4.0"
 val dialogmeldingVersion = "1.5d21db9"
 val fellesformat2Version = "1.0329dd1"
 val flywayVersion = "11.19.0"
 val hikariVersion = "7.1.0"
-val jacksonVersion = "2.22.3"
-val jacksonDatabindVersion = "3.2.3"
+val jacksonVersion = "2.22.4"
+val jacksonDatabindVersion = "3.2.4"
 val jaxbVersion = "2.3.1"
 val jsonVersion = "20260814"
 val kafkaVersion = "4.3.1"
 val kithApprecVersion = "2019.07.30-04-23-2a0d1388209441ec05d2e92a821eed4f796a3ae2"
 val kithHodemeldingVersion = "2019.07.30-12-26-5c924ef4f04022bbb850aaf299eb8e4464c1ca6a"
-val ktorVersion = "3.6.0"
-val logbackVersion = "1.6.5"
+val ktorVersion = "3.6.1"
+val logbackVersion = "1.6.6"
 val logstashEncoderVersion = "9.0"
 val micrometerRegistryVersion = "1.17.1"
 val mockkVersion = "1.14.11"
@@ -87,12 +87,19 @@ dependencies {
         exclude(group = "org.apache.logging.log4j")
     }
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion", excludeLog4j)
+    constraints {
+        implementation("at.yawk.lz4:lz4-java") {
+            version {
+                require("1.11.4")
+            }
+        }
+    }
+
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion", excludeLog4j)
     constraints {
         implementation("com.google.guava:guava") {
-            because("com.google.guava:guava:30.1.1-jre -> https://www.cve.org/CVERecord?id=CVE-2020-8908")
             version {
-                require("33.4.0-jre")
+                require("33.8.0-jre")
             }
         }
     }
