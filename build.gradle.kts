@@ -3,7 +3,7 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val confluentVersion = "8.3.0"
+val confluentVersion = "8.4.0"
 val dialogmeldingVersion = "1.5d21db9"
 val fellesformat2Version = "1.0329dd1"
 val flywayVersion = "11.19.0"
@@ -11,7 +11,7 @@ val hikariVersion = "7.1.0"
 val jacksonVersion = "2.22.4"
 val jacksonDatabindVersion = "3.2.4"
 val jaxbVersion = "2.3.1"
-val jsonVersion = "20260719"
+val jsonVersion = "20260814"
 val kafkaVersion = "4.4.0"
 val kithApprecVersion = "2019.09.09-08-50-693492ddc1d3f98e70c1638c94dcb95a66036d12"
 val kithHodemeldingVersion = "2019.09.09-08-50-693492ddc1d3f98e70c1638c94dcb95a66036d12"
@@ -87,12 +87,19 @@ dependencies {
         exclude(group = "org.apache.logging.log4j")
     }
     implementation("org.apache.kafka:kafka_2.13:$kafkaVersion", excludeLog4j)
+    constraints {
+        implementation("at.yawk.lz4:lz4-java") {
+            version {
+                require("1.11.4")
+            }
+        }
+    }
+
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion", excludeLog4j)
     constraints {
         implementation("com.google.guava:guava") {
-            because("com.google.guava:guava:30.1.1-jre -> https://www.cve.org/CVERecord?id=CVE-2020-8908")
             version {
-                require("33.4.0-jre")
+                require("33.8.0-jre")
             }
         }
     }
