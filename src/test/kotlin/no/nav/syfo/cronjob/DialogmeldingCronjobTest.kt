@@ -8,6 +8,7 @@ import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.dialogmelding.bestilling.database.getBestilling
+import no.nav.syfo.dialogmelding.edi2.OutgoingDialogMessageProducer
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 import no.nav.syfo.dialogmelding.status.database.getDialogmeldingStatusNotPublished
 import no.nav.syfo.dialogmelding.status.domain.DialogmeldingStatusType
@@ -47,6 +48,7 @@ class DialogmeldingCronjobTest {
         httpClient = externalMockEnvironment.mockHttpClient,
     )
     private val mqSenderMock = mockk<MQSender>()
+    private val outgoingDialogMessageProducer = mockk<OutgoingDialogMessageProducer>()
 
     private val dialogmeldingToBehandlerService = DialogmeldingToBehandlerService(
         database = database,
@@ -62,6 +64,8 @@ class DialogmeldingCronjobTest {
     private val dialogmeldingService = DialogmeldingService(
         pdlClient = pdlClient,
         mqSender = mqSenderMock,
+        outgoingDialogMessageProducer = outgoingDialogMessageProducer,
+        edi2SendEnabledHerIds = emptySet(),
     )
     private val dialogmeldingSendCronjob = DialogmeldingSendCronjob(
         dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,

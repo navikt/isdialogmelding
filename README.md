@@ -58,6 +58,11 @@ This application owns and consumes from the following topic:
 
 * isdialogmelding-behandler-dialogmelding-bestilling
 
+In the EDI 2.0 transition this application can also:
+
+* Produce to `helsemelding.dialog.out` for selected recipients (toggle on HER-id via `EDI2_SEND_ENABLED_HER_IDS`)
+* Consume `helsemelding.dialog.out.status` and map terminal statuses to the internal AppRec/status flow
+
 ### MQ config
 
 This application uses an encrypted channel when reading av sending messages to MQ. The certificate and password for 

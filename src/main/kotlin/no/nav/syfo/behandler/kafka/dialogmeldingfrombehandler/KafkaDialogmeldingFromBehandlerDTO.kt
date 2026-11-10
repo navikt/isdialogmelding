@@ -12,5 +12,5 @@ data class KafkaDialogmeldingFromBehandlerDTO(
     val legekontorHerId: String?,
     val legekontorOrgName: String,
     val legehpr: String?,
-    val fellesformatXML: String,
+    val fellesformatXML: String?,
 )

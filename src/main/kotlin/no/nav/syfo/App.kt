@@ -16,6 +16,7 @@ import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.dialogmelding.bestilling.DialogmeldingToBehandlerService
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.kafka.*
+import no.nav.syfo.dialogmelding.edi2.OutgoingDialogMessageProducer
 import no.nav.syfo.behandler.partnerinfo.PartnerinfoClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.btsys.LegeSuspensjonClient
@@ -26,12 +27,15 @@ import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.dialogmelding.DialogmeldingService
 import no.nav.syfo.dialogmelding.apprec.ApprecService
 import no.nav.syfo.dialogmelding.apprec.consumer.ApprecConsumer
+import no.nav.syfo.dialogmelding.edi2.status.Edi2DialogmeldingStatusConsumerService
+import no.nav.syfo.dialogmelding.edi2.status.launchKafkaTaskDialogmeldingStatusFromEdi2
 import no.nav.syfo.dialogmelding.status.DialogmeldingStatusService
 import no.nav.syfo.dialogmelding.status.kafka.*
 import no.nav.syfo.identhendelse.IdenthendelseService
 import no.nav.syfo.identhendelse.kafka.IdenthendelseConsumerService
 import no.nav.syfo.identhendelse.kafka.launchKafkaTaskIdenthendelse
 import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.LoggerFactory
 import javax.jms.Session
 
@@ -91,6 +95,7 @@ fun main() {
     lateinit var behandlerService: BehandlerService
     lateinit var dialogmeldingToBehandlerService: DialogmeldingToBehandlerService
     lateinit var dialogmeldingStatusService: DialogmeldingStatusService
+    lateinit var apprecService: ApprecService
 
     val applicationEngineEnvironment = applicationEnvironment {
         log = logger
@@ -124,6 +129,9 @@ fun main() {
                 dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
                 dialogmeldingStatusProducer = dialogmeldingStatusProducer,
             )
+            apprecService = ApprecService(
+                database = applicationDatabase,
+            )
 
             apiModule(
                 applicationState = applicationState,
@@ -146,6 +154,13 @@ fun main() {
                 val dialogmeldingService = DialogmeldingService(
                     pdlClient = pdlClient,
                     mqSender = mqSender,
+                    outgoingDialogMessageProducer = OutgoingDialogMessageProducer(
+                        kafkaProducer = KafkaProducer(
+                            kafkaProducerConfig<StringSerializer>(kafkaEnvironment = environment.kafka)
+                        ),
+                        sourceSystem = environment.mqApplicationName,
+                    ),
+                    edi2SendEnabledHerIds = environment.edi2SendEnabledHerIds,
                 )
                 cronjobModule(
                     applicationState = applicationState,
@@ -169,6 +184,18 @@ fun main() {
                     applicationEnvironmentKafka = environment.kafka,
                     database = applicationDatabase,
                 )
+                val edi2DialogmeldingStatusConsumerService = Edi2DialogmeldingStatusConsumerService(
+                    apprecService = apprecService,
+                    dialogmeldingToBehandlerService = dialogmeldingToBehandlerService,
+                    behandlerService = behandlerService,
+                )
+                if (environment.edi2ConsumeStatusTopic) {
+                    launchKafkaTaskDialogmeldingStatusFromEdi2(
+                        applicationState = applicationState,
+                        applicationEnvironmentKafka = environment.kafka,
+                        edi2DialogmeldingStatusConsumerService = edi2DialogmeldingStatusConsumerService,
+                    )
+                }
                 launchBackgroundTask(
                     applicationState = applicationState,
                 ) {
@@ -181,9 +208,6 @@ fun main() {
                         connection.start()
                         val session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE)
                         val inputconsumer = session.consumerForQueue(environment.apprecQueueName)
-                        val apprecService = ApprecService(
-                            database = applicationDatabase,
-                        )
                         val blockingApplicationRunner = ApprecConsumer(
                             applicationState = applicationState,
                             database = applicationDatabase,
