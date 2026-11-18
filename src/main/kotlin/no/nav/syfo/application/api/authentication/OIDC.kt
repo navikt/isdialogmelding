@@ -6,11 +6,11 @@ import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.client.httpClientProxy
 
+private val httpClient = httpClientProxy()
+
 fun getWellKnown(wellKnownUrl: String) =
     runBlocking {
-        httpClientProxy().use { client ->
-            client.get(wellKnownUrl).body<WellKnown>()
-        }
+        httpClient.get(wellKnownUrl).body<WellKnown>()
     }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

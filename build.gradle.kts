@@ -8,19 +8,19 @@ val dialogmeldingVersion = "1.5d21db9"
 val fellesformat2Version = "1.0329dd1"
 val flywayVersion = "11.19.0"
 val hikariVersion = "7.1.0"
-val jacksonVersion = "2.22.4"
-val jacksonDatabindVersion = "3.2.4"
+val jacksonVersion = "2.23.0"
+val jacksonDatabindVersion = "3.3.0"
 val jaxbVersion = "2.3.1"
 val jsonVersion = "20260814"
 val kafkaVersion = "4.4.0"
 val kithApprecVersion = "2019.09.09-08-50-693492ddc1d3f98e70c1638c94dcb95a66036d12"
 val kithHodemeldingVersion = "2019.09.09-08-50-693492ddc1d3f98e70c1638c94dcb95a66036d12"
 val ktorVersion = "3.6.1"
-val logbackVersion = "1.6.6"
+val logbackVersion = "1.6.7"
 val logstashEncoderVersion = "9.0"
 val micrometerRegistryVersion = "1.17.2"
-val mockkVersion = "1.14.11"
-val mqVersion = "9.4.5.0"
+val mockkVersion = "1.14.12"
+val mqVersion = "10.0.1.0"
 val nimbusjosejwtVersion = "10.10"
 val postgresVersion = "42.7.14"
 val postgresEmbeddedVersion = "2.2.2"
@@ -47,7 +47,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
 
-    implementation("io.ktor:ktor-client-apache:$ktorVersion")
+    implementation("io.ktor:ktor-client-apache5:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
     implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
