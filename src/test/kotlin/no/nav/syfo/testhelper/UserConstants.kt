@@ -41,6 +41,10 @@ object UserConstants {
     const val HERID_KONTOR_OK = 1841
     const val HERID_PSYKOLOG_KONTOR_OK = 1842
     const val HERID_KONTOR_MED_SAMME_BEHANDLER_AKTIV_OG_INAKTIV = 1843
+    const val HERID_KONTOR_MED_TJENESTER = 1844
+    const val TJENESTE_HERID = 9001
+    const val TJENESTE_HERID_INACTIVE = 9002
+    const val TJENESTE_NAVN = "Fysioterapitjenesten"
     const val ORGNR_KONTOR_OK = "987654321"
 
     const val VEILEDER_IDENT = "Z999999"

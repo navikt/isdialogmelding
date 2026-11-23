@@ -42,6 +42,24 @@ fun generateBehandlerKontorResponse(
             }
         )
     },
+    tjenester = if (kontorHerId == UserConstants.HERID_KONTOR_MED_TJENESTER) {
+        listOf(
+            generateTjenesteFraAdresseregisteret(herId = UserConstants.TJENESTE_HERID),
+            generateTjenesteFraAdresseregisteret(herId = UserConstants.TJENESTE_HERID_INACTIVE, aktiv = false),
+        )
+    } else {
+        null
+    },
+)
+
+fun generateTjenesteFraAdresseregisteret(
+    herId: Int,
+    aktiv: Boolean = true,
+) = BehandlerKontorFraAdresseregisteretDTO.TjenesteFraAdresseregisteretDTO(
+    aktiv = aktiv,
+    herId = herId,
+    navn = "Tjeneste $herId",
+    visningsnavn = UserConstants.TJENESTE_NAVN,
 )
 
 fun generateBehandlerKontorAdresse() = BehandlerKontorFraAdresseregisteretDTO.Adresse(

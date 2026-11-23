@@ -16,6 +16,8 @@ data class BehandlerKontorFraAdresseregisteretDTO(
     val epost: String?,
     val orgnummer: String?,
     val behandlere: List<BehandlerFraAdresseregisteretDTO>,
+    // null betyr at fastlegerest ikke leverer tjenester (ennå), og at tjenester ikke skal synkroniseres
+    val tjenester: List<TjenesteFraAdresseregisteretDTO>? = null,
 ) {
     data class Adresse(
         val adresse: String?,
@@ -33,6 +35,15 @@ data class BehandlerKontorFraAdresseregisteretDTO(
         val hprId: Int?,
         val kategori: String?,
     )
+
+    data class TjenesteFraAdresseregisteretDTO(
+        val aktiv: Boolean,
+        val herId: Int,
+        val navn: String,
+        val visningsnavn: String? = null,
+    ) {
+        fun visningsnavnOrNavn(): String = visningsnavn?.takeIf { it.isNotBlank() } ?: navn
+    }
 }
 
 fun BehandlerKontorFraAdresseregisteretDTO.toBehandlerKontor(partnerId: String) =

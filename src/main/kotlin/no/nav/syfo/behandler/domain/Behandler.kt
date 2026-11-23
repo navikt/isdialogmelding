@@ -78,6 +78,8 @@ enum class BehandleridentType {
     XXX,
 }
 
+fun Behandler.isTjeneste(): Boolean = kategori == BehandlerKategori.TJENESTE
+
 fun Behandler.hasAnId(): Boolean = personident != null || herId != null || hprId != null
 
 fun List<Pair<Behandler, BehandlerArbeidstakerRelasjonstype>>.removeDuplicates() = this.sortFastlegerFirst().distinctBy { it.first.behandlerRef }

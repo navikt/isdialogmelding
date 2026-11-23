@@ -4,6 +4,7 @@ import io.mockk.clearAllMocks
 import kotlinx.coroutines.test.runTest
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.*
+import no.nav.syfo.behandler.database.domain.isTjeneste
 import no.nav.syfo.behandler.database.domain.toBehandlerKontor
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerKategori
@@ -22,6 +23,7 @@ import no.nav.syfo.testhelper.UserConstants.FASTLEGE_TREDJE_FNR
 import no.nav.syfo.testhelper.UserConstants.FASTLEGE_UTEN_KATEGORI_FNR
 import no.nav.syfo.testhelper.UserConstants.HERID
 import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_MED_SAMME_BEHANDLER_AKTIV_OG_INAKTIV
+import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_MED_TJENESTER
 import no.nav.syfo.testhelper.UserConstants.HERID_KONTOR_OK
 import no.nav.syfo.testhelper.UserConstants.HERID_NOT_ACTIVE
 import no.nav.syfo.testhelper.UserConstants.HERID_PSYKOLOG_KONTOR_OK
@@ -31,6 +33,9 @@ import no.nav.syfo.testhelper.UserConstants.HPRID_UNKNOWN
 import no.nav.syfo.testhelper.UserConstants.HPRID_UTEN_KATEGORI
 import no.nav.syfo.testhelper.UserConstants.KONTOR_NAVN
 import no.nav.syfo.testhelper.UserConstants.PARTNERID
+import no.nav.syfo.testhelper.UserConstants.TJENESTE_HERID
+import no.nav.syfo.testhelper.UserConstants.TJENESTE_HERID_INACTIVE
+import no.nav.syfo.testhelper.UserConstants.TJENESTE_NAVN
 import no.nav.syfo.testhelper.createKontor
 import no.nav.syfo.testhelper.dropData
 import org.junit.jupiter.api.Assertions.*
@@ -370,7 +375,86 @@ class VerifyBehandlereForKontorCronjobTest {
         val behandler2After = database.getBehandlerById(pBehandler2.id)
         assertNull(behandler2After!!.invalidated)
     }
+
+    @Test
+    fun `Cronjob legger til aktive tjenester fra Adresseregisteret`() = runTest {
+        val kontorId = createKontor(HERID_KONTOR_MED_TJENESTER)
+        cronJob.verifyBehandlereForKontorJob()
+        val tjenester = database.getBehandlereForKontor(kontorId).filter { it.isTjeneste() }
+        assertEquals(1, tjenester.size)
+        val tjeneste = tjenester.first()
+        assertEquals(TJENESTE_HERID.toString(), tjeneste.herId)
+        assertEquals("", tjeneste.fornavn)
+        assertEquals(TJENESTE_NAVN, tjeneste.etternavn)
+        assertNull(tjeneste.hprId)
+        assertNull(tjeneste.personident)
+        assertNull(tjeneste.invalidated)
+    }
+
+    @Test
+    fun `Cronjob oppretter ikke duplikat av eksisterende tjeneste, men oppdaterer navn`() = runTest {
+        val kontorId = createKontor(HERID_KONTOR_MED_TJENESTER)
+        val pTjeneste = createTjeneste(kontorId = kontorId, herId = TJENESTE_HERID, navn = "Gammelt navn")
+        cronJob.verifyBehandlereForKontorJob()
+        cronJob.verifyBehandlereForKontorJob()
+        val tjenester = database.getBehandlereForKontor(kontorId).filter { it.isTjeneste() }
+        assertEquals(1, tjenester.size)
+        assertEquals(pTjeneste.behandlerRef, tjenester.first().behandlerRef)
+        assertEquals(TJENESTE_NAVN, tjenester.first().etternavn)
+        assertEquals(BehandlerKategori.TJENESTE.name, tjenester.first().kategori)
+    }
+
+    @Test
+    fun `Cronjob invaliderer tjeneste som er inaktiv i Adresseregisteret`() = runTest {
+        val kontorId = createKontor(HERID_KONTOR_MED_TJENESTER)
+        val pTjeneste = createTjeneste(kontorId = kontorId, herId = TJENESTE_HERID_INACTIVE)
+        cronJob.verifyBehandlereForKontorJob()
+        assertNotNull(database.getBehandlerById(pTjeneste.id)!!.invalidated)
+    }
+
+    @Test
+    fun `Cronjob invaliderer tjeneste som ikke finnes i Adresseregisteret`() = runTest {
+        val kontorId = createKontor(HERID_KONTOR_MED_TJENESTER)
+        val pTjeneste = createTjeneste(kontorId = kontorId, herId = 9999)
+        cronJob.verifyBehandlereForKontorJob()
+        assertNotNull(database.getBehandlerById(pTjeneste.id)!!.invalidated)
+    }
+
+    @Test
+    fun `Cronjob revaliderer tjeneste som er aktiv i Adresseregisteret`() = runTest {
+        val kontorId = createKontor(HERID_KONTOR_MED_TJENESTER)
+        val pTjeneste = createTjeneste(kontorId = kontorId, herId = TJENESTE_HERID)
+        database.invalidateBehandler(pTjeneste.behandlerRef)
+        cronJob.verifyBehandlereForKontorJob()
+        assertNull(database.getBehandlerById(pTjeneste.id)!!.invalidated)
+        assertEquals(1, database.getBehandlereForKontor(kontorId).count { it.isTjeneste() })
+    }
+
+    @Test
+    fun `Cronjob lar tjenester og behandlere være i fred når fastlegerest ikke leverer tjenester`() = runTest {
+        val kontorId = createKontor(HERID_KONTOR_OK)
+        val pTjeneste = createTjeneste(kontorId = kontorId, herId = TJENESTE_HERID)
+        cronJob.verifyBehandlereForKontorJob()
+        val tjenesteAfter = database.getBehandlerById(pTjeneste.id)!!
+        assertNull(tjenesteAfter.invalidated)
+        assertNull(tjenesteAfter.hprId)
+        assertEquals(TJENESTE_NAVN, tjenesteAfter.etternavn)
+        assertEquals(2, database.getBehandlereForKontor(kontorId).count { !it.isTjeneste() })
+    }
 }
+
+private fun createTjeneste(
+    kontorId: Int,
+    herId: Int,
+    navn: String = TJENESTE_NAVN,
+) = createBehandler(
+    kontorId = kontorId,
+    hprId = null,
+    herId = herId,
+    fornavn = "",
+    etternavn = navn,
+    kategori = BehandlerKategori.TJENESTE,
+)
 
 private fun createKontor(herId: Int) = database.createKontor(
     partnerId = PARTNERID,

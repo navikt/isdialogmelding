@@ -25,6 +25,8 @@ data class PBehandler(
     val suspendert: Boolean,
 )
 
+fun PBehandler.isTjeneste(): Boolean = kategori == BehandlerKategori.TJENESTE.name
+
 fun PBehandler.toBehandler(
     kontor: PBehandlerKontor,
 ) = Behandler(

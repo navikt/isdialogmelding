@@ -4,12 +4,14 @@ import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.behandler.BehandlerService
 import no.nav.syfo.behandler.database.domain.PBehandler
 import no.nav.syfo.behandler.database.domain.PBehandlerKontor
+import no.nav.syfo.behandler.database.domain.isTjeneste
 import no.nav.syfo.behandler.database.domain.toBehandlerKontor
 import no.nav.syfo.behandler.domain.Behandler
 import no.nav.syfo.behandler.domain.BehandlerKategori
 import no.nav.syfo.behandler.domain.BehandleridentType
 import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO
 import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO.BehandlerFraAdresseregisteretDTO
+import no.nav.syfo.behandler.fastlege.BehandlerKontorFraAdresseregisteretDTO.TjenesteFraAdresseregisteretDTO
 import no.nav.syfo.behandler.fastlege.FastlegeClient
 import no.nav.syfo.behandler.fastlege.toBehandlerKontor
 import no.nav.syfo.client.syfohelsenettproxy.SyfohelsenettproxyClient
@@ -30,7 +32,7 @@ class VerifyBehandlereForKontorCronjob(
 ) : DialogmeldingCronjob {
     private val runAtHour = 6
 
-    override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
+    override val initialDelayMinutes: Long = 2 // calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60 * 2
 
     override suspend fun run() {
@@ -64,12 +66,12 @@ class VerifyBehandlereForKontorCronjob(
 
                         val (aktiveBehandlereForKontor, inaktiveBehandlereForKontor) = getBehandlereFraAdresseregisteret(behandlerKontorFraAdresseregisteret)
 
-                        val existingBehandlereForKontorWithoutHPR = behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.hprId.isNullOrEmpty() }
+                        val existingBehandlereForKontorWithoutHPR = getPersonBehandlereForKontor(behandlerKontor).filter { it.hprId.isNullOrEmpty() }
                         if (existingBehandlereForKontorWithoutHPR.isNotEmpty()) {
                             repairMissingHPR(existingBehandlereForKontorWithoutHPR, behandlerKontorFraAdresseregisteret.behandlere)
                         }
 
-                        val (existingBehandlereForKontor, existingInvalidatedBehandlereForKontor) = behandlerService.getBehandlereForKontor(behandlerKontor).partition { it.invalidated == null }
+                        val (existingBehandlereForKontor, existingInvalidatedBehandlereForKontor) = getPersonBehandlereForKontor(behandlerKontor).partition { it.invalidated == null }
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${aktiveBehandlereForKontor.size} aktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${inaktiveBehandlereForKontor.size} inaktive behandlere for kontor ${behandlerKontor.herId} i Adresseregisteret")
                         log.info("VerifyBehandlereForKontorCronjob: Fant ${existingBehandlereForKontor.size} behandlere for kontor ${behandlerKontor.herId} i Modia")
@@ -97,8 +99,15 @@ class VerifyBehandlereForKontorCronjob(
 
                         updateExistingBehandlere(
                             aktiveBehandlereForKontor,
-                            behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.invalidated == null },
+                            getPersonBehandlereForKontor(behandlerKontor).filter { it.invalidated == null },
                         )
+
+                        behandlerKontorFraAdresseregisteret.tjenester?.let { tjenesterFraAdresseregisteret ->
+                            syncTjenester(
+                                tjenesterFraAdresseregisteret = tjenesterFraAdresseregisteret,
+                                behandlerKontor = behandlerKontor,
+                            )
+                        }
                     }
                 } else {
                     log.warn("VerifyBehandlereForKontorCronjob: Behandlerkontor mer herId ${behandlerKontor.herId} ble ikke funnet i Adresseregisteret")
@@ -348,6 +357,81 @@ class VerifyBehandlereForKontorCronjob(
                 }
             }
         }
+    }
+
+    private fun getPersonBehandlereForKontor(behandlerKontor: PBehandlerKontor): List<PBehandler> =
+        behandlerService.getBehandlereForKontor(behandlerKontor).filterNot { it.isTjeneste() }
+
+    private fun syncTjenester(
+        tjenesterFraAdresseregisteret: List<TjenesteFraAdresseregisteretDTO>,
+        behandlerKontor: PBehandlerKontor,
+    ) {
+        val existingTjenester = behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.isTjeneste() }
+        val tjenesterByHerId = tjenesterFraAdresseregisteret.associateBy { it.herId.toString() }
+
+        existingTjenester.filter { it.invalidated == null }.forEach { existingTjeneste ->
+            val tjenesteFraAdresseregisteret = tjenesterByHerId[existingTjeneste.herId]
+            if (tjenesteFraAdresseregisteret == null || !tjenesteFraAdresseregisteret.aktiv) {
+                behandlerService.invalidateBehandler(existingTjeneste.behandlerRef)
+                log.info("VerifyBehandlereForKontorCronjob: tjeneste ${existingTjeneste.behandlerRef} invalidated since inactive or not found in Adresseregisteret")
+            }
+        }
+
+        tjenesterFraAdresseregisteret.filter { it.aktiv }.forEach { tjenesteFraAdresseregisteret ->
+            val herId = tjenesteFraAdresseregisteret.herId.toString()
+            val navn = tjenesteFraAdresseregisteret.visningsnavnOrNavn()
+            val existingWithSameHerId = existingTjenester.filter { it.herId == herId }
+            val existingValid = existingWithSameHerId.firstOrNull { it.invalidated == null }
+            val existingInvalidated = existingWithSameHerId.firstOrNull { it.invalidated != null }
+
+            when {
+                existingValid != null -> {
+                    if (existingValid.etternavn != navn) {
+                        updateTjenesteNavn(existingValid.behandlerRef, herId, navn)
+                        log.info("VerifyBehandlereForKontorCronjob: updated navn for tjeneste ${existingValid.behandlerRef}")
+                    }
+                }
+                existingInvalidated != null -> {
+                    behandlerService.revalidateBehandler(existingInvalidated.behandlerRef)
+                    if (existingInvalidated.etternavn != navn) {
+                        updateTjenesteNavn(existingInvalidated.behandlerRef, herId, navn)
+                    }
+                    log.info("VerifyBehandlereForKontorCronjob: tjeneste ${existingInvalidated.behandlerRef} revalidated since active in Adresseregisteret")
+                }
+                else -> {
+                    val behandlerRef = UUID.randomUUID()
+                    behandlerService.createBehandler(
+                        behandler = Behandler(
+                            behandlerRef = behandlerRef,
+                            personident = null,
+                            fornavn = "",
+                            mellomnavn = null,
+                            etternavn = navn,
+                            herId = tjenesteFraAdresseregisteret.herId,
+                            hprId = null,
+                            telefon = null,
+                            kontor = behandlerKontor.toBehandlerKontor(),
+                            kategori = BehandlerKategori.TJENESTE,
+                            mottatt = nowUTC(),
+                            suspendert = false,
+                        ),
+                        kontorId = behandlerKontor.id,
+                    )
+                    log.info("VerifyBehandlereForKontorCronjob: added new tjeneste from Adresseregisteret: $behandlerRef")
+                }
+            }
+        }
+    }
+
+    private fun updateTjenesteNavn(behandlerRef: UUID, herId: String, navn: String) {
+        behandlerService.updateBehandlerNavnAndKategoriAndHerId(
+            behandlerRef = behandlerRef,
+            fornavn = "",
+            mellomnavn = null,
+            etternavn = navn,
+            kategori = BehandlerKategori.TJENESTE,
+            herId = herId,
+        )
     }
 
     companion object {
