@@ -32,7 +32,7 @@ class VerifyBehandlereForKontorCronjob(
 ) : DialogmeldingCronjob {
     private val runAtHour = 6
 
-    override val initialDelayMinutes: Long = 2 // calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
+    override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60 * 2
 
     override suspend fun run() {
