@@ -200,6 +200,16 @@ fun DatabaseInterface.setSuspendert(uuid: String) = this.connection.use { connec
     connection.commit()
 }
 
+fun DatabaseInterface.setKategoriTjeneste(uuid: String) = this.connection.use { connection ->
+    connection.prepareStatement(
+        "UPDATE BEHANDLER SET kategori='TJENESTE' WHERE behandler_ref=?"
+    ).use {
+        it.setString(1, uuid)
+        it.executeUpdate()
+    }
+    connection.commit()
+}
+
 fun DatabaseInterface.dropData() {
     val queryList = listOf(
         """

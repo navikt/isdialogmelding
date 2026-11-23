@@ -296,6 +296,30 @@ class BehandlerApiTest {
             }
 
             @Test
+            fun `search should exclude tjenester`() {
+                testApplication {
+                    val client = setupApiAndClient()
+                    client.get(url) {
+                        bearerAuth(validToken)
+                        header(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
+                    }.apply {
+                        assertEquals(HttpStatusCode.OK, status)
+                        val behandlerList = body<List<BehandlerDTO>>()
+                        assertEquals(1, behandlerList.size)
+                        database.setKategoriTjeneste(behandlerList[0].behandlerRef)
+                    }
+
+                    val response = client.get(searchUrl) {
+                        bearerAuth(validToken)
+                        header("searchstring", "Scully")
+                    }
+                    assertEquals(HttpStatusCode.OK, response.status)
+                    val behandlerList = response.body<List<BehandlerDTO>>()
+                    assertEquals(0, behandlerList.size)
+                }
+            }
+
+            @Test
             fun `search should remove special characters`() {
                 testApplication {
                     val client = setupApiAndClient()
