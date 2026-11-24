@@ -16,8 +16,7 @@ data class BehandlerKontorFraAdresseregisteretDTO(
     val epost: String?,
     val orgnummer: String?,
     val behandlere: List<BehandlerFraAdresseregisteretDTO>,
-    // null betyr at fastlegerest ikke leverer tjenester (ennå), og at tjenester ikke skal synkroniseres
-    val tjenester: List<TjenesteFraAdresseregisteretDTO>? = null,
+    val tjenester: List<TjenesteFraAdresseregisteretDTO>,
 ) {
     data class Adresse(
         val adresse: String?,

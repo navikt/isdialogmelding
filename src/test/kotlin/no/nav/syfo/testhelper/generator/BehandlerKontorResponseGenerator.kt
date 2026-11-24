@@ -48,7 +48,7 @@ fun generateBehandlerKontorResponse(
             generateTjenesteFraAdresseregisteret(herId = UserConstants.TJENESTE_HERID_INACTIVE, aktiv = false),
         )
     } else {
-        null
+        emptyList()
     },
 )
 
