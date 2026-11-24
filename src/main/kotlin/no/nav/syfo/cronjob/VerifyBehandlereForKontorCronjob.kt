@@ -34,6 +34,7 @@ class VerifyBehandlereForKontorCronjob(
 
     override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60 * 2
+    val TJENESTE_SYNC_WHITELIST_HERIDS = listOf("146067", "166579", "143749", "155747")
 
     override suspend fun run() {
         verifyBehandlereForKontorJob()
@@ -366,6 +367,10 @@ class VerifyBehandlereForKontorCronjob(
         tjenesterFraAdresseregisteret: List<TjenesteFraAdresseregisteretDTO>,
         behandlerKontor: PBehandlerKontor,
     ) {
+        if (behandlerKontor.herId !in TJENESTE_SYNC_WHITELIST_HERIDS) {
+            log.info("VerifyBehandlereForKontorCronjob: Skipping tjeneste sync for kontor ${behandlerKontor.herId} since not in whitelist")
+            return
+        }
         val existingTjenester = behandlerService.getBehandlereForKontor(behandlerKontor).filter { it.isTjeneste() }
         val tjenesterByHerId = tjenesterFraAdresseregisteret.associateBy { it.herId.toString() }
 
