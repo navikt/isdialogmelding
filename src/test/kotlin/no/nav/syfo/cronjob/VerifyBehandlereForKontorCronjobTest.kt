@@ -93,6 +93,7 @@ class VerifyBehandlereForKontorCronjobTest {
     fun beforeEach() {
         database.dropData()
         clearAllMocks()
+        TJENESTE_SYNC_WHITELIST_HERIDS.add(HERID_KONTOR_MED_TJENESTER.toString())
     }
 
     @Test

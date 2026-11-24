@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory
 import java.util.UUID
 
 const val ALERIS_HER_ID = "2033"
+val TJENESTE_SYNC_WHITELIST_HERIDS = mutableListOf("146067", "166579", "143749", "155747")
 
 class VerifyBehandlereForKontorCronjob(
     val behandlerService: BehandlerService,
@@ -34,7 +35,6 @@ class VerifyBehandlereForKontorCronjob(
 
     override val initialDelayMinutes: Long = calculateInitialDelay("VerifyBehandlereForKontorCronjob", runAtHour)
     override val intervalDelayMinutes: Long = 24 * 60 * 2
-    val TJENESTE_SYNC_WHITELIST_HERIDS = listOf("146067", "166579", "143749", "155747")
 
     override suspend fun run() {
         verifyBehandlereForKontorJob()
