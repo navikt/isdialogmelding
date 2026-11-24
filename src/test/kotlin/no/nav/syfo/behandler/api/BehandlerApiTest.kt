@@ -296,7 +296,7 @@ class BehandlerApiTest {
             }
 
             @Test
-            fun `search should exclude tjenester`() {
+            fun `search should include tjenester`() {
                 testApplication {
                     val client = setupApiAndClient()
                     client.get(url) {
@@ -315,7 +315,7 @@ class BehandlerApiTest {
                     }
                     assertEquals(HttpStatusCode.OK, response.status)
                     val behandlerList = response.body<List<BehandlerDTO>>()
-                    assertEquals(0, behandlerList.size)
+                    assertEquals(1, behandlerList.size)
                 }
             }
 
