@@ -2,6 +2,7 @@ package no.nav.syfo.dialogmelding.converter
 
 import no.kith.xmlstds.msghead._2006_05_24.ObjectFactory
 import no.kith.xmlstds.msghead._2006_05_24.XMLSender
+import no.nav.syfo.util.KODEVERK_FOR_ENHET_ID
 
 fun createSender(): XMLSender {
     val factory = ObjectFactory()
@@ -15,7 +16,7 @@ fun createSender(): XMLSender {
                         .withTypeId(
                             factory.createXMLCV()
                                 .withDN("Organisasjonsnummeret i Enhetsregisteret")
-                                .withS("2.16.578.1.12.4.1.1.9051")
+                                .withS(KODEVERK_FOR_ENHET_ID)
                                 .withV("ENH")
                         )
                 )
@@ -25,7 +26,7 @@ fun createSender(): XMLSender {
                         .withTypeId(
                             factory.createXMLCV()
                                 .withDN("Identifikator fra Helsetjenesteenhetsregisteret (HER-id)")
-                                .withS("2.16.578.1.12.4.1.1.9051")
+                                .withS(KODEVERK_FOR_ENHET_ID)
                                 .withV("HER")
                         )
                 )

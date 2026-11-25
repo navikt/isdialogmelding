@@ -7,6 +7,9 @@ import no.kith.xmlstds.msghead._2006_05_24.XMLReceiver
 import no.nav.syfo.behandler.domain.isTjeneste
 import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingToBehandlerBestilling
 import no.nav.syfo.dialogmelding.bestilling.domain.DialogmeldingType
+import no.nav.syfo.util.KODEVERK_FOR_ENHET_ID
+import no.nav.syfo.util.KODEVERK_FOR_HELSEPERSONELL_TYPE
+import no.nav.syfo.util.KODEVERK_FOR_PERSON_ID
 import no.nav.syfo.util.createXMLIdentForPersonident
 
 fun createReceiver(
@@ -34,7 +37,7 @@ private fun createKontorOrganisation(
                 .withTypeId(
                     factory.createXMLCV()
                         .withDN("Identifikator fra Helsetjenesteenhetsregisteret (HER-id)")
-                        .withS("2.16.578.1.12.4.1.1.9051")
+                        .withS(KODEVERK_FOR_ENHET_ID)
                         .withV("HER")
                 )
         )
@@ -45,7 +48,7 @@ private fun createKontorOrganisation(
                     .withTypeId(
                         factory.createXMLCV()
                             .withDN("Organisasjonsnummeret i Enhetsregisteret")
-                            .withS("2.16.578.1.12.4.1.1.9051")
+                            .withS(KODEVERK_FOR_ENHET_ID)
                             .withV("ENH")
                     )
             )
@@ -77,7 +80,7 @@ private fun createTjenesteOrganisation(
                     .withTypeId(
                         factory.createXMLCV()
                             .withDN("Identifikator fra Helsetjenesteenhetsregisteret (HER-id)")
-                            .withS("2.16.578.1.12.4.1.1.9051")
+                            .withS(KODEVERK_FOR_ENHET_ID)
                             .withV("HER")
                     )
             )
@@ -93,7 +96,7 @@ private fun createHealthcareProfessional(
             withRoleToPatient(
                 factory.createXMLCV()
                     .withV("6")
-                    .withS("2.16.578.1.12.4.1.1.9034")
+                    .withS(KODEVERK_FOR_HELSEPERSONELL_TYPE)
                     .withDN("Fastlege")
             )
         }
@@ -112,7 +115,7 @@ private fun createHealthcareProfessional(
                     .withTypeId(
                         factory.createXMLCV()
                             .withDN("HPR-nummer")
-                            .withS("2.16.578.1.12.4.1.1.8116")
+                            .withS(KODEVERK_FOR_PERSON_ID)
                             .withV("HPR")
                     )
             )
@@ -124,7 +127,7 @@ private fun createHealthcareProfessional(
                     .withTypeId(
                         factory.createXMLCV()
                             .withDN("Identifikator fra Helsetjenesteenhetsregisteret")
-                            .withS("2.16.578.1.12.4.1.1.8116")
+                            .withS(KODEVERK_FOR_PERSON_ID)
                             .withV("HER")
                     )
             )

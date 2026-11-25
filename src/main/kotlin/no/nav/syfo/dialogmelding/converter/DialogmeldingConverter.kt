@@ -3,6 +3,7 @@ package no.nav.syfo.dialogmelding.converter
 import no.kith.xmlstds.dialog._2006_10_11.ObjectFactory
 import no.kith.xmlstds.dialog._2006_10_11.XMLDialogmelding
 import no.nav.syfo.dialogmelding.bestilling.domain.*
+import no.nav.syfo.util.KODEVERK_FOR_ROLLE_NOTAT
 import java.util.*
 
 fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogmelding {
@@ -50,7 +51,7 @@ fun createDialogmelding(melding: DialogmeldingToBehandlerBestilling): XMLDialogm
                         factory.createXMLRollerRelatertNotat()
                             .withRolleNotat(
                                 fellesFactory.createXMLCV()
-                                    .withS("2.16.578.1.12.4.1.1.9057")
+                                    .withS(KODEVERK_FOR_ROLLE_NOTAT)
                                     .withV("1")
                             )
                             .withPerson(factory.createXMLPerson())
