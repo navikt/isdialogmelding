@@ -87,6 +87,7 @@ class BehandlerApiTest {
                     assertEquals(fastlegeResponse.helsepersonellregisterId, behandlerDTO.hprId)
                     assertTrue(behandlerDTO.kontorDialogmeldingmeldingEnabled)
                     assertFalse(behandlerDTO.invalidated)
+                    assertNull(behandlerDTO.kontorSystem)
                 }
             }
 
@@ -599,6 +600,24 @@ class BehandlerApiTest {
                     val behandlerDTO = response.body<BehandlerDTO>()
                     assertEquals(behandlerRef.toString(), behandlerDTO.behandlerRef)
                     assertEquals("Dana", behandlerDTO.fornavn)
+                }
+            }
+
+            @Test
+            fun `should return kontor system for behandlerRef`() {
+                val system = "EPJ-systemet"
+                database.createBehandlerForArbeidstaker(
+                    behandler = behandler.copy(kontor = behandler.kontor.copy(system = system)),
+                    arbeidstakerPersonident = ARBEIDSTAKER_FNR,
+                )
+                testApplication {
+                    val client = setupApiAndClient()
+                    val response = client.get(url) {
+                        bearerAuth(validToken)
+                    }
+
+                    val behandlerDTO = response.body<BehandlerDTO>()
+                    assertEquals(system, behandlerDTO.kontorSystem)
                 }
             }
         }

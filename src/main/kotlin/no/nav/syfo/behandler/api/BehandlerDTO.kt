@@ -14,6 +14,7 @@ data class BehandlerDTO(
     val kontor: String?,
     val kontorHerId: Int?,
     val kontorDialogmeldingmeldingEnabled: Boolean,
+    val kontorSystem: String?,
     val adresse: String?,
     val postnummer: String?,
     val poststed: String?,
